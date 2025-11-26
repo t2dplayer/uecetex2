@@ -1196,7 +1196,7 @@
 %}
 
 \lstset{
-	commentstyle=\color{Green}\ttfamily,
+	commentstyle=\color{green}\ttfamily,
 	basicstyle=\ttfamily,
 	xleftmargin=15pt,
 	stepnumber=1, 
@@ -1212,7 +1212,20 @@
 	breaklines=true,
 	frame=single,
 	belowskip=\onelineskip,
-	belowcaptionskip=\onelineskip
+	belowcaptionskip=\onelineskip,
+	literate=
+      {á}{{\'a}}1 {ã}{{\~a}}1 {â}{{\^a}}1 {à}{{\`a}}1
+      {é}{{\'e}}1 {ê}{{\^e}}1
+      {í}{{\'\i}}1
+      {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+      {ú}{{\'u}}1
+      {ç}{{\c c}}1
+      {Á}{{\'A}}1 {Ã}{{\~A}}1
+      {É}{{\'E}}1
+      {Í}{{\'I}}1
+      {Ó}{{\'O}}1 {Õ}{{\~O}}1
+      {Ú}{{\'U}}1
+      {Ç}{{\c C}}1
 }
 
 %\newfloat[chapter]{codigofonte}{locf}{\lstlistingname}
