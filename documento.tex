@@ -22,6 +22,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \input{lib/preambulo}
+\tikzset{
+  vec/box/.style={draw, rounded corners=2pt, thick, align=center, inner sep=4pt},
+  vec/small/.style={draw, rounded corners=2pt, thick, align=center, inner sep=2pt, font=\small},
+  vec/arrow/.style={-Latex, thick},
+  vec/darrow/.style={<->, Latex-Latex, thick},
+  vec/dot/.style={circle, fill, inner sep=1.3pt},
+  vec/title/.style={font=\small\bfseries, align=center},
+  vec/note/.style={font=\footnotesize, align=left},
+  vec/cloud/.style={draw, thick, cloud, cloud puffs=12, cloud puff arc=110, aspect=2, align=center, inner sep=4pt},
+  vec/tower/.style={draw, thick, isosceles triangle, isosceles triangle apex angle=25, shape border rotate=90, minimum height=10mm, minimum width=10mm, align=center},
+  vec/server/.style={draw, thick, rounded corners=2pt, minimum width=18mm, minimum height=10mm, align=center},
+}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%          Configuracoes do ueceTeX2              %%
@@ -31,13 +45,13 @@
 
 %\trabalhoacademico{tccgraduacao}
 %\trabalhoacademico{tccespecializacao}
-\trabalhoacademico{dissertacao}
-%\trabalhoacademico{tese}
+% \trabalhoacademico{dissertacao}
+\trabalhoacademico{tese}
 
 % Define se o trabalho eh uma qualificacao
 % Coloque 'nao' para versao final do trabalho
 
-\ehqualificacao{nao}
+\ehqualificacao{sim}
 
 % Remove as bordas vermelhas e verdes do PDF gerado
 % Coloque 'sim' pare remover
@@ -82,18 +96,18 @@
 %%               Informação para Tese              %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\programadoutorado{Programa de Pós-Graduação em Saúde Coletiva}
-\nomedodoutorado{Doutorado em Saúde Coletiva}
-\doutorem{Saúde Coletiva}
-\areadeconcentracaodoutorado{Saúde Coletiva}
+\programadoutorado{Programa de Pós-Graduação em Ciência da Computação}
+\nomedodoutorado{Doutorado em Ciência da Computação}
+\doutorem{Ciência da Computação}
+\areadeconcentracaodoutorado{Redes de Computadores}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Informação relacionadas ao trabalho     %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\autor{Nome Sobrenome}
-\titulo{Título do Trabalho}
-\data{2017}
+\autor{Antônio Sérgio de Sousa Vieira}
+\titulo{Modelo de Decisão Baseado em Lógica Fuzzy e Aprendizado por Reforço Profundo para o Offloading de Tarefas em Redes Veiculares 5G}
+\data{2026}
 \local{Fortaleza -- Ceará}
 
 % Exemplo: \dataaprovacao{01 de Janeiro de 2012}
@@ -103,7 +117,7 @@
 %%     Informação sobre o Orientador       %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\orientador{Nome do seu Orientador}
+\orientador{Dr. Joaquim Celestino Júnior}
 \orientadories{Universidade Estadual do Ceará – UECE}
 \orientadorcentro{Centro de Ciências e Tecnologia - CCT}
 \orientadorfeminino{nao} % Coloque 'sim' se for do sexo feminino
@@ -153,31 +167,33 @@
 	% Elementos pré-textuais
 	\imprimircapa
 	\imprimirfolhaderosto{}
-	\imprimirfichacatalografica{elementos-pre-textuais/ficha-catalografica}
-	\imprimirerrata{elementos-pre-textuais/errata}
+	% \imprimirfichacatalografica{elementos-pre-textuais/ficha-catalografica}
+	% \imprimirerrata{elementos-pre-textuais/errata}
 	\imprimirfolhadeaprovacao
-	\imprimirdedicatoria{elementos-pre-textuais/dedicatoria}
-	\imprimiragradecimentos{elementos-pre-textuais/agradecimentos}
-	\imprimirepigrafe{elementos-pre-textuais/epigrafe}
+	% \imprimirdedicatoria{elementos-pre-textuais/dedicatoria}
+	% \imprimiragradecimentos{elementos-pre-textuais/agradecimentos}
+	% \imprimirepigrafe{elementos-pre-textuais/epigrafe}
 	\imprimirresumo{elementos-pre-textuais/resumo}
 	\imprimirabstract{elementos-pre-textuais/abstract}
 	\imprimirlistadeilustracoes
 	\imprimirlistadetabelas
-	\imprimirlistadequadros
+	% \imprimirlistadequadros
 	\imprimirlistadealgoritmos
 	\imprimirlistadecodigosfonte
 	\imprimirlistadeabreviaturasesiglas	
-	\imprimirlistadesimbolos{elementos-pre-textuais/lista-de-simbolos}   
+	% \imprimirlistadesimbolos{elementos-pre-textuais/lista-de-simbolos}   
 	\imprimirsumario
 	
 	%Elementos textuais
 	\textual
 	\input{elementos-textuais/introducao}
 	\input{elementos-textuais/fundamentacao-teorica}
-	\input{elementos-textuais/trabalhos-relacionados}
+	% \input{elementos-textuais/trabalhos-relacionados}
+	% \input{elementos-textuais/revisao-literatura}
 	\input{elementos-textuais/metodologia}
-	\input{elementos-textuais/resultados}
-	\input{elementos-textuais/conclusao}
+	% \input{elementos-textuais/modelo-sistema}
+	% \input{elementos-textuais/resultados}
+	% \input{elementos-textuais/conclusao}
 	
 	%Elementos pós-textuais	
 	\bibliography{elementos-pos-textuais/referencias}

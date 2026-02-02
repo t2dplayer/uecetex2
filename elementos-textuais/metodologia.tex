@@ -1,330 +1,601 @@
 \chapter{Metodologia}
 \label{chap:metodologia}
 
-Sed aliquam tortor non laoreet semper. Nunc aliquam dapibus urna, eu tincidunt ex viverra et. Mauris dapibus sagittis consectetur. Integer leo ligula, aliquam et consectetur non, fermentum at mi. Aliquam sodales fringilla rhoncus. Vivamus quis tortor magna. Donec semper odio libero, nec scelerisque massa dignissim eget. Morbi lectus metus, semper sed lacinia sit amet, porta nec turpis. Duis pretium mi eget consequat sagittis. Praesent porttitor elementum nisl, et molestie quam. Suspendisse vehicula vitae metus eu rhoncus. Nam vitae est augue. Fusce nec diam non nunc consequat aliquam id vitae lectus. In malesuada neque nec justo sagittis, in iaculis neque feugiat. Fusce eu risus purus.
+A metodologia deste trabalho é fundamentada na simulação, utilizando o simulador de redes NS-3, estendido com os módulos 5G-LENA e C-V2X para modelar com fidelidade o ambiente veicular 5G.
 
-O autor \cite{lamport1986latex} e \cite{Maia2011} e \cite{ibge23} 
+\section{Modelagem do Sistema e Formulação do Problema}
+\label{sec:modelagem_sistema}
 
-Proin sodales tortor a odio euismod, tristique pellentesque felis porttitor. Donec suscipit non est ac auctor. Suspendisse in sollicitudin erat. Quisque at tempus libero. Morbi efficitur enim tellus, vel varius libero pharetra in. Phasellus et ultricies nibh. Sed quis sagittis sem. Nam a arcu id mi ultricies congue. Duis nec mauris ac ex ultricies vulputate. Vestibulum et tristique massa. In convallis quam sed tristique venenatis. Nullam dapibus odio quis arcu dignissim pellentesque. Vestibulum laoreet nisl quis metus mattis, quis tincidunt tellus ornare. Proin ultricies nulla ac dolor lacinia, ut gravida felis dapibus. Maecenas sed aliquet ex. Proin sodales lacus maximus quam pellentesque, non efficitur velit posuere.
+1. Entidades (unidade processadora, tarefa)
+    1.1 Unidade Processadora (OBU e VEC)
+        1.1.1 Fila de Processamento (tamanho maximo diferente durante a criaçao da unidade processadora)
+        1.1.2 Fila de Transmissão (tamanho maximo diferente durante a criaçao da unidade processadora)
+        1.1.3 Frequencia do Clock (GHZ)
+            1.1.3.1 Modulo para criar perfil heterogeneo de CPU (maquinas lentas, medias, rapidas)
+        1.1.4 Capacidade de Energia (Joules)
+            1.1.4.1 Modulo para criar perfil heterogeneo de bateria
+        1.1.5 Coeficiente de Eficiência Energética
+            1.1.5.1 Modulo para criar perfil heterogeneo de consumo energetico
+        1.1.6 Modelagem de Ambientes Não-Estacionários
+            1.1.6.1 Drift nos Atributos da Unidade Processadora durante a simulação
+    1.2 Tarefa
+        1.2.1 Tamanho dos Dados de Entrada (tamanho maximo e minimo dependente do perfil de aplicação - bytes)
+        1.2.2 Tamanho dos Dados de Saída (tamanho maximo e minimo dependente do perfil de aplicação - bytes)
+        1.2.3 Atraso Máximo Tolerável (tamanho maximo e minimo dependente do perfil de aplicação - milisegundos)
+        1.2.4 Densidade de Carga Computacional (tamanho maximo e minimo dependente do perfil de aplicação - ciclos de CPU por byte)
+        1.2.5 Densidade de Carga Energética (tamanho maximo e minimo dependente do perfil de aplicação - joules por ciclo de CPU)
+    1.3 Considerações sobre Geração de Tarefas
+        1.3.1 Distribuição Estatística dos Atributos da Tarefa para diferentes perfis de aplicação
+            1.3.1.1 Muitos dados e pouca computação
+            1.3.1.2 Poucos dados e muitas computação
+            1.3.1.3 Muitos dados e muita computação
+            1.3.1.4 Poucos dados e pouca computação
+            1.3.1.5 Media carga de dados e computação
+        1.3.2 Modelagem de Ambientes Não-Estacionários
+            1.3.2.1 Drift nos Atributos da Tarefa durante geração
+    1.3 Considerações sobre Simulador de Eventos Discretos
+        1.3.1 Adicionar na fila de processamento, remover da fila de processamento
+        1.3.2 Adicionar na fila de transmissão, remover da fila de transmissão
+        1.3.3 Iniciar processamento, finalizar processamento
+        1.3.4 Iniciar transmissão, finalizar transmissão
+    1.4 Incertezas na Modelagem
+        1.4.1 Incerteza no tempo de processamento
+        1.4.2 Incerteza no tempo de transmissão
+        1.4.3 Incerteza no consumo energético
+    1.4 Protocolo de Offloading, na camada de aplicação
+        1.4.1 Pedido de Offload
+        1.4.2 Resposta ao Pedido (Aceite/Rejeição)
+            1.4.2.1 Rejeição por fila cheia
+            1.4.2.2 Rejeição por energia insuficiente
+            1.4.2.3 Rejeição por não cumprimento do deadline
+        1.4.3 Envio dos Dados da Tarefa
+        1.4.4 Retorno do Resultado
+        1.4.5 Confirmação de Recebimento do Resultado
+        1.4.6 Timeouts e Retransmissões
+        1.4.7 Medição de Métricas de Desempenho (latência, consumo energético, taxa de falhas, tamanho média das filas)
+        1.4.8 Considerações sobre Simulador de Eventos Discretos
+            1.4.8.1 Enviar pedido de offload
+            1.4.8.2 Aguardar resposta
+    1.5 Protocolo de Descoberta de Vizinhança, na camada de aplicação
+        1.5.1 Emissão de Beacons Periódicos (via 5G NR e V2X Sidelink)
+            1.5.1.1 Conteúdo do Beacon (Device Specs, Estado Atual, velocidade, posição GPS, é VEC?, é OBU?, etc)
+        1.5.2 Tabela de Vizinhos (Neighbor Table)
+            1.5.2.1 Cálculo do Tempo de Vida Estimado do Enlace
+            1.5.2.3 Atualização Periódica da Tabela de Vizinhos
+            1.5.2.4 SNR, RSSI, CQI dos Vizinhos
+2. Canal de comunicação
+    2.1 Modelo de Canal 5G NR
+        2.1.1 Taxa de Transmissão (Shannon-Hartley)
+        2.1.2 Modelagem de Interferência
+        2.1.3 Mobilidade Veicular e Variação do Canal
+    2.2 Modelo de Canal V2X Sidelink (PC5)
+        2.2.1 Taxa de Transmissão (Shannon-Hartley)
+        2.2.2 Modelagem de Interferência
+        2.2.3 Mobilidade Veicular e Variação do Canal
+    2.3 Modelagem de Ambientes Não-Estacionários
+        2.3.1 Drift nos Atributos do Canal durante a simulação
+3. Task Offloading
+    3.1 Modos de Execução
+        3.1.1 Processamento Local
+        3.1.2 Offloading V2I (para RSU via 5G NR)
+        3.1.3 Offloading V2V (para veículo vizinho via Sidelink)
+    3.2
+4. Coleta de métricas de desempenho do task offloading
+    4.1 Métricas Globais
+        4.1.1 Atraso Total do Sistema
+        4.1.2 Consumo Energético Total do Sistema
+        4.1.3 Índice de Justiça de Jain
+        4.1.4 Taxa de Sucesso no Offloading
+        4.1.5 Total de Tarefas Processadas Localmente
+        4.1.6 Total de Tarefas Offloadadas via V2I
+        4.1.7 Total de Tarefas Offloadadas via V2V
+    4.2 Métricas por Política de Offloading
+        4.2.1 Atraso Médio por Política
+        4.2.2 Consumo Energético Médio por Política
+        4.2.3 Taxa de Sucesso no Offloading por Política
+        4.3.4 Tamanho Médio das Filas por Política
+        4.3.5 Índice de justiça de Jain por Política
+    4.3 Análise de Sensibilidade
+        4.3.1 Impacto dos Pesos na Função Objetivo
+        4.3.2 Trade-off entre Latência, Consumo Energético e Justiça
+    4.4 Função Objetivo Global
+        4.4.1 Minimização do Atraso Total considerando incerteza
+        4.4.2 Minimização do Consumo Energético Total considerando incerteza
+        4.4.3 Maximização do Índice de Justiça de Jain
+5. Integração com o SUMO
+    5.1 Geração de Cenários Veiculares Realistas
+        5.1.1 Cenário urbano com tráfego intenso, trafego moderado, tráfego leve
+    5.2 Execução da simulação utilizando o SUMO para mobilidade veicular
+6. Políticas de Decisão de Offloading
+    6.1 Políticas Heurísticas
+        6.1.1 Processamento Local
+        6.1.2 Offloading Aleatório
+        6.1.3 Offloading Ganancioso
+            6.1.3.1 Baseado na distancia ao VEC
+            6.1.3.2 Baseado na qualidade do canal
+            6.1.3.3 Baseado na latência
+            6.1.3.4 Baseado no consumo energético
+            6.1.3.5 Baseado na frequencia do clock do VEC
+            6.1.3.6 Baseado no tempo de vida do enlaces
+            6.1.3.7 Baseado na função objetivo
+6. Criação de testes unitários para validação dos módulos desenvolvidos
+    6.1 Testes para o módulo de geração de tarefas
+    6.2 Testes para o módulo de modelagem do canal
+    6.3 Testes para o módulo de offloading
+    6.4 Testes para o protocolo de descoberta de vizinhança
+    6.5 Testes para coleta de métricas de desempenho do task offloading
+7. Usar docker para facilitar a reprodução dos experimentos
+8. Usar script em bash e python para automatizar a execução dos experimentos e análise dos resultados
+9. Criar logs para facilitar o rastreamento da execuçao offloading (fim a fim)
+10. Documentar o código desenvolvido utilizando Doxygen
+11. Tratar exceções e erros durante a simulação para garantir robustez do sistema
+    11.1 Não confiar 100 porcento nas entradas das funções, tratar todas as exceções possíveis
 
-\begin{table}[ht!]
-	\Caption{\label{tabela-ibge} Um Exemplo de tabela alinhada que pode ser longa ou curta, conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE.}%
-	\IBGEtab{}{%
-		\begin{tabular}{ccc}
-			\toprule
-			Nome & Nascimento & Documento \\
-			\midrule \midrule
-			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
-			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
-			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
-			\bottomrule
-		\end{tabular}%
-	}{%
-	\Fonte{Produzido pelos autores}%
-	\Nota{Esta éuma nota, que diz que os dados são baseados na
-		regressão linear.}%
-	\Nota[Anotações]{Uma anotação adicional, seguida de várias outras.}%
-}
-\end{table}
+
+
+% Para validar a proposta de offloading em um cenário veicular heterogêneo operando sob cobertura 5G NR e comunicação V2X Sidelink, é fundamental estabelecer formalmente as entidades, as restrições físicas e os objetivos de otimização. Esta seção descreve o modelo matemático que fundamenta a arquitetura proposta.
+
+% \subsection{Entidades e Heterogeneidade}
+
+% Considere um cenário de rede veicular composto por um conjunto de veículos $\mathcal{V} = \{1, 2, \dots, V\}$ e um conjunto de RSUs (\textit{Road Side Units}) equipadas com servidores MEC, denotado por $\mathcal{R} = \{1, 2, \dots, R\}$.
+
+% Cada veículo $i \in \mathcal{V}$ possui uma tarefa computacional atômica gerada no instante $t$, definida pela tupla $k_i = (D_i, C_i, T_i^{max})$, onde:
+% \begin{itemize}
+%     \item $D_i$: Tamanho dos dados de entrada da tarefa (em bits);
+%     \item $C_i$: Custo computacional total (em ciclos de CPU);
+%     \item $T_i^{max}$: Atraso máximo tolerado pela aplicação (latência crítica).
+% \end{itemize}
+
+% A heterogeneidade das OBUs (\textit{On-Board Units}) é modelada explicitamente através de parâmetros locais distintos para cada veículo $i$:
+% \begin{equation}
+%     \text{OBU}_i = \{ f_i^{loc}, P_i^{loc}, B_i^{rem} \}
+% \end{equation}
+% \noindent onde $f_i^{loc}$ é a frequência de clock da CPU local (ciclos/s), $P_i^{loc}$ é a potência de consumo computacional e $B_i^{rem}$ é a energia residual da bateria.
+
+% \subsection{Modelos de Computação e Comunicação}
+
+% O sistema permite três modos de execução: processamento local, offloading V2I (para RSU via 5G) e offloading V2V (para veículo vizinho via Sidelink).
+
+% \subsubsection{Modelo de Computação Local}
+% Caso o veículo decida processar a tarefa internamente, o tempo de execução $T_{i}^{loc}$ e o consumo energético $E_{i}^{loc}$ são dados por:
+% \begin{equation}
+%     T_{i}^{loc} = \frac{C_i}{f_i^{loc}}, \quad E_{i}^{loc} = \kappa (f_i^{loc})^2 C_i
+% \end{equation}
+% \noindent onde $\kappa$ é o coeficiente de eficiência energética dependente da arquitetura do chip.
+
+% \subsubsection{Modelo de Comunicação (5G NR e Sidelink)}
+% A taxa de transmissão $R_{i,j}$ entre o veículo $i$ e um nó de destino $j$ (seja $j \in \mathcal{R}$ ou $j \in \mathcal{V}$) é modelada pela lei de Shannon-Hartley para canais com ruído gaussiano:
+% \begin{equation}
+%     R_{i,j} = B \log_2 \left( 1 + \frac{P_i^{tx} |h_{i,j}|^2}{N_0 + I_{i,j}} \right)
+% \end{equation}
+% \noindent onde $B$ é a largura de banda do canal, $P_i^{tx}$ é a potência de transmissão, $h_{i,j}$ representa o ganho do canal (incluindo \textit{path loss} e desvanecimento) e $N_0$ é a densidade espectral de ruído. O termo $I_{i,j}$ representa a interferência, que é particularmente crítica nas comunicações V2V via Sidelink (PC5) devido ao reuso de recursos espaciais.
+
+% \subsubsection{Modelo de Offloading}
+% Se a tarefa é transferida para um nó remoto $j$, o tempo total $T_{i,j}^{off}$ compreende o tempo de transmissão e o processamento remoto:
+% \begin{equation}
+%     T_{i,j}^{off} = \frac{D_i}{R_{i,j}} + \frac{C_i}{f_j^{rem}}
+% \end{equation}
+% O consumo energético do veículo $i$ durante o offloading considera a energia de transmissão de rádio:
+% \begin{equation}
+%     E_{i,j}^{off} = P_i^{tx} \left( \frac{D_i}{R_{i,j}} \right) + E_{tail}
+% \end{equation}
+
+% \subsection{Formalização dos Objetivos e Otimização}
+
+% O problema é modelado como uma otimização multi-objetivo visando minimizar o atraso e o consumo energético, enquanto maximiza a justiça (\textit{fairness}) entre os usuários. Seja $x_{i,j}$ uma variável binária de decisão, onde $x_{i,j}=1$ se o veículo $i$ processa no nó $j$ (sendo $j=0$ o processamento local).
+
+% \subsubsection{Métricas Globais}
+% O atraso total ($T_{sys}$) e a energia total ($E_{sys}$) do sistema são definidos como:
+% \begin{equation}
+%     T_{sys} = \sum_{i \in \mathcal{V}} \sum_{j \in \{0\} \cup \mathcal{V} \cup \mathcal{R}} x_{i,j} T_{i,j}
+% \end{equation}
+% \begin{equation}
+%     E_{sys} = \sum_{i \in \mathcal{V}} \sum_{j \in \{0\} \cup \mathcal{V} \cup \mathcal{R}} x_{i,j} E_{i,j}
+% \end{equation}
+
+% \subsubsection{Índice de Justiça de Jain}
+% Para garantir que veículos com hardware inferior não sejam penalizados desproporcionalmente, utilizamos o Índice de Jain ($J$). Definindo a utilidade do veículo como o inverso do seu atraso percebido ($U_i = 1/T_i$), o índice é dado por:
+% \begin{equation}
+%     J = \frac{\left( \sum_{i=1}^{V} U_i \right)^2}{V \cdot \sum_{i=1}^{V} (U_i)^2}
+% \end{equation}
+% O valor de $J$ varia entre $1/V$ (pior caso) e $1$ (justiça absoluta).
+
+% \subsubsection{Função de Custo Global}
+% O problema de otimização busca minimizar a função de custo ponderada $\mathcal{F}$:
+% \begin{equation} \label{eq:objective_function}
+%     \min_{\mathbf{X}} \mathcal{F} = \alpha \left( \frac{T_{sys}}{T_{max}} \right) + \beta \left( \frac{E_{sys}}{E_{max}} \right) - \gamma J
+% \end{equation}
+% Sujeito a:
+% \begin{enumerate}
+%     \item $\sum_{j} x_{i,j} = 1, \forall i \in \mathcal{V}$ (Atomicidade da tarefa);
+%     \item $T_i \leq T_i^{max}$ (Restrição de latência);
+%     \item Restrições de capacidade computacional dos nós servidores.
+% \end{enumerate}
+
+% \subsection{Formulação como Processo de Decisão de Markov (MDP)}
+
+% Dada a natureza estocástica do canal sem fio e a mobilidade veicular, o problema de otimização estático é reformulado como um Processo de Decisão de Markov (MDP), definido pela tupla $\mathcal{M} = <\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma>$.
+
+% \begin{itemize}
+%     \item \textbf{Espaço de Estados ($\mathcal{S}$):} O estado $s_t$ no instante $t$ captura a visão global do ambiente:
+%     \begin{equation}
+%         s_t = \{ \mathbf{Q}_t, \mathbf{H}_t, \mathbf{B}_t \}
+%     \end{equation}
+%     onde $\mathbf{Q}_t$ representa as filas de tarefas, $\mathbf{H}_t$ a matriz de estado do canal (CSI) para links V2I e V2V, e $\mathbf{B}_t$ o status de bateria/recursos das OBUs.
+
+%     \item \textbf{Espaço de Ações ($\mathcal{A}$):} O vetor de ações $a_t = [a_{1,t}, \dots, a_{V,t}]$ define o destino de offloading para cada veículo, onde $a_{i,t} \in \{ \text{Local}, \text{RSU}, \text{Vizinhos} \}$.
+
+%     \item \textbf{Engenharia da Função de Recompensa ($\mathcal{R}$):} A recompensa imediata $r_t$ é projetada para alinhar o aprendizado do agente com a função objetivo da Equação \ref{eq:objective_function}:
+%     \begin{equation}
+%         r_t(s_t, a_t) = - \left[ \omega_1 \bar{T}_{sys}(t) + \omega_2 \bar{E}_{sys}(t) \right] + \omega_3 \Phi(J_t)
+%     \end{equation}
+%     Aqui, a maximização da recompensa acumulada equivale à minimização do custo do sistema e maximização da justiça.
+% \end{itemize}
+
+% O objetivo do agente de Aprendizado por Reforço é encontrar uma política $\pi^*$ que maximize a equação de Bellman para o valor Q esperado:
+% \begin{equation}
+%     Q^\pi(s, a) = \mathbb{E} \left[ \sum_{k=0}^{\infty} \gamma^k r_{t+k} \mid s_t = s, a_t = a \right]
+% \end{equation}
+
+% \subsection{Metodologia de Verificação Matemática}
+
+% Para validar a adequação da proposta, a verificação seguirá três etapas analíticas e experimentais:
+
+% \begin{enumerate}
+%     \item \textbf{Análise de Convergência:} Verificação da estabilidade da curva de recompensa média acumulada durante o treinamento do agente RL, garantindo que o sistema converge para uma política estável.
+%     \item \textbf{Comparação com Baselines:} O desempenho será confrontado com algoritmos determinísticos clássicos:
+%     \begin{itemize}
+%         \item \textit{Full Local:} Processamento integral na OBU.
+%         \item \textit{Greedy Offloading:} Seleção gananciosa baseada apenas na latência imediata, ignorando custos energéticos e justiça.
+%         \item \textit{Random:} Seleção aleatória (limite inferior de desempenho).
+%     \end{itemize}
+%     \item \textbf{Análise de Sensibilidade (Pareto):} Avaliação do impacto dos pesos $\alpha, \beta, \gamma$ no comportamento do sistema, demonstrando a capacidade da solução em transitar entre modos de economia de energia e modos de baixa latência mantendo o índice $J$ próximo de 1.
+% \end{enumerate}
+
+
+% \section{Ambiente de Simulação e Módulo de Offloading}
+% Para possibilitar os experimentos, foi desenvolvido um módulo de \textit{task offloading} (`toff`) para o NS-3. Este módulo introduz a aplicação \texttt{TaskOffloadingApp}, que é instalada em todos os nós veiculares (UEs) e de borda (RSUs/VECs).
+
+% O módulo gerencia o ciclo de vida completo do descarregamento de tarefas e é composto por três componentes principais:
+% \begin{itemize}
+%     \item \textbf{Descoberta de Vizinhança:} A aplicação emite periodicamente pacotes de \textit{beacon} (via 5G NR e Sidelink V2X) que contêm o estado atual do nó, incluindo suas especificações de dispositivo (\texttt{DeviceSpecs}: capacidade de CPU, nível de energia, tempo de fila). Os nós receptores utilizam essas informações para manter uma tabela de vizinhos (\texttt{NeighborTable}), que também calcula o tempo de vida estimado do enlace.
+%     \item \textbf{Geração de Tarefas:} O \texttt{TaskGenerator} é responsável por criar novas tarefas (\texttt{Task}) em cada UE, com base em distribuições estocásticas para definir seus atributos: tamanho de entrada (bytes), tamanho de saída (bytes), ciclos de processamento (CPU cycles) e \textit{deadline} (ms). Este componente é capaz de simular ambientes não-estacionários, aplicando um "drift" aos parâmetros das tarefas ao longo do tempo, o que é crucial para validar a robustez do modelo Fuzzy-DRL.
+%     \item \textbf{Protocolo de Offloading:} Um protocolo de comunicação baseado em UDP foi definido para gerenciar a negociação. O fluxo consiste em \texttt{TASK\_REQUEST} (pedido de offload), \texttt{TASK\_RESPONSE} (aceite ou rejeição, ex: \texttt{REJECTED\_QUEUE\_FULL}), \texttt{TASK\_DATA} (envio dos dados da tarefa), \texttt{TASK\_RESULT} (retorno do resultado) e \texttt{TASK\_ACK} (confirmação).
+% \end{itemize}
+
+% \section{Integração do Modelo Fuzzy-DRL}
+% O módulo \texttt{toff} foi projetado de forma extensível, utilizando uma classe base abstrata chamada \texttt{OffloadingStrategy}. Esta classe define a interface de decisão que o agente DRL deve implementar:
+% \begin{center}
+%     \texttt{virtual OffloadDecision Decide(Task, NeighborTable, DeviceSpecs);}
+% \end{center}
+% Neste contexto, o \textit{estado} do ambiente (MDP) é composto pela \texttt{Task} (requisitos) e pela \texttt{NeighborTable} (recursos disponíveis). A \textit{ação} é a estrutura \texttt{OffloadDecision} (processar localmente ou descarregar para um vizinho VEC/V2V).
+
+% O modelo híbrido proposto será implementado como uma nova estratégia (ex: \texttt{FuzzyDrlStrategy}) que herda de \texttt{OffloadingStrategy}. O módulo de Lógica Fuzzy atuará como um pré-processador de estado, analisando a \texttt{NeighborTable} para gerar indicadores linguísticos (ex: "carga da rede", "qualidade do enlace"). O agente DRL receberá esses indicadores e aprenderá a política ótima de decisão. As estratégias mais simples, como \texttt{LocalOnlyStrategy} e \texttt{RandomStrategy}, servirão como \textit{baselines} para a avaliação de desempenho.
+
+% Sed aliquam tortor non laoreet semper. Nunc aliquam dapibus urna, eu tincidunt ex viverra et. Mauris dapibus sagittis consectetur. Integer leo ligula, aliquam et consectetur non, fermentum at mi. Aliquam sodales fringilla rhoncus. Vivamus quis tortor magna. Donec semper odio libero, nec scelerisque massa dignissim eget. Morbi lectus metus, semper sed lacinia sit amet, porta nec turpis. Duis pretium mi eget consequat sagittis. Praesent porttitor elementum nisl, et molestie quam. Suspendisse vehicula vitae metus eu rhoncus. Nam vitae est augue. Fusce nec diam non nunc consequat aliquam id vitae lectus. In malesuada neque nec justo sagittis, in iaculis neque feugiat. Fusce eu risus purus.
+
+% O autor \cite{lamport1986latex} e \cite{Maia2011} e \cite{ibge23} 
+
+% Proin sodales tortor a odio euismod, tristique pellentesque felis porttitor. Donec suscipit non est ac auctor. Suspendisse in sollicitudin erat. Quisque at tempus libero. Morbi efficitur enim tellus, vel varius libero pharetra in. Phasellus et ultricies nibh. Sed quis sagittis sem. Nam a arcu id mi ultricies congue. Duis nec mauris ac ex ultricies vulputate. Vestibulum et tristique massa. In convallis quam sed tristique venenatis. Nullam dapibus odio quis arcu dignissim pellentesque. Vestibulum laoreet nisl quis metus mattis, quis tincidunt tellus ornare. Proin ultricies nulla ac dolor lacinia, ut gravida felis dapibus. Maecenas sed aliquet ex. Proin sodales lacus maximus quam pellentesque, non efficitur velit posuere.
+
+% \begin{table}[ht!]
+% 	\Caption{\label{tabela-ibge} Um Exemplo de tabela alinhada que pode ser longa ou curta, conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE. conforme padrão IBGE.}%
+% 	\IBGEtab{}{%
+% 		\begin{tabular}{ccc}
+% 			\toprule
+% 			Nome & Nascimento & Documento \\
+% 			\midrule \midrule
+% 			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
+% 			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
+% 			Maria da Silva & 11/11/1111 & 111.111.111-11 \\
+% 			\bottomrule
+% 		\end{tabular}%
+% 	}{%
+% 	\Fonte{Produzido pelos autores}%
+% 	\Nota{Esta éuma nota, que diz que os dados são baseados na
+% 		regressão linear.}%
+% 	\Nota[Anotações]{Uma anotação adicional, seguida de várias outras.}%
+% }
+% \end{table}
 
 
 
-Pellentesque at purus justo~\cite{Huetal2000}. Fusce iaculis urna sed dolor pharetra tempor. Morbi mollis tellus sit amet massa auctor, ut scelerisque odio faucibus. Nulla interdum eget nunc nec viverra. Nunc venenatis feugiat nibh, quis consequat tortor finibus vel. Nam rutrum lorem id mi laoreet fringilla. Nullam ac imperdiet nulla. Nunc auctor tincidunt metus, eu suscipit nunc pharetra at. Fusce diam est, ornare eget lobortis in, posuere non mi. Fusce sed pellentesque elit, vitae imperdiet libero. Nam gravida blandit diam vitae venenatis.
+% Pellentesque at purus justo~\cite{Huetal2000}. Fusce iaculis urna sed dolor pharetra tempor. Morbi mollis tellus sit amet massa auctor, ut scelerisque odio faucibus. Nulla interdum eget nunc nec viverra. Nunc venenatis feugiat nibh, quis consequat tortor finibus vel. Nam rutrum lorem id mi laoreet fringilla. Nullam ac imperdiet nulla. Nunc auctor tincidunt metus, eu suscipit nunc pharetra at. Fusce diam est, ornare eget lobortis in, posuere non mi. Fusce sed pellentesque elit, vitae imperdiet libero. Nam gravida blandit diam vitae venenatis.
 
-\section{Exemplo de Algoritmos e Figuras}
-\label{sec:exemplo-de-algoritmos-e-figuras}
+% \section{Exemplo de Algoritmos e Figuras}
+% \label{sec:exemplo-de-algoritmos-e-figuras}
 
-Cras scelerisque ante vel erat hendrerit, sit amet lobortis lorem suscipit. Duis varius odio fermentum, pharetra est ac, congue nibh. Donec eget ullamcorper purus. Sed nulla magna, scelerisque in dolor in, aliquet accumsan mauris. Curabitur mi nisi, posuere sit amet magna ut, auctor dapibus dui. Donec erat sem, sodales non quam sed, pharetra consectetur enim. Pellentesque malesuada fermentum ex quis euismod. Suspendisse potenti. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse nisi odio, elementum eu odio eget, egestas hendrerit ante.
+% Cras scelerisque ante vel erat hendrerit, sit amet lobortis lorem suscipit. Duis varius odio fermentum, pharetra est ac, congue nibh. Donec eget ullamcorper purus. Sed nulla magna, scelerisque in dolor in, aliquet accumsan mauris. Curabitur mi nisi, posuere sit amet magna ut, auctor dapibus dui. Donec erat sem, sodales non quam sed, pharetra consectetur enim. Pellentesque malesuada fermentum ex quis euismod. Suspendisse potenti. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse nisi odio, elementum eu odio eget, egestas hendrerit ante.
 
-\begin{algorithm}[ht!]
-	\SetSpacedAlgorithm
-	\caption{\label{exemplo-de-algoritmo}Como escrever algoritmos no \LaTeX2e}
-	\Entrada{o proprio texto}
-	\Saida{como escrever algoritmos com \LaTeX2e }
-	\Inicio{
-		inicializa\c{c}\~ao\;
-		\Repita{fim do texto}{
-			leia o atual\;
-			\Se{entendeu}{
-				vá para o próximo\;
-				próximo se torna o atual\;}
-			\Senao{volte ao início da seção\;}
-		}
-	}	
-\end{algorithm}
+% \begin{algorithm}[ht!]
+% 	\SetSpacedAlgorithm
+% 	\caption{\label{exemplo-de-algoritmo}Como escrever algoritmos no \LaTeX2e}
+% 	\Entrada{o proprio texto}
+% 	\Saida{como escrever algoritmos com \LaTeX2e }
+% 	\Inicio{
+% 		inicializa\c{c}\~ao\;
+% 		\Repita{fim do texto}{
+% 			leia o atual\;
+% 			\Se{entendeu}{
+% 				vá para o próximo\;
+% 				próximo se torna o atual\;}
+% 			\Senao{volte ao início da seção\;}
+% 		}
+% 	}	
+% \end{algorithm}
 
-Pellentesque commodo felis ac ipsum tincidunt, sit amet pharetra metus sagittis. Fusce congue, arcu ac efficitur laoreet, nisl urna consequat lorem, condimentum sollicitudin mauris velit sit amet est. Suspendisse quis eros maximus, cursus velit a, ornare sem. Vivamus vulputate eros id eros sagittis, a vestibulum diam tempor. Pellentesque arcu arcu, semper vel ex quis, sollicitudin venenatis ex. Sed luctus, sapien id egestas dictum, lorem sapien finibus quam, ut interdum eros massa at nisi. Sed ornare, justo eget ullamcorper dignissim, lacus dui fermentum erat, at feugiat elit lorem vestibulum odio. Mauris mattis ex nisl, eget volutpat nunc egestas at. Sed feugiat ut urna in pulvinar. Nulla facilisis aliquet nunc, quis commodo erat volutpat imperdiet. Phasellus eleifend mi vitae tellus eleifend pretium. Mauris faucibus erat leo, vel varius elit lobortis eget. Nam ac ipsum pulvinar, feugiat nisi vitae, egestas diam. Sed pellentesque nec nulla at venenatis. Proin id interdum mi, nec pulvinar purus. Maecenas quis nisi auctor, tincidunt enim in, varius nunc.
-%\begin{algorithm}[H]
-%	\Entrada{o proprio texto}
-%	\Saida{como escrever algoritmos com \LaTeX2e }
-%	\Inicio{
-%		inicializa\c{c}\~ao\;
-%		\Repita{fim do texto}{
-%			leia o atual\;
-%			\Se{entendeu}{
-%				vá para o próximo\;
-%				próximo se torna o atual\;}
-%			\Senao{volte ao início da seção\;}
-%		}
-%	}
-%	\caption{Exemplo de Algoritmo Versao 02}
-%\end{algorithm}
+% Pellentesque commodo felis ac ipsum tincidunt, sit amet pharetra metus sagittis. Fusce congue, arcu ac efficitur laoreet, nisl urna consequat lorem, condimentum sollicitudin mauris velit sit amet est. Suspendisse quis eros maximus, cursus velit a, ornare sem. Vivamus vulputate eros id eros sagittis, a vestibulum diam tempor. Pellentesque arcu arcu, semper vel ex quis, sollicitudin venenatis ex. Sed luctus, sapien id egestas dictum, lorem sapien finibus quam, ut interdum eros massa at nisi. Sed ornare, justo eget ullamcorper dignissim, lacus dui fermentum erat, at feugiat elit lorem vestibulum odio. Mauris mattis ex nisl, eget volutpat nunc egestas at. Sed feugiat ut urna in pulvinar. Nulla facilisis aliquet nunc, quis commodo erat volutpat imperdiet. Phasellus eleifend mi vitae tellus eleifend pretium. Mauris faucibus erat leo, vel varius elit lobortis eget. Nam ac ipsum pulvinar, feugiat nisi vitae, egestas diam. Sed pellentesque nec nulla at venenatis. Proin id interdum mi, nec pulvinar purus. Maecenas quis nisi auctor, tincidunt enim in, varius nunc.
+% %\begin{algorithm}[H]
+% %	\Entrada{o proprio texto}
+% %	\Saida{como escrever algoritmos com \LaTeX2e }
+% %	\Inicio{
+% %		inicializa\c{c}\~ao\;
+% %		\Repita{fim do texto}{
+% %			leia o atual\;
+% %			\Se{entendeu}{
+% %				vá para o próximo\;
+% %				próximo se torna o atual\;}
+% %			\Senao{volte ao início da seção\;}
+% %		}
+% %	}
+% %	\caption{Exemplo de Algoritmo Versao 02}
+% %\end{algorithm}
 
-%\begin{algorithm}
-%	\begin{algorithmic}
-%	\Entrada{o proprio texto}
-%	\Saida{como escrever algoritmos com \LaTeX2e }	
-%	\end{algorithmic}
-%\end{algorithm}
+% %\begin{algorithm}
+% %	\begin{algorithmic}
+% %	\Entrada{o proprio texto}
+% %	\Saida{como escrever algoritmos com \LaTeX2e }	
+% %	\end{algorithmic}
+% %\end{algorithm}
 
-Exemplo de alíneas com números:
+% Exemplo de alíneas com números:
 
-\begin{alineascomnumero}
-	\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
-	\item Praesent vitae nulla varius, pulvinar quam at, dapibus nisi. Aenean in commodo tellus. Mauris molestie est sed justo malesuada, quis feugiat tellus venenatis.
-	\item Praesent quis erat eleifend, lacinia turpis in, tristique tellus. Nunc dictum sed tortor nec viverra.
-	\item Mauris facilisis odio eu ornare tempor. Nunc dictum sed tortor nec viverra.
-	\item Curabitur convallis odio at eros consequat pretium.
-\end{alineascomnumero}
+% \begin{alineascomnumero}
+% 	\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% 	\item Praesent vitae nulla varius, pulvinar quam at, dapibus nisi. Aenean in commodo tellus. Mauris molestie est sed justo malesuada, quis feugiat tellus venenatis.
+% 	\item Praesent quis erat eleifend, lacinia turpis in, tristique tellus. Nunc dictum sed tortor nec viverra.
+% 	\item Mauris facilisis odio eu ornare tempor. Nunc dictum sed tortor nec viverra.
+% 	\item Curabitur convallis odio at eros consequat pretium.
+% \end{alineascomnumero}
 
-Donec id nulla porttitor, dapibus lacus a, tempus libero. Pellentesque vulputate suscipit ipsum, ac varius nunc efficitur sed. Sed mollis magna in est pellentesque scelerisque at quis libero. Vivamus id scelerisque eros. Proin eget interdum felis, ac varius orci. Duis et auctor arcu. Curabitur porttitor lobortis pulvinar. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla a luctus metus. Donec lorem diam, vulputate suscipit tincidunt vel, aliquet sed tellus. Praesent luctus justo aliquet interdum dignissim. Fusce interdum tortor vel turpis condimentum semper. Donec nunc urna, tristique sit amet vehicula non, mattis nec nisi.
+% Donec id nulla porttitor, dapibus lacus a, tempus libero. Pellentesque vulputate suscipit ipsum, ac varius nunc efficitur sed. Sed mollis magna in est pellentesque scelerisque at quis libero. Vivamus id scelerisque eros. Proin eget interdum felis, ac varius orci. Duis et auctor arcu. Curabitur porttitor lobortis pulvinar. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla a luctus metus. Donec lorem diam, vulputate suscipit tincidunt vel, aliquet sed tellus. Praesent luctus justo aliquet interdum dignissim. Fusce interdum tortor vel turpis condimentum semper. Donec nunc urna, tristique sit amet vehicula non, mattis nec nisi.
 
-\begin{table}[ht!]	
-	\centering
-	\Caption{\label{tab:internal}Internal exon scores}	
-	\IBGEtab{}{
-		\begin{tabular}{cll}
-			\toprule
-			Ranking & Exon Coverage & Splice Site Support\\
-			\midrule \midrule
-			E1 & Complete coverage by a single transcript & Both splice sites\\
-			E2 & Complete coverage by more than a single transcript & Both splice sites\\
-			E3 & Partial coverage & Both splice sites\\
-			E4 & Partial coverage & One splice site\\
-			E5 & Complete or partial coverage & No splice sites\\
-			E6 & No coverage & No splice sites\\
-			\bottomrule
-		\end{tabular}
-	}{
-	\Fonte{os autores}
-}
-\end{table}
+% \begin{table}[ht!]	
+% 	\centering
+% 	\Caption{\label{tab:internal}Internal exon scores}	
+% 	\IBGEtab{}{
+% 		\begin{tabular}{cll}
+% 			\toprule
+% 			Ranking & Exon Coverage & Splice Site Support\\
+% 			\midrule \midrule
+% 			E1 & Complete coverage by a single transcript & Both splice sites\\
+% 			E2 & Complete coverage by more than a single transcript & Both splice sites\\
+% 			E3 & Partial coverage & Both splice sites\\
+% 			E4 & Partial coverage & One splice site\\
+% 			E5 & Complete or partial coverage & No splice sites\\
+% 			E6 & No coverage & No splice sites\\
+% 			\bottomrule
+% 		\end{tabular}
+% 	}{
+% 	\Fonte{os autores}
+% }
+% \end{table}
 
-Nulla convallis justo enim, a congue justo aliquam et. Aliquam viverra sed leo nec auctor. In ac semper nisi. Etiam volutpat egestas enim id consequat. Mauris sit amet mattis arcu. Nam commodo nibh id molestie maximus. Aliquam sodales cursus ante eu maximus. In scelerisque magna sit amet felis vestibulum, quis semper est rhoncus. Fusce et rutrum magna, et placerat libero. Phasellus auctor molestie ullamcorper. Integer posuere odio nec porta rutrum. Mauris blandit mi eget commodo congue. Pellentesque metus odio, faucibus sit amet massa ultricies, placerat bibendum mi.
+% Nulla convallis justo enim, a congue justo aliquam et. Aliquam viverra sed leo nec auctor. In ac semper nisi. Etiam volutpat egestas enim id consequat. Mauris sit amet mattis arcu. Nam commodo nibh id molestie maximus. Aliquam sodales cursus ante eu maximus. In scelerisque magna sit amet felis vestibulum, quis semper est rhoncus. Fusce et rutrum magna, et placerat libero. Phasellus auctor molestie ullamcorper. Integer posuere odio nec porta rutrum. Mauris blandit mi eget commodo congue. Pellentesque metus odio, faucibus sit amet massa ultricies, placerat bibendum mi.
 
-Referenciando a \autoref{tab:internal} 
+% Referenciando a \autoref{tab:internal} 
 
-Praesent vestibulum, metus at suscipit rhoncus, metus eros elementum tortor, hendrerit finibus quam est egestas magna. Aliquam erat volutpat. Cras semper vel justo et vestibulum. Duis condimentum a sem eu posuere. Suspendisse varius, mi id interdum sollicitudin, velit metus auctor dolor, ac pellentesque ligula enim sed urna. Nulla finibus interdum ornare. Duis porttitor, nunc tempus vestibulum rutrum, diam ipsum lacinia diam, a molestie felis dui ac neque. Phasellus vestibulum vitae nunc non congue. Sed a mi gravida, posuere massa non, aliquet libero. Phasellus et diam viverra, fermentum dolor ac, ornare erat. Fusce vestibulum magna ut pretium consectetur. Sed bibendum sapien augue. Suspendisse vitae enim sollicitudin, posuere tellus et, interdum enim. Curabitur porttitor ultricies metus in pretium. Nunc quis tortor dui.
+% Praesent vestibulum, metus at suscipit rhoncus, metus eros elementum tortor, hendrerit finibus quam est egestas magna. Aliquam erat volutpat. Cras semper vel justo et vestibulum. Duis condimentum a sem eu posuere. Suspendisse varius, mi id interdum sollicitudin, velit metus auctor dolor, ac pellentesque ligula enim sed urna. Nulla finibus interdum ornare. Duis porttitor, nunc tempus vestibulum rutrum, diam ipsum lacinia diam, a molestie felis dui ac neque. Phasellus vestibulum vitae nunc non congue. Sed a mi gravida, posuere massa non, aliquet libero. Phasellus et diam viverra, fermentum dolor ac, ornare erat. Fusce vestibulum magna ut pretium consectetur. Sed bibendum sapien augue. Suspendisse vitae enim sollicitudin, posuere tellus et, interdum enim. Curabitur porttitor ultricies metus in pretium. Nunc quis tortor dui.
 
-\index{figuras}Figuras podem ser criadas diretamente em LaTeX,
-como o exemplo da \ref{fig-grafico-1}.
+% \index{figuras}Figuras podem ser criadas diretamente em LaTeX,
+% como o exemplo da \ref{fig-grafico-1}.
 
-\begin{figure}[ht!]
-	\centering
-	\Caption{\label{fig-grafico-1}Produção anual das dissertações de mestrado e teses de doutorado entre os anos de 1990 e 2008}		
-	\IBGEtab{}{
-		\fbox{\includegraphics[scale=0.5]{figuras/figura-3}}
-	}{
-	\Fonte{os autores}
-}
-\end{figure}
+% \begin{figure}[ht!]
+% 	\centering
+% 	\Caption{\label{fig-grafico-1}Produção anual das dissertações de mestrado e teses de doutorado entre os anos de 1990 e 2008}		
+% 	\IBGEtab{}{
+% 		\fbox{\includegraphics[scale=0.5]{figuras/figura-3}}
+% 	}{
+% 	\Fonte{os autores}
+% }
+% \end{figure}
 
-Ou então figuras podem ser incorporadas de arquivos externos, como é o caso da \autoref{fig-grafico-1}. Se a figura que ser incluída se tratar de um diagrama, um gráfico ou uma ilustração que você mesmo produza, priorize o uso de imagens vetoriais no formato PDF. Com isso, o tamanho do arquivo final do trabalho será menor, e as imagens terão uma apresentação melhor, principalmente quando impressas, uma vez que imagens vetorias são perfeitamente escaláveis para qualquer dimensão. Nesse caso, se for utilizar o Microsoft Excel para produzir gráficos, ou o Microsoft Word para produzir ilustrações, exporte-os como PDF e os incorpore ao documento conforme o exemplo abaixo. No entanto, para manter a coerência no uso de software livre (já que você está usando LaTeX e abnTeX),  teste a ferramenta InkScape\index{InkScape}. ao CorelDraw\index{CorelDraw} ou ao Adobe Illustrator\index{Adobe! Illustrator}.  De todo modo, caso não seja possível  utilizar arquivos de imagens como PDF, utilize qualquer outro formato, como JPEG, GIF, BMP, etc.  Nesse caso, você pode tentar aprimorar as imagens incorporadas com o software livre \index{Gimp}Gimp. Ele é uma alternativa livre ao Adobe Photoshop\index{Adobe! Photoshop}.
+% Ou então figuras podem ser incorporadas de arquivos externos, como é o caso da \autoref{fig-grafico-1}. Se a figura que ser incluída se tratar de um diagrama, um gráfico ou uma ilustração que você mesmo produza, priorize o uso de imagens vetoriais no formato PDF. Com isso, o tamanho do arquivo final do trabalho será menor, e as imagens terão uma apresentação melhor, principalmente quando impressas, uma vez que imagens vetorias são perfeitamente escaláveis para qualquer dimensão. Nesse caso, se for utilizar o Microsoft Excel para produzir gráficos, ou o Microsoft Word para produzir ilustrações, exporte-os como PDF e os incorpore ao documento conforme o exemplo abaixo. No entanto, para manter a coerência no uso de software livre (já que você está usando LaTeX e abnTeX),  teste a ferramenta InkScape\index{InkScape}. ao CorelDraw\index{CorelDraw} ou ao Adobe Illustrator\index{Adobe! Illustrator}.  De todo modo, caso não seja possível  utilizar arquivos de imagens como PDF, utilize qualquer outro formato, como JPEG, GIF, BMP, etc.  Nesse caso, você pode tentar aprimorar as imagens incorporadas com o software livre \index{Gimp}Gimp. Ele é uma alternativa livre ao Adobe Photoshop\index{Adobe! Photoshop}.
 
-\section{Usando Fórmulas Matemáticas}
+% \section{Usando Fórmulas Matemáticas}
 
-Phasellus venenatis leo tellus. Nulla eu fringilla sapien. Duis suscipit tellus diam, ac commodo mauris faucibus sit amet. Duis dapibus consequat tellus, sit amet volutpat urna sodales non. Morbi eu nisl et ex placerat blandit a sit amet ex. Nulla elit metus, egestas ac orci a, venenatis pulvinar arcu. Vestibulum cursus vulputate ipsum ac convallis. Maecenas gravida mauris id purus convallis, vel consequat lorem ultrices. Morbi facilisis, dolor interdum feugiat luctus, tellus tellus accumsan massa, nec sollicitudin ligula mi nec neque. Aliquam varius ante velit, nec suscipit neque fringilla nec.
+% Phasellus venenatis leo tellus. Nulla eu fringilla sapien. Duis suscipit tellus diam, ac commodo mauris faucibus sit amet. Duis dapibus consequat tellus, sit amet volutpat urna sodales non. Morbi eu nisl et ex placerat blandit a sit amet ex. Nulla elit metus, egestas ac orci a, venenatis pulvinar arcu. Vestibulum cursus vulputate ipsum ac convallis. Maecenas gravida mauris id purus convallis, vel consequat lorem ultrices. Morbi facilisis, dolor interdum feugiat luctus, tellus tellus accumsan massa, nec sollicitudin ligula mi nec neque. Aliquam varius ante velit, nec suscipit neque fringilla nec.
 
-	\begin{equation}
-		\begin{aligned}
-			x = a_0 + \cfrac{1}{a_1
-				+ \cfrac{1}{a_2
-					+ \cfrac{1}{a_3 + \cfrac{1}{a_4} } } }
-		\end{aligned}
-	\end{equation}
+% 	\begin{equation}
+% 		\begin{aligned}
+% 			x = a_0 + \cfrac{1}{a_1
+% 				+ \cfrac{1}{a_2
+% 					+ \cfrac{1}{a_3 + \cfrac{1}{a_4} } } }
+% 		\end{aligned}
+% 	\end{equation}
 
-Aenean placerat tempor velit, id tristique erat vestibulum vitae. Nunc lacus ex, porta eget libero sit amet, tincidunt vestibulum diam. Aliquam sagittis ullamcorper risus, id maximus odio aliquet eu. Phasellus sed eros sed augue varius ornare non eu ante. Morbi tristique blandit magna, nec semper elit dignissim vel. Praesent lacinia tortor nec nulla tempor ultrices. Donec nec efficitur orci, quis pretium lectus. Proin pretium augue at dolor efficitur egestas. Etiam facilisis augue vel dictum ullamcorper. Aliquam erat volutpat. In ac ante nisl. Quisque mattis orci non fermentum eleifend. Cras ullamcorper ex ut leo ornare ornare. Morbi sodales hendrerit augue vel varius. Vestibulum nec erat urna. Morbi vel risus nibh.
+% Aenean placerat tempor velit, id tristique erat vestibulum vitae. Nunc lacus ex, porta eget libero sit amet, tincidunt vestibulum diam. Aliquam sagittis ullamcorper risus, id maximus odio aliquet eu. Phasellus sed eros sed augue varius ornare non eu ante. Morbi tristique blandit magna, nec semper elit dignissim vel. Praesent lacinia tortor nec nulla tempor ultrices. Donec nec efficitur orci, quis pretium lectus. Proin pretium augue at dolor efficitur egestas. Etiam facilisis augue vel dictum ullamcorper. Aliquam erat volutpat. In ac ante nisl. Quisque mattis orci non fermentum eleifend. Cras ullamcorper ex ut leo ornare ornare. Morbi sodales hendrerit augue vel varius. Vestibulum nec erat urna. Morbi vel risus nibh.
 
-	\begin{equation}
-		\begin{aligned}
-			k_{n+1} = n^2 + k_n^2 - k_{n-1}
-		\end{aligned}
-	\end{equation}
+% 	\begin{equation}
+% 		\begin{aligned}
+% 			k_{n+1} = n^2 + k_n^2 - k_{n-1}
+% 		\end{aligned}
+% 	\end{equation}
 
-Donec non ipsum nec sapien tincidunt tempor eget nec quam. Maecenas convallis eget mauris vel pretium. Nunc vitae dignissim lectus. Nam et odio at lacus dapibus pharetra eget id nisi. Aenean nec urna et dui lacinia efficitur. Mauris vitae velit semper, tincidunt dolor vitae, pulvinar est. Fusce pretium egestas lectus, vel lobortis arcu commodo ut.
+% Donec non ipsum nec sapien tincidunt tempor eget nec quam. Maecenas convallis eget mauris vel pretium. Nunc vitae dignissim lectus. Nam et odio at lacus dapibus pharetra eget id nisi. Aenean nec urna et dui lacinia efficitur. Mauris vitae velit semper, tincidunt dolor vitae, pulvinar est. Fusce pretium egestas lectus, vel lobortis arcu commodo ut.
 
-	\begin{equation}
-		\begin{aligned}
-			\cos (2\theta) = \cos^2 \theta - \sin^2 \theta
-		\end{aligned}
-	\end{equation}
+% 	\begin{equation}
+% 		\begin{aligned}
+% 			\cos (2\theta) = \cos^2 \theta - \sin^2 \theta
+% 		\end{aligned}
+% 	\end{equation}
 	
-Vestibulum dignissim pharetra purus, a interdum enim egestas sed. Pellentesque leo ligula, malesuada suscipit euismod ut, euismod ut mi. Nullam condimentum ligula id odio porttitor aliquet. Aenean dictum enim tincidunt tincidunt dignissim. Nam pretium, neque nec eleifend posuere, lorem sapien viverra leo, sed efficitur sapien purus id felis. Praesent porttitor dui ac scelerisque luctus. Ut auctor orci non velit placerat dapibus. Quisque tortor eros, lacinia at sodales a, vulputate ut augue.
+% Vestibulum dignissim pharetra purus, a interdum enim egestas sed. Pellentesque leo ligula, malesuada suscipit euismod ut, euismod ut mi. Nullam condimentum ligula id odio porttitor aliquet. Aenean dictum enim tincidunt tincidunt dignissim. Nam pretium, neque nec eleifend posuere, lorem sapien viverra leo, sed efficitur sapien purus id felis. Praesent porttitor dui ac scelerisque luctus. Ut auctor orci non velit placerat dapibus. Quisque tortor eros, lacinia at sodales a, vulputate ut augue.
 
-	\begin{equation}
-		\begin{aligned}
-			A_{m,n} =
-			\begin{pmatrix}
-			a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
-			a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
-			\vdots  & \vdots  & \ddots & \vdots  \\
-			a_{m,1} & a_{m,2} & \cdots & a_{m,n}
-			\end{pmatrix}
-		\end{aligned}
-	\end{equation}
+% 	\begin{equation}
+% 		\begin{aligned}
+% 			A_{m,n} =
+% 			\begin{pmatrix}
+% 			a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+% 			a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+% 			\vdots  & \vdots  & \ddots & \vdots  \\
+% 			a_{m,1} & a_{m,2} & \cdots & a_{m,n}
+% 			\end{pmatrix}
+% 		\end{aligned}
+% 	\end{equation}
 
-Nulla metus ligula, faucibus vel sodales dictum, lacinia sed sapien. Curabitur elit nisi, aliquet at nisi a, porttitor pellentesque orci. Sed gravida rutrum diam, vitae maximus nisi pulvinar eu. Quisque id lobortis dolor, quis tempus tellus. Donec facilisis ante at dignissim dignissim. Vestibulum fermentum orci sit amet risus egestas gravida. Praesent eleifend dolor quam.
+% Nulla metus ligula, faucibus vel sodales dictum, lacinia sed sapien. Curabitur elit nisi, aliquet at nisi a, porttitor pellentesque orci. Sed gravida rutrum diam, vitae maximus nisi pulvinar eu. Quisque id lobortis dolor, quis tempus tellus. Donec facilisis ante at dignissim dignissim. Vestibulum fermentum orci sit amet risus egestas gravida. Praesent eleifend dolor quam.
 
-	\begin{equation}
-		\begin{aligned}
-			f(n) = \left\{ 
-			\begin{array}{l l}
-			n/2 & \quad \text{if $n$ is even}\\
-			-(n+1)/2 & \quad \text{if $n$ is odd}
-			\end{array} \right.
-		\end{aligned}
-	\end{equation}
+% 	\begin{equation}
+% 		\begin{aligned}
+% 			f(n) = \left\{ 
+% 			\begin{array}{l l}
+% 			n/2 & \quad \text{if $n$ is even}\\
+% 			-(n+1)/2 & \quad \text{if $n$ is odd}
+% 			\end{array} \right.
+% 		\end{aligned}
+% 	\end{equation}
 	
-Nulla facilisi. Pellentesque eu interdum nulla. Phasellus pellentesque libero dignissim quam sagittis, sit amet varius dolor lobortis. Nam non dui scelerisque, convallis dui id, feugiat sem. Proin rutrum dapibus odio et vestibulum. Curabitur blandit porta pretium. Donec iaculis leo ut ultrices pretium. Cras vel aliquet ante. Ut nibh sem, pellentesque vel tempus sit amet, ornare dapibus augue.
+% Nulla facilisi. Pellentesque eu interdum nulla. Phasellus pellentesque libero dignissim quam sagittis, sit amet varius dolor lobortis. Nam non dui scelerisque, convallis dui id, feugiat sem. Proin rutrum dapibus odio et vestibulum. Curabitur blandit porta pretium. Donec iaculis leo ut ultrices pretium. Cras vel aliquet ante. Ut nibh sem, pellentesque vel tempus sit amet, ornare dapibus augue.
 
-\section{Usando Algoritmos}
+% \section{Usando Algoritmos}
 
-Integer ac malesuada leo. Etiam ut volutpat purus, eget tempus orci. Suspendisse molestie odio ut velit venenatis placerat. Nunc egestas mauris quis ex varius, et maximus tellus vestibulum. Pellentesque felis nisi, varius at mauris vulputate, euismod vehicula mauris. Ut iaculis urna eget molestie ultricies. Vivamus lobortis, nunc sodales molestie malesuada, odio tortor condimentum tortor, vel laoreet lacus nunc vel turpis. Aliquam tortor risus, convallis at lectus in, vulputate tincidunt tortor.
+% Integer ac malesuada leo. Etiam ut volutpat purus, eget tempus orci. Suspendisse molestie odio ut velit venenatis placerat. Nunc egestas mauris quis ex varius, et maximus tellus vestibulum. Pellentesque felis nisi, varius at mauris vulputate, euismod vehicula mauris. Ut iaculis urna eget molestie ultricies. Vivamus lobortis, nunc sodales molestie malesuada, odio tortor condimentum tortor, vel laoreet lacus nunc vel turpis. Aliquam tortor risus, convallis at lectus in, vulputate tincidunt tortor.
 
-\begin{algorithm}[ht!]
-	\SetSpacedAlgorithm
-	\caption{\label{alg:algoritmo_de_colonica_de_formigas}Algoritmo de Otimização por Colônia de Formiga}
-	\Entrada{Entrada do Algoritmo}
-	\Saida{Saida do Algoritmo}
-	\Inicio{
-		Atribua os valores dos parâmetros\;
-		Inicialize as trilhas de feromônios\;
-		\Enqto{não atingir o critério de parada}{
-			\Para{cada formiga}{
-				Construa as Soluções\;
-			}
-			Aplique Busca Local (Opcional)\;
-			Atualize o Feromônio\;
-		}	
-	}		
-\end{algorithm}
+% \begin{algorithm}[ht!]
+% 	\SetSpacedAlgorithm
+% 	\caption{\label{alg:algoritmo_de_colonica_de_formigas}Algoritmo de Otimização por Colônia de Formiga}
+% 	\Entrada{Entrada do Algoritmo}
+% 	\Saida{Saida do Algoritmo}
+% 	\Inicio{
+% 		Atribua os valores dos parâmetros\;
+% 		Inicialize as trilhas de feromônios\;
+% 		\Enqto{não atingir o critério de parada}{
+% 			\Para{cada formiga}{
+% 				Construa as Soluções\;
+% 			}
+% 			Aplique Busca Local (Opcional)\;
+% 			Atualize o Feromônio\;
+% 		}	
+% 	}		
+% \end{algorithm}
 
-Aliquam tempor laoreet felis at interdum. Ut molestie enim at nisl ultricies tempor. Mauris porta tristique orci sit amet gravida. Aenean at nulla neque. Suspendisse potenti. Pellentesque condimentum, lacus id tristique imperdiet, justo eros pulvinar ex, vel imperdiet purus augue vel erat. Donec dolor purus, sodales nec tincidunt et, semper vel risus. Aliquam at nisi aliquet, dictum lorem a, aliquam velit. Proin ipsum arcu, feugiat eu lectus quis, volutpat hendrerit tortor. Pellentesque efficitur ac ipsum non sodales. Ut scelerisque vulputate orci, non semper purus.
+% Aliquam tempor laoreet felis at interdum. Ut molestie enim at nisl ultricies tempor. Mauris porta tristique orci sit amet gravida. Aenean at nulla neque. Suspendisse potenti. Pellentesque condimentum, lacus id tristique imperdiet, justo eros pulvinar ex, vel imperdiet purus augue vel erat. Donec dolor purus, sodales nec tincidunt et, semper vel risus. Aliquam at nisi aliquet, dictum lorem a, aliquam velit. Proin ipsum arcu, feugiat eu lectus quis, volutpat hendrerit tortor. Pellentesque efficitur ac ipsum non sodales. Ut scelerisque vulputate orci, non semper purus.
 
-\section{Usando Código-fonte}
+% \section{Usando Código-fonte}
 
-Nullam aliquam quam feugiat consequat tristique. In pharetra tellus est, id facilisis quam hendrerit sit amet. Morbi non lobortis erat. Etiam a velit libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam mollis risus quis pulvinar convallis. Cras eget eleifend justo, vitae fringilla velit. Vestibulum faucibus ante nec risus ultrices tristique. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent feugiat risus nec facilisis rhoncus.
+% Nullam aliquam quam feugiat consequat tristique. In pharetra tellus est, id facilisis quam hendrerit sit amet. Morbi non lobortis erat. Etiam a velit libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam mollis risus quis pulvinar convallis. Cras eget eleifend justo, vitae fringilla velit. Vestibulum faucibus ante nec risus ultrices tristique. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent feugiat risus nec facilisis rhoncus.
 
-\lstinputlisting[language=C++,caption={Hello World em C++}]{figuras/main.cpp}
+% \lstinputlisting[language=C++,caption={Hello World em C++}]{figuras/main.cpp}
 
-Aliquam tempus, nulla eu mattis vulputate, turpis orci sollicitudin enim, nec dapibus leo nunc ac augue. Aenean blandit, magna quis sagittis sodales, dolor sapien luctus est, ut dignissim enim metus at ipsum. Duis diam libero, viverra id sollicitudin eget, rhoncus eu mi. Morbi consequat turpis velit, a mollis arcu mollis eu. Nam sed risus ac sapien ornare semper. Nunc efficitur eu leo eu efficitur. Duis varius ex non elit dignissim iaculis. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eros nunc, mollis nec semper in, malesuada id libero. Duis sodales nisl enim, in eleifend nisi venenatis vel.
+% Aliquam tempus, nulla eu mattis vulputate, turpis orci sollicitudin enim, nec dapibus leo nunc ac augue. Aenean blandit, magna quis sagittis sodales, dolor sapien luctus est, ut dignissim enim metus at ipsum. Duis diam libero, viverra id sollicitudin eget, rhoncus eu mi. Morbi consequat turpis velit, a mollis arcu mollis eu. Nam sed risus ac sapien ornare semper. Nunc efficitur eu leo eu efficitur. Duis varius ex non elit dignissim iaculis. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eros nunc, mollis nec semper in, malesuada id libero. Duis sodales nisl enim, in eleifend nisi venenatis vel.
 
-\begin{lstlisting}[language=Java,caption={Hello World em Java}]
-public class HelloWorld {
-	public static void main(String[] args) {
-		// This is a comment in Java
-		/* This is also a comment in Java */
-		// Este comentário está em português
-		System.out.println("Hello World!");
-	}
-}
-\end{lstlisting}
+% \begin{lstlisting}[language=Java,caption={Hello World em Java}]
+% public class HelloWorld {
+% 	public static void main(String[] args) {
+% 		// This is a comment in Java
+% 		/* This is also a comment in Java */
+% 		// Este comentário está em português
+% 		System.out.println("Hello World!");
+% 	}
+% }
+% \end{lstlisting}
 
-Nunc id scelerisque turpis. Praesent justo metus, volutpat id arcu in, sagittis lobortis felis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque sapien sem, vestibulum a commodo eget, iaculis nec ex. Cras aliquet scelerisque iaculis. Maecenas sit amet feugiat nulla. 
+% Nunc id scelerisque turpis. Praesent justo metus, volutpat id arcu in, sagittis lobortis felis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque sapien sem, vestibulum a commodo eget, iaculis nec ex. Cras aliquet scelerisque iaculis. Maecenas sit amet feugiat nulla. 
 
-\begin{lstlisting}[language=c++,caption={Simulação de falha: LED amarelo desativado}]
-void setup () {
-	pinMode (3, OUTPUT);
-	pinMode (4, OUTPUT); // amarelo (não acende)
-	pinMode (5, OUTPUT);
-}
-\end{lstlisting}
+% \begin{lstlisting}[language=c++,caption={Simulação de falha: LED amarelo desativado}]
+% void setup () {
+% 	pinMode (3, OUTPUT);
+% 	pinMode (4, OUTPUT); // amarelo (não acende)
+% 	pinMode (5, OUTPUT);
+% }
+% \end{lstlisting}
 
-Nunc id scelerisque turpis. Praesent justo metus, volutpat id arcu in, sagittis lobortis felis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque sapien sem, vestibulum a commodo eget, iaculis nec ex. Cras aliquet scelerisque iaculis. Maecenas sit amet feugiat nulla. Etiam cursus feugiat lacus et varius. Phasellus dignissim sagittis venenatis. Ut luctus risus nibh, et blandit neque placerat eu. Vestibulum vitae vulputate erat, feugiat vehicula lorem. Pellentesque purus tellus, convallis eu lacinia eget, cursus eu diam. Pellentesque vulputate ullamcorper felis, quis tincidunt lectus condimentum quis. Curabitur felis felis, suscipit elementum blandit ac, placerat a sem.
+% Nunc id scelerisque turpis. Praesent justo metus, volutpat id arcu in, sagittis lobortis felis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque sapien sem, vestibulum a commodo eget, iaculis nec ex. Cras aliquet scelerisque iaculis. Maecenas sit amet feugiat nulla. Etiam cursus feugiat lacus et varius. Phasellus dignissim sagittis venenatis. Ut luctus risus nibh, et blandit neque placerat eu. Vestibulum vitae vulputate erat, feugiat vehicula lorem. Pellentesque purus tellus, convallis eu lacinia eget, cursus eu diam. Pellentesque vulputate ullamcorper felis, quis tincidunt lectus condimentum quis. Curabitur felis felis, suscipit elementum blandit ac, placerat a sem.
 
-\section{Usando Teoremas, Proposições, etc}
+% \section{Usando Teoremas, Proposições, etc}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{teo}[Pitágoras]
-	Em todo triângulo retângulo o quadrado do comprimento da
-	hipotenusa é igual a soma dos quadrados dos comprimentos dos catetos.
-\end{teo}
+% \begin{teo}[Pitágoras]
+% 	Em todo triângulo retângulo o quadrado do comprimento da
+% 	hipotenusa é igual a soma dos quadrados dos comprimentos dos catetos.
+% \end{teo}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{teo}[Fermat]
-	Não existem inteiros $n > 2$, e $x, y, z$ tais que $x^n + y^n = z$
-\end{teo}
+% \begin{teo}[Fermat]
+% 	Não existem inteiros $n > 2$, e $x, y, z$ tais que $x^n + y^n = z$
+% \end{teo}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{prop}
-	Para demonstrar o Teorema de Pitágoras...
-\end{prop}
+% \begin{prop}
+% 	Para demonstrar o Teorema de Pitágoras...
+% \end{prop}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{exem}
-	Este é um exemplo do uso do ambiente exe definido acima.
-\end{exem}
+% \begin{exem}
+% 	Este é um exemplo do uso do ambiente exe definido acima.
+% \end{exem}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{xdefinicao}
-	Definimos o produto de ...
-\end{xdefinicao}
+% \begin{xdefinicao}
+% 	Definimos o produto de ...
+% \end{xdefinicao}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\section{Usando Questões}
+% \section{Usando Questões}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
 
-\begin{questao}
-	\item Esta é a primeira questão com alguns itens:
-		\begin{enumerate}
-			\item Este é o primeiro item
-			\item Segundo item
-		\end{enumerate}
-	\item Esta é a segunda questão:
-		\begin{enumerate}
-			\item Este é o primeiro item
-			\item Segundo item
-		\end{enumerate}
-	\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
-		\begin{enumerate}
-			\item consectetur
-			\item adipiscing
-			\item Nunc
-			\item dictum
-		\end{enumerate}
-\end{questao}
+% \begin{questao}
+% 	\item Esta é a primeira questão com alguns itens:
+% 		\begin{enumerate}
+% 			\item Este é o primeiro item
+% 			\item Segundo item
+% 		\end{enumerate}
+% 	\item Esta é a segunda questão:
+% 		\begin{enumerate}
+% 			\item Este é o primeiro item
+% 			\item Segundo item
+% 		\end{enumerate}
+% 	\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra. consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
+% 		\begin{enumerate}
+% 			\item consectetur
+% 			\item adipiscing
+% 			\item Nunc
+% 			\item dictum
+% 		\end{enumerate}
+% \end{questao}
 
-\section{Citações}
+% \section{Citações}
 
-\subsection{Documentos com três autores}
+% \subsection{Documentos com três autores}
 
-Quando houver três autores na citação, apresentam se os três, separados por ponto e vírgula, caso estes estejam após o texto. Se os autores estiverem incluídos no texto, devem ser separados por vírgula e pela conjunção "e".
+% Quando houver três autores na citação, apresentam se os três, separados por ponto e vírgula, caso estes estejam após o texto. Se os autores estiverem incluídos no texto, devem ser separados por vírgula e pela conjunção "e".
 
-\citeautoronline{tresautores}
+% \citeautoronline{tresautores}
 
-\cite{tresautores}
+% \cite{tresautores}
 
-\subsection{Documentos com mais de três autores}
-Havendo mais de três autores, indica-se o primeiro seguido da expressão \textit{et al.} (do latim \textit{et alli}, que significa e outros), do ano e da página.
+% \subsection{Documentos com mais de três autores}
+% Havendo mais de três autores, indica-se o primeiro seguido da expressão \textit{et al.} (do latim \textit{et alli}, que significa e outros), do ano e da página.
 
-\citeautoronline{quatroautores}
+% \citeautoronline{quatroautores}
 
-\cite{quatroautores}
+% \cite{quatroautores}
 
-\subsection{Documentos de vários autores}
+% \subsection{Documentos de vários autores}
 
-Havendo    citações    indiretas de    diversos    documentos    de    vários    autores, mencionados  simultaneamente e  que  expressam  a  mesma  ideia,  separam-se  os  autores  por ponto e vírgula, em ordem alfabética.
+% Havendo    citações    indiretas de    diversos    documentos    de    vários    autores, mencionados  simultaneamente e  que  expressam  a  mesma  ideia,  separam-se  os  autores  por ponto e vírgula, em ordem alfabética.
 
-\cite{tresautores, quatroautores}
+% \cite{tresautores, quatroautores}
 
-\section{Notas de Rodap\'{e}}
+% \section{Notas de Rodap\'{e}}
 
-Deve-se utilizar o sistema autor-data para as  citações no texto e o numérico para notas explicativas\footnote{Veja - se como exemplo desse tipo de abordagem o estudo de Netzer (1976)}. As notas de rodapé podem e devem ser alinhadas, a partir da segunda linha da mesma nota, abaixo da primeira letra da primeira palavra, de forma a destacar o expoente \footnote{Encontramos  esse  tipo  de  perspectiva  na  2ª  parte  do  verbete  referido  na  nota  anterior,  em  grande  parte  do estudo de Rahner (1962).} e sem espaço entre elas e com fonte menor (tamanho 10).
+% Deve-se utilizar o sistema autor-data para as  citações no texto e o numérico para notas explicativas\footnote{Veja - se como exemplo desse tipo de abordagem o estudo de Netzer (1976)}. As notas de rodapé podem e devem ser alinhadas, a partir da segunda linha da mesma nota, abaixo da primeira letra da primeira palavra, de forma a destacar o expoente \footnote{Encontramos  esse  tipo  de  perspectiva  na  2ª  parte  do  verbete  referido  na  nota  anterior,  em  grande  parte  do estudo de Rahner (1962).} e sem espaço entre elas e com fonte menor (tamanho 10).
 

@@ -44,7 +44,7 @@
 \usepackage{indentfirst}                            % Endenta o primeiro parágrafo de cada seção.
 \usepackage{listings}                               % Utilizar codigo fonte no documento
 \usepackage{xcolor}
-\usepackage{microtype}                              % Para melhorias de justificação?
+\usepackage[nopatch=all]{microtype}                              % Para melhorias de justificação?
 \usepackage[portuguese,ruled,lined]{algorithm2e}    % Escrever algoritmos
 \usepackage{algorithmic}                            % Criar Algoritmos  
 %\usepackage{float}                                  % Utilizado para criação de floats
@@ -73,6 +73,56 @@
 \usepackage{lib/uecetex2}		                    % Biblioteca com as normas da UECE para trabalhos academicos
 \usepackage{pdfpages}                               % Incluir pdf no documento
 \usepackage{amsmath}                                % Usar equacoes matematicas
+\usepackage{tikz}                                  % Desenhar graficos
+\usetikzlibrary{shapes.geometric, shapes.symbols, positioning, calc, fit, backgrounds, arrows.meta}
+\usepackage{textcase}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\AtBeginDocument{%
+  \let\MakeUppercase\MakeTextUppercase
+  % Desabilita uppercasing nos favoritos do PDF para evitar travamentos
+  \pdfstringdefDisableCommands{\let\MakeUppercase\relax}
+}
+
+\tikzset{
+  % Chaves configuráveis do veículo
+  vehicle body/.style={draw, thick, rounded corners=2pt},
+  vehicle wheel/.style={draw, thick},
+  vehicle scale/.initial=1.0,
+  vehicle label/.initial={},
+  % Pic do veículo
+  pics/vehicle/.style={
+    code={
+      % parâmetros
+      \def\VS{\pgfkeysvalueof{/tikz/vehicle scale}}
+      \def\VL{\pgfkeysvalueof{/tikz/vehicle label}}
+      % sistema de coordenadas local do pic
+      \begin{scope}[x=\VS cm, y=\VS cm]
+        % corpo (uma forma simples e robusta)
+        % base: retângulo arredondado
+        \path[/tikz/vehicle body] (-1.2,0.0) rectangle (1.2,0.7);
+        % "teto" (cabine)
+        \path[/tikz/vehicle body]
+          (-0.7,0.7) -- (-0.3,1.05) -- (0.6,1.05) -- (0.9,0.7) -- cycle;
+        % rodas
+        \path[/tikz/vehicle wheel] (-0.8,0.0) circle (0.18);
+        \path[/tikz/vehicle wheel] ( 0.8,0.0) circle (0.18);
+        % eixo/solo opcional (pode comentar se não quiser)
+        % \draw[thick] (-1.3,-0.05) -- (1.3,-0.05);
+        % rótulo (se fornecido)
+        \ifx\VL\empty\relax
+        \else
+          \node[font=\scriptsize, align=center] at (0,-0.6) {\VL};
+        \fi
+      \end{scope}
+    }
+  },
+  % Style útil para "nó de veículo" (para diagramas)
+  vehicle node/.style={
+    inner sep=0pt,
+    outer sep=0pt
+  }
+}
 
 % Organiza e gera a lista de abreviaturas, simbolos e glossario
 \makeglossaries

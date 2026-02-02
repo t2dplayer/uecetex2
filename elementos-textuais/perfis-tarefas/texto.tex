@@ -1,0 +1,105 @@
+{\color{red}\Large PRECISA REVISAR O TEXTO - TOTALMENTE GERADO POR IA}
+
+Nesta seção, as tarefas são organizadas em perfis de aplicação para evitar que o gerador de workload produza combinações artificiais de tamanho, densidade computacional e deadline. A motivação prática é que, em cenários de \textit{task offloading} em MEC/VEC, esses parâmetros variam por classe de aplicação e por condições operacionais, e não como amostras totalmente independentes a cada tarefa. Assim, cada perfil define faixas para (i) tamanho da entrada (\textit{size}, em bytes), (ii) densidade computacional (\textit{density}, em ciclos por byte) e (iii) deadline (em segundos). Como parte da consistência de unidades, quando a literatura reporta a complexidade em ciclos por bit, a conversão usada aqui é $\textit{cycles/byte} = 8 \cdot \textit{cycles/bit}$.
+
+Os valores numéricos adotados nos perfis a seguir devem ser interpretados como parametrizações de simulação inspiradas por intervalos frequentemente usados em trabalhos de offloading em MEC e IIoT. Esses trabalhos assumem tarefas com tamanhos na ordem de dezenas a centenas de kilobytes, complexidades em ciclos por bit e prazos que variam de regimes sensíveis a atraso até regimes mais tolerantes \cite{akbari2022drl_os_sensors,hao2021risk_sensitive_iiot_jwcn,yang2019industrial_iiot_ieee_network}. Além disso, quando se deseja representar não estacionariedade por mudanças de modo, é natural organizar o workload em regimes persistentes. Esse tipo de organização pode ser formalizado por modelos do tipo semi-Markov, nos quais o tempo de permanência em um estado é tratado explicitamente \cite{limnios2001semi_markov_reliability}.
+
+O primeiro perfil representa aplicações sensíveis a atraso com interação frequente, nas quais o orçamento de tempo é da ordem de dezenas a poucas centenas de milissegundos. Em estudos de offloading em MEC e IIoT, é comum parametrizar cenários com deadlines curtos para capturar o efeito de fila e contenção de CPU no cumprimento de prazos \cite{akbari2022drl_os_sensors,hao2021risk_sensitive_iiot_jwcn}. Para este perfil, adotam-se faixas conservadoras que preservam o caráter \textit{delay-sensitive}: tamanho entre 50~KB e 380~KB, densidade entre 4000 e 8000 ciclos/byte (equivalente a 500 a 1000 ciclos/bit) e deadline fixado em 0{,}10~s. Esses valores procuram reproduzir um regime em que pequenas variações no workload já têm impacto direto na taxa de cumprimento de deadline, sem exigir hipóteses fortes sobre a distribuição exata das tarefas.
+
+O segundo perfil descreve um cenário de MEC mais geral e heterogêneo, no qual o sistema atende tarefas com tolerância de atraso da ordem de 1~s, com tamanhos e complexidades variando em uma faixa mais ampla. Trabalhos de otimização e estratégia de offloading em MEC usualmente consideram tarefas com complexidades na ordem de centenas a poucos milhares de ciclos por bit e prazos mais relaxados quando o objetivo é estudar trade-offs de energia, utilização de recursos e estabilidade de desempenho \cite{akbari2022drl_os_sensors,hao2021risk_sensitive_iiot_jwcn}. Portanto, este perfil utiliza tamanho entre 60~KB e 500~KB, densidade entre 4000 e 12000 ciclos/byte e deadline em 1{,}0~s. A função desse perfil é oferecer um regime de referência menos restritivo, no qual políticas simples podem ter bom desempenho mesmo sob variações moderadas de carga.
+
+O terceiro perfil concentra-se em conjuntos de tarefas com tamanho médio, com o objetivo de representar cenários em que o volume de dados não é extremo mas a variabilidade de complexidade computacional ainda é relevante. Esse tipo de parametrização é compatível com cenários de IIoT, nos quais aplicações podem alternar entre tarefas com baixo volume de dados e tarefas com maior custo de processamento, dependendo do tipo de medição e do estágio do pipeline \cite{yang2019industrial_iiot_ieee_network,hao2021risk_sensitive_iiot_jwcn}. Neste caso, adota-se tamanho entre 50~KB e 75~KB, densidade entre 4000 e 12000 ciclos/byte. Para o deadline, quando não há um valor explícito associado a uma aplicação específica no estudo considerado, utiliza-se um valor intermediário como 0{,}20~s apenas para manter coerência com o objetivo do simulador, isto é, permitir atrasos perceptíveis sem tornar o sistema trivialmente inviável. Essa escolha deve ser tratada como parâmetro de cenário e não como propriedade universal do tipo de aplicação.
+
+O quarto perfil representa tarefas intensivas em computação com deadline mais relaxado. Em cenários de offloading, esse caso é útil para separar o efeito de volume de dados do efeito de custo computacional, pois o gargalo principal tende a migrar do canal para a CPU, alterando o trade-off entre executar localmente e descarregar para a borda \cite{akbari2022drl_os_sensors}. Para este perfil, define-se tamanho fixo em 60~KB, densidade fixa em 253440 ciclos/byte e deadline em 10~s. A intenção é capturar regimes em que a variação de desempenho é dominada pelo custo computacional, o que também favorece a análise de regimes persistentes e mudanças de modo ao longo do tempo \cite{limnios2001semi_markov_reliability}.
+
+Por fim, o quinto perfil é um perfil de estresse com deadlines muito curtos, usado para testar robustez do simulador e das políticas em situações nas quais o efeito de fila e a disponibilidade de recursos dominam completamente a taxa de sucesso. Esse tipo de caso aparece de forma natural em cenários que combinam comunicação direta (D2D) com MEC, justamente por induzir forte competição por recursos e por exigir decisões rápidas quando o sistema opera próximo ao limite \cite{he2019d2d_mec_twc}. Neste perfil, o tamanho varia entre 62{,}5~KB e 125~KB, a densidade é 4000 ciclos/byte (500 ciclos/bit) e o deadline é 0{,}002~s. Esses valores devem ser entendidos como configuração de estresse e não como recomendação geral para todos os cenários.
+
+A Tabela~\ref{tab:task-profiles-summary} resume os perfis de aplicação adotados no gerador de tarefas, incluindo as faixas de tamanho, densidade computacional e deadline usadas em cada caso. O objetivo dessa organização é manter consistência de unidades e evitar combinações artificiais de parâmetros, preservando classes de aplicações com restrições de tempo distintas, como cenários sensíveis a atraso e cenários mais tolerantes \cite{akbari2022drl_os_sensors,hao2021risk_sensitive_iiot_jwcn,yang2019industrial_iiot_ieee_network}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumo dos perfis de aplicação adotados para o gerador de tarefas. O tamanho está em KB (decimal), a densidade computacional em ciclos/byte e o deadline em segundos.}
+\label{tab:task-profiles-summary}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{c|p{3.6cm}|c|c|c}
+\hline
+\textbf{ID} & \textbf{Perfil} & \textbf{Size (KB)} & \textbf{Density (ciclos/byte)} & \textbf{Deadline (s)} \\
+\hline
+0 & Delay-sensitive / interativo & 50--380 & 4000--8000 & 0{,}10 \\
+\hline
+1 & MEC geral / tolerante a atraso & 60--500 & 4000--12000 & 1{,}0 \\
+\hline
+2 & Tamanho m\'edio (workload base) & 50--75 & 4000--12000 & 0{,}20 \\
+\hline
+3 & Compute-intensivo / deadline relaxado & 60 (fixo) & 253440 (fixo) & 10{,}0 \\
+\hline
+4 & Estresse (ultra baixa lat\^encia) & 62{,}5--125 & 4000 (fixo) & 0{,}002 \\
+\hline
+\end{tabular}
+\vspace{2pt}
+\\
+{
+    \footnotesize \textit{Notas:} (i) Quando a complexidade \'e reportada em ciclos/bit, a convers\~ao usada \'e ciclos/byte = 8 $\cdot$ ciclos/bit. (ii) Os perfis foram inspirados por parametriza\c{c}\~oes usuais na literatura de offloading em MEC/IIoT e por configura\c{c}\~oes de estresse para avaliar robustez \cite{akbari2022drl_os_sensors,hao2021risk_sensitive_iiot_jwcn,yang2019industrial_iiot_ieee_network,he2019d2d_mec_twc}.
+}
+\end{table}
+
+Esses perfis devem ser interpretados como parametrizações de simulação inspiradas por hipóteses comuns na literatura e não como valores universais para qualquer sistema MEC/VEC. Em particular, o perfil de estresse (ID 4) é incluído para avaliar robustez sob deadlines muito curtos, situação em que efeitos de fila e contenção de recursos tendem a dominar o cumprimento de prazos. Essa característica é compatível com cenários de alta competição por recursos discutidos em formulações que integram D2D e MEC \cite{he2019d2d_mec_twc}.
+
+No simulador, cada tarefa é parametrizada por três grandezas: tamanho de entrada (em bytes), densidade computacional (em ciclos por byte) e deadline (em segundos). Como a literatura nem sempre reporta essas grandezas nas mesmas unidades, adotamos conversões explícitas para manter consistência: quando o artigo informa tamanho em \emph{kb} (kilobits), convertemos para bytes por $(kb \cdot 1000)/8$; quando a densidade é dada em ciclos por bit, convertemos para ciclos por byte multiplicando por $8$. Esse cuidado evita que diferenças de convenção (por exemplo, bits versus bytes e kilobit versus kilobyte) gerem perfis incoerentes no gerador de tarefas.
+
+Para os perfis de aplicação, usamos como âncora um conjunto típico de parâmetros reportados em estudos de offloading com múltiplos servidores MEC. Em particular, Fang et al. configuram tamanhos de tarefas na faixa de $300$ a $1000$ kb e densidades de processamento na faixa de $500$ a $800$ ciclos/bit, valores que se traduzem diretamente para o espaço do simulador após conversão de unidades \cite{fang2021mec_iot}. Esses intervalos são úteis porque produzem variação simultânea de carga de comunicação e carga de computação, o que é desejável quando o objetivo é estudar decisões de offloading sob concorrência e variação temporal.
+
+Para os perfis de CPU, adotamos faixas de capacidade compatíveis com as parametrizações mais comuns em trabalhos de MEC. Fang et al. consideram capacidade de computação do dispositivo (UE) entre $0{,}5$ e $1$ GHz e capacidade de servidor MEC em torno de $5$ GHz \cite{fang2021mec_iot}. Além disso, Yang et al. utilizam $1$ GHz como capacidade local em seus experimentos de alocação eficiente de recursos em MEC \cite{yang2019noma_mec}. Essas escolhas não têm a pretensão de representar um hardware específico mas sim de criar regimes de capacidade suficientemente separados para que a decisão local versus remota tenha consequências mensuráveis em latência e fila.
+
+A Tabela~\ref{tab:cpu-profiles-summary} resume os perfis de CPU utilizados no simulador. A intenção é representar classes de capacidade computacional com separação suficiente para que a decisão de execução local versus offloading tenha efeitos mensuráveis em fila e tempo de serviço, sem comprometer a reprodutibilidade do cenário. Os valores foram escolhidos para permanecer compatíveis com parametrizações típicas encontradas em trabalhos de MEC, que abstraem a computação local e a computação na borda por frequências efetivas \cite{fang2021mec_iot,yang2019noma_mec}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumo dos perfis de CPU. A frequência é dada em GHz (frequência efetiva usada no modelo), e o número de núcleos representa a capacidade de paralelismo do recurso no simulador.}
+\label{tab:cpu-profiles-summary}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{c|p{4.4cm}|c|c|c}
+\hline
+\textbf{ID} & \textbf{Perfil} & \textbf{$f_{\min}$ (GHz)} & \textbf{$f_{\max}$ (GHz)} & \textbf{Cores} \\
+\hline
+0 & Dispositivo local (UE/veículo), capacidade variável & 0{,}5 & 1{,}0 & 1 \\
+\hline
+1 & Servidor de borda (MEC/RSU), capacidade alta & 5{,}0 & 5{,}0 & 1 \\
+\hline
+2 & Dispositivo local (UE/veículo), capacidade fixa & 1{,}0 & 1{,}0 & 1 \\
+\hline
+\end{tabular}
+\vspace{2pt}
+\\
+{\footnotesize \textit{Notas:} (i) Os valores refletem parametrizações típicas de simulação em MEC, nas quais a computação é abstraída por uma frequência efetiva e um recurso de servidor \cite{fang2021mec_iot,yang2019noma_mec}. (ii) Caso o simulador modele paralelismo por múltiplos \textit{servers}, o campo \textit{Cores} pode ser interpretado como capacidade do recurso (por exemplo, número de slots).}
+\end{table}
+
+Para perfis de energia de computação, incluímos dois modelos complementares, ambos recorrentes na literatura, justamente para reduzir a colinearidade entre tempo de processamento e energia. O primeiro modelo segue a forma quadrática em frequência típica de abstrações de DVFS, $E = \kappa \, f^2 \, b$, em que $b$ é o número de ciclos de CPU e $\kappa$ é um coeficiente de arquitetura. Essa forma e uma parametrização representativa aparecem no estudo de alocação energética para múltiplas tarefas em MEC \cite{liu2022multitask_mec}. O segundo modelo usa energia constante por ciclo, $E = \varepsilon \, b$, que também é empregado como simplificação prática em experimentos de MEC \cite{yang2019noma_mec}. Ao permitir alternar o regime de CPU e o regime de energia de forma parcialmente independente (por exemplo, mudando $\kappa$ ou $\varepsilon$ sem mudar $f$), o simulador consegue gerar cenários não estacionários com regimes sem forçar que toda variação temporal de energia seja apenas um reflexo mecânico da variação do tempo de serviço.
+
+A Tabela~\ref{tab:energy-profiles-summary} apresenta os perfis de energia computacional. O objetivo não é reproduzir fielmente uma microarquitetura específica mas oferecer dois modelos recorrentes na literatura: um baseado em dependência quadrática com a frequência (associado a abstrações de DVFS) e outro baseado em energia constante por ciclo. Essa duplicidade é útil para reduzir colinearidade entre tempo de processamento e energia em cenários não estacionários, permitindo que regimes de energia possam variar sem serem apenas um reflexo mecânico do regime de CPU \cite{liu2022multitask_mec,yang2019noma_mec}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumo dos perfis de energia computacional. O perfil 0 usa um modelo dependente de frequência, enquanto o perfil 1 usa energia constante por ciclo, ambos recorrentes na literatura.}
+\label{tab:energy-profiles-summary}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{c|p{4.6cm}|p{4.9cm}}
+\hline
+\textbf{ID} & \textbf{Modelo} & \textbf{Parâmetros} \\
+\hline
+0 &
+$E = \kappa \, f^{2} \, b$ (modelo quadrático em $f$) &
+$\kappa = 10^{-28}$; $f$ em Hz; $b$ em ciclos \cite{liu2022multitask_mec} \\
+\hline
+1 &
+$E = \varepsilon \, b$ (energia constante por ciclo) &
+$\varepsilon = 10^{-10}$ J/ciclo; $b$ em ciclos \cite{yang2019noma_mec} \\
+\hline
+\end{tabular}
+\vspace{2pt}
+\\
+{\footnotesize \textit{Notas:} (i) $b$ representa o número total de ciclos de CPU exigidos pela tarefa (por exemplo, $b = \textit{size} \cdot \textit{density}$). (ii) Ao alternar o perfil de energia de forma independente do perfil de CPU, é possível gerar regimes não estacionários sem impor correlação forte e permanente entre tempo de serviço e energia.}
+\end{table}

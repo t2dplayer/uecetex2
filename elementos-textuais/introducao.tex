@@ -1,38 +1,288 @@
+% !TeX root = ../documento.tex
 \chapter{Introdução}
 \label{cap:introducao}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in gravida libero, ut sollicitudin ex. Phasellus maximus est non massa pellentesque eleifend. Curabitur tempor placerat est ac placerat. Praesent in ipsum eget ex dapibus pellentesque in vel velit. Donec vulputate vel nibh quis tempor. Praesent luctus fermentum libero, quis convallis metus tristique in. Sed dapibus, odio sed consequat tempor, turpis dolor consectetur risus, sed pharetra nulla ex ut est. Ut dignissim mattis tincidunt. Proin at libero pellentesque, hendrerit tellus ac, placerat felis.
+Neste capítulo serão apresentados o contexto (Seção \ref{sec:contextualizacao}), a motivação (Seção \ref{sec:motivacao}), a definição do problema (Seção \ref{sec:definicao-do-problema}), as questões de pesquisa (Seção \ref{sec:questoes-de-pesquisa}), as hipóteses (Seção \ref{sec:hipoteses}), os objetivos (Seção \ref{sec:objetivos}), as contribuições esperadas (Seção \ref{sec:contribuicoes}), a publicação conseguida (Seção \ref{sec:publicacao}) e finalmente como será realizada a organização do trabalho (Seção \ref{sec:organizacao}).
 
-Vestibulum lectus nisi, pretium sed viverra sodales, ornare imperdiet metus. Sed non nulla orci. Sed in odio interdum, tempus mi non, posuere risus. Nullam leo quam, auctor in nisl eget, dignissim suscipit diam. Nunc lacinia lectus non ex euismod, nec hendrerit tellus maximus. Fusce vel lorem sit amet ex pulvinar imperdiet vitae eget massa. Sed sem arcu, sagittis vel ultricies dapibus, finibus vitae orci. Vestibulum laoreet molestie dolor sit amet varius. Curabitur euismod justo fringilla turpis interdum fermentum. Phasellus dignissim tellus pharetra, accumsan est at, imperdiet odio. Curabitur volutpat odio et sem tempor fringilla.
+\section{Contextualização}
+\label{sec:contextualizacao}
 
-Ut tincidunt neque eu sapien vehicula varius. Proin in vestibulum massa, non hendrerit magna. Proin diam turpis, posuere sit amet nulla ut, venenatis maximus justo. Aenean ac erat condimentum, tempus velit et, vestibulum risus. Donec et consequat nunc. Vivamus eu congue risus, vel consequat mi. Vestibulum sit amet lectus felis. Sed laoreet mi non neque tempor, nec tincidunt turpis lobortis. Aliquam eros justo, sollicitudin sit amet suscipit eu, consequat sit amet nisi. Nulla id tempus felis.
+A convergência entre tecnologias de comunicação, eletrificação veicular e condução autônoma tem moldado um novo paradigma para o setor de transportes. O conceito de Internet de Veículos (IoV) transforma veículos em sistemas computacionais sofisticados, capazes de viabilizar diversas aplicações de Sistemas de Transporte Inteligentes (ITS)~\cite{RANI2023108543}. 
+
+Veículos modernos são equipados com múltiplos sensores, unidades de processamento e interfaces de comunicação, permitindo a coleta e o processamento de grandes volumes de dados. Contudo, a complexidade das aplicações e a quantidade crescente de dados a serem processados podem exceder a capacidade computacional das unidades de bordo (\textit{On-Board Unit} - OBU) instaladas.
+
+Uma solução imediata seria aumentar a capacidade computacional dessas OBUs, possibilitando maior processamento local. No entanto, o atual período de transição tecnológica resulta em cenários heterogêneos, no qual coexistem OBUs com diferentes capacidades computacionais~\cite{luo2024} e distintas tecnologias de comunicação~\cite{zheng2015}. Essa diversidade representa um desafio fundamental para a implementação de aplicações veiculares em larga escala, especialmente no contexto das cidades inteligentes (\textit{Smart Cities})~\cite{luo2024}.
+
+Nesse ambiente fortemente dinâmico e caótico, muitas aplicações, em particular aquelas voltadas à condução autônoma, impõem requisitos rigorosos de latência~\cite{chao2025}. A execução integral do processamento nos dispositivos terminais (\textit{User Equipments} – UEs) frequentemente inviabiliza o atendimento a tais requisitos, devido às limitações físicas de energia e capacidade computacional dos chips embarcados~\cite{luo2024}.
+
+Para superar essas restrições, destaca-se a Computação Veicular de Borda (\textit{Vehicular Edge Computing} – VEC), um paradigma onde servidores computacionalmente robustos são posicionados próximos aos veículos, reduzindo de forma significativa a latência de processamento~\cite{liu2021}. Tecnologias relacionadas, como a Computação em Nuvem Veicular (\textit{Vehicular Cloud Computing} – VCC)~\cite{whaiduzzaman2014} e a Computação em Névoa Veicular (\textit{Vehicular Fog Computing} – VFC)~\cite{keshari2022}, ampliam o escopo do processamento distribuído, oferecendo suporte adicional em diferentes níveis de proximidade e escalabilidade.
+
+O descarregamento de tarefas (\textit{task offloading}) surge como o mecanismo central para operacionalizar a comunicação e o processamento colaborativo entre veículos e essas arquiteturas distribuídas. Essa técnica consiste em migrar tarefas computacionais para nós mais capazes, como servidores de borda ou outros veículos com maior poder de processamento~\cite{wang2022}. Dessa forma, veículos com recursos limitados conseguem executar aplicações complexas, aproveitando melhor a infraestrutura distribuída disponível na rede.
+
+O principal desafio, entretanto, está em decidir quando e para onde descarregar as tarefas, considerando múltiplos fatores conflitantes, como tempo limite de processamento, custo energético, balanceamento de carga e qualidade do enlace de comunicação. Abordagens determinísticas, baseadas exclusivamente em heurísticas, apresentam desempenho limitado diante da alta variabilidade espacial e temporal do ambiente veicular~\cite{ahmed2022}. Mobilidade intensa, flutuações do canal e mudanças abruptas na carga computacional tornam as decisões estáticas rapidamente obsoletas, comprometendo a eficiência do sistema.
+
+Essa limitação tem impulsionado a busca por soluções adaptativas e mais robustas, baseadas em aprendizado de máquina e sistemas inteligentes~\cite{mao2017,zhang2018,zhou2019,huang2020,shi2023,nieto2024}. Diante desse cenário, este trabalho propõe um modelo híbrido para o descarregamento de tarefas que integra técnicas de aprendizado de máquina (ML) e lógica fuzzy. Essa abordagem combina a capacidade do ML de capturar padrões dinâmicos e realizar decisões adaptativas com a habilidade da lógica fuzzy de lidar com incertezas e valores imprecisos do ambiente veicular, oferecendo um mecanismo mais flexível e eficaz para tomada de decisão em tempo real.
 
 \section{Motivação}
 \label{sec:motivacao}
 
-Duis consequat, urna sed pretium euismod, risus ipsum aliquet sem, sed semper lectus purus vitae erat. Donec aliquam at erat ac ullamcorper. Donec enim neque, consectetur nec finibus eget, porttitor a tortor. Integer ac massa tincidunt, accumsan purus et, fringilla orci. Vivamus tristique commodo tincidunt. Integer eget nisi elementum, auctor lectus at, dignissim lorem. Morbi varius ornare tellus quis viverra. Vestibulum massa ipsum, tempor venenatis ligula ut, molestie sodales lectus. Aenean commodo urna ut lacus varius fringilla. Aliquam et lacus feugiat, mollis velit quis, efficitur lacus. Phasellus aliquam interdum ipsum maximus convallis. Integer egestas, mi ac cursus semper, nulla tellus tempus odio, at lacinia lectus turpis vel lectus. Morbi consectetur orci ex, a lacinia risus rutrum eget. Sed arcu sapien, varius vitae convallis ac, venenatis vel lacus.
+\section{Definição do Problema}
+\label{sec:definicao-do-problema}
 
-Aliquam fringilla dignissim risus a ullamcorper. Fusce sed condimentum dolor. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus eu purus convallis, congue lectus nec, facilisis massa. Fusce lacinia urna id velit vehicula, a aliquam ligula finibus. Nam consequat gravida lectus, eu viverra metus iaculis sed. Aliquam erat volutpat. Fusce venenatis est mauris, nec iaculis leo egestas et.
+Diante das limitações de processamento local e da elevada variabilidade do ambiente veicular, o problema central investigado neste trabalho pode ser formulado da seguinte maneira:
+
+\begin{quote}
+\textbf{Como realizar o descarregamento de tarefas em sistemas de Computação Veicular de Borda (VEC) ou em outros dispositivos veiculares de modo confiável e adaptativo, garantindo redução no tempo de execução, diminuição do consumo energético e adequado balanceamento de carga entre os nós disponíveis?}
+\end{quote}
+
+Estudos recentes reforçam que a alta mobilidade, a intermitência dos enlaces e a heterogeneidade de recursos tornam esse desafio ainda mais complexo~\cite{liu2021,mao2017,shi2023,nieto2024}.
+
+Para delimitar o escopo da solução proposta, é importante destacar que o problema de task offloading, em sua essência, configura-se como um problema de otimização \textit{NP-hard}~\cite{mao2017,feng2017}. Isso implica que soluções exatas em tempo polinomial são inviáveis para cenários dinâmicos como o veicular, o que direciona a busca por métodos de baixa complexidade computacional e boa capacidade de adaptação. 
+
+Outro aspecto importante refere-se a maneira na qual o descarregamento é realizado, podendo ser classificado em três categorias principais: \textit{full offloading} (descarregamento total da tarefa), \textit{partial offloading} (descarregamento parcial) e \textit{adaptive offloading} (descarregamento adaptativo)~\cite{wang2022} como pode ser observado na Figura~\ref{fig:offloading_categories}. Cada abordagem apresenta vantagens e desvantagens específicas, influenciando diretamente a formulação do problema e as estratégias de solução adotadas.
+
+\begin{figure}[ht!]
+    \centering
+    \caption{Formas de descarregamento de tarefas em VEC: \textit{full}, \textit{partial} e \textit{adaptive offloading}, com seus trade-offs de confiabilidade e complexidade.}
+    \UECEfig{}{
+        \fbox{\includegraphics[width=12cm]{figuras/introducao/offloading_categories.pdf}}
+    }{
+        \Fonte{Elaborado pelo autor}
+    }
+\end{figure}
+
+Nesse contexto, a literatura apresenta diversas abordagens para modelar e melhorar a tomada de decisão de descarregamento de tarefas, por exemplo: programação linear e inteira para cenários de Computação de de Borda Multiacesso (\textit{Multi-access Edge Computing} - MEC)~\cite{khan2020energy}, meta-heurísticas como algoritmos genéticos~\cite{li2020genetic}, PSO~\cite{you2021efficient} e colônia de formigas~\cite{kishor2022task} para problemas de grande escala, além de abordagens baseadas em aprendizado de máquina e aprendizado por reforço profundo, adequadas para ambientes altamente variáveis e parcialmente observáveis~\cite{huang2020,shi2023,nieto2024}.
+
+Outra consideração fundamental diz respeito à modelagem do ambiente veicular. Cada solução proposta na literatura assume combinações específicas de tecnologias de comunicação, capacidades computacionais e modelos de consumo energético, o que impacta diretamente a forma como o problema é otimizado~\cite{liu2021}. Além disso, deve-se definir se o descarregamento será realizado apenas para servidores de borda, para veículos vizinhos (\textit{offloading} colaborativo) ou para ambos, como no paradigma de \textit{Vehicular Fog Computing} (\textit{VFC})~\cite{keshari2022}. Essa escolha é influenciada pela disponibilidade de recursos, pelo perfil da aplicação e pela estabilidade dos enlaces, variando conforme o cenário de estudo.
+
+A mobilidade veicular constitui outro elemento crítico. Diferentes cenários, como os urbanos, suburbanos e  rodoviários, apresentam padrões distintos de flutuação do canal, densidade de veículos e comportamento do tráfego. Em áreas urbanas, fatores como congestionamentos, presença de pedestres, ônibus e motocicletas podem alterar significativamente a dinâmica da conectividade e, consequentemente, as estratégias de \textit{offloading}~\cite{chao2025,luo2024}. Tais aspectos precisam ser considerados para que a tomada de decisão seja realista e eficaz.
+
+A viabilização do processo de decisão depende de mecanismos eficientes de comunicação e descoberta de recursos. Neste trabalho, assume-se comunicação via 5G NR (\textit{Fifth-Generation Wireless Technology NewRadio}) entre os veículos e os servidores de borda, e comunicação V2X (\textit{Vehicle-to-Everything}) entre os veículos, alinhado às diretrizes das arquiteturas 3GPP Release 16/17~\cite{3gppRel17}. Além disso, protocolos de descoberta e anúncios de recursos são necessários para que os veículos obtenham informações sobre capacidade de CPU, características relacionadas ao estado energético e qualidade do enlace dos dispositivos vizinhos~\cite{zhou2019,liu2021}.
+
+Outro ponto essencial refere-se ao perfil das aplicações beneficiadas pelo descarregamento. A popularização de hardware embarcado mais poderoso em OBUs permite o processamento local de aplicações leves; contudo, aplicações com baixa carga de dados, mas com alta demanda computacional, como visão computacional, detecção de objetos, fusão sensorial, criptografia e algoritmos de navegação autônoma, são candidatas naturais ao \textit{offloading}~\cite{shi2023,nieto2024}. Para evitar latências excessivas, é necessário equilibrar o custo de transmissão com o ganho de processamento externo, preservando as restrições temporais impostas pela aplicação.
+
+Somente após a coleta e integração dessas informações é possível realizar a tomada de decisão sobre o descarregamento. Essa decisão deve considerar a incerteza inerente às medições, a rápida variação do ambiente e a necessidade de minimizar falhas. Assim, soluções adaptativas baseadas em aprendizado de máquina, reforço profundo ou lógica fuzzy têm sido exploradas como alternativas promissoras para lidar com a incerteza, o dinamismo e a complexidade dos cenários veiculares~\cite{huang2020,shi2023,nieto2024}.
+
+De forma geral pode-se resumir os problemas enfrentados através da Figura~\ref{fig:problems} onde uma decisão de descarregamento de tarefa deve considerar o cenário observado, as tecnologias de comunicação empregadas, as aplicações utilizadas, a incerteza do ambiente, o custo e o objetivo buscado.
+
+\begin{figure}[ht!]
+    \centering
+    \caption{\label{fig:problems}Principais problemas inerentes ao \textit{task offloading} veicular: mobilidade e instabilidade do enlace, heterogeneidade de recursos e filas, custos energéticos, incerteza de medições, dependência de tecnologias/protocolos e complexidade \textit{NP-hard} sob restrições de latência e confiabilidade.}
+    \UECEfig{}{
+        \fbox{%
+        \resizebox{0.95\linewidth}{!}{%
+        \begin{tikzpicture}[
+          font=\scriptsize,
+          node distance=7mm and 9mm,
+          >=Latex
+        ]
+          \tikzset{
+            box/.style={
+              draw, thick, rounded corners=2pt,
+              align=left, inner sep=4pt,
+              text width=3.4cm, minimum height=14mm
+            },
+            cbox/.style={
+              draw, thick, rounded corners=2pt,
+              align=center, inner sep=4pt,
+              text width=3.8cm, minimum height=14mm
+            },
+            arrow/.style={-Latex, thick},
+            group/.style={draw, thick, rounded corners=3pt, inner sep=6pt},
+          }
+
+          % -----------------------------
+          % Núcleo (centro)
+          % -----------------------------
+          \node[cbox] (decision) {\textbf{Decisão de offloading}\\local / MEC / V2V};
+
+          \node[cbox, above=of decision] (goals)
+            {\textbf{Objetivos / Restrições}\\
+             Reduzir tempo e energia.\\
+             Cumprir restrição de tempo das aplicações.\\
+             Balancear a carga entre os dispositivos.};
+
+          \node[cbox, above=of goals] (nphard)
+            {\textbf{Complexidade}\\
+             Otimização \textit{NP-hard}\\
+             Exige soluções rápida e adaptativas.};
+
+          \node[cbox, below=of decision] (model)
+            {\textbf{Modelagem e Protocolos}\\
+             5G NR / V2X.\\
+             Descoberta/anúncio de recursos.\\
+             Protocolo para \textit{Offloading}.};
+
+          % -----------------------------
+          % Laterais (problemas do ambiente)
+          % -----------------------------
+          \node[box, left=of decision] (mob)
+            {\textbf{Mobilidade / Canal}\\
+             Flutuação do canal.\\
+             Intermitência na comunicaçao.};
+
+          \node[box, right=of decision] (hetero)
+            {\textbf{Recursos / Carga}\\
+             CPUs distintas.\\
+             Filas variáveis.\\
+             Balanceamento de carga.};
+
+          % Contexto acima das laterais (sem aumentar largura)
+          \node[box, above=of mob] (scen)
+            {\textbf{Cenário}\\
+             Urbano ou Rodoviário.\\
+             Densidade e tráfego distintos.};
+
+          \node[box, above=of hetero] (apps)
+            {\textbf{Aplicações}\\
+             Diferentes perfis e requisitos. 
+             Visão Computacional, Criptografia, Navegação etc.};
+
+          % Problemas inferiores
+          \node[box, below=of mob] (energy)
+            {\textbf{Energia}\\
+             Custo variável por ciclo.\\
+             Bateria / estado Energético.\\
+             \textit{Trade-off} energia--tempo};
+
+          \node[box, below=of hetero] (unc)
+            {\textbf{Incerteza}\\
+             Medições ruidosas.\\
+             Estimativas imperfeitas.\\
+             Estado parcial.};
+
+          % -----------------------------
+          % Setas (sem cruzamentos)
+          % -----------------------------
+          \draw[arrow] (nphard) -- (goals);
+          \draw[arrow] (goals) -- (decision);
+
+          \draw[arrow] (model) -- (decision);
+
+          \draw[arrow] (mob) -- (decision);
+          \draw[arrow] (hetero) -- (decision);
+
+          \draw[arrow] (energy.north east) -- ($(decision.south west)+(2mm,0mm)$);
+          \draw[arrow] (unc.north west)   -- ($(decision.south east)+(-2mm,0mm)$);
+
+          \draw[arrow] (scen) -- (mob);
+          \draw[arrow] (apps) -- (hetero);
+
+          % Moldura (opcional)
+          \begin{pgfonlayer}{background}
+            \node[group, fit=(nphard)(goals)(decision)(model)(scen)(mob)(energy)(apps)(hetero)(unc)] {};
+          \end{pgfonlayer}
+
+        \end{tikzpicture}%
+        }%
+        }%
+    }{
+        \Fonte{Elaborado pelo autor}
+    }
+\end{figure}
+
+
+\section{Questões de Pesquisa}
+\label{sec:questoes-de-pesquisa}
+
+Este trabalho busca responder às seguintes questões de pesquisa, formuladas a partir das limitações inerentes ao ambiente veicular, da complexidade do problema de descarregamento de tarefas e da necessidade de garantir confiabilidade, eficiência energética e baixa latência em sistemas VEC/V2X:
+
+\begin{alineas}[label=\textbf{QP\arabic*.}]
+    \item \textbf{Como realizar o descarregamento de tarefas em ambientes VEC/V2X de maneira confiável e adaptativa, considerando a alta variabilidade da mobilidade veicular, do canal de comunicação e da carga computacional?}
+
+    \item \textbf{De que forma modelos híbridos, combinando aprendizado de máquina e lógica fuzzy, podem melhorar a tomada de decisão de \textit{task offloading} em cenários veiculares dinâmicos, mitigando incertezas na coleta de informação e na predição do estado futuro da rede?}
+
+    \item \textbf{Quais são os impactos do uso conjunto de comunicação 5G NR e V2X no desempenho do \textit{task offloading}, especialmente na redução da latência, no consumo energético e na taxa de falhas de descarregamento?}
+
+    \item \textbf{Como diferentes perfis de aplicação veicular, especialmente aquelas com baixa carga de dados e alta demanda computacional, influenciam a decisão de quando, para onde e quanto descarregar, considerando limites de latência, balanceamento de carga e consumo energético?}
+
+\end{alineas}
+
+
+\section{Hipóteses}
+\label{sec:hipoteses}
+
+A partir das questões acima e da fundamentação teórica apresentada, formulam-se as seguintes hipóteses de pesquisa:
+
+\begin{alineas}[label=\textbf{H\arabic*.}]
+    \item \textbf{A integração de aprendizado de máquina com lógica fuzzy é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários VEC/V2X altamente dinâmicos.}
+
+    \item \textbf{O uso de modelos híbridos reduz o impacto das incertezas inerentes à mobilidade veicular, permitindo estimar de forma mais robusta o melhor destino para o descarregamento de tarefas.}
+
+    \item \textbf{A utilização conjunta de 5G NR e V2X proporciona atendimento as requisitos das aplicações mais estáveis e de menor latência, aumentando a confiabilidade do \textit{offloading} e reduzindo a probabilidade de falhas decorrentes de desconexões súbitas.}
+
+    \item \textbf{Aplicações com baixa carga de dados e alta demanda computacional apresentam o maior ganho com o offloading, desde que o modelo consiga estimar adequadamente o custo energético e o impacto na latência de processamento.}
+
+\end{alineas}
+
+
 
 \section{Objetivos}
 \label{sec:objetivos}
 
-Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ex tellus, sodales in euismod at, ultricies quis leo.
 
 \subsection{Objetivo Geral}
 \label{sec:objetivo-geral}
+Desenvolver e avaliar um modelo híbrido de decisão, baseado na integração da lógica fuzzy com o aprendizado por reforço, para otimizar o descarregamento de tarefas multiobjetivo em redes veiculares 5G NR (VEC/V2X).
 
-Integer imperdiet ac magna eu pulvinar. Aliquam erat volutpat. Etiam molestie, nulla a egestas aliquet, velit augue congue metus, et ultricies metus massa vel nibh. Vivamus viverra commodo finibus. Nam elementum convallis accumsan. Quisque tincidunt purus nisl, tincidunt ultricies odio ultrices eu.
 
 \subsection{Objetivos Específicos}
 \label{sec:objetivos-especificos}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque, velit at facilisis hendrerit, dui eros lacinia metus, non maximus mi tortor ut lectus. Donec hendrerit leo ut consectetur tincidunt. 
 
-	\begin{alineas}
-		\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dictum sed tortor nec viverra.
-		\item Praesent vitae nulla varius, pulvinar quam at, dapibus nisi. Aenean in commodo tellus. Mauris molestie est sed justo malesuada, quis feugiat tellus venenatis.
-		\item Praesent quis erat eleifend, lacinia turpis in, tristique tellus. Nunc dictum sed tortor nec viverra.
-		\item Mauris facilisis odio eu ornare tempor. Nunc dictum sed tortor nec viverra.
-		\item Curabitur convallis odio at eros consequat pretium.
-	\end{alineas}
+\begin{alineas}[label=\textbf{OE\arabic*.}]
+    \item \textbf{Realizar uma revisão sistemática de algoritmos de \textit{task offloading} em cenários VEC, focando em abordagens de DRL e Lógica Fuzzy}.
+    \item \textbf{Modelar as incertezas do ambiente veicular (ex: qualidade do link, carga do servidor, mobilidade) usando Lógica Fuzzy, projetando funções de pertinência e regras de inferência para gerar indicadores de estado robustos}.
+    \item \textbf{Desenvolver um agente Híbrido Fuzzy-RL que utilize os indicadores fuzzy gerados como parte de seu vetor de estado, e que aprenda uma política de \textit{offloading} para otimizar uma função de recompensa que equilibre latência, balanceamento de carga, taxa de sucesso no offloading e consumo energético}.
+    \item \textbf{Validar a arquitetura híbrida proposta em ambiente de simulação (NS-3), comparando seu desempenho (latência fim-a-fim, consumo de energia e taxa de sucesso no \textit{offloading}) com algoritmos de DRL puros (não-fuzzy) e heurísticas tradicionais}.
+\end{alineas}
+
+\section{Contribuições Esperadas}
+\label{sec:contribuicoes}
+Espera-se que este trabalho produza contribuições relevantes tanto do ponto de vista científico quanto do ponto de vista prático, sobretudo no contexto de sistemas veiculares inteligentes e computação de borda. As principais contribuições previstas são:
+
+\begin{alineas}[label=\textbf{CE\arabic*.}]
+\item \textbf{Proposição de um modelo híbrido para descarregamento de tarefas em ambientes veiculares, integrando técnicas de aprendizado de máquina com lógica fuzzy. O modelo pretende oferecer uma tomada de decisão mais robusta e adaptativa do que abordagens puramente determinísticas ou exclusivamente baseadas em ML, sobretudo em cenários com forte incerteza e alta mobilidade}.
+
+\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do 3GPP Release~17), comunicação V2X sidelink, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de offloading}.
+
+\item \textbf{Desenvolvimento de um módulo fuzzy para tratamento de incertezas e valores imprecisos, voltado para critérios críticos como latência, energia, estabilidade do canal e carga computacional. O módulo fuzzy será integrado ao sistema de decisão, auxiliando na suavização das transições e na prevenção de falhas abruptas}.
+
+\item \textbf{Construção e avaliação de um mecanismo de aprendizado por reforço capaz de identificar padrões dinâmicos e otimizar a ação de descarregamento em tempo real}.
+
+\item \textbf{Implementação do modelo completo em ambiente ns-3 (versão 3.42), utilizando o 5G-LENA e o suporte ao V2X, permitindo avaliar de forma rigorosa métricas como latência, taxa de sucesso, consumo energético, throughput e eficiência do uso do canal}.
+
+\item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais, algoritmos matemáticos e abordagens baseadas exclusivamente em heurísticas, destacando os ganhos obtidos pela integração híbrida ML–Fuzzy}.
+
+\item \textbf{Produção de um conjunto de diretrizes práticas para pesquisadores e engenheiros interessados em projetar sistemas de task offloading veicular, evidenciando cenários onde o modelo híbrido apresenta maior vantagem}.
+
+
+\end{alineas}
+
+\section{Publicação}
+\label{sec:publicacao}
+
+Como parte do desenvolvimento deste trabalho, foi submetido e aceito um artigo no periódico internacional \textit{Journal of Cloud Computing} (Springer), classificado como Q1 nas bases \textit{Scopus/SJR} e posicionado no percentil superior da área de \textit{Computer Networks and Communications}. O artigo, intitulado ``\textit{FOFF: an energy-efficient task offloading in VEC-enabled vehicular networks using fuzzy TOPSIS}''~\cite{vieira2025}, apresenta uma versão preliminar do modelo híbrido de descarregamento de tarefas proposto nesta dissertação, incluindo a arquitetura conceitual e os primeiros resultados derivados de experimentos em simulação. A publicação serviu tanto como validação da relevância científica da abordagem quanto como etapa intermediária para o refinamento metodológico, a ampliação dos cenários simulados e o aprofundamento das análises apresentadas nos capítulos seguintes.
+
+\section{Organização do Trabalho}
+\label{sec:organizacao}
+
+% Este documento está estruturado de forma a conduzir o leitor desde os fundamentos teóricos até os resultados e conclusões do trabalho. A organização segue o seguinte formato:
+
+% \begin{itemize}
+% \item Capítulo~\ref{cap:introducao} — Introdução: apresenta o contexto geral, a motivação, o problema investigado, as questões de pesquisa, as hipóteses e as contribuições esperadas, além desta descrição organizacional.
+
+% \item **Capítulo~\ref{cap:fundamentacao} — Fundamentação Teórica:** discute os conceitos essenciais sobre IoV, VEC, V2X, 5G NR (3GPP Rel.~16/17), task offloading, lógica fuzzy, aprendizado de máquina e modelagens energéticas e computacionais relevantes.
+
+% \item **Capítulo~\ref{cap:trabalhos-relacionados} — Trabalhos Relacionados:** apresenta uma análise crítica da literatura sobre técnicas determinísticas, meta-heurísticas, métodos baseados em aprendizado de máquina e abordagens híbridas para task offloading em cenários veiculares.
+
+% \item **Capítulo~\ref{cap:metodologia} — Metodologia Proposta:** detalha o modelo híbrido desenvolvido, incluindo sua arquitetura, modelos matemáticos, integração ML–Fuzzy, protocolos de comunicação, modelagem do ambiente e etapas do processo de decisão.
+
+% \item **Capítulo~\ref{cap:experimentacao} — Ambiente Experimental e Resultados:** descreve o ambiente de simulação em ns-3, os cenários avaliados, os parâmetros utilizados, os algoritmos comparados e os resultados experimentais, incluindo análise estatística e discussão dos achados.
+
+% \item **Capítulo~\ref{cap:conclusao} — Conclusão e Trabalhos Futuros:** sintetiza as contribuições alcançadas, responde às questões de pesquisa, discute limitações e apresenta direções promissoras para pesquisas futuras.
+
+
+% \end{itemize}
+
+% Essa estrutura visa proporcionar fluidez na leitura, evidenciando os fundamentos, avanços e impactos científicos do trabalho de forma clara e organizada.

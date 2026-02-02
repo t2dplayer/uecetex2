@@ -576,7 +576,13 @@
 
 \preambulo{
 	\ifthenelse{\boolean{uecetex2@ehqualificacao}}{ %
-		Proposta de qualificação apresentada ao Curso de \imprimirmestrado\  da \imprimiries\ (\imprimiriessigla) como requisito parcial para a defesa de dissertação.
+		\ifthenelse{\boolean{uecetex2@ehtese}}{ %
+			Proposta de qualificação apresentada ao Curso de \imprimirdoutorado\ do \imprimirprogramadoutorado\ do \imprimircentro\ da \imprimiries, como requisito parcial para a defesa de tese.
+		}{ %
+			\ifthenelse{\boolean{uecetex2@ehdissertacao}}{ %
+				Proposta de qualificação apresentada ao Curso de \imprimirmestrado\  da \imprimiries\ (\imprimiriessigla) como requisito parcial para a defesa de dissertação.
+			}{} %
+		}
 	}{ %
 		\ifthenelse{\boolean{uecetex2@ehdissertacao}}{ %
 			\preambulodissertacao %	
