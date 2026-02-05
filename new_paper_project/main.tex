@@ -28,7 +28,7 @@
 
 \begin{document}
 
-\title[Article Title]{A Hybrid Fuzzy-Deep Reinforcement Learning Approach for Task Offloading in 5G VEC Networks}
+\title[Article Title]{A RL Fuzzy Backoff Mechanism for Task Offloading in VEC 5G NR Environments}
 
 \author*[1,2]{\fnm{Antônio Sérgio de Sousa} \sur{Vieira}}\email{sergio.vieira@ifce.edu.br}
 \author[1,3]{\fnm{Alisson Barbosa de} \sur{Souza}}\email{alisson@ufc.br}
@@ -40,7 +40,7 @@
 
 
 \abstract{
-The convergence of autonomous driving, vehicular electrification, and 5G networks has established a new paradigm in Intelligent Transportation Systems (ITS). Vehicular Edge Computing (VEC) emerges as a critical enabler for processing computationally intensive tasks with low latency. However, high mobility, channel intermittency, and the heterogeneity of vehicular resources make task offloading a complex NP-hard problem. Deterministic approaches often fail to adapt to the acute variability of this environment, while pure Machine Learning models may struggle with cold-start and uncertainty handling. This paper proposes a hybrid decision model that integrates Fuzzy Logic with Deep Reinforcement Learning (DRL). The Fuzzy module handles the inherent uncertainty of system inputs (e.g., varying channel quality and load), providing robust processing state indicators, which then inform a DRL agent to optimize offloading decisions. Extensive simulations using NS-3 and 5G-LENA demonstrate that our hybrid approach outperforms traditional heuristics and pure DRL methods in terms of latency reduction, energy efficiency, and task completion rates, particularly in non-stationary scenarios.
+
 }
 
 \keywords{Task Offloading, Vehicular Edge Computing, Deep Reinforcement Learning, Fuzzy Logic, 5G NR}
@@ -48,39 +48,26 @@ The convergence of autonomous driving, vehicular electrification, and 5G network
 \maketitle
 
 \section{Introduction}\label{sec_introduction}
+% Aplicações em ambientes veiculares. Ambiente 5G NR e V2X. Limitações de recursos computacionais veiculares. Transição de capacidade computacional dos OBUS veículos. Problemas de latencia podem ser resolvidos através do descarregamento de tarefas para servidores de boda (VEC). Ambiente altamente dinâmico, dispositivos de borda podem possuir regimes diferentes para processamento e consumo energético, além das aplicações. Isso são os drifts. Em problemas reais, existem diversos agentes disputando recursos computacionais limitados. Cada vez que uma tarefa é descarregada, o estado do sistema muda, causando um drift induzido no tempo de processamento, pois os servidores possuem filas. Agentes egoistas, podem identificar recursos ociosos e ao mesmo tempo, vários podem ir em busca desses recursos (efeito manada) gerando problemas de atendimento. Neste trabalho é proposto um mecanismo descentralizado de back-off baseado em lógica fuzzy e aprendizado por reforço em ambientes multi-agent não estacionários para melhorar o uso dos recursos, ao mesmo tempo que busca atender os requisitos das aplicações, diminuir o consumo energético global e garantir balanceamento de carga utilizando índice de jain. As principais contribuições deste trabalho são: (i) quantificar matematicamente o colapso quanto agentes convergem para a mesma política simultaneamente; (ii) utilizar abordagem descentralizadas através de aprendizado de campo médio para identificar a densidade local; (iii) propor um mecanismo de backoff fuzzificado.
+Com o advento do \textit{5G New Radio} (NR) e a evolução das comunicações \textit{Vehicle-to-Everything} (V2X), as aplicações em ambientes veiculares tornaram-se mais sofisticadas, exigindo alta performance em tempo real. No entanto, esse ecossistema enfrenta um desafio crítico: as limitações de recursos computacionais das unidades de bordo (\textit{On-Board Units} - OBUs). Para contornar essa restrição, a transição da capacidade computacional dos veículos para a borda da rede --- o chamado \textit{Vehicular Edge Computing} (VEC) --- surge como uma solução fundamental para mitigar problemas de latência por meio do descarregamento de tarefas (\textit{offloading}).
 
-The automotive industry is undergoing a transformative shift driven by the integration of communication technologies, vehicular electrification, and autonomous driving. This convergence has given rise to the Internet of Vehicles (IoV), turning vehicles into sophisticated computational nodes capable of supporting advanced Intelligent Transportation Systems (ITS) applications \cite{RANI2023108543}. Modern vehicles effectively operate as data centers on wheels, equipped with high-resolution sensors and powerful onboard units (OBUs). However, the computational demand of applications such as sensor fusion, trajectory planning, and real-time computer vision often exceeds the constrained resources of individual vehicles \cite{luo2024}.
 
-Vehicular Edge Computing (VEC) addresses this limitation by positioning computational resources at the network edge, enabling task offloading from vehicles to Radio Access Network (RAN) nodes or Roadside Units (RSUs) \cite{liu2021}. While VEC significantly reduces latency compared to cloud computing, the decision of \textit{when}, \textit{where}, and \textit{how} to offload tasks remains a critical challenge. The vehicular environment is characterized by high mobility, dynamic network topology, and rapid fluctuations in channel quality, making static or purely heuristic offloading decisions inefficient \cite{ahmed2022}.
 
-The fundamental problem can be formulated as: \textit{How to reliably and adaptively offload tasks in VEC systems to minimize latency and energy consumption while ensuring load balancing, given the uncertainties of the vehicular environment?}
+Contudo, o ambiente VEC é intrinsecamente dinâmico. Dispositivos de borda operam sob diferentes regimes de processamento e consumo energético, além de lidarem com demandas heterogêneas das aplicações, fenômenos conhecidos como \textit{drifts}. Em cenários reais, a disputa por recursos limitados ocorre entre múltiplos agentes. Cada decisão de descarregamento altera o estado do sistema, induzindo um \textit{drift} temporal no processamento devido à formação de filas nos servidores. Quando agentes agem de forma egoísta, identificando e convergindo simultaneamente para recursos ociosos, ocorre o chamado ``efeito manada'', o qual compromete a estabilidade do sistema e degrada a qualidade do atendimento.
 
-Existing solutions often rely on deterministic optimization or heuristics, which lack the flexibility to handle the stochastic nature of vehicular networks. Conversely, data-driven approaches like Deep Reinforcement Learning (DRL) have shown promise in learning optimal policies from environmental interaction \cite{mao2017, shi2023}. However, DRL agents can struggle with convergence speed and stability when facing highly uncertain or noisy state spaces typical of 5G vehicular networks.
+Para enfrentar a natureza não estacionária e competitiva desses ambientes, este trabalho propõe um mecanismo descentralizado de \textit{back-off}, fundamentado em Lógica Fuzzy e Aprendizado por Reforço (\textit{Reinforcement Learning} - RL) em ambientes multiagente não estacionários. O objetivo central é otimizar o uso de recursos e atender aos requisitos de QoS das aplicações, reduzindo o consumo energético global e garantindo o balanceamento de carga através do Índice de Fairness de Jain \cite{jain1984quantitative}.
 
-To overcome these limitations, we propose a \textbf{Hybrid Fuzzy-DRL Task Offloading Model}. This novel architecture combines the logic-based robustness of Fuzzy Logic with the adaptive learning capabilities of DRL. The Fuzzy module preprocesses uncertain environmental data (such as signal quality and server load) into reliable linguistic state indicators. These indicators enrich the state space of the DRL agent, allowing it to learn more efficient offloading policies faster and with greater stability.
+% $$J(x_1, x_2, \dots, x_n) = \frac{(\sum_{i=1}^{n} x_i)^2}{n \cdot \sum_{i=1}^{n} x_i^2}$$
 
-The main contributions of this paper are:
-\begin{enumerate}
-    \item A unified system model for 5G VEC networks incorporating non-stationary arrival processes and realistic energy consumption profiles.
-    \item A novel hybrid decision-making architecture where Fuzzy Logic mitigate environmental uncertainty, enhancing the training process of a Deep Reinforcement Learning agent.
-    \item A comparative performance evaluation using the NS-3 simulator with the 5G-LENA module, demonstrating the superiority of the proposed approach over baseline benchmarks in terms of latency, energy consumption, and reliability.
+As principais contribuições deste trabalho são detalhadas a seguir:
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{Quantificação Matemática do Colapso:} Uma análise do impacto sistêmico quando múltiplos agentes convergem para a mesma política simultaneamente;
+    \item \textbf{Aprendizado de Campo Médio (\textit{Mean Field Learning}):} Utilização de uma abordagem descentralizada para identificar a densidade local de agentes e mitigar a explosão de estados;
+    \item \textbf{Mecanismo de \textit{Back-off} Fuzzificado:} Proposição de um método inteligente para gerenciar o acesso aos recursos, adaptando-se às incertezas do ambiente veicular dinâmico.
 \end{enumerate}
 
-The remainder of this paper is organized as follows: Section \ref{sec_related_work} reviews related work. Section \ref{sec_system_model} details the system model. Section \ref{sec_methodology} presents the proposed hybrid solution. Section \ref{sec_experiments} describes the experimental setup and discusses results. Section \ref{sec_conclusion} concludes the paper.
 
 \section{Related Work}\label{sec_related_work}
-
-Task offloading in VEC has attracted significant research attention. Approaches can generally be categorized into deterministic optimization, heuristics, and learning-based methods.
-
-Deterministic methods typically model offloading as an optimization problem (e.g., Integer Linear Programming) to minimize delay or energy. While mathematically rigorous, these solutions often require complete system state information, which is impractical in real-time vehicular scenarios \cite{khan2020energy}.
-
-Heuristic algorithms, such as Greedy approaches, Genetic Algorithms \cite{li2020genetic}, or Particle Swarm Optimization (PSO) \cite{you2021efficient}, offer lower complexity but may get trapped in local optima and fail to adapt to rapid environmental changes.
-
-Recently, Reinforcement Learning (RL) and Deep RL (DRL) have emerged as powerful tools for dynamic decision-making. For instance, \cite{lu2023a3c} proposed an A3C-based algorithm for load balancing in VEC. Similarly, \cite{guo2024deep} combined DDPG with Priority Experience Replay to optimize offloading policies. While promising, these pure DRL methods often suffer from slow convergence and instability when the state space is noisy or highly widespread.
-
-Fuzzy Logic has typically been used for network selection or simple decision-making \cite{vieira2025}, excelling at handling imprecise data. However, standard Fuzzy controllers lack the ability to ``learn'' and optimize long-term rewards.
-
-Our work bridges this gap by integrating Fuzzy Logic as a state-abstraction layer for DRL, creating a hybrid model that leverages the strengths of both paradigms: the uncertainty handling of Fuzzy Logic and the adaptability of Deep Reinforcement Learning.
 
 \section{System Model}\label{sec_system_model}
 
@@ -210,106 +197,29 @@ where $\alpha \in [0,1)$ is the inertia factor. Figure \ref{fig:regime_com_inerc
     \label{fig:regime_com_inercia}
 \end{figure}
 
-\section{Proposed Hybrid Solution}\label{sec_methodology}
+\section{Proposed Solution}\label{sec_methodology}
 
-The core novelty of tasks offloading in this work is the integration of Fuzzy Logic as a state abstraction layer for a Deep Reinforcement Learning (DRL) agent. VEC environments are characterized by noisy and imprecise data; raw metrics like SINR or queue length fluctuate rapidly, potentially destabilizing DRL training ("state explosion" or "noisy feedback"). The Fuzzy Logic Controller (FLC) smoothens these inputs into high-level indicators (e.g., "Link Quality is High"), which then constitute the state space for the DRL agent.
 
-\subsection{Fuzzy Logic Preprocessing}
-The FLC processes raw environmental metrics to produce a "Suitability Score" for each candidate server. This score represents a logic-based assessment of the server's fitness for offloading, considering multiple criteria simultaneously.
+\subsection{Fuzzy Logic}
 
 \subsubsection{Fuzzification}
-Input variables (e.g., predicted Latency $L_{pred}$ and Energy Cost $E_{cost}$) are mapped to linguistic terms (e.g., Low, Medium, High) using Triangular Membership Functions (TMFs).
-A TMF is defined by a triplet $(a, b, c)$ as:
-\begin{equation}
-    \mu(x) = \begin{cases}
-    0, & x < a \\
-    \frac{x-a}{b-a}, & a \le x \le b \\
-    \frac{c-x}{c-b}, & b \le x \le c \\
-    0, & x > c
-    \end{cases}
-\end{equation}
 
 \subsubsection{Fuzzy Rules and Inference}
-We utilize a set of fuzzy rules (IF-THEN) to map inputs to the output Suitability. For example:
-\begin{itemize}
-    \item \textbf{Rule 1:} IF Latency is \textit{Low} AND Energy is \textit{Low} THEN Suitability is \textit{Very High}.
-    \item \textbf{Rule 2:} IF Latency is \textit{High} OR Energy is \textit{High} THEN Suitability is \textit{Poor}.
-\end{itemize}
-The output is defuzzified to produce a scalar value $O_{fuzzy} \in [0, 1]$.
 
 \subsection{Deep Reinforcement Learning Agent}
-The DRL agent makes the final offloading decision. We employ the Proximal Policy Optimization (PPO) algorithm, known for its stability and sample efficiency. The problem is formulated as a Markov Decision Process (MDP):
 
 \subsubsection{State Space ($S_t$)}
-The state vector $s_t$ aggregates the fuzzy indicators and vehicle status:
-\begin{equation}
-    s_t = \{ \mathbf{S}_{fuzzy}, B_{rem}, Q_{local} \}
-\end{equation}
-where $\mathbf{S}_{fuzzy}$ is the vector of fuzzy suitability scores for all available RSUs, $B_{rem}$ is the remaining battery, and $Q_{local}$ is the local queue size.
 
 \subsubsection{Action Space ($A_t$)}
-The action $a_t$ is the discrete selection of the offloading target:
-\begin{equation}
-    a_t \in \{ 0, 1, \dots, K \}
-\end{equation}
-where $0$ denotes local processing and $k \in \{1, \dots, K\}$ denotes offloading to RSU $k$.
 
 \subsubsection{Reward Function ($R_t$)}
-The reward function is designed to minimize system cost (latency and energy) while enforcing reliability constraints. The immediate reward $r_t$ is defined as:
-\begin{equation}
-    r_t = - \left( \alpha \frac{L_i}{L_{max}} + \beta \frac{E_i}{E_{max}} \right) - \eta \cdot \mathbb{I}_{fail}
-\end{equation}
-where $\alpha, \beta$ are weighting factors, $L_{max}, E_{max}$ are normalization constants, and $\mathbb{I}_{fail}$ is a penalty term if the task misses its deadline. By maximizing cumulative reward, the agent learns a policy $\pi^*(a_t|s_t)$ that balances delay and energy consumption.
 
 \section{Experimental Evaluation}\label{sec_experiments}
 
 \subsection{Simulation Setup}
-We implement the proposed solution in the Network Simulator 3 (ns-3) version 3.35, integrated with the 5G-LENA module (v2.0) to accurately model the 5G NR Radio Access Technology. The scenario consists of a 3x3 Manhattan Grid topology, where each intersection is equipped with an RSU connected to an Edge Server. Vehicles move according to the SUMO mobility traces, maintaining a realistic urban traffic flow.
 
-The channel bandwidth is set to 100 MHz in the 3.5 GHz band. Task generation follows the non-stationary regime model described in Section \ref{sec_system_model}, alternating between "Low Load" (Poisson $\lambda=0.5$ tasks/s) and "Burst" (Pareto $\alpha=1.5$) phases.
-
-\subsection{Performance Analysis}
-We compare the \textbf{Hybrid Fuzzy-DRL} approach against three baselines: \textit{Local-Only}, \textit{Random Offloading}, and \textit{Greedy} (SNR-based).
-
-\subsubsection{Latency Reduction}
-Figure \ref{fig:results_latency} presents the average task completion time. The Hybrid solution consistently achieves the lowest latency. In regime transitions (e.g., sudden traffic spikes), the Fuzzy pre-processor allows the DRL agent to quickly adapt its state perception, avoiding congested servers that the Greedy approach ironically targets.
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.95\linewidth]{images/figura-4.png}
-    \caption{Average Task Latency (ms) comparison. The Hybrid model demonstrates superior stability and lower delay, especially in high-load regimes.}
-    \label{fig:results_latency}
-\end{figure}
-
-\subsubsection{Energy Efficiency}
-Figure \ref{fig:results_energy} illustrates the total energy consumption per successfully completed task. By optimizing the trade-off between transmission power and computation cost, the Hybrid agent reduces energy usage by approximately 15\% compared to the Greedy strategy.
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.95\linewidth]{images/figura-5.png}
-    \caption{Average Energy Consumption (J/task). The proposed solution effectively minimizes energy by selecting energy-efficient offloading targets.}
-    \label{fig:results_energy}
-\end{figure}
-
-\subsubsection{Success Rate}
-Table \ref{tab:results} provides a summary of the task success rates. The ability of the Hybrid model to anticipate congestion through fuzzy load indicators results in fewer packet drops and deadline violations.
-
-\begin{table}[!ht]
-    \caption{Performance Summary (High Load Scenario)}\label{tab:results}
-    \begin{tabular}{lccc}
-        \toprule
-        \textbf{Strategy} & \textbf{Latency (ms)} & \textbf{Energy (J)} & \textbf{Success (\%)} \\
-        \midrule
-        Local & 150 & 5.2 & 100 \\
-        Random & 120 & 3.5 & 85 \\
-        Greedy & 95 & 2.8 & 92 \\
-        Hybrid & \textbf{82} & \textbf{2.4} & \textbf{98} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
 
 \section{Conclusion}\label{sec_conclusion}
-This paper presented a hybrid task offloading mechanism for 5G vehicular networks. By coupling logic-based reasoning (Fuzzy) with data-driven learning (DRL), our solution effectively addresses the non-stationarity and uncertainty of the vehicular edge. Future work will investigate multi-agent cooperation and support for partial offloading.
 
 \bibliographystyle{sn-mathphys-num}
 \bibliography{bib/refs}
