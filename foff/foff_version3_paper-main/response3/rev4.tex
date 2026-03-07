@@ -1,0 +1,156 @@
+\begin{center}
+    \fbox{\textbf{Reviewer \#4}}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{mdframed}[style=review] 
+\textbf{Overall Comment:} This paper focuses on computation offloading in vehicular edge computing networks. A bee colony-based algorithm is proposed to schedule tasks to minimize the total application execution time.
+\end{mdframed}
+
+\textbf{Authors' Response:} We appreciate your detailed review and feedback and for allowing us to improve the article. We carefully read all your comments and address them one by one. We hope the manuscript has been improved as expected.
+\\
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.1:} Although some efforts have been made on the problem solving, the topic of this paper is not novel, and there exist many similar studies to schedule multiple tasks among multiple edge servers. As a result, the novelty and the contribution of this paper need to be further improved.
+\end{mdframed}
+
+\textbf{Authors' Response:} We appreciate the suggestion and the opportunity to improve our paper. Indeed, there are many works on task offloading in vehicular networks, as can be seen in a survey that we previously published [9]. This survey shows that there is much interest from the scientific community in the subject. However, there are still many questions to be explored in the area. In addition, each work in the area has unique characteristics, such as the communication technology used, the remote execution environment, problem formulation, objectives, solution strategies, contextual parameters considered, and experiment scenarios. So, following the suggestion, we created a new table that compares related works and added new texts to the article to help clarify the novelties and contributions of our paper. Modifications are listed below.
+
+\textbf{Changes in the Manuscript:}
+
+\begin{itemize}
+    \item New Table: \textcolor{blue}{Table 1: Comparison of different characteristics of related works.}
+\end{itemize}
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 3, Line 203: \textcolor{blue}{In summary, as can be seen in Table 1, task offloading works in VEC systems investigate multi or single-objective problems using different solution strategies. Of the works that deal with the single-objective optimization problem of reducing the execution time of applications, some use infeasible strategies or that present disadvantages. Others present more sophisticated solution strategies like metaheuristics or deep learning. Even so, communication or computing resources are wasted. In the case of our solution, it is also based on a sophisticated strategy, the ABC metaheuristic. It is simple and easy to implement, requires few parameters for its configuration, and has outperformed other intelligent algorithms [14], [36]. However, to the best of our knowledge, it has not yet been applied to the problem of reducing the execution time of applications in VEC systems. Such a strategy allows our solution to be robust and flexible and return good solutions in a timely manner. Furthermore, unlike other works in the area, our proposed algorithm allows the simultaneous sending of application tasks to vehicles and edge servers via V2V/WAVE and 5G/V2I connections. In this way, we better use the available computational resources and increase the transmission rates of the network. Our BTV algorithm also uses more contextual information, increasing the accuracy of task scheduling decisions, and considers connectivity and energy constraints to avoid failures. Finally, we evaluated and validated our proposal in different vehicular scenarios.}    
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.2:} What is the difference between “total time spent to execute each task” defined in equation (5) and the applications’ execution time? Sine the optimization problem defined in problem P1 is to minimize the total time spent to execute each task and the objective of the designed algorithm is to minimize the applications’ execution time. As a result, their relationship should be clarified.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thank you for raising this important issue. In the new version of the article, we explain that $t_{total}$ is the total time spent to execute all tasks of a workload. Furthermore, we consider that an application may have several workloads. Thus, when we decrease $t_{total}$, we also decrease the execution time of an application. Changes to the text can be seen below.   
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 5, Line 350: where $t^{total}_{client}$ is the total time spent to execute \textcolor{blue}{all tasks} of $W$ on the client\textcolor{blue}{, and $t^{total}_{servers}$ is defined by Equation 6}.
+    \item Page 5, Line 379: \textcolor{blue}{As we consider that an application may have several workloads (sets of tasks) and that $t_{total}$ is the total time to execute all tasks of a workload, decreasing $t_{total}$ also means decreasing the execution time of an application.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.3.1:} The motivation of utilizing bee colony-based algorithm is not clear, and why other algorithms are not applicable?
+\end{mdframed}
+
+\textbf{Authors' Response:} Thank you for allowing us to improve our article and answer this question. About the motivation, as the problem addressed in the paper is NP-hard and real-time, it is unfeasible to try to find the optimal solution [12]. Thus, we chose to use a metaheuristic-based algorithm, given that, in general, metaheuristics provide good solutions in an acceptable time and have better performance than simple heuristics [9]. Of the researched metaheuristics, we used the Artificial Bee Colony (ABC) because it outperforms other metaheuristics in several optimization problems and has fast convergence, being simple to use, flexible and requiring few control parameters [13]-[16]. However, as stated in the final part of the conclusion of our paper, "in future works, we intend to implement decision algorithms based on other intelligent strategies". The following are the changes made to the article.
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 2, Line 86: \textcolor{blue}{As it may be impractical to find the optimal solution in NP-hard problems, a frequently used alternative is metaheuristic algorithms [12]. Although they do not guarantee optimal solutions for such problems, they commonly return satisfactory solutions in a reasonable time [9]. A well-known metaheuristic algorithm used to solve multi-variable NP-hard optimization problems is the Artificial Bee Colony (ABC). The ABC is a robust and flexible algorithm inspired by the foraging behavior of honey bees in search of food sources. Because it has a fast convergence, it can quickly return solutions close to the global optimum to problems that need to be solved in real-time. In addition, it performs better than other metaheuristics in several optimization problems with the advantage of being simple to use and requiring few control parameters [13]-[16].}
+     \item New reference: \textcolor{blue}{[[13] D. Karaboga and B. Akay, “A comparative study of artificial bee colony algorithm,” Appl. Math. Comput., vol. 214, no. 1, pp. 108–132, 2009.}
+    \item New reference: \textcolor{blue}{[15] K. Du and M. Swamy, “Bee metaheuristics,” in Search and Optimization by Metaheuristics: Techniques and Algorithms Inspired by Nature. Birkhauser, 2016, ch. 12, pp. 201–216.}
+    \item New reference: \textcolor{blue}{[16] B. Akay, D. Karaboga, B. Gorkemli, and E. Kaya, “A survey on the artificial bee colony algorithm variants for binary, integer and mixed integer programming problems,” Appl. Soft Comput., vol. 106, p. 107351, 2021.}
+    \item Page 3, Line 205: \textcolor{blue}{Of the works that deal with the single-objective optimization problem of reducing the execution time of applications, some use infeasible strategies or that present disadvantages.}
+    \item Page 3, Line 211: \textcolor{blue}{In the case of our solution, it is also based on a sophisticated strategy, the ABC metaheuristic. It is simple and easy to implement, requires few parameters for its configuration, and has outperformed other intelligent algorithms [14], [36]. However, to the best of our knowledge, it has not yet been applied to the problem of reducing the execution time of applications in VEC systems. Such a strategy allows our solution to be robust and flexible and return good solutions in a timely manner.}    
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.3.2:} In addition, the relationship during different parts of the algorithm defined from subsections 4.3-4.8 should be explained. The algorithm process is described following the pseudocode, and the algorithm logic and the reason for why in this step is not clear. The content for algorithm description should be improved.
+\end{mdframed}
+
+\textbf{Authors' Response:} We appreciate the reviewer's suggestion. As requested, we have made several improvements to our algorithm description. For example, we added entries in the notation table to improve the readability of algorithm variables. We made textual modifications to improve the relationship between the different parts and sections of the algorithm. We have improved and added some text snippets to explain better the algorithm's logic, which is based on the ABC metaheuristic. Finally, we added three new flowcharts to make it easier to understand the main steps of the algorithm. Modifications are listed below.
+
+\textbf{Changes in the Manuscript:} 
+
+\begin{itemize}
+    \item New Figures: \textcolor{blue}{3, 4, and 6}.
+\end{itemize}
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 4: Addition of notation definitions to Table 2: \textcolor{blue}{Definitions of the most used notations.}
+    \item Page 6, Line 482: \textcolor{blue}{To facilitate the understanding of the upcoming sections, Figure 3 presents, in flowchart form, an overall view of the BTV (Algorithm 1) and its main steps. The first significant step, presented in the next section, is initializing/filling the food source set.}
+    \item Page 7, Line 499: \textcolor{blue}{Figure 4 presents the flowchart containing the most important steps and the general behavior of Algorithm 2 and Algorithms 3-5, described in the next sections. After receiving the inputs and initializing, Algorithms 2-5 check a stopping criterion. It can be verified whether the set of food sources has been fully filled (Algorithm 2) or whether the necessary evaluations of existing food sources have been carried out (Algorithms 3-5). If the stopping criterion is met, the algorithms return an output. Otherwise, the algorithms remain in a loop to add (Algorithm 2) or update food sources (Algorithms 3-5). As shown in the flowchart, these additions or updates depend on the assembly and feasibility check of solutions made by Algorithms 6 and 7 (Sections 4.7 and 4.8). The possible updates of food sources are carried out through three phases, shown in the following three sections (Sections 4.4 to 4.6): employed, onlooker, and scout bees.}
+    \item Page 8, Line 556: \textcolor{blue}{The part of assembling and feasibility check of solutions (invoked by Algorithms 2 to 5) is explained in the following two sections.}
+    \item Page 8, Line 577: \textcolor{blue}{Figure 6 shows a flowchart with the salient steps of Algorithm 6. We can see that the algorithm's objective is to generate a feasible solution (food source) where all allocations of tasks to servers are feasible. After receiving inputs and initializing, the algorithm checks if the solution is complete (all tasks allocated to servers). If so, the algorithm returns a complete and feasible solution. Otherwise, it remains in a loop to allocate each task to a server, ensuring that the allocations are feasible through Algorithm 7 (shown in the next section).}    
+\end{itemize}
+
+\vspace{\baselineskip}
+
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.4:} The author states the contextual information utilized in the algorithm, but there is not any explanation for what the contextual information is about, and how to integrate them with the designed algorithm for performance improvement. Similar with 5G and WAVE networks.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thank you for the comment. We have included sentences in the new version of the article that better explain the concepts of contextual information and WAVE and 5G networks. We have also included new text detailing how we integrated contextual information and 5G and WAVE networks with our algorithm for performance improvement. These modifications can be seen below.
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 1, Line 10: \textcolor{blue}{The former is a network architecture formed by the IEEE 1609 and IEEE 802.11p protocols. The latter refers to cellular networks designed to support improved mobile broadband, greater node mobility, low latency, and ultra-reliable communications.}
+    \item Page 1, Line 40: \textcolor{blue}{Nonetheless, a vehicle needs to become aware of which servers are available and their contextual information to take advantage of the capabilities of a VEC system. This context refers to information that characterizes entities, including servers [10]. In our case, contextual information consists of descriptive parameters of location, direction, speed, energy, bandwidth and range of the communication technology used, and CPU availability and capacity. With this information gathered about the system nodes through network messages, a vehicle can better assess how to optimize the processing of its applications.}
+    \item Page 3, Line 263: Upon receiving the request from the client, each device replies by sending \textcolor{blue}{its contextual information}.    
+    \item Page 4, Line 274: \textcolor{blue}{In the case of sending tasks to remote servers, this can be done simultaneously by WAVE (V2V) and 5G (V2I) networks.} In the Figure 1, the client (red vehicle) distributes two tasks to other vehicles (blue and green, \textcolor{blue}{via WAVE}) and two tasks to the edge server \textcolor{blue}{(via 5G)}.
+    \item Page 4, Line 294: \textcolor{blue}{The latter depends on communication technology (WAVE or 5G) [28].}
+    \item Page 6, Line 437: \textcolor{blue}{Each of these messages contains contextual information transmitted by a potential server, such as speed, direction, location, complete route to the destination (if available), queue time ($t_{queue}$), CPU capacity ($C$), transmission rate and range (5G or WAVE), CPU chip circuit power ($P_{proc}$), current stored energy level ($E_{cur}$), and minimum energy level ($A$).}
+    \item Page 6, Line 450: \textcolor{blue}{A remote server is considered feasible if it can execute at least one task for the client. For this, the client analyzes if such a server meets the constraints C2 and C4 of problem P1, taking into account: the contextual information of the server in set M and Equations 1 (transmission time via WAVE or 5G) and 4 (computation time).}
+    \item Page 6, Line 473: In line 13, the BTV sorts \textcolor{blue}{the table $S$ of tasks to remote servers}, prioritizing the upload of tasks to edge servers \textcolor{blue}{(via 5G)} and vehicle servers with the smallest link lifetimes to $i$ \textcolor{blue}{(via WAVE)}. \textcolor{blue}{The chosen solution ($H$ and the table $S$ extracted from it) is already calculated considering the possible simultaneous upload of tasks using 5G and WAVE, increasing the transmission rate and reducing delays.}
+    \item Page 8, Line 596: \textcolor{blue}{The client calculates these estimates based on the contextual information received from $j$ and by Section 3. For example, the variable $t_{G_j}$ is calculated based on Equations 1 and 3. In them, the client considers the amount of data to be transmitted and processed and the data related to $j$, such as transmission rate (WAVE or 5G), position, distance, queue time, and processing capacity. $E^{proc}_{j}$ is calculated by the client considering the CPU chip circuit power ($P_{proc}$) of $j$ and the estimated processing time.}
+    \item Page 9, Line 610: \textcolor{blue}{As shown in [28], the following contextual information from $j$ is considered for the client to calculate $t^{link}_{i,j}$: position, distance, complete route to destination (if available), speed, direction, and communication range (WAVE or 5G).}
+    \item Page 9, Line 615: \textcolor{blue}{For this last check, the client considers the current energy amount of $j$ ($E^{cur}_{j}$), the minimum amount of energy ($A$) that $j$ must have, and $E^{proc}_{j}$.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.5.1:} The comparison algorithms utilized in section 5 are all baseline algorithms.
+\end{mdframed}
+
+\textbf{Authors' Response:} We understand the reviewer's concern. We also understand that we have not made this issue clear enough in the text of the first version of the article. Furthermore, we agree with the reviewer that the First In, First Out (FIFO) algorithm can be seen as a baseline algorithm, being a point of reference for comparison. However, we would like to explain two points. The first point is that we use only the execution of tasks completely on the client as a de-facto baseline. This choice was made because one of the main goals of the task offloading technique is to reduce the execution time of applications that would be executed only locally. Thus, the metric reduction in execution time was calculated by comparing the execution time of each algorithm with the local execution. The second point is that the other evaluated algorithms are not baseline algorithms. Instead, they are state-of-the-art algorithms in the area. For example, the Hybrid Vehicular edge Cloud (HVC) algorithm [26] is one of the most cited algorithms in the area and was published in 2018 by the IEEE Vehicular Technology Magazine. The other algorithms, the Multi-Decision based Offloading (MDO) [27] (implemented and evaluated in the new experiments of our revised article after the reviewer's suggestion) and the Greedy Task by Task (GTT) [28], are two recent works that used new ideas, methods, and techniques and were published in 2020 and 2021 by the Vehicular Communications journal.
+
+These explanations have been added in the new version of the paper, as changed below.
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 9, Line 654: \textcolor{blue}{The FIFO, considered a baseline algorithm, sends a task to each server that replies to the request first. The HVC tries to send tasks first to edge servers via 5G. If problems occur, the HVC also sends tasks to neighboring vehicles. The MDO sends tasks to the client itself or neighboring vehicles through a scoring scheme based on the relative speeds between the vehicles and their task queue times. Finally, the GTT uses a heuristic method to allocate each task in the workload to the best available servers.}
+    \item Page 10, Line 717: \textcolor{blue}{This section presents the evaluation of the algorithms through the reduction in execution time metric. The baseline used is the method that executes all tasks locally by the client. In this way, the algorithms' impact in reducing the execution time of different workloads compared to the baseline can be analyzed.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#4.5.2:} More existing representative algorithms should be compared with the designed algorithm.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thank you for your suggestion. In addition to state-of-the-art solutions that we had implemented and were already using for comparison, the Hybrid Vehicular edge Cloud (HVC) [26] and the Greedy Task by Task (GTT) [28], we implemented another algorithm, which was also used in experiments after the reviewer's suggestion. Such an algorithm is the Multi-Decision based Offloading (MDO) [27], published in 2020 by the Vehicular Communications journal.
+
+\textbf{Changes in the Manuscript:} 
+
+\begin{itemize}
+    \item Table: \textcolor{blue}{4}.
+    \item New Figures: \textcolor{blue}{7a, 7b, 7c, 7d, 7e, 7f, 8a, 8b, 8c, 8d, 8e, and 8f}.
+\end{itemize}
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 9, Line 651: \textcolor{blue}{Multi-Decision based Offloading (MDO) [27]}.
+    \item New reference: \textcolor{blue}{[27] A. U. Rahman, A. W. Malik, V. Sati, A. Chopra, and S. D. Ravana, “Context-aware opportunistic computing in vehicle-to- 870 vehicle networks,” Veh. Commun., vol. 24, p. 100236, 2020}.
+    \item Page 9, Line 658: \textcolor{blue}{The MDO sends tasks to the client itself or neighboring vehicles through a scoring scheme based on the relative speeds between the vehicles and their task queue times.}
+    \item Section 5.2.1 \textit{Violations of Energy Constraints}, Page 10: Sentences about the results of the new experiments.
+    \item Section 5.2.2 \textit{Tasks by Type of Occurrence}, Page 10: Sentences about the results of the new experiments.
+    \item Section 5.2.3 \textit{Reduction in Execution Time}, Pages 10: Sentences about the results of the new experiments.
+\end{itemize}

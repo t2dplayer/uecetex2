@@ -1,0 +1,349 @@
+Para mitigar a \gls{ISI}, o \gls{5G} utiliza a técnica de inserção do Prefixo Cíclico (\gls{CP}) \cite{stallings2021}. O \gls{CP} atua como um intervalo de guarda protetor onde a porção final do símbolo \gls{OFDM} é copiada e inserida no início desse mesmo símbolo \cite{cox2025}. Contanto que a duração do \gls{CP} seja maior que o \gls{Delay Spread} do canal, os ecos do multipercurso são totalmente absorvidos dentro desse intervalo de guarda, permitindo que o receptor processe o sinal sem sofrer interferência de símbolos anteriores \cite{morais2025}. Fisicamente, a duração total de um símbolo transmitido na interface aérea engloba tanto o seu tempo útil quanto o tempo de guarda, dada pela equação $T_s = \frac{1}{\Delta f} + T_{CP}$ \cite{cox2025}. A Figura~\ref{fig:prefixo_ciclico} detalha o mecanismo de inserção do \gls{CP} e como ele absorve os ecos do multipercurso.
+
+% =========================================================================
+% FIGURA 3: Mecanismo do Prefixo Cíclico (CP)
+% =========================================================================
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=Latex, scale=0.85, transform shape]
+
+  % ===== PAINEL SUPERIOR: Símbolo OFDM original (antes do CP) =====
+  \node[font=\small\bfseries, anchor=west] at (-0.5, 6.0) {(a) Símbolo \gls{OFDM} original (sem CP):};
+
+  \draw[->, thick] (0, 4.2) -- (13.0, 4.2) node[right, font=\small] {Tempo};
+
+  % Símbolo original inteiro
+  \draw[fill=blue!15, draw=blue!70!black, thick, rounded corners=1pt]
+    (1.0, 4.2) rectangle (11.0, 5.4);
+  \node[font=\small, text=blue!70!black] at (6.0, 4.8) {Parte útil do Símbolo $n$};
+
+  % Destaque da porção final (que será copiada)
+  \draw[fill=orange!25, draw=orange!70!black, thick, rounded corners=1pt]
+    (9.0, 4.2) rectangle (11.0, 5.4);
+  \node[font=\footnotesize\bfseries, text=orange!70!black, align=center] at (10.0, 4.8) {Porção\\Final};
+
+  % Duração útil
+  \draw[decorate,decoration={brace,amplitude=5pt},thick] (1.0, 5.6) -- (11.0, 5.6)
+    node[midway, above=5pt, font=\small] {$T_u = 1/\Delta f$};
+
+  % ===== PAINEL INFERIOR: Símbolo transmitido (com CP) =====
+  \node[font=\small\bfseries, anchor=west] at (-0.5, 3.0) {(b) Símbolo transmitido (com CP inserido):};
+
+  \draw[->, thick] (0, 0.7) -- (13.0, 0.7) node[right, font=\small] {Tempo};
+
+  % Símbolo n-1 (parcial)
+  \draw[fill=gray!15, draw=gray!60, thick, rounded corners=1pt]
+    (0.2, 0.7) rectangle (1.5, 1.9);
+  \node[font=\footnotesize, text=gray!60] at (0.85, 1.3) {$n\!-\!1$};
+
+  % CP (cópia da porção final)
+  \draw[fill=orange!25, draw=orange!70!black, thick, rounded corners=1pt]
+    (1.5, 0.7) rectangle (3.5, 1.9);
+  \node[font=\small\bfseries, text=orange!70!black, align=center] at (2.5, 1.3) {CP\\{\footnotesize(cópia)}};
+
+  % Parte útil do símbolo n
+  \draw[fill=blue!15, draw=blue!70!black, thick, rounded corners=1pt]
+    (3.5, 0.7) rectangle (11.5, 1.9);
+  \node[font=\small, text=blue!70!black] at (7.5, 1.3) {Parte útil do Símbolo $n$};
+
+  % Porção final destacada no símbolo transmitido
+  \draw[fill=orange!12, draw=orange!50!black, thick, rounded corners=1pt]
+    (9.5, 0.7) rectangle (11.5, 1.9);
+  \node[font=\footnotesize, text=orange!50!black, align=center] at (10.5, 1.3) {Porção\\Final};
+
+  % Seta de cópia entre painéis
+  \draw[->, very thick, orange!70!black, dashed]
+    (10.0, 4.15) .. controls (12.5, 3.0) and (4.5, 2.5) .. (2.5, 1.95);
+  \node[font=\footnotesize\bfseries, text=orange!70!black, fill=white, inner sep=2pt] at (8.5, 2.8) {Cópia};
+
+  % Chaves de duração
+  \draw[decorate,decoration={brace,amplitude=5pt,mirror},thick]
+    (1.5, 0.4) -- (3.5, 0.4) node[midway, below=5pt, font=\small] {$T_{CP}$};
+  \draw[decorate,decoration={brace,amplitude=5pt,mirror},thick]
+    (3.5, 0.4) -- (11.5, 0.4) node[midway, below=5pt, font=\small] {$T_u = 1/\Delta f$};
+  \draw[decorate,decoration={brace,amplitude=6pt,mirror},thick]
+    (1.5, -0.3) -- (11.5, -0.3) node[midway, below=6pt, font=\small\bfseries] {$T_s = T_{CP} + T_u$};
+
+  % Região onde os ecos são absorvidos
+  \draw[pattern=north east lines, pattern color=red!40, draw=red!60!black, thick]
+    (1.5, 0.7) rectangle (3.5, 1.9);
+
+  % Anotação: Ecos absorvidos dentro do CP
+  \node[draw=red!60!black, fill=red!5, rounded corners=3pt, font=\footnotesize, align=center, inner sep=4pt]
+    at (2.5, -1.5) {Ecos do multipercurso\\absorvidos dentro do CP\\($T_{CP} > \tau_{DS}$)};
+  \draw[->, red!60!black, thick] (2.5, -1.0) -- (2.5, 0.35);
+
+  % Anotação: Janela livre de ISI
+  \node[draw=green!60!black, fill=green!5, rounded corners=3pt, font=\footnotesize, align=center, inner sep=4pt]
+    at (9.5, -1.5) {Janela útil processada\\pelo receptor sem \gls{ISI}};
+  \draw[->, green!60!black, thick] (7.5, -1.2) -- (7.5, 0.65);
+
+\end{tikzpicture}
+\Caption{\label{fig:prefixo_ciclico} Mecanismo do Prefixo Cíclico (\gls{CP}) no \gls{5G} \gls{NR}. Em (a), a porção final do símbolo \gls{OFDM} original é identificada. Em (b), essa porção é copiada e inserida antes do símbolo transmitido como intervalo de guarda. Desde que $T_{CP} > \tau_{DS}$, os ecos do canal multipercurso são absorvidos dentro do \gls{CP}, garantindo a recepção livre de \gls{ISI}.}
+\Fonte{Elaborado pelo autor com base em \cite{stallings2021, cox2025, morais2025}.}
+\end{figure}
+
+\subsubsection{(3) Modulação}
+O 5G mapeia os bits de informação na portadora variando sua amplitude e fase (Modulação QAM) [13, 14]. A modulação QPSK transporta 2 bits/símbolo, enquanto ordens superiores transportam 4 bits (16-QAM), 6 bits (64-QAM) e 8 bits (256-QAM) [13-15]. Modulações complexas exigem relações de Sinal-Ruído (SINR) excepcionais, forçando os nós de borda da célula a regredirem dinamicamente (Adaptação de Enlace) para esquemas robustos como o QPSK [16-18].
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.7]
+    % QPSK
+    \draw[->, thick] (-2,0) -- (2,0) node[right] {I};
+    \draw[->, thick] (0,-2) -- (0,2) node[above] {Q};
+    \node[align=center] at (0, 2.5) {\textbf{QPSK} (2 bits)};
+    \filldraw[blue] (1,1) circle (2.5pt) (-1,1) circle (2.5pt) (-1,-1) circle (2.5pt) (1,-1) circle (2.5pt);
+
+    % 16-QAM
+    \begin{scope}[xshift=6cm]
+        \draw[->, thick] (-2.5,0) -- (2.5,0) node[right] {I};
+        \draw[->, thick] (0,-2.5) -- (0,2.5) node[above] {Q};
+        \node[align=center] at (0, 2.5) {\textbf{16-QAM} (4 bits)};
+        \foreach \x in {-1.5, -0.5, 0.5, 1.5} \foreach \y in {-1.5, -0.5, 0.5, 1.5} \filldraw[red] (\x,\y) circle (2pt);
+    \end{scope}
+\end{tikzpicture}
+\caption{Constelações de modulação QPSK e 16-QAM do 5G NR [13, 19].}
+\label{fig:qam}
+\end{figure}
+
+\subsubsection{(4) Explicação de Cenários (UMi, etc.)}
+As premissas de atenuação seguem os modelos estocásticos 3GPP TR 38.901 [20, 21]. O \textit{Urban Micro} (UMi) foca em estações base instaladas abaixo dos telhados, atendendo a curtas distâncias densas, frequentemente em condições de Não-Linha de Visada (NLOS). O \textit{Urban Macro} (UMa) cobre áreas mais amplas com antenas acima dos telhados [22]. No contexto milimétrico (mmWave), a probabilidade de bloqueio físico em UMi é severa, exigindo a injeção estocástica do sombreamento log-normal ($X_\sigma$) e cálculos de perda de bloqueio ($A_{block}$) [20, 23].
+
+\subsubsection{(5) Interface PC5 no 5G C-V2X}
+Para atender a aplicações de direção autônoma, o Release 16 do 3GPP estabeleceu a interface \textbf{PC5 (Sidelink)}, complementando o \textit{uplink}/\textit{downlink} tradicional (Uu) [24-26]. A interface PC5 suporta comunicação D2D direta operando na faixa ITS de 5,9 GHz. A gestão de recursos ocorre via o \textit{Physical Sidelink Control Channel} (PSCCH), e a carga útil é enviada pelo PSSCH [27, 28]. O 5G NR Sidelink introduz o \textit{feedback} via PSFCH, vital para confiabilidade \textit{unicast} e \textit{groupcast} [25, 27].
+
+% ==============================================================================
+% (B) CENÁRIO 5G V2I
+% ==============================================================================
+\subsection{(B) Cenário 5G V2I (Interface Uu)}
+
+O pior cenário para a comunicação Veículo-Infraestrutura (V2I) é modelado pela topologia \textbf{UMi NLOS}, com o usuário (veículo) posicionado na borda da célula, sob severo sombreamento de edificações de concreto e sob intensa carga de interferência co-canal das células vizinhas.
+
+\subsubsection{(6) Balanço de Potência e Degradação de Sinal}
+Segundo o 3GPP TR 38.901 para UMi NLOS [23, 29], a perda de percurso (em dB) deduzida em função da distância tridimensional $d$ e da frequência portadora $f_c$ (em GHz) é:
+\begin{equation}
+    PL_{\text{UMi-NLOS}}(d) = 32.4 + 31.9 \log_{10}(d) + 20 \log_{10}(f_c) + X_{\sigma}
+\end{equation}
+Onde $X_{\sigma} \sim \mathcal{N}(0, \sigma_{SF}^2)$ representa o desvanecimento lento (\textit{shadow fading}), tipicamente com $\sigma_{SF} = 8.2$ dB para cenários NLOS [20, 29]. 
+O balanço de potência para obter a potência de recepção linear no gNB ($p_{rx}$) parte da Potência Isotropicamente Radiada Equivalente (EIRP) [30], deduzindo as perdas:
+\begin{equation}
+    P_{rx (\text{dBm})} = P_{tx} + 10\log_{10}(N_t) + G_{tx} + G_{rx} - PL_{\text{UMi-NLOS}}(d) - L_{pen}
+\end{equation}
+Onde $L_{pen}$ é a perda por penetração veicular (típica entre 10 e 20 dB) [30].
+
+\subsubsection{(7) Relação Sinal-Ruído-Interferência (SINR)}
+No receptor do gNB, a qualidade é determinada pelo SINR linear:
+\begin{equation}
+    \text{SINR} = \frac{p_{rx}}{N_0 B + \sum_{k} I_k}
+\end{equation}
+Sendo $N_0$ a densidade espectral do ruído térmico ($-174$ dBm/Hz), $B$ a largura de banda, e $\sum I_k$ o somatório da interferência proveniente das emissões ativas em setores adjacentes [31, 32].
+
+\subsubsection{(8) Cálculo da Taxa ($R$) e Tempo de Transferência ($T$) com Exemplo}
+A taxa bruta limite mapeada via o \textit{Modulation and Coding Scheme} (MCS) aproxima-se da Capacidade de Shannon, porém penalizada pelo \textit{overhead} temporal/frequencial ($OH$) nativo das sinalizações 5G (DMRS, CSI-RS) [33]:
+\begin{equation}
+    R = (1 - OH) \cdot B \cdot \log_2(1 + \text{SINR}) \quad \text{[bits/s]}
+\end{equation}
+O tempo para a transferência do plano de usuário, $T_{tx}$, de um pacote de $L$ bits é derivado por $T_{tx} = \frac{L}{R}$ (quando tratado num modelo contínuo) ou quantizado via \textit{slots} [34].
+
+\textbf{Exemplo V2I:} O veículo necessita enviar $L = 12.000$ bits de telemetria sensível. Com $\mu=1$ ($T_{slot}=0.5$ ms) e, devido ao baixo SINR na borda, a capacidade adaptada via MCS é de apenas $8.000$ bits por \textit{slot} [35, 36]. O cálculo dedutivo base exige:
+$N_{slots} = \lceil 12.000 / 8.000 \rceil = 2 \text{ slots}$ [37].
+O tempo de transmissão nominal é:
+$T_{tx} = 2 \times 0.5\text{ ms} = 1.0\text{ ms}$ [38].
+
+\subsubsection{(9) Confiabilidade e BLER, com Exemplo}
+Sob cenários URLLC, se o veículo está em UMi NLOS com SINR baixo, modulações de robustez como BPSK/QPSK dominam. A probabilidade de erro de bit ($P_{be}$) via função-Q e desvanecimento gaussiano é estocástica $P_{be} \approx Q(\sqrt{2 \cdot \text{SINR}})$ [18]. Assumindo bits incorretos como independentes, a dedução do Bloco de Erro (\gls{BLER} ou \gls{PER}) torna-se [39]:
+\begin{equation}
+    PER = 1 - (1 - P_{be})^L
+\end{equation}
+\textbf{Exemplo de Confiabilidade V2I:} Requisitos de direção exigem $PER \le 10^{-5}$ [39]. Se o baixo SINR na borda gerar uma probabilidade onde o pacote falha (acionando $N_{HARQ}=1$), o sistema exige retransmissão via protocolo \gls{HARQ} [40, 41]. O atraso real sofrerá a soma da ida e volta (RTT):
+\begin{equation}
+    T_{UP\_real} = T_{tx} + T_{proc} + T_{prop} + (N_{HARQ} \times T_{RTT\_HARQ})
+\end{equation}
+Com o erro de canal induzindo $N_{HARQ}=1$ e $T_{RTT\_HARQ}=2.0$ ms, o tempo total explode para $T_{UP\_real} = 1.0 + 0.2 + 0.001 + 2.0 = 3.201\text{ ms}$ [38, 42]. Esta latência rompe a barreira ideal URLLC de $1\text{ ms}$.
+
+% ==============================================================================
+% (C) CENÁRIO 5G C-V2X
+% ==============================================================================
+\subsection{(C) Cenário 5G C-V2X (Interface PC5 Sidelink)}
+
+Para conexões \textit{Device-to-Device} (D2D) estritas operando sob Sidelink 5G, o cenário catastrófico (\textit{worst-case}) corresponde à operação do \textbf{Modo 2} sob topologia densa cruzando o canal veicular de não-linha de visada (\textbf{NLOSv}) causado pela obstrução mecânica de caminhões pesados nas vias [20, 43, 44].
+
+\subsubsection{(10) Balanço de Potência e Modelo NLOSv, com Exemplo}
+Para a interface PC5, a difração tipo \textit{knife-edge} criada pelos veículos obstrutores eleva o limite da perda. A perda de percurso milimétrica/centimétrica sob bloqueio dinâmico $A_{block}$ e desvanecimento log-normal $X_\sigma$ é deduzida como [20, 45]:
+\begin{equation}
+    PL_{NLOSv}(d) = PL_{LOS}(d) + A_{block} + X_{\sigma}
+\end{equation}
+E a potência final recebida pelo veículo-alvo:
+$P_{rx\_SL} = P_{tx\_SL} + G_{tx\_UE} + G_{rx\_UE} - PL_{NLOSv}(d)$.
+\textbf{Exemplo Sidelink:} O Veículo $Tx$ irradia 23 dBm em 5.9 GHz com ganho MIMO 0 dBi. Se $PL_{LOS}$ em 50 metros for 80 dB, e um caminhão gerar atenuação de difração $A_{block} = 15$ dB, com $X_\sigma = 4$ dB, a perda total passa a 99 dB. O $P_{rx\_SL}$ afunda para $-76$ dBm, empurrando o sinal para próximo ao limiar de sensibilidade do ruído.
+
+\subsubsection{(11) Impacto da Interferência no Modo 2, com Exemplo}
+No Sidelink Modo 2, a coordenação não é do gNB. O veículo avalia o espectro (\textit{Channel Sensing}) independentemente [25]. Sob superlotação na Grade Urbana, colisões de nós ocultos ocorrem massivamente. A equação de SINR degradado pelo $I_{SL}$ (Interferência Intra-Sidelink) é:
+\begin{equation}
+    \text{SINR}_{SL} = \frac{p_{rx\_SL}}{N_0 B + I_{SL}} \approx \frac{p_{rx\_SL}}{I_{SL}} \quad \text{(regime dominado por interferência)}
+\end{equation}
+\textbf{Exemplo:} Se 20 veículos adjacentes escolhem o mesmo \gls{PRB} baseados na leitura falha pelo bloqueio, a $I_{SL}$ cumulativa será severa ($> -60$ dBm). O SINR local recua para $-16$ dB, tornando 16-QAM inútil, forçando QPSK ou gerando um corte severo (\textit{outage}) na recepção do Controle de \textit{Sidelink} (SCI) [25, 46].
+
+\subsubsection{(12) Cálculo de Tempo no Sidelink, com Exemplo}
+Diferente do V2I que reage imediatamente ao agendador (DCI), no C-V2X (Modo 2) os atrasos de despachos de MAC somam a componente da "Janela de Sensoriamento" ($T_{sensing}$) para calcular o \textit{Channel Occupancy Ratio} (CBR) antes de emitir:
+\begin{equation}
+    T_{E2E\_SL} = T_{sensing} + \frac{L}{(1 - OH) \cdot B \cdot \log_2(1 + \text{SINR}_{SL})} + T_{prop}
+\end{equation}
+\textbf{Exemplo:} Se o $T_{sensing}$ estatutário para evitar colisão levar $10$ ms para avaliar a janela, e a transmissão efetiva ($T_{tx\_SL}$) for $1$ ms, o tempo para a primeira liberação dos dados atinge $11$ ms, impossibilitando avisos precoces instantâneos de freio de emergência (que requerem $<5$ ms).
+
+\subsubsection{(13) Confiabilidade e Tolerância a Erros no PC5, com Exemplos}
+Quando o bloqueio ($A_{block}$) destrói a decodificação das informações formatadas no SCI, a recepção falha [25, 27, 46]. No \textit{Sidelink} Release 16, a introdução do canal de \textit{feedback} PSFCH permite a resposta do HARQ lateralmente [25]. A falha ($PER \gg 10^{-5}$) dispara múltiplos ciclos NACK:
+\begin{equation}
+    T_{\text{latência\_final\_PC5}} = T_{E2E\_SL} + (N_{HARQ\_SL} \times T_{RTT\_PSFCH})
+\end{equation}
+\textbf{Exemplo Crítico de V2X:} Em configuração de \textit{Platooning} (comboio de alta densidade), se o pacote falha e o pool de recursos PC5 estipula o RTT de PSFCH em slots distantes de $3$ ms, duas retransmissões ($N_{HARQ}=2$) adicionarão $6$ ms puros ao retardo de entrega, inviabilizando o controle cooperativo de frenagem e demandando intervenção do MEC ou comutação via gNB ancorado.
+
+% -------------------------------------------------------------------------
+% FIGURA FINAL DE TOPO DO SISTEMA
+% -------------------------------------------------------------------------
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.95]
+    % Infraestrutura
+    \node[draw, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, rounded corners] (mec) at (0, 5.5) {\textbf{Servidor MEC}\\(Baixa Latência E2E)};
+    \node[draw, fill=gray!20, minimum width=1cm, minimum height=2.5cm] (mast) at (-4.5, 2.5) {};
+    \node[draw, fill=green!30, regular polygon, regular polygon sides=3, inner sep=1pt, rotate=180] (ant) at (-4.5, 4.5) {gNB};
+    \draw[<->, thick, blue] (ant.north) |- node[near end, above, font=\footnotesize] {Backhaul ideal} (mec.west);
+
+    % Veículos
+    \node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue1) at (-2, 0) {\textbf{UE 1 (Tx)}};
+    \node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue2) at (4, 0) {\textbf{UE 2 (Rx)}};
+    
+    % Obstáculos do Pior Cenário
+    \node[draw, fill=gray!50, minimum width=1.5cm, minimum height=2.5cm, align=center] (building) at (-3, 1.5) {Prédio\\UMi NLOS};
+    \node[draw, fill=red!30, minimum width=2.2cm, minimum height=1.5cm, rounded corners, align=center] (truck) at (1, 0) {Caminhão\\$A_{block}$};
+
+    % V2I Uu Link (sombreado)
+    \draw[->, thick, dashed, orange!80!black] (ant.east) -- node[above, sloped, font=\footnotesize] {V2I (Uu) - Erro Alto} (building.north west);
+    \draw[->, thick, dashed, orange!80!black] (building.east) -- (ue1.north);
+    
+    % PC5 Sidelink (bloqueado)
+    \draw[->, thick, purple] (ue1.east) -- node[above, font=\footnotesize] {PC5 Modo 2} (ue2.west);
+    \node[text=purple, font=\scriptsize, align=center] at (1, -1.5) {Difração ($PL_{NLOSv}$) + \\ Interferência $I_{SL}$};
+    
+    % Feedback Sidelink
+    \draw[<-, thick, dotted, purple] ([yshift=-0.3cm]ue1.east) -- node[below, font=\scriptsize] {HARQ NACK (PSFCH)} ([yshift=-0.3cm]ue2.west);
+\end{tikzpicture}
+\caption{Representação topológica dos piores cenários V2I e V2X. O V2I experimenta sombreamento predial severo ($X_\sigma$). O C-V2X experimenta atenuação por bloqueio dinâmico de caminhões ($A_{block}$) no Sidelink, acionando mecanismos limitantes do HARQ e penalizando a confiabilidade.}
+\label{fig:worst_case_v2x_math}
+\end{figure}
+
+
+\subsection{Justificativa Teórica das Constantes do Simulador}
+
+O código desenvolvido para o cálculo de latência baseia-se na união entre os fundamentos físicos da propagação de radiofrequência e os parâmetros arquiteturais estipulados pelas normas do 5G NR. A seguir, detalha-se a origem e a função de cada valor inserido no simulador.
+
+\subsubsection{1. Constantes Físicas e Conversões de Potência}
+
+\begin{itemize}
+    \item \textbf{\texttt{N0\_dBm\_Hz = -174} (Densidade Espectral de Ruído Térmico):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} Este é um valor fixo derivado da física do ruído térmico (Ruído de Johnson-Nyquist). É calculado pela equação $N_0 = 10 \log_{10}(k \cdot T \cdot 1000)$, onde $k$ é a constante de Boltzmann e $T$ é a temperatura ambiente padrão ($\approx 290$ K) \cite{stallings2021, cox2025}.
+        \item \textbf{Uso na Teoria:} Representa o piso de ruído mínimo absoluto (em dBm por Hertz) que qualquer receptor sofre. No cálculo do SINR, ele é multiplicado pela largura de banda $B$ para encontrar a potência total do ruído ($N_0 \times B$) que irá mascarar o sinal útil.
+    \end{itemize}
+
+    \item \textbf{Valores \texttt{30} e \texttt{10} nas funções de conversão dBm $\leftrightarrow$ Watts:}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} A escala de decibéis (dB) é logarítmica. A unidade \textit{dBm} refere-se à potência relativa a 1 miliwatt (mW) \cite{stallings2021}.
+        \item \textbf{Uso na Teoria:} A fórmula canônica é $P_{\text{dBm}} = 10 \log_{10}(P_{\text{mW}})$. Para converter de Watts inteiros para miliwatts, multiplica-se por $10^3$, o que, pelas propriedades do logaritmo, transforma-se na adição da constante $30$ ($10 \log_{10}(10^3) = 30$). No código, a conversão para escala linear (Watts) é obrigatória antes de somar ruído e interferência no denominador do SINR.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{2. Parâmetros do Cenário 5G V2I (Interface Uu)}
+
+Estes valores modelam um cenário de telemetria veicular sob forte degradação de sinal urbano, conforme descrito na fundamentação de "Pior Caso" do \textit{texto.txt}.
+
+\begin{itemize}
+    \item \textbf{\texttt{L\_bits\_v2i = 12000} (Tamanho da Carga Útil):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} Reflete um pacote IP (Maximum Transmission Unit - MTU padrão de 1500 bytes) contendo dados críticos de sensores ou telemetria veicular.
+        \item \textbf{Uso na Teoria:} Define a quantidade total de bits de dados puros que a camada de aplicação precisa entregar à camada MAC para transmissão no canal de rádio (variável $L$ na equação $T=L/R$).
+    \end{itemize}
+
+    \item \textbf{\texttt{T\_slot\_v2i = 0.5} (Duração do \textit{Slot} em ms):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} Derivado diretamente da numerologia escalável do 5G NR \cite{cox2025}. Para $\mu = 1$, o espaçamento de subportadoras (SCS) é de 30 kHz. Como tempo e frequência são inversamente proporcionais, a duração padrão de um \textit{slot} de 14 símbolos sob $\mu=1$ é exatamente 0,5 ms.
+    \end{itemize}
+
+    \item \textbf{\texttt{capacidade\_slot\_v2i = 8000} (Tamanho do Bloco de Transporte - TBS):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} Na teoria do 5G, a informação não flui continuamente, mas é "empacotada" em Blocos de Transporte (\gls{TBS}) \cite{cox2025, fowdur2025}. Devido à borda da célula (baixo SINR), o algoritmo de Adaptação de Enlace restringe a modulação para QPSK, permitindo embarcar apenas 8.000 bits úteis por \textit{slot} de 0,5 ms.
+        \item \textbf{Uso na Teoria:} Força a divisão temporal. Como o pacote ($12.000$ bits) é maior que a capacidade do \textit{slot} ($8.000$ bits), o código utiliza a função Teto (\texttt{math.ceil}) para alocar 2 \textit{slots} inteiros, gerando 1,0 ms de tempo de antena efetivo.
+    \end{itemize}
+
+    \item \textbf{\texttt{T\_proc = 0.2 ms} e \texttt{T\_prop = 0.001 ms} (Processamento e Propagação):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} O \texttt{T\_prop} é o tempo de voo da onda eletromagnética à velocidade da luz ($d/c$). Para um raio de $\approx 300$ metros urbanos, o valor é $\approx 1\,\mu\text{s}$ ou $0,001$ ms. O \texttt{T\_proc} modela a latência algorítmica (Baseband + Computação de Borda/MEC).
+    \end{itemize}
+
+    \item \textbf{\texttt{N\_harq = 1} e \texttt{T\_rtt\_harq\_ms = 2.0} (Protocolo de Retransmissão):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} O \gls{HARQ} (\textit{Hybrid Automatic Repeat Request}) é o principal mecanismo da camada MAC para corrigir erros de canal \cite{cox2025}. Se a taxa de erro (BLER) for violada devido a um obstáculo (ex: caminhão), o pacote falha.
+        \item \textbf{Uso na Teoria:} \texttt{N\_harq} é a quantidade estocástica de falhas ocorridas. \texttt{T\_rtt\_harq\_ms} é o tempo exigido para o receptor enviar o sinal negativo (NACK) e o transmissor reagendar e retransmitir os dados, punindo drasticamente a latência URLLC em $+2,0$ ms.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{3. Parâmetros do Cenário 5G C-V2X (Sidelink PC5)}
+
+Estes valores modelam as particularidades da comunicação descentralizada direta entre veículos (Modo 2).
+
+\begin{itemize}
+    \item \textbf{\texttt{T\_sensing = 10.0} (Janela de Sensoriamento em ms):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} No LTE/5G Sidelink Modo 2, os veículos não possuem uma antena central agendando quem fala. Para evitar colisões, a norma do 3GPP impõe o \textit{Channel Sensing} \cite{garcia2021}. 
+        \item \textbf{Uso na Teoria:} O veículo deve observar a ocupação do canal (CBR) em uma janela de tempo passada (aqui adotada como 10 ms) antes de reservar o Bloco de Recursos. Esse atraso MAC obrigatório soma-se à latência antes mesmo de o primeiro bit de dados ir ao ar.
+    \end{itemize}
+
+    \item \textbf{\texttt{N\_harq\_sl = 2} e \texttt{T\_rtt\_psfch\_ms = 3.0} (Feedback Sidelink):}
+    \begin{itemize}
+        \item \textbf{Origem Teórica:} Ao contrário de transmissões abertas (\textit{broadcast}) passadas, o Release 16 do 5G NR introduziu o canal \gls{PSFCH} (\textit{Physical Sidelink Feedback Channel}) para garantir que falhas em modo \textit{groupcast} disparem retransmissões laterais \cite{cox2025}.
+        \item \textbf{Uso na Teoria:} Devido ao "pior caso" de sombreamento dinâmico (\textit{NLOSv}), o código modela 2 falhas sucessivas (\texttt{N\_harq\_sl=2}). Cada falha exige aguardar a oportunidade no \gls{PSFCH} (neste caso parametrizada em grade de 3,0 ms) para a notificação de erro, penalizando o atraso fim-a-fim da frenagem autônoma para absurdos $17$ ms.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Modelagem Matemática da Latência 5G V2X}
+
+A avaliação analítica do tempo de resposta nas comunicações V2X (\textit{Vehicle-to-Everything}) exige a modelagem simultânea de suas duas interfaces operacionais: a interface Uu (direcionada ao enlace V2I - Veículo-Infraestrutura) e a interface PC5 (direcionada ao \textit{Sidelink} V2V - Veículo-Veículo). No padrão 5G \textit{New Radio} (NR), a duração temporal de um \textit{slot} ($T_{slot}$) em ambas as interfaces é governada pela numerologia escalável $\mu$, sendo expressa matematicamente por $2^{-\mu}$~ms. Assumindo o uso do Prefixo Cíclico (CP) normal, cada \textit{slot} aloca um número fixo de 14 símbolos OFDM, fazendo com que a duração individual de cada símbolo decresça exponencialmente de acordo com o aumento do espaçamento de subportadoras.
+
+O tempo nominal de transmissão ($T_{tx}$) de um pacote de dados depende do tamanho da carga útil ($L$) e da capacidade suportada por um único \textit{slot}, tratada como Tamanho do Bloco de Transporte ($TBS_{slot}$). Como a transmissão ocorre invariavelmente em blocos discretos, o número de \textit{slots} necessários ($N_{slots}$) é obtido através da função teto da divisão entre o pacote e a capacidade de rádio do \textit{slot} (Equação \ref{eq:n_slots}). Consequentemente, o tempo efetivo de antena é o produto do número de blocos de tempo ocupados pela duração fixa temporal de cada \textit{slot} adotado na rede (Equação \ref{eq:t_tx}).
+
+\begin{equation}
+    N_{slots} = \left\lceil \frac{L}{TBS_{slot}} \right\rceil
+    \label{eq:n_slots}
+\end{equation}
+
+\begin{equation}
+    T_{tx} = N_{slots} \times T_{slot}
+    \label{eq:t_tx}
+\end{equation}
+
+Para refletir cenários de "pior caso" veicular com baixa Relação Sinal-Interferência-Ruído (SINR), o que obriga a rede a utilizar modulações robustas, a modelagem incorpora pacotes de telemetria de $L = 12.000$~bits enquadrados em restrições conservadoras de $TBS_{slot} = 8.000$~bits. 
+
+Além do tempo no ar, a latência de plano de usuário sofre um impacto direto do tempo de processamento algorítmico do terminal de rádio ($T_{proc}$). As especificações normativas do 3GPP não tratam esse atraso temporal como um relógio de processador (como GHz) arbitrário, mas o fixam como um número mínimo de símbolos exigidos para o preparo dos canais, baseando-se na capacidade declarada do equipamento do usuário (\textit{UE Processing Capability}). A norma diferencia terminais de perfil normal (\textit{Capability 1}) de terminais ultrarrápidos projetados especificamente para baixa latência (\textit{Capability 2}). A Equação \ref{eq:t_proc} converte essa carga de matrizes em milissegundos de atraso puro ao multiplicar a quantidade de símbolos exigidos ($N_{symb}$) pela fração temporal correspondente a um único símbolo no \textit{slot} padrão.
+
+\begin{equation}
+    T_{proc} = N_{symb} \times \left( \frac{T_{slot}}{14} \right)
+    \label{eq:t_proc}
+\end{equation}
+
+Para as comunicações V2I, a Equação \ref{eq:t_v2i} estabelece o tempo da latência real na infraestrutura de Estação Base via interface Uu, consolidando os componentes da formulação: a transmissão discreta, o processamento de \textit{hardware}, o tempo de voo eletromagnético em linha de visada ($T_{prop}$) e as penalidades estocásticas do controle de falhas. Em situações de bloqueio severo onde o pacote original falha, o protocolo \gls{HARQ} dispara um processo de correção de erros que adiciona o atraso de ida e volta do sistema ($T_{RTT\_HARQ}$) repetido pelo número necessário de retransmissões ($N_{harq}$). Na simulação adotou-se a restrição de $N_{harq}=1$ falha ao custo temporal agressivo de $2,0$~ms.
+
+\begin{equation}
+    T_{UP\_V2I} = T_{tx} + T_{proc} + T_{prop} + (N_{harq} \times T_{RTT\_HARQ})
+    \label{eq:t_v2i}
+\end{equation}
+
+Diferentemente da topologia celular centralizada V2I, a comunicação direta e autônoma entre veículos na vertente V2V (Interface PC5 \textit{Sidelink}) operando sob o Modo 2 é independente da coordenação da nuvem ou do agendador central. Para evitar interferências no ar e garantir o espaço, o 3GPP exige que o transmissor avalie previamente a ocupação dos recursos realizando um sensoriamento de canal, criando uma latência anterior imposta pela janela temporal de observação ($T_{sensing}$) parametrizada em torno de 10~ms. 
+
+Por fim, para garantir a confiabilidade necessária em serviços veiculares críticos de formação de pelotão industrial (\textit{platooning} / \textit{groupcast}), o canal físico exclusivo \gls{PSFCH} foi normatizado no Release 16 para transportar as confirmações de estado imediato (ACK/NACK) enviadas por veículos próximos. O emprego desse mecanismo reflete fortemente na latência fim-a-fim da vertente V2V na interface PC5 ($T_{e2e\_SL}$), penalizando o atraso da frenagem autônoma cada vez que o bloqueio por caminhões (ou sombreamento \textit{NLOSv}) demanda repetições de mensagens laterais, regidas pela Equação \ref{eq:t_pc5}.
+
+\begin{equation}
+    T_{e2e\_SL} = T_{sensing} + T_{tx} + T_{proc} + T_{prop} + (N_{harq\_sl} \times T_{RTT\_PSFCH})
+    \label{eq:t_pc5}
+\end{equation}

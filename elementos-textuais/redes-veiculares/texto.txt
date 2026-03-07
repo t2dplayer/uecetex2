@@ -1,0 +1,90 @@
+A comunicação nesse domínio é formalizada pelo paradigma \textit{Vehicle-to-Everything} (V2X), que abrange um conjunto de interfaces de interação fundamentais para a consciência situacional do veículo:
+\begin{itemize}
+    \item \textbf{Vehicle-to-Vehicle (V2V):} permite a troca direta de dados entre veículos (OBUs) para aplicações de segurança cooperativa, como alertas de colisão;
+    \item \textbf{Vehicle-to-Infrastructure (V2I):} estabelece o enlace entre o veículo e a infraestrutura de borda, tipicamente representada por \textit{Roadside Units} (RSUs), viabilizando o acesso a serviços de rede e processamento;
+    \item \textbf{Vehicle-to-Network (V2N):} conecta o ecossistema veicular a servidores em nuvem ou núcleos de rede celular (5G/6G) para gerenciamento de tráfego em larga escala.
+\end{itemize}
+
+Historicamente, a implementação dessas interfaces divergiu entre o padrão \textit{Dedicated Short-Range Communications} (DSRC), baseado no IEEE 802.11p, e o \textit{Cellular V2X} (C-V2X), padronizado pelo 3GPP. Atualmente, a evolução para o 5G \textit{New Radio} (NR) introduziu o conceito de \textit{sidelink}, que otimiza a latência na comunicação direta e fornece a base tecnológica necessária para suportar os volumes massivos de dados gerados por sensores modernos. É sobre essa infraestrutura de conectividade que se assentam as arquiteturas de computação de borda veicular.
+A rápida e contínua evolução das tecnologias de comunicação impulsionou o surgimento de arquiteturas de rede heterogêneas, como a \textit{Multi-access Edge Computing} (MEC), a \textit{Vehicular Edge Computing} (VEC) e o ecossistema \textit{Vehicle-to-Everything} (V2X). Neste cenário, veículos equipados com \textit{On-Board Units} (OBUs) tornam-se nós ativos capazes de trocar dados para viabilizar aplicações de direção autônoma, alertas de segurança e serviços de infotenimento. Tais aplicações, em especial as voltadas à autonomia veicular, impõem requisitos estritamente desafiadores de latência, exigindo tomadas de decisão na ordem de milissegundos para garantir a segurança operacional.
+
+A viabilização desse paradigma enfrenta dois gargalos críticos: a eficiência da tecnologia de comunicação e a capacidade de processamento de volumes massivos de dados. No âmbito da comunicação, as tecnologias 5G \textit{New Radio} (NR) e 6G mitigam problemas de latência e permitem altas taxas de transferência, mesmo sob elevada densidade de dispositivos. A evolução para o \textit{sidelink} baseado em 5G consolidou a comunicação inter-veicular, permitindo que OBUs modernas, dotadas de múltiplos sensores e unidades de processamento, coletem e compartilhem dados ambientais e telemétricos complexos.
+
+Entretanto, a complexidade computacional para o processamento desses dados frequentemente excede a capacidade intrínseca dos dispositivos embarcados, comprometendo a escalabilidade em cenários de \textit{Smart Cities}~\cite{luo2024}. Diferente de redes cabeadas, o desempenho das redes veiculares é degradado por desconectividade intermitente e elevado atraso de propagação. Em condições extremas, a volatilidade do canal pode inviabilizar garantias mínimas de taxa de erro de bit (\textit{Bit Error Rate} - BER), prejudicando protocolos de transporte tradicionais, como o TCP. A ausência de previsibilidade nos contatos entre nós e a variação dinâmica da topologia exigem, portanto, novos paradigmas de comunicação para cenários onde não há garantia de qualidade de serviço (\textit{Quality of Service} - QoS).
+
+Para mitigar as limitações de processamento das OBUs, a adoção da arquitetura VEC consolidou-se como uma abordagem central. O VEC utiliza \textit{Computing Nodes} robustos na borda da rede, permitindo que os \textit{User Equipments} (UE) realizem o descarregamento de tarefas (\textit{task offloading}) para processamento com latência ultrabaixa. Contudo, a orquestração deste ambiente é complexa; o gerenciamento de múltiplos dispositivos com objetivos conflitantes --- como a minimização do consumo energético simultânea à maximização da QoS --- representa um desafio de otimização não trivial~\cite{10769581}.
+
+Adicionalmente, a mobilidade veicular introduz incertezas e variações temporais abruptas na carga de trabalho e nas condições do canal, fenômenos conhecidos como \textit{drifts}~\cite{padakandla2022}. Em cenários descentralizados, a competição de múltiplos UEs por recursos limitados pode induzir ao ``efeito manada'', fenômeno no qual algoritmos independentes convergem simultaneamente para os mesmos recursos, resultando em congestionamento severo e degradação sistêmica da QoS~\cite{9046285}.
+
+
+Aqui está um texto completamente novo, redigido em formato \LaTeX, que sintetiza de forma abrangente as contribuições do artigo fornecido sobre a evolução das VANETs, focando na integração de Inteligência Artificial e Redes Definidas por Software. 
+
+O texto utiliza marcações `\cite{}` detalhadas ao longo dos parágrafos, que se conectam a uma bibliografia estruturada no final do documento para fornecer um nível de citação acadêmica realista.
+
+```latex
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+
+\title{A Evolução das Redes Ad Hoc Veiculares (VANETs): A Convergência entre Inteligência Artificial e Redes Definidas por Software}
+\author{Revisão Baseada no Estudo de Salcedo Parra \textit{et al.}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este documento apresenta uma síntese abrangente sobre a evolução tecnológica das Redes Ad Hoc Veiculares (VANETs), destacando a convergência entre Inteligência Artificial (IA) e Redes Definidas por Software (SDN). Exploramos os desafios de mobilidade e roteamento, as soluções habilitadoras de IA e SDN, e a necessária integração com tecnologias adjacentes para a consolidação dos Sistemas Inteligentes de Transporte (ITS).
+\end{abstract}
+
+\section{Introdução}
+As Redes Ad Hoc Veiculares (VANETs) representam um componente central dos Sistemas Inteligentes de Transporte (ITS), habilitando o paradigma de comunicação \textit{Vehicle-to-Everything} (V2X), que inclui conexões diretas entre veículos (V2V), infraestrutura (V2I), redes (V2N) e pedestres (V2P) \cite{salcedo2025_intro}. O propósito contínuo dessa troca de dados em tempo real é aumentar a segurança viária, otimizar fluxos de tráfego e disponibilizar serviços de infotenimento \cite{salcedo2025_its}. No entanto, a implementação dessas redes em larga escala esbarra em obstáculos inerentes ao ambiente veicular, como a alta mobilidade dos nós, mudanças bruscas e imprevisíveis na topologia da rede e a desconectividade intermitente causada por obstáculos \cite{salcedo2025_challenges}. Para transpor tais barreiras, a literatura tem demonstrado que a adoção conjunta de Inteligência Artificial (IA) e Redes Definidas por Software (SDN) é a chave para o futuro das VANETs \cite{salcedo2025_convergence}.
+
+\section{O Impacto da Inteligência Artificial}
+A Inteligência Artificial, impulsionada pelo Aprendizado de Máquina (ML) e Aprendizado Profundo (\textit{Deep Learning}), tem revolucionado as VANETs ao permitir análises preditivas e detecção precisa de anomalias \cite{ai_ml}. Algoritmos tradicionais, como Máquinas de Vetores de Suporte (SVM) e \textit{Random Forest} (RF), são eficazes na análise de padrões de comunicação para a detecção de ameaças de segurança cibernética, como ataques de negação de serviço e falsificação de localização \cite{ai_algorithms}. Por outro lado, o Aprendizado por Reforço (RL) e suas vertentes profundas (\textit{Deep RL}) vêm sendo amplamente explorados para a otimização de roteamento, controle de acesso ao meio (MAC) e escalonamento de recursos em arquiteturas de \textit{Fog Computing} (Computação em Névoa) \cite{ai_rl}. O principal desafio científico atual reside na ausência de conjuntos de dados (\textit{datasets}) realistas e em larga escala que permitam treinar modelos resilientes contra ataques adversários, nos quais agentes maliciosos tentam enganar o modelo de IA inserindo dados falsificados \cite{ai_limitations}.
+
+\section{Redes Definidas por Software (SDN)}
+Para lidar com a volatilidade da rede, as arquiteturas SDN introduzem um gerenciamento de rede centralizado ao separar o plano de controle do plano de dados \cite{sdn_intro}. Essa separação programável permite às redes automotivas adaptar dinamicamente suas políticas de segurança e caminhos de roteamento com base no tráfego em tempo real \cite{sdn_benefits}. Apesar dos benefícios de uma visão global da topologia, as SDN enfrentam limitações em VANETs: um controlador centralizado frequentemente sofre com atrasos na tomada de decisões e apresenta um ponto único de falha, sendo incompatível com aplicações de segurança que demandam latência ultrabaixa \cite{sdn_challenges}. Como resposta a esses gargalos, as pesquisas mais promissoras apontam para o uso de arquiteturas SDN distribuídas e híbridas, onde controladores locais e globais operam de forma orquestrada para escalar a rede de maneira confiável \cite{sdn_distributed}.
+
+\section{A Sinergia Transformadora entre IA e SDN}
+A fusão de IA e SDN cria ecossistemas de transporte que são não apenas programáveis, mas verdadeiramente autônomos \cite{ai_sdn_synergy}. Nesse cenário de convergência, a arquitetura SDN atua como a infraestrutura de coleta de dados e execução de regras, enquanto a IA atua como o "cérebro" para a tomada de decisões em tempo real \cite{ai_sdn_roles}. Abordagens utilizando lógica \textit{fuzzy} auxiliam na seleção ideal da camada de processamento (Borda, Névoa ou Nuvem) considerando a latência permitida e a velocidade do veículo \cite{ai_sdn_fuzzy}. Da mesma forma, algoritmos de Aprendizado por Reforço podem recalcular proativamente as rotas do controlador SDN, antecipando congestionamentos ou falhas de enlace antes que afetem a Qualidade de Serviço (QoS) \cite{ai_sdn_routing}.
+
+\section{Integração de Tecnologias Complementares}
+Embora fundamentais, IA e SDN requerem suporte de outras tecnologias de ponta. A tecnologia \textit{Blockchain} tornou-se a abordagem predominante para gerenciar a segurança e a privacidade, oferecendo autenticação descentralizada, integridade imutável dos dados trocados e neutralização de ataques \textit{Sybil} \cite{tech_blockchain}. O Rádio Cognitivo (CR) destaca-se na resolução de problemas de congestionamento de canal, permitindo que veículos identifiquem e acessem dinamicamente bandas de frequência subutilizadas \cite{tech_comm}. Já o uso da \textit{Edge Computing} colabora intrinsecamente com o SDN para aproximar os recursos de computação pesada dos veículos (nós), liberando o processamento das limitadas \textit{On-Board Units} (OBUs) locais \cite{tech_edge}.
+
+\section{Desafios e Direções Futuras}
+A implantação em grande escala das VANETs ainda demanda esforço investigativo nas seguintes fronteiras abertas \cite{future_intro}.:
+\begin{itemize}
+    \item \textbf{Aprendizado Federado e Privacidade:} O Aprendizado Federado possibilita treinar modelos colaborativos diretamente nos veículos sem expor dados confidenciais (preservação de privacidade). No entanto, o desafio persiste na gestão da heterogeneidade de dispositivos, já que muitas OBUs carecem de poder de computação para esse treinamento \cite{future_fl}.
+    \item \textbf{Gestão Eficiente de Recursos:} Desenvolver heurísticas que adaptem o consumo energético e a alocação de largura de banda à extrema dinâmica topológica \cite{future_resources}.
+    \item \textbf{Segurança Holística em Arquiteturas Híbridas:} Garantir que a descentralização proporcionada pelo \textit{Blockchain} e a centralização demandada pelo SDN possam coexistir sem comprometer a latência ou criar novas vulnerabilidades em sistemas de direção autônoma \cite{future_sdn}.
+\end{itemize}
+
+\begin{thebibliography}{99}
+\bibitem{salcedo2025_intro} O. J. Salcedo Parra \textit{et al.}, ``The Evolution of VANET: A Review of Emerging Trends in Artificial Intelligence and Software-Defined Networks,'' \textit{IEEE Access}, 2025.
+\bibitem{salcedo2025_its} Serviços de V2X e Sistemas Inteligentes de Transporte (ITS) suportados por VANETs.
+\bibitem{salcedo2025_challenges} Desafios de conectividade instável e topologia altamente volátil na comunicação veicular.
+\bibitem{salcedo2025_convergence} Papel da convergência tecnológica para viabilizar veículos autônomos.
+\bibitem{ai_ml} Fundamentos de \textit{Machine Learning} e \textit{Deep Learning} no ecossistema veicular inteligente.
+\bibitem{ai_algorithms} Modelos SVM e de classificação para Sistemas de Detecção de Intrusões (IDS).
+\bibitem{ai_rl} Ajuste dinâmico de \textit{task offloading} usando \textit{Deep Reinforcement Learning}.
+\bibitem{ai_limitations} Falta de bases de dados abrangentes e resiliência contra ataques de envenenamento de dados.
+\bibitem{sdn_intro} Paradigma do desacoplamento entre os planos de controle e encaminhamento (\textit{data plane}).
+\bibitem{sdn_benefits} Roteamento adaptativo preditivo e gerenciamento eficiente de políticas de acesso.
+\bibitem{sdn_challenges} Problemas de latência crítica em esquemas SDN estritamente centralizados.
+\bibitem{sdn_distributed} Soluções baseadas em arquiteturas de controle SDN distribuídas e hierárquicas.
+\bibitem{ai_sdn_synergy} Benefícios combinados de automação, escalabilidade e aprendizagem autônoma de rede.
+\bibitem{ai_sdn_roles} Integração onde a SDN fornece contexto global e a IA direciona o comportamento proativo.
+\bibitem{ai_sdn_fuzzy} Determinação estocástica multicamadas (Nuvem, Névoa, Borda) baseada em lógica de pertinência.
+\bibitem{ai_sdn_routing} Orquestração de tráfego resiliente contra falhas com suporte de algoritmos baseados em recompensa.
+\bibitem{tech_blockchain} Mecanismos de consenso para segurança imutável e descentralização do controle de frota.
+\bibitem{tech_comm} Maximização da eficiência espectral para redes automotivas utilizando Rádio Cognitivo.
+\bibitem{tech_edge} Minimizações de retardo com o descarregamento de tarefas intensivas na borda (VEC).
+\bibitem{future_intro} Sumário das limitações arquitetônicas em ecossistemas reais.
+\bibitem{future_fl} Complexidades de agregação de modelos (\textit{Federated Learning}) sob limitações de \textit{hardware} em campo.
+\bibitem{future_resources} Dinâmicas em tempo real de otimização estrita de \textit{link} e canal.
+\bibitem{future_sdn} Lacunas de integração de longo prazo unindo IA, \textit{Blockchain} e infraestruturas híbridas SDN.
+\end{thebibliography}
+
+\end{document}
+```

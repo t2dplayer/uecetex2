@@ -1,0 +1,125 @@
+\begin{center}
+    \fbox{\textbf{Reviewer \#3}}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{mdframed}[style=review] 
+\textbf{Overall Comment:} Comments to the Author
+\end{mdframed}
+
+\textbf{Authors' Response:} We thank your review work and the opportunity to improve our paper. We have attentively examined all the comments and handled each one of them below.
+\\
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.1.1:} The manuscript requires proper proofreading. There seems to be a semantic gap between what authors want to convey.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thanks for the suggestion. We made some revisions to the article and tried to eliminate all semantic gaps.
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.1.2:} Also, some terminologies are not properly explained.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thanks for the comment. In the new version of the paper, we further explain the following terminologies in the Introduction: WAVE, 5G, VEC, contextual information, task offloading, metaheuristic, and artificial bee colony. Changes to the paper can be seen below.
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 1, Line 10: \textcolor{blue}{The former is a network architecture formed by the IEEE 1609 and IEEE 802.11p protocols. The latter refers to cellular networks designed to support improved mobile broadband, greater node mobility, low latency, and ultra-reliable communications.}
+    \item Page 1, Line 33: \textcolor{blue}{A system that can help address these application processing requirements is Vehicular Edge Computing (VEC). In this system, neighboring vehicles and edge servers coupled to base stations (BSs) share their computing resources to perform remote processing. This near processing avoids the high latency communication with traditional cloud servers and allows idle computational resources on the system nodes to be better utilized.}
+    \item Page 1, Line 40: \textcolor{blue}{Nonetheless, a vehicle needs to become aware of which servers are available and their contextual information to take advantage of the capabilities of a VEC system. This context refers to information that characterizes entities, including servers [10]. In our case, contextual information consists of descriptive parameters of location, direction, speed, energy, bandwidth and range of the communication technology used, and CPU availability and capacity. With this information gathered about the system nodes through network messages, a vehicle can better assess how to optimize the processing of its applications.}
+    \item Page 1, Line 51: \textcolor{blue}{Generally, a good option is to parallelize the processing through the task offloading technique. In this technique, a vehicle must decide which computational resources to use in the VEC system. So, it must transfer different tasks (or smaller parts of applications) to be executed in parallel in nearby vehicles (via V2V) or edge servers (via V2I).}
+    \item Page 2, Line 86: \textcolor{blue}{As it may be impractical to find the optimal solution in NP-hard problems, a frequently used alternative is metaheuristic algorithms [12]. Although they do not guarantee optimal solutions for such problems, they commonly return satisfactory solutions in a reasonable time [9].}
+    \item Page 2, Line 91: \textcolor{blue}{A well-known metaheuristic algorithm used to solve multi-variable NP-hard optimization problems is the Artificial Bee Colony (ABC). The ABC is a robust and flexible algorithm inspired by the foraging behavior of honey bees in search of food sources. Because it has a fast convergence, it can quickly return solutions close to the global optimum to problems that need to be solved in real-time. In addition, it performs better than other metaheuristics in several optimization problems with the advantage of being simple to use and requiring few control parameters [13]-[16].}
+    \item New reference: \textcolor{blue}{[[13] D. Karaboga and B. Akay, “A comparative study of artificial bee colony algorithm,” Appl. Math. Comput., vol. 214, no. 1, pp. 108–132, 2009.}
+    \item New reference: \textcolor{blue}{[15] K. Du and M. Swamy, “Bee metaheuristics,” in Search and Optimization by Metaheuristics: Techniques and Algorithms Inspired by Nature. Birkhauser, 2016, ch. 12, pp. 201–216.}
+    \item New reference: \textcolor{blue}{[16] B. Akay, D. Karaboga, B. Gorkemli, and E. Kaya, “A survey on the artificial bee colony algorithm variants for binary, integer and mixed integer programming problems,” Appl. Soft Comput., vol. 106, p. 107351, 2021.}
+    \item Page 2, Line 111: \textcolor{blue}{In addition, it is able to use all the technological potential available in terms of computing, through the computational resources of vehicles and edge servers, as well as communication, through sending data via WAVE and 5G networks.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.1.3:} The paper must be re-read to avoid syntactic mistakes.
+\end{mdframed}
+
+\textbf{Authors' Response:} We appreciate the reviewer's suggestion. The paper was re-read, and we made changes throughout the article to avoid syntactic mistakes.
+
+
+\vspace{\baselineskip}
+
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.2:} How is the processing delay of tasks computed in the paper?
+\end{mdframed}
+
+\textbf{Authors' Response:} Although it was unclear in the previous text, and the equations were not highlighted, the processing delay is computed by dividing the number of CPU cycles required to execute the task ($c$) by the computational capacity of the device ($C$). A similar approach was adopted in [19] and [31]. We have highlighted the equations and made the following changes in the article's new version to clarify this point.
+
+\textbf{Additions to the Manuscript:}
+
+\begin{itemize}
+    \item Page 4, Line 324: $t^{proc}_{client}$ is the time to process $\tau$ on the \textcolor{blue}{client} CPU. \textcolor{blue}{According to [19, 31], the processing time of $\tau$ on the client is given by:}
+    \begin{equation}    
+    t^{proc}_{client} = \frac{c_{\tau}}{C_{client}}~,
+    \end{equation} 
+    where $C_{client}$ is the computational capacity of the client (in CPU cycles per second).
+    \item New reference: \textcolor{blue}{[19] J. Zhang, H. Guo, J. Liu, and Y. Zhang, “Task offloading in vehicular edge computing networks: A load-balancing solution,” IEEE Trans. Veh. Technol., vol. 69, no. 2, pp. 2092–2104, 2019}.
+    \item Page 5, Line 334: $t^{proc}_{server}$ is the time for the server \textcolor{blue}{CPU} to execute $\tau$. \textcolor{blue}{The processing time of $\tau$ on the server is given by:}    
+    \begin{equation}    
+    t^{proc}_{server} = \frac{c_{\tau}}{C_{server}}~,
+    \end{equation}    
+    where $C_{server}$ is the computational capacity of the server (in CPU cycles per second) \textcolor{blue}{[19], [31]}.
+    \item Page 9, Table 3: CPU Capacity of Edge Servers \textcolor{blue}{($C$)}, CPU Capacity of Vehicles \textcolor{blue}{($C$)}, and CPU Requirement of a Task \textcolor{blue}{($c$)}.
+    \item Page 9, Line 646: \textcolor{blue}{The values of $c_{\tau}$ and $C_{\tau}$ (also shown in Table 3) were based on task processing real experiments and in the works of [31] and [19].}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.3:} The authors adopt bee colony-based algorithms, which usually do not have real-time guarantees of vehicular applications. Could authors justify their motivation for using bee colony-based algorithms rather than other approaches?
+\end{mdframed}
+
+\textbf{Authors' Response:} About the motivation, as the problem addressed in the paper is NP-hard and real-time, it is unfeasible to try to find the optimal solution [12]. Thus, we chose to use a metaheuristic-based algorithm, given that, in general, metaheuristics provide good solutions in an acceptable time and have better performance than simple heuristics [9]. Of the researched metaheuristics, we used the Artificial Bee Colony (ABC) because it outperforms other metaheuristics in several optimization problems, being simple to use, flexible and requiring few control parameters. Furthermore, although there are no real-time guarantees, ABC converges and delivers near-optimum solutions quickly, even faster than other metaheuristics [13]-[16], [36]. As such, it can be used for complex real-time problems, as seen in the works on [A]-[C]. However, as stated in the final part of the conclusion of our paper, "in future works, we intend to implement decision algorithms based on other intelligent strategies". 
+
+[A] Huang, Hsu-Chih and Chuang, Chun-Chia, Artificial bee colony optimization algorithm incorporated with fuzzy theory for real-time machine learning control of articulated robotic manipulators, IEEE Access. 2020, volume 8, 192481--192492.\newline
+[B] Zhang, Shaoqing and Lv, Mingwei and Wang, Yanwei and Liu, Wei, Multi-UAVs Collaboration Routing Plan Based on Modified Artificial Bee Colony Algorithm, Advances in Guidance, Navigation and Control, 2022. Springer, 933--943.\newline
+[C] Ng, KKH and Lee, Carman KM and Zhang, SZ and Wu, Kan and Ho, William, A multiple colonies artificial bee colony algorithm for a capacitated vehicle routing problem and re-routing strategies under time-dependent traffic congestion, Computers \& Industrial Engineering. 2017, Elsevier, volume 109, 151-168.
+
+The following are the changes made to the article.
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Page 2, Line 86: \textcolor{blue}{As it may be impractical to find the optimal solution in NP-hard problems, a frequently used alternative is metaheuristic algorithms [12]. Although they do not guarantee optimal solutions for such problems, they commonly return satisfactory solutions in a reasonable time [9]. A well-known metaheuristic algorithm used to solve multi-variable NP-hard optimization problems is the Artificial Bee Colony (ABC). The ABC is a robust and flexible algorithm inspired by the foraging behavior of honey bees in search of food sources. Because it has a fast convergence, it can quickly return solutions close to the global optimum to problems that need to be solved in real-time. In addition, it performs better than other metaheuristics in several optimization problems with the advantage of being simple to use and requiring few control parameters [13]-[16].}
+    \item New reference: \textcolor{blue}{[[13] D. Karaboga and B. Akay, “A comparative study of artificial bee colony algorithm,” Appl. Math. Comput., vol. 214, no. 1, pp. 108–132, 2009.}
+    \item New reference: \textcolor{blue}{[15] K. Du and M. Swamy, “Bee metaheuristics,” in Search and Optimization by Metaheuristics: Techniques and Algorithms Inspired by Nature. Birkhauser, 2016, ch. 12, pp. 201–216.}
+    \item New reference: \textcolor{blue}{[16] B. Akay, D. Karaboga, B. Gorkemli, and E. Kaya, “A survey on the artificial bee colony algorithm variants for binary, integer and mixed integer programming problems,” Appl. Soft Comput., vol. 106, p. 107351, 2021.}
+    \item Page 3, Line 205: \textcolor{blue}{Of the works that deal with the single-objective optimization problem of reducing the execution time of applications, some use infeasible strategies or that present disadvantages.}
+    \item Page 3, Line 211: \textcolor{blue}{In the case of our solution, it is also based on a sophisticated strategy, the ABC metaheuristic. It is simple and easy to implement, requires few parameters for its configuration, and has outperformed other intelligent algorithms [14], [36]. However, to the best of our knowledge, it has not yet been applied to the problem of reducing the execution time of applications in VEC systems. Such a strategy allows our solution to be robust and flexible and return good solutions in a timely manner.}    
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#3.4:} Though the authors have beautiful images in the manuscript, and the resolution of results is good; there is no comprehensive image that gives an overall view of the working of the proposed mechanism BTV. It is encouraged that the authors include an image that shows all salient steps in the proposed solution/ decision process.
+\end{mdframed}
+
+\textbf{Authors' Response:} Thanks for your suggestion. To handle the reviewer's demand, we added three new figures containing flowcharts that help describe our algorithm. The modifications are listed below.
+
+\textbf{Changes in the Manuscript:} 
+
+\begin{itemize}
+    \item New Figures: \textcolor{blue}{3, 4, and 6}.
+\end{itemize}
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Page 6, Line 482: \textcolor{blue}{To facilitate the understanding of the upcoming sections, Figure 3 presents, in flowchart form, an overall view of the BTV (Algorithm 1) and its main steps. The first significant step, presented in the next section, is initializing/filling the food source set.}
+    \item Page 7, Line 499: \textcolor{blue}{Figure 4 presents the flowchart containing the most important steps and the general behavior of Algorithm 2 and Algorithms 3-5, described in the next sections. After receiving the inputs and initializing, Algorithms 2-5 check a stopping criterion. It can be verified whether the set of food sources has been fully filled (Algorithm 2) or whether the necessary evaluations of existing food sources have been carried out (Algorithms 3-5). If the stopping criterion is met, the algorithms return an output. Otherwise, the algorithms remain in a loop to add (Algorithm 2) or update food sources (Algorithms 3-5). As shown in the flowchart, these additions or updates depend on the assembly and feasibility check of solutions made by Algorithms 6 and 7 (Sections 4.7 and 4.8). The possible updates of food sources are carried out through three phases, shown in the following three sections (Sections 4.4 to 4.6): employed, onlooker, and scout bees.}
+    \item Page 8, Line 577: \textcolor{blue}{Figure 6 shows a flowchart with the salient steps of Algorithm 6. We can see that the algorithm's objective is to generate a feasible solution (food source) where all allocations of tasks to servers are feasible. After receiving inputs and initializing, the algorithm checks if the solution is complete (all tasks allocated to servers). If so, the algorithm returns a complete and feasible solution. Otherwise, it remains in a loop to allocate each task to a server, ensuring that the allocations are feasible through Algorithm 7 (shown in the next section).}
+\end{itemize}

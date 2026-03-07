@@ -1,0 +1,1061 @@
+% \input{elementos-textuais/5g-nr-v2x/stallings-5g}
+
+\section{Arquitetura e Modelagem 5G V2I e C-V2X}
+\label{sec:comunicacao-5g-e-sidelink}
+
+Nesta seção, analisam-se as arquiteturas \gls{5G} \gls{NR} e \gls{5G} \gls{NR} \gls{V2X}, fundamentadas nas especificações do Release 16 do \gls{3GPP}~\cite{3gpp38901}. 
+
+% \subsection{Dicotomia NSA vs. SA e Impactos na Latência}
+
+A quinta geração de comunicações móveis celulares, o \gls{5G}, representou um avanço tecnológico disruptivo. Ele foi projetado para revolucionar não apenas o setor de telecomunicações, mas também a sociedade como um todo~\cite{stallings2021}. Essa geração teve por objetivo entregar altas taxas de dados, maior confiabilidade, cobertura aprimorada e latências bem menores em comparação com as tecnologias antecessoras, como a \gls{LTE}~\cite{stallings2021, dummies5g}.
+
+As especificações técnicas e diretrizes de avaliação do \gls{5G} foram fundamentadas pelo padrão internacional IMT-2020, enquanto que a \gls{ITU} ficou encarregada de sua avaliação e monitoramento~\cite{asplund2025, cox2025, itu2015m2083, itu2017m2410, itu2021m2150}. 
+
+Para satisfazer os requisitos estipulados no IMT-2020, o \gls{3GPP} definiu toda a arquitetura lógica e física do \gls{5G} em sucessivos lançamentos, denominados de ``Releases''~\cite{stallings2021, asplund2025, cox2025, itu2015m2083, itu2017m2410, itu2021m2150}.
+
+Ele foi idealizado para funcionar em três grandes cenários de uso, vitais para a implantação das futuras infraestruturas digitais das cidades e da indústria~\cite{ioannou2025}. Estas características são fundamentais para viabilizar os \gls{ITS}, que exigem comunicações capazes de suportar casos de uso avançados, como o \textit{platooning} \footnote{Refere-se à aplicação de \gls{ITS} que vincula eletronicamente dois ou mais veículos para que trafeguem de forma coordenada, mantendo uma distância mínima e constante entre si.} e a direção autônoma de Nível 4 e 5, estágios onde o \gls{ADS} detém o controle total e permanente da tarefa dinâmica de direção~\cite{sae2021j3016}.
+
+O primeiro cenário, conhecido como \gls{eMBB}, busca atender a demanda por serviços que exigem altas taxas de transferência de dados, como realidade aumentada e streaming de vídeo em alta definição. Para isso, o \gls{5G} foi projetado para suportar picos de taxas de transferência de até 20~Gbps no \textit{downlink} e 10~Gbps no \textit{uplink}~\cite{stallings2021, asplund2025, cox2025, itu2015m2083, itu2017m2410, itu2021m2150}.
+
+O segundo cenário é o de \gls{mMTC}, que foi formulado para interconectar eficientemente o ecossistema da \gls{IoT}, suportando um grande número de dispositivos interligados que requerem economia rigorosa de energia e baixo custo operacional~\cite{morais2025, raghavan2025}.
+
+O terceiro cenário é o de \gls{URLLC}, sendo este essecial para aplicações que demanda atrasos a frações de milissegundos e taxas de erro na casa de $10^{-5}$, como controle robótico, \gls{ITS} ou qualquer aplicação que demande alta confiabilidade e baixa latência~\cite{raghavan2025, sheikh2026}.
+
+Para suportar tais exigências, a arquitetura do \gls{5G} foi subdividida em dois grandes blocos: (i) a \gls{NG-RAN} e (ii) o \gls{5GC}~\cite{stallings2021} (Figura~\ref{fig:arquitetura_5g_macro}).
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.8, transform shape, font=\sffamily]
+  % Nodes
+  \node[draw, rectangle, rounded corners, fill=blue!15, minimum width=2cm, minimum height=1.5cm, align=center] (ue) {\textbf{UE}\\(Usuário)};
+  \node[draw, rectangle, rounded corners, fill=green!20, minimum width=3cm, minimum height=1.5cm, align=center, right of=ue, node distance=4.5cm] (ran) {\textbf{Rede de Acesso}\\\textbf{(NG-RAN)}};
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=3cm, minimum height=1.5cm, align=center, right of=ran, node distance=5.2cm] (core) {\textbf{Rede Núcleo}\\\textbf{(5GC)}};
+  \node[draw, rectangle, rounded corners, fill=gray!20, minimum width=2.5cm, minimum height=1.5cm, align=center, right of=core, node distance=4.5cm] (dn) {\textbf{Rede de Pacotes}\\\textbf{de Dados Externos (DN)}};
+
+  % Edges
+  \draw[<->, very thick] (ue) -- node[above, font=\small] {Interface} node[below, font=\small] {Aérea (Uu)} (ran);
+  \draw[<->, very thick] (ran) -- node[above, font=\small] {Backhaul} (core);
+  \draw[<->, very thick] (core) -- (dn);
+\end{tikzpicture}
+\Caption{\label{fig:arquitetura_5g_macro} Modelo de sistema básico 3GPP evidenciando os dois grandes blocos operacionais do 5G.}
+\Fonte{Baseado no modelo de sistema 3GPP \cite{fowdur2025}.}
+\end{figure}
+
+O \gls{5GC} implementa o modelo de \gls{SBA}, onde diversas funções de rede comunicam-se através de requisições de serviço em interfaces bem padronizadas \cite{stallings2021}. A Figura~\ref{fig:arquitetura_5g_short} ilustra alguns serviços que se integram entre si e com os outros elementos do \gls{5G} além da divisão entre \gls{CUPS}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[node distance=2cm, auto, scale=0.9, transform shape, font=\sffamily]
+  % Nodes base
+  \node[draw, rectangle, rounded corners, fill=blue!15, minimum width=2.5cm, minimum height=1.2cm] (ue) {UE};
+  \node[draw, rectangle, rounded corners, fill=green!20, minimum width=2.5cm, minimum height=1.2cm, right of=ue, node distance=4.5cm] (gnb) {NG-RAN};
+  
+  % Nodes do 5GC
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=3cm, minimum height=1.2cm, align=center, right of=gnb, node distance=5cm, yshift=2cm] (amf) {\begin{tabular}{c}AMF / SMF\\ (Plano de Controle)\end{tabular}};
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=3cm, minimum height=1.2cm, align=center, right of=gnb, node distance=5cm, yshift=-2cm] (upf) {\begin{tabular}{c}UPF\\ (Plano de Usuário)\end{tabular}};
+  
+  % Caixa delimitadora do 5GC usando a biblioteca 'fit'
+  \node[draw=orange, thick, dashed, rounded corners, fit=(amf) (upf), inner sep=0.7cm] (5gc) {};
+  \node[fill=white, text=orange, font=\bfseries] at (5gc.north) {5GC (Core Network)};
+  
+  % Node da Rede Externa
+  \node[draw, rectangle, rounded corners, fill=gray!20, minimum width=2.5cm, minimum height=1.2cm, align=center, right of=upf, node distance=4.5cm] (dn) {\begin{tabular}{c}Rede de Pacotes\\ de Dados Externos\end{tabular}};
+
+  % Edges com os Reference Points reinseridos
+  \draw[<->, thick] (ue) -- node[above] {Uu} (gnb);
+  \draw[<->, thick, dashed] (gnb) -- node[above, sloped] {N2} (amf);
+  \draw[<->, thick] (gnb) -- node[below, sloped] {N3} (upf);
+  \draw[<->, thick, dashed] (amf) -- node[right] {N4} (upf);
+  \draw[<->, thick] (upf) -- node[above] {N6} (dn);
+\end{tikzpicture}
+\Caption{\label{fig:arquitetura_5g_short} Arquitetura Simplificada da Rede 5G (Plano de Controle e Usuário).}
+\Fonte{Elaborado pelo autor.}
+\end{figure}
+
+Na Figura~\ref{fig:arquitetura_5g_short}, o componente \gls{AMF} é o responsável por gerenciar o acesso do usuário à rede, sua mobilidade contínua (rastreamento de localização e transição entre antenas) e o estado de suas conexões através do protocolo \gls{NAS}. Já o \gls{SMF} é responsável por estabelecer e gerenciar o tráfego de dados do usuário, isto inclui a conexão do usuário com a rede, a alocação de endereços IP, o fornecimento de regras de como os pacotes de dados devem ser roteados, inspecionados ou bloqueados, além do monitoramento do tráfego e geração de relatórios de uso de dados~\cite{fowdur2025}.
+
+Nas especificações do \gls{3GPP} foram definidas nomenclaturas, ou pontos de referência, que identificam as interfaces lógicas de comunicação entre os elementos da arquitetura \gls{5G}. Elas são identificadas pela união da letra "N" seguido de um número~\cite{stallings2021, fowdur2025}. A seguir, são apresentadas as principais interfaces lógicas e suas definições:
+
+\begin{itemize} 
+    \item \textbf{N1:} Conexão lógica fim a fim. É a interface de sinalização entre o \gls{UE} e a \gls{AMF}. 
+    \item \textbf{N2:} Interface exclusiva de sinalização do Plano de Controle que interliga a estação rádio base (\gls{NG-RAN}) à \gls{AMF} do núcleo. 
+    \item \textbf{N3:} Interface responsável por transportar o tráfego de dados entre a rede de acesso (\gls{NG-RAN}) e a \gls{UPF}. 
+    \item \textbf{N4:} Interface de comunicação que viabiliza a separação dos planos de controle e usuário (\gls{CUPS}); é através dela que a \gls{SMF} envia as regras de roteamento, processamento e liberação de pacotes para a \gls{UPF}. 
+    \item \textbf{N6:} Interface que conecta a \gls{UPF} diretamente às \gls{DN} externas, como a Internet pública ou intranets de clientes. 
+\end{itemize}
+
+A arquitetura do \gls{5GC}, por conta de sua modularidade, viabiliza o conceito de \gls{NS}. Tal conceito possibilita a criação de redes virtuais independentes, isoladas e que operam em paralelo sobre uma infraestrutura física compartilhada \cite{stallings2021}. Graças à abstração de hardware permitida pelas tecnologias de \gls{SDN} e \gls{NFV}, cada rede virtual individual (\textit{slice}) adquire um conjunto dedicado de recursos físicos e funções de rede \cite{stallings2021}. Dessa forma, cada \textit{slice} (Figura~\ref{fig:slicing_short}) pode ser parametrizado em termos de latência, largura de banda, mobilidade e segurança, oferecendo atributos específicos e blindando o desempenho de um cenário de uso contra congestionamentos em serviços paralelos, viabilizando o diversificado ecossistema digital do \gls{5G} \cite{stallings2021}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.85, transform shape, font=\sffamily]
+  % Infraestrutura Física Base
+  \node[draw=black!70, rectangle, fill=gray!20, minimum width=15cm, minimum height=1.5cm, rounded corners=4pt, align=center] (infra) {\Large \textbf{Infraestrutura Física Compartilhada}\\[0.1cm] \normalsize (Hardware de Rádio, Transporte e Servidores Core abstraídos por SDN/NFV)};
+
+  % Slices Operando em Paralelo
+  % Slice 2: URLLC (Centro)
+  \node[draw=magenta!80!black, fill=magenta!10, rectangle, text width=4.2cm, minimum height=3.2cm, rounded corners=4pt, above=1.2cm of infra.north, align=center] (urllc) {
+    \textbf{Slice 2: URLLC}\\
+    \textit{Low Latency} \\
+    \rule{3cm}{0.5pt} \\
+    \vspace{0.1cm}
+    Latência ultrabaixa (<1ms)\\
+    Alta Confiabilidade\\
+    Condução Autônoma
+  };
+
+  % Slice 1: eMBB (Esquerda)
+  \node[draw=cyan!80!black, fill=cyan!10, rectangle, text width=4.2cm, minimum height=3.2cm, rounded corners=4pt, left=0.4cm of urllc, align=center] (embb) {
+    \textbf{Slice 1: eMBB}\\
+    \textit{Mobile Broadband} \\
+    \rule{3cm}{0.5pt} \\
+    \vspace{0.1cm}
+    Alto Throughput\\
+    Vídeo 4K/8K \& VR\\
+    Smartphones
+  };
+
+  % Slice 3: mMTC (Direita)
+  \node[draw=orange!80!black, fill=orange!10, rectangle, text width=4.2cm, minimum height=3.2cm, rounded corners=4pt, right=0.4cm of urllc, align=center] (mmtc) {
+    \textbf{Slice 3: mMTC}\\
+    \textit{Massive IoT} \\
+    \rule{3cm}{0.5pt} \\
+    \vspace{0.1cm}
+    Alta Densidade\\
+    Baixo Consumo de Bateria\\
+    Sensores \& Smart Cities
+  };
+
+  % Conexões (Pipes) entre a Infraestrutura e os Slices
+  \draw[dashed, <->, cyan!80!black, line width=1.5pt] (embb.south) -- (embb.south |- infra.north);
+  \draw[dashed, <->, magenta!80!black, line width=1.5pt] (urllc.south) -- (infra.north);
+  \draw[dashed, <->, orange!80!black, line width=1.5pt] (mmtc.south) -- (mmtc.south |- infra.north);
+
+\end{tikzpicture}
+\Caption{\label{fig:slicing_short} Conceito de Fatiamento de Rede (Network Slicing) baseado em NFV/SDN evidenciando o isolamento e parametrização por serviço.}
+\Fonte{Elaborado pelo autor.}
+\end{figure}
+
+Enquanto a tecnologia \gls{NFV} abstrai as capacidades de computação, armazenamento e funções de rede via software, dispensando hardwares físicos proprietários, a \gls{SDN} isola o plano de dados do plano de controle nos dispositivos de rede, consolidando as rotas a partir de um controlador centralizado e programável \cite{stallings2021}.
+
+Para garantir baixas latências, foi necessário distribuir as funções de processamento e armazenamento da nuvem para dispositivos mais próximos do cliente do serviço. Na prática, isto significou que as aplicações não precisariam mais enviar seus dados para \textit{datacenters} distantes, sendo penalizadas com latências elevadas. Essa solução foi materializada com a integração do \gls{MEC} à rede móvel \gls{5G}, onde a \gls{UPF} é distribuída localmente para rotear os dados diretamente aos servidores periféricos, possibilitando a resposta em tempo real. A Figura~\ref{fig:arquitetura_mec_5g} ilustra a arquitetura do \gls{5GC} com a integração do \gls{MEC}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.85, transform shape, font=\sffamily]
+  % Nodes Padrão
+  \node[draw, rectangle, rounded corners, fill=blue!15, minimum width=2cm, minimum height=1.2cm] (ue) {UE};
+  \node[draw, rectangle, rounded corners, fill=green!20, minimum width=2.5cm, minimum height=1.2cm, right=1.5cm of ue] (gnb) {NG-RAN};
+
+  % Borda (Edge / MEC)
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, below=2cm of gnb] (upfl) {UPF\\ (Local)};
+  
+  % Core Central (5GC)
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, right=4cm of gnb, yshift=1.2cm] (amf) {AMF / SMF\\ (Controle)};
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, below=1.2cm of amf] (upfc) {UPF\\ (Central)};
+
+  % Servidor MEC alinhado com UPF Central
+  \node[draw, rectangle, rounded corners, fill=purple!20, minimum width=2.5cm, minimum height=1.2cm, align=center] at (upfc |- upfl) (mec) {Servidor MEC\\ (Aplicações)};
+
+  % Nuvem
+  \node[draw, rectangle, rounded corners, fill=gray!20, minimum width=2.5cm, minimum height=1.2cm, align=center, right=1.5cm of upfc] (cloud) {Datacenter\\ (Nuvem)};
+
+  % Caixas Delimitadoras
+  \node[draw=orange, thick, dashed, rounded corners, fit=(amf) (upfc), inner sep=0.4cm] (core) {};
+  \node[fill=white, text=orange, font=\bfseries, inner sep=2pt] at (core.north) {5GC (Central)};
+
+  \node[draw=purple, thick, dashed, rounded corners, fit=(gnb) (upfl) (mec), inner sep=0.6cm] (edge) {};
+  \node[fill=white, text=purple, font=\bfseries, inner sep=2pt] at (edge.south) {Infraestrutura de Borda (MEC)};
+
+  % Conexões Básicas
+  \draw[<->, thick] (ue) -- node[above] {Uu} (gnb);
+
+  % Conexões na Borda (Desvio de tráfego local)
+  \draw[<->, thick, blue] (gnb) -- node[left, text=blue] {N3} (upfl);
+  \draw[<->, thick, blue] (upfl) -- node[below, text=blue] {N6 (Local)} (mec);
+  \draw[<->, thick, dashed] (upfl) -- (amf);
+
+  % Conexões com o Core Central e Nuvem
+  \draw[<->, thick, dashed] (gnb) -- node[above, sloped] {N2} (amf);
+  \draw[<->, thick] (gnb) -- node[above, sloped, pos=0.3] {N3} (upfc);
+  
+  \draw[<->, thick, dashed] (amf) -- node[right] {N4} (upfc);
+  
+  \draw[<->, thick] (upfc) -- node[above] {N6} (cloud);
+
+\end{tikzpicture}
+\caption{\label{fig:arquitetura_mec_5g} Integração do \gls{MEC} à rede \gls{5G} distribuindo a função \gls{UPF} localmente visando reduzir a latência de tráfego sensível.}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+Na rede de acesso \gls{5G}, a \gls{gNB} atua como a \gls{RBS} responsável por fornecer a interface aérea, gerenciando a transmissão e a recepção de dados entre o \gls{UE} e a rede núcleo \cite{fowdur2025, cox2025}. Quanto à sua infraestrutura, a \gls{gNB} evoluiu em relação ao \gls{eNodeB} (rede de acesso do \gls{4GLTE}) adotando uma arquitetura modular. Essa nova estrutura separa suas funções base em duas unidades (divisão funcional): a \gls{CU} e as \glspl{DU}.
+
+A \gls{CU} é responsável pelo processamento de serviços em tempo não real e hospeda os protocolos de maior nível da pilha de rádio, como o \gls{RRC} (para controle de mobilidade e conexões), o \gls{PDCP} e o \gls{SDAP} (responsáveis pela criptografia e mapeamento de \gls{QoS}). Por outro lado, as \glspl{DU} são alocadas localmente, mais próximas às antenas, para executar serviços estritamente de tempo real. Elas hospedam os protocolos de camadas inferiores, como o \gls{RLC}, \gls{MAC} e a camada Física (\gls{PHY}), lidando diretamente com o agendamento de recursos de rádio em milissegundos, correção rápida de erros e o processamento digital dos sinais. A Figura~\ref{fig:gnb_split} ilustra essa divisão funcional da \gls{gNB}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.9, transform shape, font=\sffamily]
+
+  % gNB Enclosure
+  \node[draw=green!60!black, thick, dashed, rectangle, rounded corners, fill=green!5, minimum width=9.5cm, minimum height=6.8cm, align=center] (gnb) {};
+  \node[font=\bfseries, anchor=north, yshift=-0.2cm, text=green!50!black] at (gnb.north) {Estação Base 5G (gNB)};
+
+  % CU Block
+  \node[draw, rectangle, rounded corners, fill=blue!10, minimum width=3.8cm, minimum height=5.4cm, align=center, anchor=west, xshift=0.6cm, yshift=-0.3cm] (cu) at (gnb.west) {};
+  \node[font=\bfseries, align=center, anchor=north, yshift=-0.2cm] (cu_title) at (cu.north) {Unidade Central\\(CU)};
+  \node[font=\small\itshape, align=center, anchor=north, yshift=-0.1cm] (cu_subtitle) at (cu_title.south) {Tempo Não Real};
+  
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, anchor=north, yshift=-0.3cm] (rrc) at (cu_subtitle.south) {RRC};
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, below=0.15cm of rrc] (sdap) {SDAP};
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, below=0.15cm of sdap] (pdcp) {PDCP};
+
+  % DU Block
+  \node[draw, rectangle, rounded corners, fill=orange!15, minimum width=3.8cm, minimum height=5.4cm, align=center, anchor=east, xshift=-0.6cm, yshift=-0.3cm] (du) at (gnb.east) {};
+  \node[font=\bfseries, align=center, anchor=north, yshift=-0.2cm] (du_title) at (du.north) {Unidade Distribuída\\(DU)};
+  \node[font=\small\itshape, align=center, anchor=north, yshift=-0.1cm] (du_subtitle) at (du_title.south) {Tempo Real};
+
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, anchor=north, yshift=-0.3cm] (rlc) at (du_subtitle.south) {RLC};
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, below=0.15cm of rlc] (mac) {MAC};
+  \node[draw, rectangle, fill=white, minimum width=3cm, minimum height=0.6cm, align=center, below=0.15cm of mac] (phy) {PHY};
+
+  % Connection between CU and DU
+  \draw[<->, very thick, dashed] (cu.east) -- node[above, font=\small\bfseries] {F1} (du.west);
+
+  % Connection to Core
+  \draw[<->, very thick, dashed] (cu.west) -- ++(-1.8cm,0) node[left, font=\bfseries] {Core 5GC};
+
+  % Connection to Antenna / UE
+  \draw[<->, very thick] (du.east) -- ++(1.8cm,0) node[right, font=\bfseries, align=center] {Interface\\Aérea (Uu)};
+
+\end{tikzpicture}
+\caption{\label{fig:gnb_split} Divisão funcional arquitetural da estação base \gls{gNB} nas unidades \gls{CU} e \gls{DU}, mostrando a alocação dos protocolos de rádio.}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+Estas mudanças na arquitetura da rede forçaram as operadoras a elaborar um plano estratégico para migrar do \gls{4GLTE} para o \gls{5G}, formalmente designado como Opção 3. Inicialmente, a ideia foi aproveitar a infraestrutura existente do \gls{4GLTE} como base, adotando o modelo de implantação \gls{NSA}. O modelo \gls{NSA} mantém o uso do núcleo de pacotes do \gls{4GLTE}, conhecido como \gls{EPC}, e fornece \gls{EN-DC} ao usuário. Nesse arranjo, a estação base \gls{LTE} (\gls{eNodeB}) atua como nó mestre, utilizando o \gls{UPF} do \gls{EPC} para gerenciar a sinalização (como autenticação, mobilidade e estabelecimento da conexão). Simultaneamente, a estação \gls{5G} (\gls{en-gNB}) atua como nó secundário dedicado ao Plano de Usuário, fornecendo a interface de rádio de alta capacidade para reforçar o fluxo de dados brutos da internet (Figura~\ref{fig:migracao_nsa}). A Figura~\ref{fig:migracao_nsa} ilustra essa migração.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.85, transform shape, font=\sffamily]
+
+  % Core Network
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=6cm, minimum height=1.5cm, align=center] (epc) {\textbf{Núcleo 4G (EPC)}\\ Ancoragem do Plano de Controle};
+
+  % Redes de Acesso (RAN)
+  % eNodeB (Master Node)
+  \node[draw, rectangle, rounded corners, fill=blue!10, minimum width=4.5cm, minimum height=3.4cm, align=center, below left=1.2cm and 0.5cm of epc] (enodeb) {};
+  \node[font=\bfseries, align=center, anchor=north, yshift=-0.2cm] at (enodeb.north) {4G eNodeB\\(Nó Mestre - MN)};
+  \node[draw, rectangle, fill=white, minimum width=3.8cm, minimum height=1cm, align=center, anchor=south, yshift=0.3cm] at (enodeb.south) {Controladora\\ Rádio};
+
+  % en-gNB (Secondary Node, com CU e DU)
+  \node[draw, rectangle, rounded corners, fill=green!15, minimum width=4.5cm, minimum height=3.4cm, align=center, below right=1.2cm and 0.5cm of epc] (gnb) {};
+  \node[font=\bfseries, align=center, anchor=north, yshift=-0.2cm] at (gnb.north) {5G en-gNB\\(Nó Secundário - SN)};
+  \node[draw, rectangle, fill=white, minimum width=3.8cm, minimum height=0.7cm, align=center, anchor=south, yshift=1.1cm] at (gnb.south) (cu) {CU (Central Unit)};
+  \node[draw, rectangle, fill=white, minimum width=3.8cm, minimum height=0.7cm, align=center, anchor=south, yshift=0.3cm] at (gnb.south) (du) {DU (Distributed Unit)};
+
+  % Equipamento do Usuário (UE)
+  \node[draw, rectangle, rounded corners, fill=gray!20, minimum width=9cm, minimum height=1.2cm, align=center, below=6.5cm of epc] (ue) {\textbf{Dispositivo do Usuário (UE)}\\ Conectividade Dupla (EN-DC)};
+
+  % Conexões Core -> RAN
+  \draw[<->, dashed, thick, purple] (epc.200) -- node[left, align=center, text=purple] {S1-C\\(Controle)} (epc.200 |- enodeb.north);
+  \draw[<->, thick, blue] (epc.230) -- node[right, pos=0.3, text=blue] {S1-U} (epc.230 |- enodeb.north);
+  \draw[<->, thick, blue] (epc.330) -- node[right, align=center, text=blue] {S1-U\\(Dados)} (epc.330 |- gnb.north);
+
+  % Interface X2 (Inter-RAN - FUNDAMENTAL NO NSA)
+  \draw[<->, thick, dashed] (enodeb.east) -- node[above] {X2} (gnb.west);
+
+  % Conexões RAN -> UE
+  \draw[<->, dashed, thick, purple] (enodeb.230) -- node[left, align=center, text=purple] {Sinalização\\ (LTE-Uu)} (enodeb.230 |- ue.north);
+  \draw[<->, thick, blue] (enodeb.310) -- node[right, text=blue] {Dados} (enodeb.310 |- ue.north);
+  
+  \draw[<->, thick, blue] (gnb.south) -- node[right, align=center, text=blue] {Dados\\ (NR-Uu)} (gnb.south |- ue.north);
+
+\end{tikzpicture}
+\caption{\label{fig:migracao_nsa} Estrutura de implantação Não-Autônoma (\gls{NSA}) baseada no núcleo legado \gls{EPC}, separando a controladora rádio \gls{4GLTE} do nó secundário \gls{en-gNB} (dividido em \gls{CU} e \gls{DU}).}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+Ainda na Figura \ref{fig:migracao_nsa}, as interfaces lógicas S1 (\gls{S1-C} e \gls{S1-U}) ligam a rede de acesso ao núcleo \gls{EPC}. A \gls{S1-C} transporta o tráfego do plano de controle (sinalização), enquanto a \gls{S1-U} transporta pacotes de dados do usuário. Já a interface \gls{X2} conecta diretamente o \gls{eNodeB} e o \gls{en-gNB}, permitindo que o \gls{MN} coordene o \gls{SN}, gerencie a mobilidade e divida o fluxo de dados do usuário entre as duas torres. As interfaces \gls{LTE-Uu} e \gls{NR-Uu} são as interfaces aéreas de conexão de rádio que conectam o \gls{UE} às torres \gls{4G} e \gls{5G}, respectivamente.
+
+O segundo passo em direção ao uso pleno do \gls{5G} é a migração para o modelo \gls{SA}, cenário formalmente designado como Opção 2. Nessa arquitetura, a estação base \gls{gNB} conecta-se diretamente ao núcleo \gls{5GC} através da interface lógica \gls{NG}, concretizando suas funcionalidades sem qualquer dependência da infraestrutura legada do \gls{4GLTE} (Figura~\ref{fig:migracao_sa}).
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[auto, thick, scale=0.9, transform shape, font=\sffamily]
+
+  % Core Network 5GC
+  \node[draw, rectangle, rounded corners, fill=orange!20, minimum width=6cm, minimum height=1.5cm, align=center] (5gc) {\textbf{Núcleo 5G (5GC)}\\ Plano de Controle e Usuário};
+
+  % gNB
+  \node[draw, rectangle, rounded corners, fill=green!15, minimum width=6cm, minimum height=3.2cm, align=center, below=1.5cm of 5gc] (gnb) {};
+  \node[font=\bfseries, align=center, anchor=north, yshift=-0.2cm] at (gnb.north) {Estação Base 5G (gNB)};
+  \node[draw, rectangle, fill=white, minimum width=4.8cm, minimum height=0.6cm, align=center, anchor=south, yshift=1.1cm] at (gnb.south) (cu) {CU (Central Unit)};
+  \node[draw, rectangle, fill=white, minimum width=4.8cm, minimum height=0.6cm, align=center, anchor=south, yshift=0.3cm] at (gnb.south) (du) {DU (Distributed Unit)};
+
+  % UE
+  \node[draw, rectangle, rounded corners, fill=gray!20, minimum width=6cm, minimum height=1.2cm, align=center, below=1.5cm of gnb] (ue) {\textbf{Dispositivo do Usuário (UE)}\\ Conexão Única (SA)};
+
+  % Interfaces Core -> RAN
+  \draw[<->, dashed, thick, purple] ([xshift=-2cm]5gc.south) -- node[left, text=purple] {NG-C} ([xshift=-2cm]gnb.north);
+  \draw[<->, thick, blue] ([xshift=2cm]5gc.south) -- node[right, text=blue] {NG-U} ([xshift=2cm]gnb.north);
+
+  \path (5gc.south) -- (gnb.north) node[midway, anchor=center, font=\small\bfseries, text=black!70] {Interface NG};
+
+  % Interfaces RAN -> UE
+  \draw[<->, thick, blue] (gnb.south) -- node[right, align=center, text=blue] {Conexão Direta\\(NR-Uu)} (ue.north);
+
+\end{tikzpicture}
+\caption{\label{fig:migracao_sa} Estrutura de implantação Autônoma (\gls{SA}) ou Opção 2. O núcleo \gls{5GC} conecta-se diretamente à estação base \gls{gNB} via interface \gls{NG}.}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+No modelo \gls{SA}, as conexões sem fio com o usuário final operam através de uma interface aérea, conhecida como \gls{5G} \gls{NR}. Nela, o espectro de radiofrequência suporta maiores larguras de banda. Para tanto, as operações foram divididas em duas faixas de frequência: (i) a \gls{FR1} e (ii) a \gls{FR2}.
+
+O intervalo de radiofrequência \gls{FR1} abrange o espectro da faixa sub-6~GHz, partindo de 410~MHz até 7.125~GHz, o que possibilita um balanço entre penetração em ambientes internos e uma boa capacidade de cobertura. Em relação a largura de banda, o \gls{FR1} suporta até 100~MHz. Já o intervalo de radiofrequência \gls{FR2}, cujas frequências são conhecidas como \gls{mmWave}, estendem-se de 24.25~GHz a 71~GHz e suporta até 400~MHz de largura de banda. A Figura~\ref{fig:nr_spectrum} sintetiza conceitualmente essa divisão de frequências no espectro da interface \gls{NR}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[font=\sffamily, scale=1.0, transform shape]
+
+  % Base Timeline
+  \draw[->, thick, gray] (-0.5, 0) -- (12, 0) node[right, font=\bfseries] {Frequência};
+  
+  % Ticks
+  \draw[thick, gray] (0, 0.2) -- (0, -0.2) node[below] {410 MHz};
+  \draw[thick, gray] (4.5, 0.2) -- (4.5, -0.2) node[below] {7.125 GHz};
+  
+  \draw[thick, gray] (7, 0.2) -- (7, -0.2) node[below] {24.25 GHz};
+  \draw[thick, gray] (11.5, 0.2) -- (11.5, -0.2) node[below] {71 GHz};
+
+  % FR1 Bar
+  \draw[thick, fill=cyan!15, rounded corners] (0, 0.5) rectangle (4.5, 1.5);
+  \node[font=\bfseries] at (2.25, 1) {FR1 (Sub-6 GHz)};
+  \node[font=\small, align=center, text=cyan!60!black, anchor=south] at (2.25, 1.6) {Balanço: Cobertura\\e Penetração};
+
+  % Gap/dots
+  \filldraw[gray!60] (4.9, 1.0) circle (1.5pt);
+  \filldraw[gray!60] (5.25, 1.0) circle (1.5pt);
+  \filldraw[gray!60] (5.6, 1.0) circle (1.5pt);
+  \filldraw[gray!60] (5.95, 1.0) circle (1.5pt);
+  \filldraw[gray!60] (6.3, 1.0) circle (1.5pt);
+  \filldraw[gray!60] (6.65, 1.0) circle (1.5pt);
+
+  % FR2 Bar
+  \draw[thick, fill=magenta!15, rounded corners] (7, 0.5) rectangle (11.5, 1.5);
+  \node[font=\bfseries] at (9.25, 1) {FR2 (mmWave)};
+  \node[font=\small, align=center, text=magenta!60!black, anchor=south] at (9.25, 1.6) {Alta Capacidade\\e Banda Ultra-larga};
+
+\end{tikzpicture}
+\caption{\label{fig:nr_spectrum} Divisão conceitual do espectro de radiofrequência \gls{5G} \gls{NR} nas faixas \gls{FR1} (Sub-6 GHz) e \gls{FR2} (mmWave).}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+No \gls{4G} tradicional, eram utilizadas antenas \gls{MIMO} com até 8 elementos, mas tal configuração revelou-se inadequada para as operações em faixas de frequência milimétricas. Portanto, no \gls{5G}, aproveitando-se do diminuto comprimento de onda dessas frequências, foi possível aumentar o número de elementos de antena consideravelmente, integrando dezenas ou centenas de elementos (como 64, 128 ou 256) em um único painel. Essa configuração é conhecida como \textit{Massive} \gls{MIMO}. Ela é altamente densa e atua em conjunto para gerar ganhos consideráveis, compensando a atenuação natural do sinal nas faixas do \gls{FR2}.
+
+A eficácia do \textit{Massive} \gls{MIMO} depende de uma técnica de filtragem espacial dos sinais conhecida como conformação de feixes (\textit{Beamforming}). As antenas, em vez de irradiar a energia do rádio em todas as direções, direcionam o sinal de forma precisa para o dispositivo do usuário. Isso evita que o sinal cause interferência a usuários próximos e mitiga o desperdício de potência em rotas desnecessárias, o que eleva a eficiência energética do sistema e entrega conexões mais eficientes ao usuário pontual e em movimento. Além disso, a altíssima resolução espacial do \textit{Massive} \gls{MIMO} confere ao sistema a capacidade de mapear a assinatura espacial do canal, distinguindo e separando diferentes ângulos de propagação com extrema precisão. É essa característica que permite realizar a multiplexação espacial para atender a múltiplos usuários simultaneamente sobre o mesmo recurso de tempo e frequência (\gls{MU-MIMO}).
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily]
+
+    % ==========================================
+    % LADO ESQUERDO: 4G TRADICIONAL
+    % ==========================================
+    
+    % Mastro 4G
+    \fill[gray!60] (-0.1, -3.5) rectangle (0.1, 0);
+    
+    % Antena 4G (MIMO até 8 elementos)
+    \draw[thick, fill=gray!20, rounded corners=1pt] (-0.3, 0) rectangle (0.3, 1.2);
+    \foreach \x in {-0.15, 0.15} {
+        \foreach \y in {0.15, 0.45, 0.75, 1.05} {
+            \fill[black!70] (\x, \y) circle (1.5pt);
+        }
+    }
+    \node[above, align=center] at (0, 2.5) {\textbf{\gls{4G} Tradicional}\\\small \gls{MIMO} (até 8 elementos)\\\small Irradiação Omnidirecional/Setorial};
+
+    % Feixe Largo 4G (Desperdício)
+    \draw[fill=blue!20, draw=blue!50!black, thick, opacity=0.6] (0.3, 0.6)
+        .. controls (2, 2.6) and (4, 2.6) .. (4.5, 0.6)
+        .. controls (4, -1.4) and (2, -1.4) .. (0.3, 0.6);
+
+    \node[text=blue!70!black, align=center, font=\footnotesize] at (2.4, -2.1) {\textbf{Feixe Largo:}\\ Desperdício de potência em rotas\\inúteis e maior interferência};
+
+    % Usuários 4G
+    \node[draw, thick, fill=black!80, text=white, rounded corners=1pt, inner sep=2pt, font=\tiny] (ue1) at (3.8, 1.2) {UE};
+    \node[draw, thick, fill=black!80, text=white, rounded corners=1pt, inner sep=2pt, font=\tiny] (ue2) at (3.5, -0.2) {UE};
+
+    % Setas ilustrando o desperdício de energia
+    \draw[->, blue!80!black, dashed, thick] (0.5, 0.8) -- (2.8, 2.2);
+    \draw[->, blue!80!black, dashed, thick] (0.5, 0.4) -- (2.8, -1.0);
+
+
+    % ==========================================
+    % LADO DIREITO: 5G MASSIVE MIMO
+    % ==========================================
+    \begin{scope}[xshift=7.5cm]
+    
+    % Mastro 5G
+    \fill[gray!60] (-0.1, -3.5) rectangle (0.1, 0);
+    
+    % Antena 5G (Massive MIMO - Painel Denso)
+    \draw[thick, fill=gray!20, rounded corners=1pt] (-0.4, -0.2) rectangle (0.4, 1.4);
+    % Desenhando o grid para representar as centenas de elementos (64, 128, 256)
+    \draw[step=0.1cm, gray!60, thin] (-0.4, -0.2) grid (0.4, 1.4);
+    \draw[thick, rounded corners=1pt] (-0.4, -0.2) rectangle (0.4, 1.4); % Borda externa
+    
+    \node[above, align=center] at (0, 2.5) {\textbf{\gls{5G} \textit{Massive} \gls{MIMO}}\\\small Centenas de elementos (FR2)\\\small Altíssima resolução espacial};
+
+    % Feixes direcionados 5G (Beamforming & MU-MIMO)
+    
+    % Feixe 1 (Verde) - Usuário pontual
+    \draw[fill=green!30, draw=green!60!black, thick, opacity=0.8] (0.4, 0.6)
+        .. controls (2.5, 1.6) and (3.5, 1.6) .. (4.2, 1.4)
+        .. controls (3.5, 1.2) and (2.5, 1.2) .. (0.4, 0.6);
+        
+    % Feixe 2 (Laranja) - Usuário em movimento
+    \draw[fill=orange!30, draw=orange!60!black, thick, opacity=0.8] (0.4, 0.6)
+        .. controls (2.5, 0.2) and (3.5, 0.2) .. (4.0, 0)
+        .. controls (3.5, -0.2) and (2.5, -0.2) .. (0.4, 0.6);
+        
+    % Feixe 3 (Roxo) - Múltiplos usuários
+    \draw[fill=purple!30, draw=purple!60!black, thick, opacity=0.8] (0.4, 0.6)
+        .. controls (2.5, -1.0) and (3.5, -1.0) .. (4.1, -1.2)
+        .. controls (3.5, -1.4) and (2.5, -1.4) .. (0.4, 0.6);
+
+    % Textos Explicativos 5G
+    \node[text=green!50!black, align=center, font=\footnotesize] at (3.3, 2.1) {\textbf{\textit{Beamforming}:}\\Filtragem espacial evita\\interferência};
+    \node[text=orange!80!black, align=center, font=\footnotesize] at (2.5, -2.1) {\textbf{\gls{MU-MIMO}:}\\Multiplexação espacial no\\mesmo recurso de tempo/frequência};
+
+    % Usuários 5G
+    \node[draw, thick, fill=black!80, text=white, rounded corners=1pt, inner sep=2pt, font=\tiny] (ue3) at (4.2, 1.4) {UE};
+    \node[draw, thick, fill=black!80, text=white, rounded corners=1pt, inner sep=2pt, font=\tiny] (ue4) at (4.0, 0) {UE};
+    \node[draw, thick, fill=black!80, text=white, rounded corners=1pt, inner sep=2pt, font=\tiny] (ue5) at (4.1, -1.2) {UE};
+
+    \end{scope}
+
+\end{tikzpicture}
+\caption{Comparativo ilustrativo entre a arquitetura \gls{4G} tradicional e o \gls{5G} \textit{Massive} \gls{MIMO}. À esquerda, nota-se a limitação dos painéis com poucos elementos e o desperdício de potência. À direita, aproveitando o diminuto comprimento de onda no \gls{FR2}, o adensamento massivo de antenas gera uma altíssima resolução espacial, permitindo a conformação de feixes (\textit{Beamforming}) eficientes e a multiplexação \gls{MU-MIMO}.}
+\label{fig:massive_mimo_beamforming}
+\end{figure}
+
+Os sinais e dados enviados ao \gls{UE} a partir da \gls{RBS} utilizam o esquema de acesso múltiplo \gls{OFDMA}. O \gls{OFDMA} divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados pela estação base como uma matriz bidimensional de tempo e frequência e agrupados em \gls{RB}, em que cada bloco contém 12 subportadoras. Dessa forma, a rede entrega diferentes fatias do espectro a diferentes usuários de forma simultânea, o que aumenta a eficiência espectral da transmissão e a qualidade da experiência do usuário. A Figura \ref{fig:ofdma} ilustra o funcionamento do \gls{OFDMA} onde são alocados \gls{RB} para quatro \gls{UE} diferentes.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.85, transform shape]
+
+    % === PAINEL ESQUERDO: gNB irradiando para UEs ===
+    % Torre gNB
+    \fill[gray!60] (-6.9, -0.5) rectangle (-6.7, 3);
+    \draw[thick, fill=gray!20, rounded corners=1pt] (-7.1, 3) rectangle (-6.5, 4.2);
+    \node[font=\bfseries\small, above] at (-6.8, 4.3) {gNB};
+
+    % Feixes coloridos para cada UE
+    \draw[->, blue!70, line width=1.5pt] (-6.5, 3.8) -- (-4.8, 4.8);
+    \draw[->, green!60!black, line width=1.5pt] (-6.5, 3.5) -- (-4.8, 3.2);
+    \draw[->, orange!80!black, line width=1.5pt] (-6.5, 3.2) -- (-4.8, 1.5);
+    \draw[->, purple!70, line width=1.5pt] (-6.5, 3.0) -- (-4.8, 0.0);
+
+    % UEs receptores
+    \node[draw, thick, fill=blue!20, rounded corners, inner sep=3pt, font=\small\bfseries] at (-4.2, 4.8) {UE 1};
+    \node[draw, thick, fill=green!20, rounded corners, inner sep=3pt, font=\small\bfseries] at (-4.2, 3.2) {UE 2};
+    \node[draw, thick, fill=orange!20, rounded corners, inner sep=3pt, font=\small\bfseries] at (-4.2, 1.5) {UE 3};
+    \node[draw, thick, fill=purple!20, rounded corners, inner sep=3pt, font=\small\bfseries] at (-4.2, 0.0) {UE 4};
+
+    % Seta de conexão entre painéis
+    \draw[->, thick, gray!70] (-3.2, 2.5) -- (-1.0, 2.5) node[midway, above, font=\footnotesize, text=gray!80] {Alocação de RBs};
+
+    % === PAINEL DIREITO: Grade Tempo x Frequência ===
+    % Eixos
+    \draw[->, thick] (0,0) -- (9.5,0) node[right] {\textbf{Tempo} (\textit{Slots})};
+    \draw[->, thick] (0,0) -- (0,6.0) node[above] {\textbf{Frequência}};
+
+    % Grid fino (cada célula = 1 RB)
+    \draw[step=0.8cm, gray!30, thin] (0,0) grid (8.8,5.6);
+
+    % Alocação UE 1 (Azul) - blocos dispersos no tempo
+    \filldraw[fill=blue!25, draw=blue!70, thick] (0,0) rectangle (1.6,1.6);
+    \filldraw[fill=blue!25, draw=blue!70, thick] (4.0,0) rectangle (5.6,0.8);
+    \node[text=blue!80!black, font=\small\bfseries] at (0.8,0.8) {UE 1};
+
+    % Alocação UE 2 (Verde) - faixa alta de frequência
+    \filldraw[fill=green!25, draw=green!70, thick] (0,3.2) rectangle (3.2,5.6);
+    \node[text=green!80!black, font=\small\bfseries] at (1.6,4.4) {UE 2};
+
+    % Alocação UE 3 (Laranja) - faixa média, slots intermediários
+    \filldraw[fill=orange!25, draw=orange!70, thick] (4.0,1.6) rectangle (7.2,4.0);
+    \node[text=orange!80!black, font=\small\bfseries] at (5.6,2.8) {UE 3};
+
+    % Alocação UE 4 (Roxo) - slots finais, faixa alta
+    \filldraw[fill=purple!25, draw=purple!70, thick] (5.6,4.0) rectangle (8.8,5.6);
+    \node[text=purple!80!black, font=\small\bfseries] at (7.2,4.8) {UE 4};
+
+    % Chaves indicativas
+    \draw[decorate,decoration={brace,amplitude=5pt},thick] (-0.15,0) -- (-0.15,0.8) node[midway,left=6pt, font=\scriptsize, align=right] {1 Subportadora\\(12 subp. = 1 RB)};
+    \draw[decorate,decoration={brace,amplitude=5pt,mirror},thick] (0,-0.15) -- (0.8,-0.15) node[midway,below=6pt, font=\scriptsize] {1 \textit{Slot}};
+
+    % Rótulos dos slots embaixo
+    \foreach \i/\lbl in {0/0, 1/1, 2/2, 3/3, 4/4, 5/5, 6/6, 7/7, 8/8, 9/9, 10/10} {
+        \pgfmathsetmacro{\xpos}{\i*0.8}
+        \ifnum\i<12
+        \fi
+    }
+
+\end{tikzpicture}
+\caption{Representação do \gls{OFDMA} no \gls{5G}: à esquerda, a estação base (\gls{gNB}) distribui feixes dedicados a cada usuário; à direita, a grade bidimensional de tempo e frequência exibe como os Blocos de Recursos (\gls{RB}) são alocados simultaneamente a diferentes \gls{UE}.}
+\label{fig:ofdma}
+\vspace{0.2cm}
+\small{\textbf{Fonte:} Elaborado pelo autor.}
+\end{figure}
+
+Diferente do \gls{LTE}, que limitava o \gls{SCS} ao valor fixo de 15~kHz, o \gls{5G} \gls{NR} utiliza um mecanismo capaz de flexibilizar o espaçamento de subportadoras \cite{stallings2021}. Através da numerologia escalável $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, é possível obter diferentes valores de \gls{SCS} (Equação~\ref{eq:numerologia_escalavel}), viabilizando a adaptação da rede a diferentes faixas de frequência e cenários de uso \cite{asplund2025, cox2025}.
+
+\begin{equation}
+    \Delta f = 15 \times 2^{\mu} \text{ kHz}
+    \label{eq:numerologia_escalavel}
+\end{equation}
+
+Por conta da relação inversamente proporcional entre tempo e frequência, $T_u=\frac{1}{\Delta f}$, o aumento do parâmetro $\mu$ alarga a banda ocupada pela subportadora, reduzindo exponencialmente a duração útil do símbolo \gls{OFDM} \cite{cox2025}. A Figura~\ref{fig:numerologia_escalavel} ilustra essa dinâmica: à medida que $\mu$ é incrementado em uma unidade, o espaçamento entre as subportadoras duplica e, consequentemente, a duração temporal do símbolo \gls{OFDM} cai pela metade \cite{stallings2021}.
+
+% =========================================================================
+% FIGURA 1: Numerologia Escalável do 5G NR
+% =========================================================================
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=Latex, scale=0.80, transform shape]
+
+  % ===== Cabeçalhos das colunas =====
+  \node[font=\small\bfseries, anchor=base] at (-2.0, 7.4) {$\mu$};
+  \node[font=\small\bfseries, anchor=base, align=center] at (-0.6, 7.6)
+    {$\Delta f$\\[-2pt]{\scriptsize(kHz)}};
+  \node[font=\small\bfseries, anchor=base, align=center] at (2.2, 7.6)
+    {Subportadoras em uma\\mesma faixa\\[-2pt]{\scriptsize(domínio da frequência)}};
+  \node[font=\small\bfseries, anchor=base, align=center] at (9.0, 7.6)
+    {Duração do símbolo $T_u$\\[-2pt]{\scriptsize(domínio do tempo)}};
+  \draw[thick, gray!40] (-2.8, 7.0) -- (12.8, 7.0);
+
+  % Separador vertical entre painéis
+  \draw[gray!25, dashed] (4.6, -0.6) -- (4.6, 7.0);
+
+  % Linhas guia horizontais suaves
+  \foreach \y in {6.0, 4.5, 3.0, 1.5, 0.0} {
+    \draw[gray!8, thin] (-2.8, \y) -- (12.8, \y);
+  }
+
+  % ==========================================================
+  % mu=0 — SCS = 15 kHz — 16 subportadoras — Tu = 66,67 us
+  % ==========================================================
+  \node[font=\small\bfseries] at (-2.0, 6.0) {0};
+  \node[font=\small\bfseries, text=cyan!70!black] at (-0.6, 6.0) {15};
+  % Freq: bloco de 4 cm dividido em 16 subportadoras (cada 0,25 cm)
+  \fill[cyan!30] (0, 5.72) rectangle (4, 6.28);
+  \draw[cyan!70!black] (0, 5.72) rectangle (4, 6.28);
+  \foreach \i in {1,...,15} {
+    \draw[white, line width=0.5pt] (\i*0.25, 5.72) -- (\i*0.25, 6.28);
+  }
+  \node[font=\tiny, text=gray!70, anchor=west] at (4.1, 6.0) {16};
+  % Tempo: barra de 6 cm
+  \fill[cyan!20] (5.5, 5.72) rectangle (11.5, 6.28);
+  \draw[cyan!70!black, thick, rounded corners=2pt] (5.5, 5.72) rectangle (11.5, 6.28);
+  \node[font=\small\bfseries, text=cyan!70!black, anchor=west] at (11.65, 6.0) {$66{,}67~\mu$s};
+
+  % ==========================================================
+  % mu=1 — SCS = 30 kHz — 8 subportadoras — Tu = 33,33 us
+  % ==========================================================
+  \node[font=\small\bfseries] at (-2.0, 4.5) {1};
+  \node[font=\small\bfseries, text=green!60!black] at (-0.6, 4.5) {30};
+  % Freq: 4 cm / 8 = 0,5 cm por subportadora
+  \fill[green!30] (0, 4.22) rectangle (4, 4.78);
+  \draw[green!60!black] (0, 4.22) rectangle (4, 4.78);
+  \foreach \i in {1,...,7} {
+    \draw[white, line width=0.5pt] (\i*0.5, 4.22) -- (\i*0.5, 4.78);
+  }
+  \node[font=\tiny, text=gray!70, anchor=west] at (4.1, 4.5) {8};
+  % Tempo: barra de 3 cm
+  \fill[green!20] (5.5, 4.22) rectangle (8.5, 4.78);
+  \draw[green!60!black, thick, rounded corners=2pt] (5.5, 4.22) rectangle (8.5, 4.78);
+  \node[font=\small\bfseries, text=green!60!black, anchor=west] at (8.65, 4.5) {$33{,}33~\mu$s};
+
+  % ==========================================================
+  % mu=2 — SCS = 60 kHz — 4 subportadoras — Tu = 16,67 us
+  % ==========================================================
+  \node[font=\small\bfseries] at (-2.0, 3.0) {2};
+  \node[font=\small\bfseries, text=orange!80!black] at (-0.6, 3.0) {60};
+  % Freq: 4 cm / 4 = 1,0 cm por subportadora
+  \fill[orange!30] (0, 2.72) rectangle (4, 3.28);
+  \draw[orange!80!black] (0, 2.72) rectangle (4, 3.28);
+  \foreach \i in {1,...,3} {
+    \draw[white, line width=0.5pt] (\i*1.0, 2.72) -- (\i*1.0, 3.28);
+  }
+  \node[font=\tiny, text=gray!70, anchor=west] at (4.1, 3.0) {4};
+  % Tempo: barra de 1,5 cm
+  \fill[orange!20] (5.5, 2.72) rectangle (7.0, 3.28);
+  \draw[orange!80!black, thick, rounded corners=2pt] (5.5, 2.72) rectangle (7.0, 3.28);
+  \node[font=\small\bfseries, text=orange!80!black, anchor=west] at (7.15, 3.0) {$16{,}67~\mu$s};
+
+  % ==========================================================
+  % mu=3 — SCS = 120 kHz — 2 subportadoras — Tu = 8,33 us
+  % ==========================================================
+  \node[font=\small\bfseries] at (-2.0, 1.5) {3};
+  \node[font=\small\bfseries, text=red!70!black] at (-0.6, 1.5) {120};
+  % Freq: 4 cm / 2 = 2,0 cm por subportadora
+  \fill[red!30] (0, 1.22) rectangle (4, 1.78);
+  \draw[red!70!black] (0, 1.22) rectangle (4, 1.78);
+  \draw[white, line width=0.5pt] (2.0, 1.22) -- (2.0, 1.78);
+  \node[font=\tiny, text=gray!70, anchor=west] at (4.1, 1.5) {2};
+  % Tempo: barra de 0,75 cm
+  \fill[red!20] (5.5, 1.22) rectangle (6.25, 1.78);
+  \draw[red!70!black, thick, rounded corners=2pt] (5.5, 1.22) rectangle (6.25, 1.78);
+  \node[font=\small\bfseries, text=red!70!black, anchor=west] at (6.4, 1.5) {$8{,}33~\mu$s};
+
+  % ==========================================================
+  % mu=4 — SCS = 240 kHz — 1 subportadora — Tu = 4,17 us
+  % ==========================================================
+  \node[font=\small\bfseries] at (-2.0, 0.0) {4};
+  \node[font=\small\bfseries, text=purple!70!black] at (-0.6, 0.0) {240};
+  % Freq: 4 cm / 1 = bloco inteiro
+  \fill[purple!30] (0, -0.28) rectangle (4, 0.28);
+  \draw[purple!70!black] (0, -0.28) rectangle (4, 0.28);
+  \node[font=\tiny, text=gray!70, anchor=west] at (4.1, 0.0) {1};
+  % Tempo: barra de 0,375 cm
+  \fill[purple!20] (5.5, -0.28) rectangle (5.875, 0.28);
+  \draw[purple!70!black, thick, rounded corners=2pt] (5.5, -0.28) rectangle (5.875, 0.28);
+  \node[font=\small\bfseries, text=purple!70!black, anchor=west] at (6.05, 0.0) {$4{,}17~\mu$s};
+
+  % ===== Setas marginais =====
+  % Esquerda: largura da subportadora cresce
+  \draw[<-, line width=1pt, blue!60!black] (-2.8, 5.7) -- (-2.8, 0.3);
+  \node[font=\scriptsize\bfseries, text=blue!60!black, rotate=90, anchor=south]
+    at (-3.1, 3.0) {Subportadoras mais largas};
+
+  % Direita: duração do símbolo diminui
+  \draw[->, line width=1pt, gray!60] (12.5, 5.7) -- (12.5, 0.3);
+  \node[font=\scriptsize\bfseries, text=gray!60, rotate=90, anchor=south]
+    at (11.8, 3.0) {$T_u$ diminui};
+
+  % ===== Fórmula =====
+  \node[font=\small, anchor=west, text=black!70] at (-2.0, -1.0)
+    {$\Delta f = 15 \cdot 2^\mu$~kHz\,,\quad $T_u = 1/\Delta f$};
+
+\end{tikzpicture}
+\Caption{\label{fig:numerologia_escalavel} Numerologia escalável do \gls{5G} \gls{NR}: a relação inversamente proporcional entre o espaçamento de subportadoras ($\Delta f = 15 \times 2^\mu$~kHz) e a duração útil do símbolo \gls{OFDM} ($T_u = 1/\Delta f$). Numerologias menores favorecem cobertura ampla, enquanto maiores reduzem latência.}
+\Fonte{Elaborado pelo autor com base em \cite{cox2025, stallings2021}.}
+\end{figure}
+
+Outro aspecto importante da numerologia escalável do 5G NR é a flexibilidade da duração do \textit{slot}. Ela permite que a rede adapte dinamicamente a transmissão aos cenários de uso. Ao utilizar espaçamentos maiores de subportadoras (símbolos mais curtos), reduz-se a latência na rede e mitigam-se distorções de sinal em altas frequências, como o ruído de fase e o espalhamento Doppler em veículos de alta velocidade \cite{garcia2021}. Em contrapartida, o uso de espaçamentos menores preserva símbolos mais longos, aumentando a tolerância da rede em células de grande cobertura \cite{stallings2021}.
+
+Para mitigar a \gls{ISI}, a porção final do símbolo \gls{OFDM} é copiada e inserida em seu próprio início. Essa técnica é conhecida por \gls{CP}. Se a duração do \gls{CP} ($T_{CP}$) for maior que o Espalhamento de Atraso ($\tau_{DS}$) do canal, os ecos do multipercurso são totalmente absorvidos, permitindo que o receptor processe o sinal sem interferências. Fisicamente, a duração total de um símbolo na interface aérea é dada por $T_s = \frac{1}{\Delta f} + T_{CP}$, como ilustrado na Figura~\ref{fig:prefixo_ciclico}.
+
+% =========================================================================
+% FIGURA 2: Propagação Multipercurso e Interferência Inter-Simbólica
+% =========================================================================
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=Latex, scale=0.85, transform shape]
+
+  % ===== PAINEL SUPERIOR: Cenário de Multipercurso =====
+  \node[font=\small\bfseries, anchor=north west, text=black!80] at (-1.3, 9.0) {(a) Cenário de multipercurso urbano:};
+
+  % Fundo urbano sutil
+  \fill[gray!8] (-1.5, 3.0) rectangle (16.5, 9.2);
+  \draw[gray!30, thin] (-1.5, 3.0) rectangle (16.5, 9.2);
+
+  % Chão / Solo
+  \fill[brown!15] (-1.5, 3.0) rectangle (16.5, 3.5);
+  \draw[brown!40, thick] (-1.5, 3.5) -- (16.5, 3.5);
+
+  % Prédio (Obstáculo) — posição central
+  \fill[draw=gray!70, fill=gray!15, thick] (5.8, 3.5) rectangle (7.8, 8.5);
+  % Janelas
+  \foreach \x in {6.05, 6.55, 7.05} {
+    \foreach \y in {3.9, 4.6, 5.3, 6.0, 6.7, 7.4} {
+      \fill[cyan!20] (\x, \y) rectangle (\x+0.35, \y+0.45);
+      \draw[cyan!40, thin] (\x, \y) rectangle (\x+0.35, \y+0.45);
+    }
+  }
+  % Teto
+  \fill[gray!30] (5.6, 8.5) -- (6.8, 9.0) -- (8.0, 8.5) -- cycle;
+  \node[font=\scriptsize\bfseries, text=black!60, anchor=south] at (6.8, 9.0) {Obstáculo};
+
+  % Torre gNB (Transmissor)
+  \node[draw=blue!80!black, fill=blue!8, very thick, rounded corners=3pt,
+        minimum width=1.4cm, minimum height=1.0cm, align=center] (tx) at (1.0, 6.0) {\textbf{Tx}};
+  % Antena
+  \draw[blue!80!black, very thick] (1.0, 6.5) -- (1.0, 7.8);
+  \draw[blue!80!black, thick] (0.5, 7.5) -- (1.0, 7.8) -- (1.5, 7.5);
+  \draw[blue!80!black, thick] (0.65, 7.2) -- (1.0, 7.45) -- (1.35, 7.2);
+  \node[font=\scriptsize\bfseries, text=blue!80!black, anchor=south] at (1.0, 7.85) {gNB};
+
+  % Veículo (Receptor)
+  % Corpo do carro
+  \fill[orange!15, rounded corners=2pt] (10.5, 3.5) rectangle (13.0, 4.5);
+  \draw[orange!80!black, thick, rounded corners=2pt] (10.5, 3.5) rectangle (13.0, 4.5);
+  % Teto do carro
+  \fill[orange!10, rounded corners=2pt] (11.0, 4.5) rectangle (12.5, 5.2);
+  \draw[orange!80!black, thick, rounded corners=2pt] (11.0, 4.5) rectangle (12.5, 5.2);
+  % Rodas
+  \fill[black!70] (11.0, 3.5) circle (0.2);
+  \fill[black!70] (12.5, 3.5) circle (0.2);
+  % Janela
+  \fill[cyan!15] (11.15, 4.6) rectangle (12.35, 5.05);
+  \draw[cyan!30, thin] (11.15, 4.6) rectangle (12.35, 5.05);
+  \node[font=\scriptsize\bfseries, text=orange!80!black] at (11.75, 4.0) {\textbf{Rx}};
+  % Antena do veículo
+  \draw[orange!80!black, thick] (12.0, 5.2) -- (12.0, 5.8);
+  \fill[orange!80!black] (12.0, 5.8) circle (0.06);
+  \node (rx_ant) at (12.0, 5.8) {};
+  % Label abaixo do carro para não sobrepor a brace
+  \node[font=\scriptsize\bfseries, text=orange!80!black, anchor=north] at (11.75, 3.1) {Veículo (UE)};
+
+  % ===== Caminhos de Propagação =====
+
+  % 1. Caminho Direto (LOS) — azul sólido
+  \draw[-{Latex[length=3mm]}, very thick, blue!70!black]
+    (1.5, 6.0) -- (rx_ant);
+  \node[font=\scriptsize\bfseries, text=blue!70!black, fill=white, inner sep=2pt,
+        rounded corners=1pt] at (5.0, 4.7) {Caminho Direto (LOS)};
+
+  % 2. Reflexão no Prédio — vermelho tracejado
+  \draw[-{Latex[length=2.5mm]}, thick, dashed, red!70!black]
+    (1.5, 6.5) -- (5.8, 7.5);
+  \draw[-{Latex[length=2.5mm]}, thick, dashed, red!70!black]
+    (7.8, 7.5) -- (rx_ant);
+  \node[font=\scriptsize\bfseries, text=red!70!black, fill=white, inner sep=1.5pt,
+        rounded corners=1pt] at (3.2, 7.3) {Reflexão 1};
+
+  % 3. Reflexão no Solo — laranja tracejado
+  \draw[-{Latex[length=2.5mm]}, thick, dashed, orange!85!black]
+    (1.5, 5.5) -- (6.5, 3.5);
+  \draw[-{Latex[length=2.5mm]}, thick, dashed, orange!85!black]
+    (6.5, 3.5) -- (rx_ant);
+  \node[font=\scriptsize\bfseries, text=orange!85!black, fill=white, inner sep=1.5pt,
+        rounded corners=1pt] at (8.8, 3.8) {Reflexão 2 (solo)};
+
+  % Chave de Delay Spread (à direita)
+  % Setas de chegada no tempo (à direita do veículo)
+  \draw[-{Latex[length=2mm]}, blue!70!black, thick] (13.5, 7.2) -- (13.8, 7.2);
+  \node[font=\scriptsize, text=blue!70!black, anchor=east] at (13.5, 7.2) {$t_1$};
+  \draw[-{Latex[length=2mm]}, orange!85!black, thick] (13.5, 5.6) -- (13.8, 5.6);
+  \node[font=\scriptsize, text=orange!85!black, anchor=east] at (13.5, 5.6) {$t_2$};
+  \draw[-{Latex[length=2mm]}, red!70!black, thick] (13.5, 4.3) -- (13.8, 4.3);
+  \node[font=\scriptsize, text=red!70!black, anchor=east] at (13.5, 4.3) {$t_3$};
+
+  % Chave de Delay Spread (bem à direita, sem sobrepor)
+  \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick, purple!80!black]
+    (14.2, 7.5) -- (14.2, 4.0);
+  \node[font=\scriptsize\bfseries, text=purple!80!black, anchor=west, align=center]
+    at (14.2, 5.45) {Espalhamento\\de Atraso\\($\tau_{DS}$)};
+
+  % ===== SEPARADOR =====
+  \draw[gray!50, thick, dashed] (-1.5, 2.4) -- (16.5, 2.4);
+
+  % ===== PAINEL INFERIOR: ISI no domínio do tempo =====
+  \node[font=\small\bfseries, anchor=west, text=black!80] at (-1.3, 1.8) {(b) Recepção no domínio do tempo:};
+
+  % Eixo temporal
+  \draw[-{Latex[length=3mm]}, thick] (-0.5, -0.8) -- (13.0, -0.8)
+    node[right, font=\small\bfseries] {$t$};
+
+  % Símbolo n (sinal direto)
+  \fill[blue!12] (0.0, -0.8) rectangle (4.5, 0.8);
+  \draw[blue!80!black, thick] (0.0, -0.8) rectangle (4.5, 0.8);
+  \node[font=\small\bfseries, text=blue!80!black] at (2.25, 0.0) {Símbolo $n$};
+
+  % Símbolo n+1 (sinal direto)
+  \fill[blue!12] (4.5, -0.8) rectangle (9.0, 0.8);
+  \draw[blue!80!black, thick] (4.5, -0.8) rectangle (9.0, 0.8);
+  \node[font=\small\bfseries, text=blue!80!black] at (6.75, 0.0) {Símbolo $n\!+\!1$};
+
+  % Símbolo n+2 (parcial)
+  \fill[blue!12] (9.0, -0.8) rectangle (11.5, 0.8);
+  \draw[blue!80!black, thick] (9.0, -0.8) rectangle (11.5, 0.8);
+  \node[font=\small\bfseries, text=blue!80!black] at (10.25, 0.0) {Símbolo $n\!+\!2$};
+
+  % Eco atrasado do Símbolo n (sobreposto)
+  \fill[red!15, opacity=0.7] (1.5, -0.8) rectangle (6.0, 0.8);
+  \draw[red!70!black, thick, dashed] (1.5, -0.8) rectangle (6.0, 0.8);
+
+  % Zona de ISI (hachurada)
+  \fill[pattern=north east lines, pattern color=red!50] (4.5, -0.8) rectangle (6.0, 0.8);
+  \draw[red!80!black, very thick] (4.5, -0.8) rectangle (6.0, 0.8);
+
+  % Rótulo do eco
+  \node[font=\scriptsize\bfseries, text=red!70!black, fill=white, inner sep=2pt,
+        rounded corners=1pt, anchor=south] at (3.0, 1.0) {Eco atrasado (Símbolo $n$)};
+  \draw[->, red!70!black, thin] (3.0, 1.0) -- (3.0, 0.8);
+
+  % Rótulo da zona de ISI
+  \node[draw=red!80!black, fill=white, rounded corners=3pt, thick,
+        font=\scriptsize\bfseries, text=red!80!black, inner sep=4pt]
+    (isi_label) at (8.5, 1.6) {Zona de ISI};
+  \draw[->, red!80!black, thick] (isi_label.west) -- (5.6, 0.8);
+
+  % Delay Spread no eixo
+  \draw[<->, thick, purple!80!black] (0.0, -1.3) -- (1.5, -1.3);
+  \node[font=\scriptsize\bfseries, text=purple!80!black, anchor=north] at (0.75, -1.3) {$\tau_{DS}$};
+
+  % Marcas no eixo
+  \draw[thick] (0.0, -0.9) -- (0.0, -0.7);
+  \draw[thick] (4.5, -0.9) -- (4.5, -0.7);
+  \draw[thick] (9.0, -0.9) -- (9.0, -0.7);
+
+\end{tikzpicture}
+\Caption{\label{fig:multipercurso_isi} Efeito do multipercurso e da \gls{ISI} em comunicações V2X. (a)~Cenário urbano: o sinal da gNB chega ao veículo receptor pelo caminho direto (LOS, instante $t_1$) e por dois percursos refletidos (no prédio em $t_2$ e no solo em $t_3$), gerando um espalhamento de atraso $\tau_{DS} = t_3 - t_1$. (b)~Domínio do tempo: o eco atrasado do Símbolo~$n$ invade a janela do Símbolo~$n\!+\!1$, causando a zona hachurada de \gls{ISI}.}
+\Fonte{Elaborado pelo autor com base em \cite{stallings2021}.}
+\end{figure}
+
+
+% INSERIR FIGURA DO PREFIXO CÍCLICO (Fornecida no seu texto original)
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=Latex, scale=0.85, transform shape]
+% ===== PAINEL SUPERIOR: Símbolo OFDM original (sem CP) =====
+\node[font=\small\bfseries, anchor=west] at (-0.5, 6.0) {(a) Símbolo \gls{OFDM} original (sem CP):};
+\draw[->, thick] (0, 4.2) -- (13.0, 4.2) node[right, font=\small] {Tempo};
+\draw[fill=blue!15, draw=blue!70!black, thick, rounded corners=1pt] (1.0, 4.2) rectangle (11.0, 5.4);
+\node[font=\small, text=blue!70!black] at (6.0, 4.8) {Parte útil do Símbolo $n$};
+\draw[fill=orange!25, draw=orange!70!black, thick, rounded corners=1pt] (9.0, 4.2) rectangle (11.0, 5.4);
+\node[font=\footnotesize\bfseries, text=orange!70!black, align=center] at (10.0, 4.8) {Porção\\Final};
+\draw[decorate,decoration={brace,amplitude=5pt},thick] (1.0, 5.6) -- (11.0, 5.6) node[midway, above=10pt, anchor=west, font=\small] {$T_u = 1/\Delta f$};
+
+% ===== PAINEL INFERIOR: Símbolo transmitido (com CP) =====
+\node[font=\small\bfseries, anchor=west] at (-0.5, 3.0) {(b) Símbolo transmitido (com CP inserido):};
+\draw[->, thick] (0, 0.7) -- (13.0, 0.7) node[right, font=\small] {Tempo};
+\draw[fill=gray!15, draw=gray!60, thick, rounded corners=1pt] (0.2, 0.7) rectangle (1.5, 1.9);
+\node[font=\footnotesize, text=gray!60] at (0.85, 1.3) {$n\!-\!1$};
+\draw[fill=orange!25, draw=orange!70!black, thick, rounded corners=1pt] (1.5, 0.7) rectangle (3.5, 1.9);
+\node[font=\small\bfseries, text=orange!70!black, align=center] at (2.5, 1.3) {CP\\{\footnotesize(cópia)}};
+\draw[fill=blue!15, draw=blue!70!black, thick, rounded corners=1pt] (3.5, 0.7) rectangle (11.5, 1.9);
+\node[font=\small, text=blue!70!black] at (7.5, 1.3) {Parte útil do Símbolo $n$};
+\draw[fill=orange!12, draw=orange!50!black, thick, rounded corners=1pt] (9.5, 0.7) rectangle (11.5, 1.9);
+\node[font=\footnotesize, text=orange!50!black, align=center] at (10.5, 1.3) {Porção\\Final};
+
+% Setas e Chaves
+\draw[->, very thick, orange!70!black, dashed] (10.0, 4.15) .. controls (12.5, 3.0) and (4.5, 2.5) .. (2.5, 1.95);
+\node[font=\footnotesize\bfseries, text=orange!70!black, fill=white, inner sep=2pt] at (8.5, 2.8) {Cópia};
+\draw[decorate,decoration={brace,amplitude=5pt,mirror},thick] (1.5, 0.4) -- (3.5, 0.4) node[midway, below=5pt, font=\small] {$T_{CP}$};
+\draw[decorate,decoration={brace,amplitude=5pt,mirror},thick] (3.5, 0.4) -- (11.5, 0.4) node[midway, below=5pt, font=\small] {$T_u = 1/\Delta f$};
+\draw[decorate,decoration={brace,amplitude=6pt,mirror},thick] (1.5, -0.3) -- (11.5, -0.3) node[midway, below=6pt, font=\small\bfseries] {$T_s = T_{CP} + T_u$};
+
+% Anotações de ISI
+\draw[pattern=north east lines, pattern color=red!40, draw=red!60!black, thick] (1.5, 0.7) rectangle (3.5, 1.9);
+\node[draw=red!60!black, fill=red!5, rounded corners=3pt, font=\footnotesize, align=center, inner sep=4pt] at (2.5, -1.5) {Ecos do multipercurso\\absorvidos dentro do CP\\($T_{CP} > \tau_{DS}$)};
+\draw[->, red!60!black, thick] (2.5, -1.0) -- (2.5, 0.35);
+\node[draw=green!60!black, fill=green!5, rounded corners=3pt, font=\footnotesize, align=center, inner sep=4pt] at (9.5, -1.5) {Janela útil processada\\pelo receptor sem \gls{ISI}};
+\draw[->, green!60!black, thick] (7.5, -1.2) -- (7.5, 0.65);
+\end{tikzpicture}
+\Caption{\label{fig:prefixo_ciclico} Mecanismo do Prefixo Cíclico (\gls{CP}) no \gls{5G} \gls{NR}. Em (a), a porção final da parte útil do símbolo é copiada para seu início, parte (b), buscando proteger o sinal de interferências.}
+\Fonte{Elaborado pelo autor com base em \cite{stallings2021, cox2025}.}
+\end{figure}
+
+Na camada física do \gls{5G}, a informação digital é mapeada em ondas eletromagnéticas utilizando esquemas de \gls{QAM}. Para o dimensionamento dinâmico da transmissão, o 3GPP especifica tabelas de \gls{MCS} que associam um índice a um esquema de modulação específico (como QPSK, 16-QAM, 64-QAM e 256-QAM) e à sua respectiva taxa de codificação (\textit{code rate}). Cada esquema empacota uma quantidade crescente de bits em um único símbolo transmitido --- variando de 2 bits no QPSK a 8 bits no 256-QAM ---, o que contribui diretamente para a elevação da vazão de dados e da eficiência espectral da rede.
+
+No entanto, à medida que a ordem de modulação aumenta e um único símbolo empacota mais bits, os pontos no diagrama de constelação tornam-se mais densos e próximos uns dos outros (Figura \ref{fig:qam}). Isso torna o sinal altamente vulnerável, exigindo uma \gls{SINR} excepcional para evitar que distorções no canal causem a leitura errônea de um símbolo, o que elevaria severamente a \gls{BER}. 
+
+Para contornar esse problema de degradação, a rede utiliza o mecanismo de Adaptação de Enlace (\textit{Link Adaptation}). O sistema avalia continuamente a qualidade do canal e, sob condições adversas (como na borda da célula), obriga o transmissor a regredir dinamicamente para esquemas de modulação mais simples e com maior espaçamento entre os pontos, como o QPSK. Apesar de o QPSK transportar apenas 2 bits por símbolo -- reduzindo a vazão de dados --, ele é extremamente resiliente contra ruídos e interferências, assegurando a confiabilidade da entrega dos pacotes.
+
+
+
+% FIGURA: Constelações QAM — grade 2×2
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[scale=0.95]
+
+% ===== QPSK (superior esquerdo) =====
+\begin{scope}[xshift=0cm, yshift=0cm]
+  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+  \draw[gray!30, thin] (0,0) circle (1.414cm);
+  \foreach \x/\y in {1/1, -1/1, -1/-1, 1/-1}
+    \filldraw[blue!80!black] (\x,\y) circle (3pt);
+  \node[font=\small, blue!80!black, anchor=south west] at (1.05,1.05) {\texttt{00}};
+  \node[font=\small, blue!80!black, anchor=south east] at (-1.05,1.05) {\texttt{01}};
+  \node[font=\small, blue!80!black, anchor=north east] at (-1.05,-1.05) {\texttt{11}};
+  \node[font=\small, blue!80!black, anchor=north west] at (1.05,-1.05) {\texttt{10}};
+  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(a) QPSK --- 2 bits/símbolo};
+\end{scope}
+
+% ===== 16-QAM (superior direito) =====
+\begin{scope}[xshift=6cm, yshift=0cm]
+  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+  \foreach \x in {-1.5, -0.5, 0.5, 1.5}
+    \foreach \y in {-1.5, -0.5, 0.5, 1.5}
+      \filldraw[red!80!black] (\x,\y) circle (2.5pt);
+  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(b) 16-QAM --- 4 bits/símbolo};
+\end{scope}
+
+% ===== 64-QAM (inferior esquerdo) =====
+\begin{scope}[xshift=0cm, yshift=-6cm]
+  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+  \foreach \i in {0,...,7}
+    \foreach \j in {0,...,7} {
+      \pgfmathsetmacro{\px}{-1.75 + \i * 0.5}
+      \pgfmathsetmacro{\py}{-1.75 + \j * 0.5}
+      \filldraw[green!50!black] (\px,\py) circle (1.8pt);
+    }
+  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(c) 64-QAM --- 6 bits/símbolo};
+\end{scope}
+
+% ===== 256-QAM (inferior direito) =====
+\begin{scope}[xshift=6cm, yshift=-6cm]
+  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+  \foreach \i in {0,...,15}
+    \foreach \j in {0,...,15} {
+      \pgfmathsetmacro{\px}{-1.875 + \i * 0.25}
+      \pgfmathsetmacro{\py}{-1.875 + \j * 0.25}
+      \filldraw[purple!70!black] (\px,\py) circle (1.0pt);
+    }
+  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(d) 256-QAM --- 8 bits/símbolo};
+\end{scope}
+
+\end{tikzpicture}
+\Caption{\label{fig:qam} Diagramas de constelação dos esquemas de modulação \gls{QAM} utilizados no \gls{5G} NR. À medida que a ordem da modulação aumenta de (a) para (d), cada símbolo transporta mais bits, elevando a vazão, porém a maior densidade de pontos exige uma \gls{SINR} proporcionalmente superior para manter a taxa de erro aceitável.}
+\Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
+\end{figure}
+
+% ==============================================================================
+% SEÇÃO: MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G V2X
+% ==============================================================================
+
+\section{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_v2x}
+
+A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} (\textit{Vehicle-to-Everything}) exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação de cenários de missão crítica (\textit{worst-case}), é imprescindível compreender a camada física, os modelos de propagação estocásticos e as restrições matemáticas de latência.
+
+Para atender aos rigorosos requisitos da comunicação veicular (V2X), especialmente em aplicações de condução autônoma e coordenação de pelotões (\textit{platooning}), o 3GPP introduziu no Release 16 o suporte padronizado ao 5G NR \textit{Sidelink} \cite{garcia2021}. Enquanto a interface aérea Uu tradicional conecta o veículo à infraestrutura da rede celular (V2I/V2N), a interface \textbf{PC5} estabelece um enlace direto de dispositivo para dispositivo (\gls{D2D}), permitindo a comunicação Veículo-para-Veículo (V2V) sem que o tráfego de dados precise transitar pelo núcleo da rede (5GC) \cite{cox2025, garcia2021}.
+
+Diferentemente das gerações anteriores (como o LTE-V2X) que suportavam majoritariamente transmissões abertas (\textit{broadcast}), o Sidelink do 5G NR foi arquitetado para suportar também comunicações \textit{unicast} (ponto a ponto) e \textit{groupcast} (ponto a multiponto), garantindo maior privacidade e controle de qualidade de serviço \cite{cox2025, garcia2021}. Para viabilizar e gerenciar essas trocas de dados diretas, a camada física da interface PC5 é composta por canais estruturais específicos:
+
+\begin{itemize}
+    \item \textbf{PSCCH (\textit{Physical Sidelink Control Channel}):} Canal responsável por carregar o primeiro estágio das Informações de Controle do Sidelink (SCI - \textit{Sidelink Control Information}). Ele atua anunciando a alocação de recursos de frequência e tempo, o esquema de modulação e a prioridade para a transmissão iminente \cite{garcia2021}.
+    \item \textbf{PSSCH (\textit{Physical Sidelink Shared Channel}):} Canal que transporta efetivamente a carga útil de dados (Blocos de Transporte) da aplicação veicular, bem como o segundo estágio do SCI, que contém identificadores de origem/destino e informações essenciais para a decodificação do pacote pelo veículo receptor \cite{garcia2021}.
+    \item \textbf{PSFCH (\textit{Physical Sidelink Feedback Channel}):} Uma adição crucial do 5G NR em relação às tecnologias anteriores para elevar a confiabilidade. O PSFCH é um canal reverso que transporta as confirmações do protocolo \gls{HARQ} (ACK/NACK), permitindo que o veículo transmissor saiba imediatamente se os seus dados \textit{unicast} ou \textit{groupcast} falharam e exigem retransmissão \cite{garcia2021, cox2025}.
+\end{itemize}
+
+A gestão do acesso ao meio e a alocação de recursos de rádio na interface PC5 operam sob dois paradigmas fundamentais. No \textbf{Modo 1}, a alocação é centralizada: a estação base (gNB) agenda explicitamente os recursos de \textit{Sidelink} para os veículos através da interface Uu, exigindo que todos os nós estejam sob rigorosa cobertura celular \cite{garcia2021}. 
+
+Por outro lado, o \textbf{Modo 2} foi projetado para cenários autônomos ou locais onde a cobertura celular é intermitente, severamente congestionada ou inexistente. Neste modo, os próprios veículos selecionam os recursos de rádio de forma distribuída \cite{garcia2021, cox2025}. Para evitar colisões destrutivas no ar e equilibrar o uso do espectro, o Modo 2 impõe que o terminal realize um sensoriamento prévio do canal (\textit{Channel Sensing}), escutando o ambiente por uma janela de tempo determinada para avaliar a disponibilidade de blocos livres antes de efetuar a transmissão \cite{garcia2021}.
+
+
+% ==============================================================================
+% 2.2 MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G NR
+% ==============================================================================
+
+\subsection{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_latencia}
+
+A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação em cenários de missão crítica (\textit{worst-case}), é imprescindível formular os modelos de propagação estocásticos, as restrições matemáticas de latência e suas respectivas integrações computacionais.
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem de Propagação e Balanço de Potência}
+\label{sec:propagacao_potencia}
+
+Para representar o canal de rádio de forma fidedigna em ambas as interfaces, adotam-se os modelos estocásticos estabelecidos no documento 3GPP TR 38.901 \cite{3gpp38901}. No cenário de comunicação Veículo-Infraestrutura (V2I), o pior caso é modelado pela topologia \textit{Urban Micro} de Não-Linha de Visada (\textbf{UMi NLOS}). Nesta situação, o veículo encontra-se na borda da célula e sob severo sombreamento de edificações. A perda de percurso tridimensional $PL_{\text{UMi-NLOS}}(d)$ e a potência de recepção linear $P_{rx}$ no \gls{gNB} são expressas pelas Equações \ref{eq:pl_v2i} e \ref{eq:prx_v2i}:
+
+\begin{equation}
+    PL_{\text{UMi-NLOS}}(d) = 32.4 + 31.9 \log_{10}(d) + 20 \log_{10}(f_c) + X_{\sigma}
+    \label{eq:pl_v2i}
+\end{equation}
+\begin{equation}
+    P_{rx (\text{dBm})} = P_{tx} + 10\log_{10}(N_t) + G_{tx} + G_{rx} - PL_{\text{UMi-NLOS}}(d) - L_{pen}
+    \label{eq:prx_v2i}
+\end{equation}
+
+Onde $X_{\sigma} \sim \mathcal{N}(0, \sigma_{SF}^2)$ modela o desvanecimento lento (\textit{shadow fading}) com $\sigma_{SF} = 8.2$ dB, e $L_{pen}$ insere as perdas por penetração da lataria veicular. A qualidade do sinal V2I é governada pela Relação Sinal-Interferência-Ruído (\gls{SINR}), calculada pela razão entre a potência recebida e o somatório do ruído térmico base ($N_0 B$) com a interferência intercelular ($\sum I_k$).
+
+Em contrapartida, para as comunicações diretas \gls{D2D} sob a interface PC5 \textit{Sidelink} (Modo 2), o pior cenário corresponde ao ambiente veicular \textbf{NLOSv}, causado por obstruções dinâmicas de grande porte, como caminhões. A difração (\textit{knife-edge}) gerada insere uma severa perda por bloqueio ($A_{block}$), redefinindo a atenuação conforme a Equação \ref{eq:pl_nlosv}:
+
+\begin{equation}
+    PL_{NLOSv}(d) = PL_{LOS}(d) + A_{block} + X_{\sigma}
+    \label{eq:pl_nlosv}
+\end{equation}
+
+Além do bloqueio físico, a operação no Modo 2 do Sidelink não conta com um gNB coordenando o espectro; os próprios veículos realizam o sensoriamento de canal. Sob tráfego urbano intenso, o sistema entra em um regime dominado por interferência, onde as colisões intra-Sidelink ($I_{SL}$) esmagam o limiar do ruído térmico ($I_{SL} \gg N_0 B$). Consequentemente, o SINR degradado ($\text{SINR}_{SL} \approx P_{rx\_SL} / I_{SL}$) força uma regressão imediata da modulação e frequentemente causa a perda do pacote de controle \cite{garcia2021}. A Figura \ref{fig:worst_case_v2x_math} ilustra as dinâmicas físicas e os obstáculos que compõem esses dois enlaces críticos.
+
+\begin{figure}[htpb]
+\centering
+\Caption{\label{fig:worst_case_v2x_math} Representação topológica dos piores cenários V2I e V2X. O V2I experimenta sombreamento predial severo. O C-V2X (Sidelink) experimenta atenuação por bloqueio dinâmico ($A_{block}$), acionando o canal PSFCH para \textit{feedback} de erros.}
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.95]
+% Infraestrutura
+\node[draw, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, rounded corners] (mec) at (0, 5.5) {\textbf{Servidor MEC}\\(Baixa Latência E2E)};
+\node[draw, fill=gray!20, minimum width=1cm, minimum height=2.5cm] (mast) at (-4.5, 2.5) {};
+\node[draw, fill=green!30, regular polygon, regular polygon sides=3, inner sep=1pt, rotate=180] (ant) at (-4.5, 4.5) {gNB};
+\draw[<->, thick, blue] (ant.north) |- node[near end, above, font=\footnotesize] {Backhaul ideal} (mec.west);
+% Veículos
+\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue1) at (-2, 0) {\textbf{UE 1 (Tx)}};
+\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue2) at (4, 0) {\textbf{UE 2 (Rx)}};
+% Obstáculos do Pior Cenário
+\node[draw, fill=gray!50, minimum width=1.5cm, minimum height=2.5cm, align=center] (building) at (-3, 1.5) {Prédio\\UMi NLOS};
+\node[draw, fill=red!30, minimum width=2.2cm, minimum height=1.5cm, rounded corners, align=center] (truck) at (1, 0) {Caminhão\\$A_{block}$};
+% Enlaces
+\draw[->, thick, dashed, orange!80!black] (ant.east) -- node[above, sloped, font=\footnotesize] {V2I (Uu) - Erro Alto} (building.north west);
+\draw[->, thick, dashed, orange!80!black] (building.east) -- (ue1.north);
+\draw[->, thick, purple] (ue1.east) -- node[above, font=\footnotesize] {PC5 Modo 2} (ue2.west);
+\node[text=purple, font=\scriptsize, align=center] at (1, -1.5) {Difração ($PL_{NLOSv}$) + \\ Interferência $I_{SL}$};
+\draw[<-, thick, dotted, purple] ([yshift=-0.3cm]ue1.east) -- node[below, font=\scriptsize] {HARQ NACK (PSFCH)} ([yshift=-0.3cm]ue2.west);
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor}
+\end{figure}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem Matemática da Latência}
+\label{sec:modelagem_matematica_latencia}
+
+Para o dimensionamento de serviços \gls{URLLC}, a latência de plano de usuário exige uma modelagem estrita. Embora a capacidade do canal possa ser teoricamente aproximada pelo Teorema de Shannon-Hartley -- penalizado pelos \textit{overheads} nativos de sinalização ($OH$) --, a alocação prática no 5G NR ocorre através de blocos temporais indivisíveis. Sendo a duração de um \textit{slot} $T_{slot} = 2^{-\mu}$~ms, o número de blocos necessários ($N_{slots}$) e o tempo nominal de antena ($T_{tx}$) para transmitir uma carga de $L$ bits obedecem ao Tamanho do Bloco de Transporte suportado ($TBS_{slot}$), conforme as Equações \ref{eq:n_slots} e \ref{eq:t_tx}:
+
+\begin{equation}
+    N_{slots} = \left\lceil \frac{L}{TBS_{slot}} \right\rceil
+    \label{eq:n_slots}
+\end{equation}
+\begin{equation}
+    T_{tx} = N_{slots} \times T_{slot}
+    \label{eq:t_tx}
+\end{equation}
+
+Além da transmissão bruta, as restrições de \textit{hardware} do 3GPP impõem o tempo de processamento algorítmico do terminal ($T_{proc}$). A norma determina esse atraso como um número mínimo fixo de símbolos \gls{OFDM} exigidos ($N_{symb}$) para o preparo dos canais. A conversão dessa carga matricial em tempo é dada pela Equação \ref{eq:t_proc}:
+
+\begin{equation}
+    T_{proc} = N_{symb} \times \left( \frac{T_{slot}}{14} \right)
+    \label{eq:t_proc}
+\end{equation}
+
+Com as componentes físicas definidas, a latência real na infraestrutura V2I (Equação \ref{eq:t_v2i}) consolida a propagação tridimensional de voo ($T_{prop}$) e as penalidades do protocolo \gls{HARQ}, que reage às falhas injetando retransmissões associadas ao tempo de ida e volta (\textit{Round-Trip Time}) do sistema ($T_{RTT\_HARQ}$):
+
+\begin{equation}
+    T_{UP\_V2I} = T_{tx} + T_{proc} + T_{prop} + (N_{harq} \times T_{RTT\_HARQ})
+    \label{eq:t_v2i}
+\end{equation}
+
+Diferentemente da topologia celular V2I, a interface PC5 exige que o veículo adicione uma janela temporal estrita de observação preventiva ($T_{sensing}$) para avaliar e reservar os recursos de forma autônoma. Somado a isso, no Release 16, a notificação de erros disparada por perdas decorrentes de obstáculos ocorre via canal \gls{PSFCH}, regendo a latência fim-a-fim da comunicação direta ($T_{e2e\_SL}$) pela Equação \ref{eq:t_pc5}:
+
+\begin{equation}
+    T_{e2e\_SL} = T_{sensing} + T_{tx} + T_{proc} + T_{prop} + (N_{harq\_sl} \times T_{RTT\_PSFCH})
+    \label{eq:t_pc5}
+\end{equation}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Integração Computacional e Constantes do Simulador}
+\label{sec:integracao_computacional}
+
+Para viabilizar a avaliação empírica das métricas propostas nesta fundamentação teórica, a formulação analítica foi traduzida para um ambiente computacional orientado a objetos desenvolvido em Python, encapsulado através da classe \texttt{SimuladorLatenciaV2X}. Essa estrutura algorítmica aplica o cálculo de balanço de potência e aloca recursos temporalmente utilizando as operações de teto matemático da teoria de blocos (\texttt{math.ceil}). O impacto das restrições de confiabilidade é codificado em rotinas distintas para Uu e PC5, agregando os mecanismos de espera passiva e os protocolos HARQ.
+
+Para a consolidação da execução dessa simulação, os seguintes parâmetros referenciais e restrições de pior caso foram estipulados em aderência à literatura normativa e física \cite{stallings2021, cox2025, fowdur2025}:
+
+\begin{itemize}
+    \item \textbf{\texttt{N0\_dBm\_Hz = -174} e Transformações de Potência:} Valor fixo derivado do limite físico de Johnson-Nyquist em temperatura ambiente ($\approx 290$ K). A conversão computacional de dBm para escala linear (Watts) realiza-se dividindo a potência por 10 e adicionando-se a constante 30 (referente à base logarítmica de miliwatts) para viabilizar o cálculo do denominador do SINR.
+    
+    \item \textbf{\texttt{L\_bits = 12000} e \texttt{TBS\_slot = 8000}:} O tamanho do pacote (12.000 bits) reflete um pacote IP sob \textit{Maximum Transmission Unit} (MTU) transportando telemetria automotiva prioritária. O bloco de transporte restrito a 8.000 bits representa a borda de célula (canal degradado), onde o sistema regride para modulação QPSK. Este valor de \textit{slot} já embute e desconta o desperdício (\textit{overhead}) das sinalizações de controle.
+    
+    \item \textbf{\texttt{T\_slot = 0.25 ms} e Processamento Normativo ($\mu=2$):} Apoiado na numerologia estrita $2^{-\mu}$ ms com espaçamento de 60 kHz. O nó veicular autônomo foi tipificado como \textit{Low Latency Capability}, demandando a preparação de matrizes de rádio em ultrarrápidos 11 símbolos OFDM, o que computa um fardo de processamento de hardware temporal $T_{proc} \approx 0,196$ ms.
+    
+    \item \textbf{Penalidades de Controle de Acesso ao Meio (MAC):} A obrigação estatutária de sensoriamento contínuo no Modo 2 impõe uma restrição de \texttt{T\_sensing = 10.0 ms}. Em eventos de bloqueios dinâmicos $NLOSv$, a tolerância foi limitada a duas falhas (\texttt{N\_harq\_sl = 2}), impondo um salto temporal estrito de \texttt{3.0 ms} por retransmissão atrelada às janelas de notificação do PSFCH.
+\end{itemize}

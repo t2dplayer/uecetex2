@@ -1,0 +1,211 @@
+\section{A Internet de Veículos (IoV) e as Redes Veiculares}
+\label{sec:internet-de-veiculos}
+
+A evolução das Redes de Comunicação Veicular nas últimas décadas é marcada por uma transição clara entre paradigmas tecnológicos. Inicialmente, o foco concentrava-se nas Redes Ad Hoc Veiculares (VANETs, \textit{Vehicular Ad hoc NETworks}), priorizando a conectividade direta entre os veículos. Com o amadurecimento da Internet das Coisas (IoT, \textit{Internet of Things}), iniciou-se um processo de convergência que resultou no atual ecossistema da Internet dos Veículos (IoV, \textit{Internet of Vehicles}) \cite{salcedo2025_evolution, abd2024comparative}. Enquanto o estágio inicial das VANETs visava a comunicação básica, a IoV contemporânea integra sensores embarcados, Inteligência Artificial (IA) e Redes Definidas por Software (SDN) para viabilizar Sistemas de Transporte Inteligentes (ITS) verdadeiramente autônomos e conectados.
+
+As VANETs emergiram como uma evolução das redes móveis ad hoc (MANETs, \textit{Mobile Ad hoc NETworks}). No entanto, seu grande diferencial é a alta mobilidade dos nós, o que impõe desafios rigorosos em termos de conectividade e latência. Diferente das MANETs, os enlaces nas redes veiculares surgem e desaparecem rapidamente. Para aplicações de segurança crítica, como alertas de colisão, atrasos na comunicação são intoleráveis. Consequentemente, novas tecnologias de comunicação foram desenvolvidas para atender às exigências das VANETs e da futura IoV, destacando-se o DSRC (\textit{Dedicated Short-Range Communications}) e o C-V2X (\textit{Cellular Vehicle-to-Everything}).
+
+À medida que as redes veiculares evoluíam, os sistemas de IoT se expandiam pelas infraestruturas urbanas. Cada vez mais, dispositivos com sensores foram instalados em semáforos, estações meteorológicas, equipamentos públicos e até mesmo sendo carregados por pedestres \cite{abd2024comparative}. A IoV surge da consolidação deste cenário, sendo definida como uma rede heterogênea de grande escala que possibilita a comunicação entre veículos, infraestrutura, pedestres e a nuvem \cite{ansari2020v2x}. O compartilhamento destas informações amplia a observação do ambiente \cite{naik2019evolution}, otimiza a orquestração do tráfego \cite{sanchez2025evolution} e aprimora os sistemas de segurança \cite{abd2024comparative}.
+
+\begin{figure}[ht!]
+\centering
+\Caption{\label{fig:v2x-overview} Abstração do Ecossistema IoV: V2V, V2I, V2N e V2P em Cruzamento}
+\vspace{0.2cm}
+\begin{tikzpicture}[
+    font=\sffamily,
+    car top up/.pic={
+        \begin{scope}[scale=0.55]
+            \filldraw[fill=blue!30, draw=none, rounded corners=2pt] (-0.9, -1.9) rectangle (0.7, 1.9);
+            \filldraw[fill=white, draw=black, rounded corners=2pt, thick] (-0.8, -1.8) rectangle (0.8, 1.8);
+            \filldraw[fill=black!70, draw=black, thick] (-0.6, 0.5) -- (-0.5, 1.0) -- (0.5, 1.0) -- (0.6, 0.5) -- cycle;
+            \filldraw[fill=black!70, draw=black, thick] (-0.6, -0.6) -- (-0.5, -1.1) -- (0.5, -1.1) -- (0.6, -0.6) -- cycle;
+            \filldraw[fill=white, draw=black, thick] (-0.6, -0.6) rectangle (0.6, 0.5);
+            \filldraw[fill=yellow!80, draw=none] (-0.7, 1.6) rectangle (-0.4, 1.8);
+            \filldraw[fill=yellow!80, draw=none] (0.4, 1.6) rectangle (0.7, 1.8);
+        \end{scope}
+    },
+    car top right/.pic={
+        \begin{scope}[scale=0.55]
+            \filldraw[fill=red!30, draw=none, rounded corners=2pt] (-1.9, -0.9) rectangle (1.9, 0.7);
+            \filldraw[fill=white, draw=black, rounded corners=2pt, thick] (-1.8, -0.8) rectangle (1.8, 0.8);
+            \filldraw[fill=black!70, draw=black, thick] (0.5, -0.6) -- (1.0, -0.5) -- (1.0, 0.5) -- (0.5, 0.6) -- cycle;
+            \filldraw[fill=black!70, draw=black, thick] (-0.6, -0.6) -- (-1.1, -0.5) -- (-1.1, 0.5) -- (-0.6, 0.6) -- cycle;
+            \filldraw[fill=white, draw=black, thick] (-0.6, -0.6) rectangle (0.5, 0.6);
+            \filldraw[fill=yellow!80, draw=none] (1.6, -0.7) rectangle (1.8, -0.4);
+            \filldraw[fill=yellow!80, draw=none] (1.6, 0.4) rectangle (1.8, 0.7);
+        \end{scope}
+    },
+    tree/.pic={
+        \begin{scope}[scale=0.5]
+            \fill[black!30] (0.2,-0.2) circle (0.6) (-0.2,-0.3) circle (0.5) (0.5,0.2) circle (0.5);
+            \filldraw[fill=green!50!black, draw=black, thick]
+                (0,0.5) circle (0.5)
+                (0.4, 0.1) circle (0.4)
+                (-0.4, 0) circle (0.45)
+                (0.2, -0.4) circle (0.4)
+                (-0.2, -0.3) circle (0.3);
+        \end{scope}
+    }
+]
+
+    % Clip to bounding box
+    \clip (0,0) rectangle (12,10);
+
+    % Background grass / terrain
+    \fill[green!10] (0,0) rectangle (12,10);
+
+    % Crossroads (Streets)
+    % Vertical street (x=4.5 to 7.5)
+    \fill[black!40] (4.5, 0) rectangle (7.5, 10);
+    % Horizontal street (y=3.5 to 6.5)
+    \fill[black!40] (0, 3.5) rectangle (12, 6.5);
+    
+    % Street markings (White dashed lines)
+    \draw[line width=2pt, white, dashed, dash pattern=on 10pt off 10pt] (6, 0) -- (6, 3.5);
+    \draw[line width=2pt, white, dashed, dash pattern=on 10pt off 10pt] (6, 6.5) -- (6, 10);
+    \draw[line width=2pt, white, dashed, dash pattern=on 10pt off 10pt] (0, 5) -- (4.5, 5);
+    \draw[line width=2pt, white, dashed, dash pattern=on 10pt off 10pt] (7.5, 5) -- (12, 5);
+    
+    % Crosswalks
+    \foreach \y in {3.7, 4.0, 4.3, 4.6, 4.9, 5.2, 5.5, 5.8, 6.1, 6.4} {
+        \fill[white] (3.8, \y) rectangle (4.3, \y+0.15); % Left
+        \fill[white] (7.7, \y) rectangle (8.2, \y+0.15); % Right
+    }
+    \foreach \x in {4.7, 5.0, 5.3, 5.6, 5.9, 6.2, 6.5, 6.8, 7.1, 7.4} {
+        \fill[white] (\x, 2.8) rectangle (\x+0.15, 3.3); % Bottom
+        \fill[white] (\x, 6.7) rectangle (\x+0.15, 7.2); % Top
+    }
+
+    % Objects (Trees, Buildings)
+    \filldraw[fill=gray!20, draw=black, thick] (0.5, 7.5) rectangle (3.5, 9.5);
+    \node[font=\bfseries, align=center] at (2, 8.5) {Edifício};
+
+    % Trees
+    \pic at (2, 1.5) {tree};
+    \pic at (3.5, 2.5) {tree};
+    \pic at (9.5, 8.5) {tree};
+    \pic at (10.5, 2) {tree};
+
+    % Car 1 (Going Right on horizontal street)
+    % Center: x=3.0, y=4.25
+    \foreach \r in {1, 2, 3} { \draw[black!50, thin] (3, 4.25) circle (\r); }
+    \pic at (3, 4.25) {car top right};
+    \node[font=\scriptsize\bfseries] at (3, 3.5) {Veículo A};
+
+    % Car 2 (Going Up on vertical street)
+    % Center: x=6.75, y=1.5
+    \foreach \r in {1, 2, 3} { \draw[black!50, thin] (6.75, 1.5) circle (\r); }
+    \pic at (6.75, 1.5) {car top up};
+    \node[font=\scriptsize\bfseries] at (8.0, 1.5) {Veículo B};
+
+    % V2I RSU (Traffic light / Edge node at intersection corner)
+    \filldraw[fill=gray!80, draw=black, thick] (4.0, 7.0) rectangle (4.4, 7.4);
+    \filldraw[fill=green!40, draw=black, thick] (4.1, 7.1) rectangle (4.3, 7.3);
+    \node[fill=white, inner sep=2pt, font=\scriptsize\bfseries, rounded corners] at (3.1, 6.8) {Edge RSU};
+
+    % V2N Tower & Cloud (Top Right)
+    \node[draw=black, fill=red!10, thick, rounded corners, align=center, font=\scriptsize\bfseries] (Tower) at (10.5, 5.5) {Torre\\(5G gNB)};
+    \node[cloud, cloud puffs=12, cloud puff arc=120, aspect=2, draw=black, fill=gray!10, thick, font=\scriptsize\bfseries] (Cloud) at (10.5, 8.0) {Core 5G / ITS};
+    \draw[thick] (Tower) -- (Cloud);
+
+    % V2P Pedestrian (Crossing top crosswalk)
+    \filldraw[fill=blue] (6.0, 6.95) circle (0.15); 
+    \filldraw[fill=white!80!pink] (6.0, 6.95) circle (0.08); 
+    \node[fill=white, inner sep=2pt, font=\scriptsize\bfseries, rounded corners] at (6.4, 7.5) {Pedestre};
+
+    % Communication Links
+    % V2V (Car 1 <-> Car 2)
+    \draw[<->, dashed, line width=1.5pt, blue] (3.8, 4.0) -- (6.5, 2.2) node[midway, sloped, above=1pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2V};
+    
+    % V2I (Car 1 <-> RSU)
+    \draw[<->, dashed, line width=1.5pt, green!50!black] (3.2, 4.8) -- (4.2, 7.0) node[midway, left=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2I};
+    
+    % V2N (Car 2 <-> Tower)
+    \draw[<->, dashed, line width=1.5pt, purple] (7.2, 2.0) -- (9.8, 4.9) node[midway, below=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2N};
+    
+    % V2P (Car 1 <-> Pedestrian)
+    \draw[<->, dashed, line width=1.5pt, orange] (3.8, 4.6) -- (5.8, 6.8) node[midway, sloped, above=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2P};
+
+    % Border 
+    \draw[thick] (0,0) rectangle (12,10);
+
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor}
+\end{figure} 
+
+
+O ecossistema IoV, referenciado como \textit{Vehicle-to-Everything} (V2X), é estruturado por quatro interfaces de comunicação que determinam a topologia e o alcance da troca de dados. A interface \textbf{Vehicle-to-Vehicle (V2V)} viabiliza a comunicação direta entre veículos, configurando-se como um requisito crítico para sistemas de segurança ativa e alertas de colisão iminente. A comunicação \textbf{Vehicle-to-Infrastructure (V2I)} conecta o veículo aos equipamentos da infraestrutura viária (RSUs, \textit{Road Side Units}), provendo tanto dados locais de tráfego quanto o acesso a recursos de computação robustos com baixa latência. Para cenários que demandam coordenação global ou acesso a um poder de armazenamento e processamento massivo, a interface \textbf{Vehicle-to-Network (V2N)} estabelece o enlace celular com a rede núcleo da operadora, encaminhando o tráfego para a nuvem em detrimento do aumento da latência. Por fim, a interface \textbf{Vehicle-to-Pedestrian (V2P)} integra pedestres à rede por meio de dispositivos móveis, ampliando a consciência situacional do sistema de transporte.
+
+Neste cenário, a viabilização da IoV é intrinsecamente dependente da maturidade de tecnologias de rádio robustas. Historicamente, o marco inicial no desenvolvimento de sistemas de comunicação de baixa latência ocorreu no final da década de 1990, com a alocação de 75MHz do espectro na banda 5.9GHz para sistemas de transporte inteligente \cite{zheng2015}. A motivação na época, residia na incapacidade das redes celulares em atender aos requisitos de segurança viária (latências proibitivas e instabilidade de conexão), somada às limitações de interferência das bandas não licenciadas \textit{Industrial, Scientific, and Medical} (ISM). Sob uma perspectiva técnica, o DSRC consolidou-se não como um protocolo isolado, mas como um arcabouço regulatório e tecnológico que, ao integrar a camada física IEEE 802.11p à arquitetura \textit{Wireless Access in Vehicular Environments} (WAVE) --- responsável por definir como as mensagens de segurança são estruturadas, criptografadas e um conjunto de padrões de interface de comunicação V2V e V2I --- definiu os parâmetros fundamentais para aplicações de segurança ativa e sistemas de tarifação eletrônica (Figura \ref{fig:arquitetura-dsrc-wave}).
+
+\begin{figure}[ht!]
+\centering
+\Caption{\label{fig:arquitetura-dsrc-wave} Arquitetura de Protocolos DSRC / WAVE (IEEE 1609 / 802.11p)}
+\begin{tikzpicture}[
+    font=\sffamily,
+    node distance=0cm,
+    layer_node/.style={rectangle, draw=black!70, thick, minimum width=8cm, minimum height=0.75cm, align=center, fill=white, font=\small\sffamily},
+    bracket/.style={thick, draw=black!40}
+]
+
+    % Camadas Centrais
+    \node[layer_node, fill=blue!5] (app) {Camada de Aplicação (SAE J2735 / BSM)};
+    
+    % Group WAVE
+    \node[layer_node, below=0.3cm of app, fill=green!5] (sec) {Segurança (IEEE 1609.2)};
+    \node[layer_node, below=of sec, fill=green!5] (net) {Rede e Transporte (WSMP / IPv6) (IEEE 1609.3)};
+    \node[layer_node, below=of net, fill=green!5] (mc) {Operação Multi-canal (IEEE 1609.4)};
+    
+    % Group DSRC
+    \node[layer_node, below=0.3cm of mc, fill=orange!5] (mac) {Controle de Acesso ao Meio - MAC (IEEE 802.11p)};
+    \node[layer_node, below=of mac, fill=orange!5] (phy) {Camada Física - PHY (IEEE 802.11p)};
+
+    % Colchetes Laterais (Esquerda)
+    \foreach \topnode/\botnode/\labeltext/\labelcolor in {app/app/ITS/blue!60!black, sec/mc/WAVE/green!50!black, mac/phy/DSRC/orange!70!black} {
+        \draw[bracket] ([xshift=-0.1cm]\topnode.north west) -- ([xshift=-0.3cm]\topnode.north west) 
+                    -- ([xshift=-0.3cm]\botnode.south west) -- ([xshift=-0.1cm]\botnode.south west);
+        \node[anchor=east, font=\bfseries\small, \labelcolor] at ([xshift=-0.4cm]$(\topnode.north west)!0.5!(\botnode.south west)$) {\labeltext};
+    }
+
+    % Espaçamento invisível à direita para manter a centralização do bloco principal
+    \path ([xshift=1.5cm]app.east);
+
+    % Fluxo entre grupos
+    \draw[<->, thick] (app.south) -- (sec.north);
+    \draw[<->, thick] (mc.south) -- (mac.north);
+
+\end{tikzpicture}
+\Fonte{Adaptado de \cite{zheng2015}}
+\end{figure}
+
+A partir do legado do DSRC, a evolução tecnológica da comunicação veicular ramificou-se em dois eixos técnicos distintos. O primeiro, o padrão \textbf{IEEE 802.11bd} (\textit{Next Generation V2X} - NGV), surge como uma melhoria incremental do IEEE 802.11p. Conforme \cite{naik2019}, a demanda por maior vazão de dados (\textit{throughput}) e a necessidade de robustez contra o desvanecimento rápido em cenários de alta mobilidade foram os principais motivadores desta evolução, integrando técnicas para suporte a velocidades de até 250 km/h. 
+
+O segundo eixo representa uma mudança de paradigma com o surgimento do \textbf{C-V2X} (\textit{Cellular V2X}) e sua posterior transição para o \textbf{5G NR-V2X} e o horizonte do \textbf{6G} \cite{rodriguez2025_6genabled}. As limitações do DSRC em termos de escalabilidade e custo de implantação impulsionaram o desenvolvimento do C-V2X pelo 3GPP \cite{chen2017}. Sob uma perspectiva regulatória atual, a disputa tecnológica foi amplamente resolvida em mercados-chave; nos Estados Unidos, a FCC estabeleceu o C-V2X como padrão obrigatório para segurança ITS com descontinuação oficial do DSRC em dezembro de 2026 \cite{fcc2024_59ghz}, enquanto no Brasil a ANATEL, através da Resolução nº 772/2025 \cite{anatel2025_res772}, harmonizou os requisitos técnicos nacionais com os padrões globais celular e radar automotivo \cite{anatel2025_ato14158}. A Tabela \ref{tab:radio-tech-comparison} sintetiza a evolução e as divergências técnicas entre essas abordagens.
+
+
+\begin{table}[ht!]
+    \centering
+    \Caption{\label{tab:radio-tech-comparison} Comparativo técnico da evolução V2X: do DSRC ao 6G}
+    \UECEtab{}{
+        \begin{tabular}{lp{1.8cm}p{1.8cm}p{2.2cm}p{2.5cm}}
+            \toprule
+            \textbf{Atributo} & \textbf{DSRC (11p)} & \textbf{NGV (11bd)} & \textbf{C-V2X (5G NR)} & \textbf{6G-V2X (Exp.)} \\
+            \midrule \midrule
+            Acesso MAC & CSMA/CA & CSMA/CA+ & CP-OFDM & Holístico/Cognit. \\
+            Código Canal & BCC & LDPC & LDPC & Polar / AI-based \\
+            Latência & ~100 ms & < 50 ms & 3 - 10 ms & < 1 ms \\
+            Taxa Dados & 6 - 27 Mbps & Até 90 Mbps & Mbps a Gbps & > 1 Tbps \\
+            Transmissão & Broadcast & Broadcast & Uni/Groupcast & Semântica / ISAC \\
+            Conectividade & Ad-hoc & Ad-hoc & Nativa Sidelink & Integrada (Sat.) \\
+            Robustez Doppler& Moderada & Alta & Muito Alta & Extrema \\
+            Sincronização & Não exigida & Não exigida & Exigida (GNSS) & Pevasiva (AI) \\
+            \bottomrule
+        \end{tabular}
+    }{
+        \Fonte{Elaborado pelo autor com base em \cite{naik2019evolution, abd2024comparative, sanchez2025evolution}}
+        \Nota{BC: \textit{Broadcast}; CP-OFDM: \textit{Cyclic Prefix Orthogonal Frequency Division Multiplexing}; GNSS: \textit{Global Navigation Satellite System}; ISAC: \textit{Integrated Sensing and Communication}; LDPC: \textit{Low-Density Parity-Check}; NGV: \textit{Next Generation V2X}.}
+    }
+\end{table}
+
+
+As redes veiculares evoluíram com a integração à IoV, transitando da incerteza tecnológica para uma realidade onde a superioridade do C-V2X é um fato regulatório consolidado \cite{ansari2020v2x}. Embora o DSRC possua validação extensiva em segurança básica, a indústria convergiu para o ecossistema celular em função de sua projeção escalonável em direção ao 5G NR em frequências milimétricas (mmWave, FR2) e aos futuros padrões 6G operando em faixas Terahertz (THz) \cite{naik2019evolution}. Entretanto, o transplante das arquiteturas de rádio para bandas de frequência tão elevadas introduz barreiras operacionais agressivas, como deficiências estruturais de difração, elevada taxa de absorção atmosférica e severas falhas (\textit{outage}) originadas pelo bloqueio dinâmico gerado pelo próprio tráfego (veículos de grande porte e pedestres), demandando arranjos de antenas estritamente direcionais e complexas matrizes estocásticas e de teoria de filas para modelar matematicamente sua real confiabilidade \cite{moltchanov2022tutorial}. Consequentemente, a pesquisa atual concentra-se em preencher os hiatos dos mecanismos de serviço (\textit{service-level performance}) propondo sub-rogação de tráfego, reservas de banda vitais, sistemas híbridos de predição e gestão inteligente de espectro — como Redes de Atenção para Grafos (GAT) e Aprendizado por Reforço Multiagente (MARL) — com a finalidade de otimizar a coexistência multitecnologia e manter a operação em tempo real irrestrita \cite{turcanu2016}.

@@ -1,0 +1,144 @@
+\documentclass[iicol]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{siunitx}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+\usepackage{adjustbox}%
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage[numbers]{natbib}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+\raggedbottom
+
+\begin{document}
+
+\title[RA-FA-IQL for V2X]{Risk-Aware Fuzzy-Adaptive Learning for Distributed Load Balancing in Non-Stationary V2X Networks}
+
+\author*[1,2]{\fnm{Antônio Sérgio de Sousa} \sur{Vieira}}\email{sergio.vieira@ifce.edu.br}
+\author[1,3]{\fnm{Alisson Barbosa de} \sur{Souza}}\email{alisson@ufc.br}
+\author[1]{\fnm{Joaquim} \sur{Celestino Júnior}}\email{joaquim.celestino@uece.br}
+
+\affil*[1]{\orgdiv{Intelligent Networks and Systems Group (INETSYS)}, \orgname{State University of Ceará}, \orgaddress{\street{Av. Dr. Silas Munguba, 1700}, \city{Fortaleza}, \postcode{60714-903}, \state{CE}, \country{Brazil}}}
+\affil[2]{\orgname{Federal Institute of Education, Science and Technology}, \orgaddress{\street{Av. da Universidade, 102}, \city{Itapipoca}, \postcode{62500-000}, \state{CE}, \country{Brazil}}}
+\affil[3]{\orgname{Federal University of Ceará}, \orgaddress{\street{Av. José F. Queiroz, 5003}, \city{Quixadá}, \postcode{63902-580}, \state{CE}, \country{Brazil}}}
+
+
+\abstract{
+The heterogeneity and high mobility of 5G Vehicular Edge Computing (VEC) networks create non-stationary environments where standard offloading algorithms often fail. A critical issue in decentralized multi-agent scenarios is the "Thundering Herd" phenomenon, where autonomous agents simultaneously target the same optimal resource, causing sudden congestion and performance collapse. This paper proposes a novel \textbf{Risk-Aware Fuzzy-Adaptive Independent Q-Learning (RA-FA-IQL)} approach. Unlike traditional methods, our solution dynamically tunes the learning rate ($\alpha$) and the exploration entropy (Softmax temperature) based on real-time Fuzzy inference of "Drift" and "Queue Risk". Simulation results demonstrate that RA-FA-IQL outperforms standard IQL and Sliding-Window UCB in critical stress scenarios (Arrival Rate $\approx$ 5.4), reducing average queue size by 25.6\% and latency by 14.5\% while maintaining a Jain's Fairness Index above 0.91.
+}
+
+\keywords{Task Offloading, Thundering Herd, Independent Q-Learning, Fuzzy Logic, Entropy Control, Non-Stationary V2X}
+
+\maketitle
+
+\section{Introduction}\label{sec_introduction}
+
+The convergence of 5G New Radio (NR) and Vehicular Edge Computing (VEC) enables ultra-low latency applications for autonomous driving. However, the decision of task offloading in a decentralized environment presents a classic Game Theoretic dilemma: the \textit{Thundering Herd} problem. When multiple vehicles independently learn that a specific Roadside Unit (RSU) provides the best service, they simultaneously migrate their workloads to it, causing immediate congestion and service degradation.
+
+
+
+Existing solutions typically rely on centralized coordination or complex communication overheads to achieve load balancing. In contrast, Reinforcement Learning (RL) approaches, such as Independent Q-Learning (IQL), offer decentralized decision-making but suffer from instability in non-stationary environments where channel qualities drift and network load fluctuates rapidly.
+
+To address these challenges, we propose a hybrid architecture: **Risk-Aware Fuzzy-Adaptive IQL (RA-FA-IQL)**. Our contribution is threefold:
+\begin{enumerate}
+    \item We model the VEC environment as a Non-Stationary Decentralized Partially Observable MDP (Dec-POMDP) with congestion effects.
+    \item We introduce a Fuzzy Logic Controller that manipulates the \textit{Entropy} of the agent's policy. By dynamically adjusting the Softmax temperature, the agents spontaneously "spread out" during congestion events without explicit communication.
+    \item We validate the model in a high-stress simulation, demonstrating survival capabilities where baseline algorithms fail.
+\end{enumerate}
+
+\section{System Model}\label{sec_system_model}
+
+We consider a network with $N$ autonomous vehicles and $K$ RSUs. The system is modeled to reflect realistic non-stationary behaviors, including physical channel drift and load-dependent latency.
+
+\subsection{Non-Stationary Environment}
+The environment is characterized by a "Drift" process where the baseline latency of RSUs changes abruptly over time (simulating shadowing or handover). Additionally, the effective latency $L_{eff}$ of an RSU follows a congestion function:
+\begin{equation}
+    L_{eff} = L_{base} \times \gamma^{(n-1)}
+\end{equation}
+where $n$ is the number of concurrent users and $\gamma$ is the penalty factor. This nonlinearity creates the "trap" for greedy algorithms.
+
+\section{Proposed Solution: RA-FA-IQL}\label{sec_methodology}
+
+The core innovation is the integration of a Fuzzy Meta-Controller atop a standard Q-Learning agent. The agent does not use static hyperparameters; instead, its learning plasticity ($\alpha$) and exploration strategy ($\tau$) are functions of its internal state risk and external surprise.
+
+
+
+\subsection{Fuzzy Logic Controller (FLC)}
+The FLC takes two crisp inputs:
+\begin{itemize}
+    \item \textbf{TD-Error ($|\delta|$):} Represents the "Surprise" or Drift. A high error indicates the environment has changed.
+    \item \textbf{Queue Usage ($Q_{pct}$):} Represents the "Risk". High usage indicates imminent buffer overflow.
+\end{itemize}
+
+
+
+The FLC outputs three control variables:
+\begin{itemize}
+    \item \textbf{Learning Rate ($\alpha$):} Increases when Drift is detected to quickly adapt to new RSU qualities.
+    \item \textbf{Temperature ($\tau$):} Controls the Entropy of the Softmax policy. High $\tau$ flattens the probability distribution, effectively forcing Load Balancing among agents.
+    \item \textbf{Panic Mode ($P$):} A binary trigger. If $Q_{pct} > 0.6$ (Critical), the agent abandons exploration and reverts to a Greedy strategy to drain the queue.
+\end{itemize}
+
+\subsection{Entropy-based Load Balancing}
+Unlike $\epsilon$-greedy strategies, we utilize a dynamic Softmax policy:
+\begin{equation}
+    \pi(a|s) = \frac{e^{Q(s,a)/\tau}}{\sum_{k} e^{Q(s,k)/\tau}}
+\end{equation}
+When the FLC detects congestion (via high TD-error and moderate risk), it increases $\tau$. This mathematical manipulation causes the agents to probabilistically disperse across suboptimal RSUs, resolving the Thundering Herd problem organically.
+
+\section{Experimental Evaluation}\label{sec_experiments}
+
+We evaluated the proposed RA-FA-IQL against three baselines: \textit{Random}, \textit{Standard IQL}, and \textit{Sliding-Window UCB (SW-UCB)}.
+The simulation was configured with an \textbf{Arrival Rate of 5.4 tasks/step}, a critical "Sweet Spot" calculated to exceed the capacity of a single RSU but fit within the capacity of a balanced system.
+
+\subsection{Numerical Results}
+
+Table \ref{tab:results} summarizes the performance metrics over 2000 simulation steps.
+
+\begin{table}[h]
+    \caption{Performance Comparison (Stress Scenario)}
+    \label{tab:results}
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Algorithm} & \textbf{Avg Queue} & \textbf{Max Queue} & \textbf{Latency (s)} & \textbf{Fairness} \\
+        \midrule
+        Random       & 92.69 & 98.85 & 0.8798 & 0.8893 \\
+        SW-UCB       & 73.22 & 90.19 & 0.5140 & 0.7748 \\
+        Standard IQL & 42.81 & 56.91 & 0.5597 & 0.8874 \\
+        \textbf{RA-FA-IQL} & \textbf{31.82} & \textbf{41.54} & \textbf{0.4782} & \textbf{0.9186} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Discussion}
+
+\subsubsection{Survival Analysis (Queue Management)}
+As shown in Table \ref{tab:results}, Random and SW-UCB agents failed to manage the queue, reaching near-saturation levels ($>90$ packets). Standard IQL managed to survive but operated with a high average queue of 42.81. The RA-FA-IQL reduced the average queue to 31.82 (a 25.6\% improvement), proving its superior risk management capability via the "Panic Mode" mechanism.
+
+\subsubsection{Latency and Fairness}
+Surprisingly, RA-FA-IQL achieved the lowest latency (0.478s), outperforming the "Greedy" Standard IQL. This counter-intuitive result confirms that in high-load regimes, \textit{cooperation} (via entropy-induced load balancing) yields faster processing than competition. The Jain's Fairness Index of 0.9186 confirms that RA-FA-IQL effectively utilizes all available RSUs, whereas SW-UCB (0.7748) suffered from severe load imbalance.
+
+\section{Conclusion}\label{sec_conclusion}
+This paper introduced RA-FA-IQL, a hybrid learning approach for VEC. By dynamically coupling Fuzzy Logic with Q-Learning, we demonstrated that manipulating policy entropy is a viable strategy to solve the Thundering Herd problem without inter-agent communication. Future work will explore the implementation of this logic on FPGA-based Smart NICs.
+
+\bibliographystyle{sn-mathphys-num}
+\bibliography{bib/refs}
+
+\end{document}
