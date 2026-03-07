@@ -347,3 +347,148 @@ Por fim, para garantir a confiabilidade necessária em serviços veiculares crí
     T_{e2e\_SL} = T_{sensing} + T_{tx} + T_{proc} + T_{prop} + (N_{harq\_sl} \times T_{RTT\_PSFCH})
     \label{eq:t_pc5}
 \end{equation}
+
+
+
+####################################
+
+
+
+
+% ==============================================================================
+% SEÇÃO: MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G V2X
+% ==============================================================================
+
+\section{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_v2x}
+
+A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} (\textit{Vehicle-to-Everything}) exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação de cenários de missão crítica (\textit{worst-case}), é imprescindível compreender a camada física, os modelos de propagação estocásticos e as restrições matemáticas de latência.
+
+Para atender aos rigorosos requisitos da comunicação veicular (V2X), especialmente em aplicações de condução autônoma e coordenação de pelotões (\textit{platooning}), o 3GPP introduziu no Release 16 o suporte padronizado ao 5G NR \textit{Sidelink} \cite{garcia2021}. Enquanto a interface aérea Uu tradicional conecta o veículo à infraestrutura da rede celular (V2I/V2N), a interface \textbf{PC5} estabelece um enlace direto de dispositivo para dispositivo (\gls{D2D}), permitindo a comunicação Veículo-para-Veículo (V2V) sem que o tráfego de dados precise transitar pelo núcleo da rede (5GC) \cite{cox2025, garcia2021}.
+
+Diferentemente das gerações anteriores (como o LTE-V2X) que suportavam majoritariamente transmissões abertas (\textit{broadcast}), o Sidelink do 5G NR foi arquitetado para suportar também comunicações \textit{unicast} (ponto a ponto) e \textit{groupcast} (ponto a multiponto), garantindo maior privacidade e controle de qualidade de serviço \cite{cox2025, garcia2021}. Para viabilizar e gerenciar essas trocas de dados diretas, a camada física da interface PC5 é composta por canais estruturais específicos:
+
+\begin{itemize}
+    \item \textbf{PSCCH (\textit{Physical Sidelink Control Channel}):} Canal responsável por carregar o primeiro estágio das Informações de Controle do Sidelink (SCI - \textit{Sidelink Control Information}). Ele atua anunciando a alocação de recursos de frequência e tempo, o esquema de modulação e a prioridade para a transmissão iminente \cite{garcia2021}.
+    \item \textbf{PSSCH (\textit{Physical Sidelink Shared Channel}):} Canal que transporta efetivamente a carga útil de dados (Blocos de Transporte) da aplicação veicular, bem como o segundo estágio do SCI, que contém identificadores de origem/destino e informações essenciais para a decodificação do pacote pelo veículo receptor \cite{garcia2021}.
+    \item \textbf{PSFCH (\textit{Physical Sidelink Feedback Channel}):} Uma adição crucial do 5G NR em relação às tecnologias anteriores para elevar a confiabilidade. O PSFCH é um canal reverso que transporta as confirmações do protocolo \gls{HARQ} (ACK/NACK), permitindo que o veículo transmissor saiba imediatamente se os seus dados \textit{unicast} ou \textit{groupcast} falharam e exigem retransmissão \cite{garcia2021, cox2025}.
+\end{itemize}
+
+A gestão do acesso ao meio e a alocação de recursos de rádio na interface PC5 operam sob dois paradigmas fundamentais. No \textbf{Modo 1}, a alocação é centralizada: a estação base (gNB) agenda explicitamente os recursos de \textit{Sidelink} para os veículos através da interface Uu, exigindo que todos os nós estejam sob rigorosa cobertura celular \cite{garcia2021}. 
+
+Por outro lado, o \textbf{Modo 2} foi projetado para cenários autônomos ou locais onde a cobertura celular é intermitente, severamente congestionada ou inexistente. Neste modo, os próprios veículos selecionam os recursos de rádio de forma distribuída \cite{garcia2021, cox2025}. Para evitar colisões destrutivas no ar e equilibrar o uso do espectro, o Modo 2 impõe que o terminal realize um sensoriamento prévio do canal (\textit{Channel Sensing}), escutando o ambiente por uma janela de tempo determinada para avaliar a disponibilidade de blocos livres antes de efetuar a transmissão \cite{garcia2021}.
+
+
+% ==============================================================================
+% 2.2 MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G NR
+% ==============================================================================
+
+\section{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_latencia}
+
+A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação em cenários de missão crítica (\textit{worst-case}), é imprescindível formular os modelos de propagação estocásticos, as restrições matemáticas de latência e suas respectivas integrações computacionais.
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem de Propagação e Balanço de Potência}
+\label{sec:propagacao_potencia}
+
+Para representar o canal de rádio de forma fidedigna em ambas as interfaces, adotam-se os modelos estocásticos estabelecidos no documento 3GPP TR 38.901 \cite{3gpp38901}. No cenário de comunicação Veículo-Infraestrutura (V2I), o pior caso é modelado pela topologia \textit{Urban Micro} de Não-Linha de Visada (\textbf{UMi NLOS}). Nesta situação, o veículo encontra-se na borda da célula e sob severo sombreamento de edificações. A perda de percurso tridimensional $PL_{\text{UMi-NLOS}}(d)$ e a potência de recepção linear $P_{rx}$ no \gls{gNB} são expressas pelas Equações \ref{eq:pl_v2i} e \ref{eq:prx_v2i}:
+
+\begin{equation}
+    PL_{\text{UMi-NLOS}}(d) = 32.4 + 31.9 \log_{10}(d) + 20 \log_{10}(f_c) + X_{\sigma}
+    \label{eq:pl_v2i}
+\end{equation}
+\begin{equation}
+    P_{rx (\text{dBm})} = P_{tx} + 10\log_{10}(N_t) + G_{tx} + G_{rx} - PL_{\text{UMi-NLOS}}(d) - L_{pen}
+    \label{eq:prx_v2i}
+\end{equation}
+
+Onde $X_{\sigma} \sim \mathcal{N}(0, \sigma_{SF}^2)$ modela o desvanecimento lento (\textit{shadow fading}) com $\sigma_{SF} = 8.2$ dB, e $L_{pen}$ insere as perdas por penetração da lataria veicular. A qualidade do sinal V2I é governada pela Relação Sinal-Interferência-Ruído (\gls{SINR}), calculada pela razão entre a potência recebida e o somatório do ruído térmico base ($N_0 B$) com a interferência intercelular ($\sum I_k$).
+
+Em contrapartida, para as comunicações diretas \gls{D2D} sob a interface PC5 \textit{Sidelink} (Modo 2), o pior cenário corresponde ao ambiente veicular \textbf{NLOSv}, causado por obstruções dinâmicas de grande porte, como caminhões. A difração (\textit{knife-edge}) gerada insere uma severa perda por bloqueio ($A_{block}$), redefinindo a atenuação conforme a Equação \ref{eq:pl_nlosv}:
+
+\begin{equation}
+    PL_{NLOSv}(d) = PL_{LOS}(d) + A_{block} + X_{\sigma}
+    \label{eq:pl_nlosv}
+\end{equation}
+
+Além do bloqueio físico, a operação no Modo 2 do Sidelink não conta com um gNB coordenando o espectro; os próprios veículos realizam o sensoriamento de canal. Sob tráfego urbano intenso, o sistema entra em um regime dominado por interferência, onde as colisões intra-Sidelink ($I_{SL}$) esmagam o limiar do ruído térmico ($I_{SL} \gg N_0 B$). Consequentemente, o SINR degradado ($\text{SINR}_{SL} \approx P_{rx\_SL} / I_{SL}$) força uma regressão imediata da modulação e frequentemente causa a perda do pacote de controle \cite{garcia2021}. A Figura \ref{fig:worst_case_v2x_math} ilustra as dinâmicas físicas e os obstáculos que compõem esses dois enlaces críticos.
+
+\begin{figure}[htpb]
+\centering
+\Caption{\label{fig:worst_case_v2x_math} Representação topológica dos piores cenários V2I e V2X. O V2I experimenta sombreamento predial severo. O C-V2X (Sidelink) experimenta atenuação por bloqueio dinâmico ($A_{block}$), acionando o canal PSFCH para \textit{feedback} de erros.}
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.95]
+% Infraestrutura
+\node[draw, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, rounded corners] (mec) at (0, 5.5) {\textbf{Servidor MEC}\\(Baixa Latência E2E)};
+\node[draw, fill=gray!20, minimum width=1cm, minimum height=2.5cm] (mast) at (-4.5, 2.5) {};
+\node[draw, fill=green!30, regular polygon, regular polygon sides=3, inner sep=1pt, rotate=180] (ant) at (-4.5, 4.5) {gNB};
+\draw[<->, thick, blue] (ant.north) |- node[near end, above, font=\footnotesize] {Backhaul ideal} (mec.west);
+% Veículos
+\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue1) at (-2, 0) {\textbf{UE 1 (Tx)}};
+\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue2) at (4, 0) {\textbf{UE 2 (Rx)}};
+% Obstáculos do Pior Cenário
+\node[draw, fill=gray!50, minimum width=1.5cm, minimum height=2.5cm, align=center] (building) at (-3, 1.5) {Prédio\\UMi NLOS};
+\node[draw, fill=red!30, minimum width=2.2cm, minimum height=1.5cm, rounded corners, align=center] (truck) at (1, 0) {Caminhão\\$A_{block}$};
+% Enlaces
+\draw[->, thick, dashed, orange!80!black] (ant.east) -- node[above, sloped, font=\footnotesize] {V2I (Uu) - Erro Alto} (building.north west);
+\draw[->, thick, dashed, orange!80!black] (building.east) -- (ue1.north);
+\draw[->, thick, purple] (ue1.east) -- node[above, font=\footnotesize] {PC5 Modo 2} (ue2.west);
+\node[text=purple, font=\scriptsize, align=center] at (1, -1.5) {Difração ($PL_{NLOSv}$) + \\ Interferência $I_{SL}$};
+\draw[<-, thick, dotted, purple] ([yshift=-0.3cm]ue1.east) -- node[below, font=\scriptsize] {HARQ NACK (PSFCH)} ([yshift=-0.3cm]ue2.west);
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor}
+\end{figure}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem Matemática da Latência}
+\label{sec:modelagem_matematica_latencia}
+
+Para o dimensionamento de serviços \gls{URLLC}, a latência de plano de usuário exige uma modelagem estrita. Embora a capacidade do canal possa ser teoricamente aproximada pelo Teorema de Shannon-Hartley -- penalizado pelos \textit{overheads} nativos de sinalização ($OH$) --, a alocação prática no 5G NR ocorre através de blocos temporais indivisíveis. Sendo a duração de um \textit{slot} $T_{slot} = 2^{-\mu}$~ms, o número de blocos necessários ($N_{slots}$) e o tempo nominal de antena ($T_{tx}$) para transmitir uma carga de $L$ bits obedecem ao Tamanho do Bloco de Transporte suportado ($TBS_{slot}$), conforme as Equações \ref{eq:n_slots} e \ref{eq:t_tx}:
+
+\begin{equation}
+    N_{slots} = \left\lceil \frac{L}{TBS_{slot}} \right\rceil
+    \label{eq:n_slots}
+\end{equation}
+\begin{equation}
+    T_{tx} = N_{slots} \times T_{slot}
+    \label{eq:t_tx}
+\end{equation}
+
+Além da transmissão bruta, as restrições de \textit{hardware} do 3GPP impõem o tempo de processamento algorítmico do terminal ($T_{proc}$). A norma determina esse atraso como um número mínimo fixo de símbolos \gls{OFDM} exigidos ($N_{symb}$) para o preparo dos canais. A conversão dessa carga matricial em tempo é dada pela Equação \ref{eq:t_proc}:
+
+\begin{equation}
+    T_{proc} = N_{symb} \times \left( \frac{T_{slot}}{14} \right)
+    \label{eq:t_proc}
+\end{equation}
+
+Com as componentes físicas definidas, a latência real na infraestrutura V2I (Equação \ref{eq:t_v2i}) consolida a propagação tridimensional de voo ($T_{prop}$) e as penalidades do protocolo \gls{HARQ}, que reage às falhas injetando retransmissões associadas ao tempo de ida e volta (\textit{Round-Trip Time}) do sistema ($T_{RTT\_HARQ}$):
+
+\begin{equation}
+    T_{UP\_V2I} = T_{tx} + T_{proc} + T_{prop} + (N_{harq} \times T_{RTT\_HARQ})
+    \label{eq:t_v2i}
+\end{equation}
+
+Diferentemente da topologia celular V2I, a interface PC5 exige que o veículo adicione uma janela temporal estrita de observação preventiva ($T_{sensing}$) para avaliar e reservar os recursos de forma autônoma. Somado a isso, no Release 16, a notificação de erros disparada por perdas decorrentes de obstáculos ocorre via canal \gls{PSFCH}, regendo a latência fim-a-fim da comunicação direta ($T_{e2e\_SL}$) pela Equação \ref{eq:t_pc5}:
+
+\begin{equation}
+    T_{e2e\_SL} = T_{sensing} + T_{tx} + T_{proc} + T_{prop} + (N_{harq\_sl} \times T_{RTT\_PSFCH})
+    \label{eq:t_pc5}
+\end{equation}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Integração Computacional e Constantes do Simulador}
+\label{sec:integracao_computacional}
+
+Para viabilizar a avaliação empírica das métricas propostas nesta fundamentação teórica, a formulação analítica foi traduzida para um ambiente computacional orientado a objetos desenvolvido em Python, encapsulado através da classe \texttt{SimuladorLatenciaV2X}. Essa estrutura algorítmica aplica o cálculo de balanço de potência e aloca recursos temporalmente utilizando as operações de teto matemático da teoria de blocos (\texttt{math.ceil}). O impacto das restrições de confiabilidade é codificado em rotinas distintas para Uu e PC5, agregando os mecanismos de espera passiva e os protocolos HARQ.
+
+Para a consolidação da execução dessa simulação, os seguintes parâmetros referenciais e restrições de pior caso foram estipulados em aderência à literatura normativa e física \cite{stallings2021, cox2025, fowdur2025}:
+
+\begin{itemize}
+    \item \textbf{\texttt{N0\_dBm\_Hz = -174} e Transformações de Potência:} Valor fixo derivado do limite físico de Johnson-Nyquist em temperatura ambiente ($\approx 290$ K). A conversão computacional de dBm para escala linear (Watts) realiza-se dividindo a potência por 10 e adicionando-se a constante 30 (referente à base logarítmica de miliwatts) para viabilizar o cálculo do denominador do SINR.
+    
+    \item \textbf{\texttt{L\_bits = 12000} e \texttt{TBS\_slot = 8000}:} O tamanho do pacote (12.000 bits) reflete um pacote IP sob \textit{Maximum Transmission Unit} (MTU) transportando telemetria automotiva prioritária. O bloco de transporte restrito a 8.000 bits representa a borda de célula (canal degradado), onde o sistema regride para modulação QPSK. Este valor de \textit{slot} já embute e desconta o desperdício (\textit{overhead}) das sinalizações de controle.
+    
+    \item \textbf{\texttt{T\_slot = 0.25 ms} e Processamento Normativo ($\mu=2$):} Apoiado na numerologia estrita $2^{-\mu}$ ms com espaçamento de 60 kHz. O nó veicular autônomo foi tipificado como \textit{Low Latency Capability}, demandando a preparação de matrizes de rádio em ultrarrápidos 11 símbolos OFDM, o que computa um fardo de processamento de hardware temporal $T_{proc} \approx 0,196$ ms.
+    
+    \item \textbf{Penalidades de Controle de Acesso ao Meio (MAC):} A obrigação estatutária de sensoriamento contínuo no Modo 2 impõe uma restrição de \texttt{T\_sensing = 10.0 ms}. Em eventos de bloqueios dinâmicos $NLOSv$, a tolerância foi limitada a duas falhas (\texttt{N\_harq\_sl = 2}), impondo um salto temporal estrito de \texttt{3.0 ms} por retransmissão atrelada às janelas de notificação do PSFCH.
+\end{itemize}

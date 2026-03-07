@@ -5,7 +5,7 @@
 
 Nesta seção, analisam-se as arquiteturas \gls{5G} \gls{NR} e \gls{5G} \gls{NR} \gls{V2X}, fundamentadas nas especificações do Release 16 do \gls{3GPP}~\cite{3gpp38901}. 
 
-% \subsection{Dicotomia NSA vs. SA e Impactos na Latência}
+% \section{Dicotomia NSA vs. SA e Impactos na Latência}
 
 A quinta geração de comunicações móveis celulares, o \gls{5G}, representou um avanço tecnológico disruptivo. Ele foi projetado para revolucionar não apenas o setor de telecomunicações, mas também a sociedade como um todo~\cite{stallings2021}. Essa geração teve por objetivo entregar altas taxas de dados, maior confiabilidade, cobertura aprimorada e latências bem menores em comparação com as tecnologias antecessoras, como a \gls{LTE}~\cite{stallings2021, dummies5g}.
 
@@ -922,36 +922,421 @@ Para contornar esse problema de degradação, a rede utiliza o mecanismo de Adap
 \Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
 \end{figure}
 
-% ==============================================================================
-% SEÇÃO: MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G V2X
-% ==============================================================================
+% Início V2X
 
-\section{Modelagem de Desempenho e Latência em Redes 5G NR}
-\label{sec:modelagem_v2x}
+O próximo passo natural, depois dessa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \gls{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração trouxe avanços significativos, consolidando o paradigma \textbf{C-V2X (\textit{Cellular Vehicle-to-Everything})} \cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.
 
-A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} (\textit{Vehicle-to-Everything}) exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação de cenários de missão crítica (\textit{worst-case}), é imprescindível compreender a camada física, os modelos de propagação estocásticos e as restrições matemáticas de latência.
+O \gls{C-V2X} opera fundamentalmente sobre duas interfaces: (i) a \textbf{Uu}, conectando o veículo à infraestrutura da rede celular (\gls{V2I}/\gls{V2N}), e (ii) a \textbf{PC5 (\textit{Sidelink})}, que estabelece um enlace direto veículo-veículo (\gls{V2V}) e veículo-pedestre (\gls{V2P}) sem que os dados precisem transitar pelas antenas ou pelo núcleo da rede \gls{5GC}. No \textit{Release} 16 do \gls{3GPP}, o \textit{Sidelink} do \gls{5G} \gls{NR} foi aprimorado para suportar não apenas transmissões abertas (\textit{broadcast}), mas também comunicações \textit{unicast} e \textit{groupcast}, garantindo maior controle de \gls{QoS} em manobras cooperativas, como a formação de pelotões (\textit{platooning}). 
 
-Para atender aos rigorosos requisitos da comunicação veicular (V2X), especialmente em aplicações de condução autônoma e coordenação de pelotões (\textit{platooning}), o 3GPP introduziu no Release 16 o suporte padronizado ao 5G NR \textit{Sidelink} \cite{garcia2021}. Enquanto a interface aérea Uu tradicional conecta o veículo à infraestrutura da rede celular (V2I/V2N), a interface \textbf{PC5} estabelece um enlace direto de dispositivo para dispositivo (\gls{D2D}), permitindo a comunicação Veículo-para-Veículo (V2V) sem que o tráfego de dados precise transitar pelo núcleo da rede (5GC) \cite{cox2025, garcia2021}.
+O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5} \textit{Sidelink} operam sob dois modos distintos. No \textbf{Modo 1}, a alocação de recursos é centralizada. A estação base (\gls{gNB}) agenda os recursos para os veículos através da interface celular (\gls{Uu}), garantindo uma baixa ocorrência de colisões, mas exigindo que os veículos estejam sob cobertura celular ininterrupta. No \textbf{Modo 2}, os próprios veículos gerenciam os recursos de rádio de forma autônoma através de sensoriamento prévio do canal (\textit{Channel Sensing}). A Figura \ref{fig:arquitetura_cv2x} apresenta essas conexões.
 
-Diferentemente das gerações anteriores (como o LTE-V2X) que suportavam majoritariamente transmissões abertas (\textit{broadcast}), o Sidelink do 5G NR foi arquitetado para suportar também comunicações \textit{unicast} (ponto a ponto) e \textit{groupcast} (ponto a multiponto), garantindo maior privacidade e controle de qualidade de serviço \cite{cox2025, garcia2021}. Para viabilizar e gerenciar essas trocas de dados diretas, a camada física da interface PC5 é composta por canais estruturais específicos:
 
-\begin{itemize}
-    \item \textbf{PSCCH (\textit{Physical Sidelink Control Channel}):} Canal responsável por carregar o primeiro estágio das Informações de Controle do Sidelink (SCI - \textit{Sidelink Control Information}). Ele atua anunciando a alocação de recursos de frequência e tempo, o esquema de modulação e a prioridade para a transmissão iminente \cite{garcia2021}.
-    \item \textbf{PSSCH (\textit{Physical Sidelink Shared Channel}):} Canal que transporta efetivamente a carga útil de dados (Blocos de Transporte) da aplicação veicular, bem como o segundo estágio do SCI, que contém identificadores de origem/destino e informações essenciais para a decodificação do pacote pelo veículo receptor \cite{garcia2021}.
-    \item \textbf{PSFCH (\textit{Physical Sidelink Feedback Channel}):} Uma adição crucial do 5G NR em relação às tecnologias anteriores para elevar a confiabilidade. O PSFCH é um canal reverso que transporta as confirmações do protocolo \gls{HARQ} (ACK/NACK), permitindo que o veículo transmissor saiba imediatamente se os seus dados \textit{unicast} ou \textit{groupcast} falharam e exigem retransmissão \cite{garcia2021, cox2025}.
-\end{itemize}
+% % é a base para a condução autônoma distribuída, projetado para operar independentemente da cobertura da rede celular ou em zonas de "sombra" (túneis, rodovias remotas). Neste modo, 
 
-A gestão do acesso ao meio e a alocação de recursos de rádio na interface PC5 operam sob dois paradigmas fundamentais. No \textbf{Modo 1}, a alocação é centralizada: a estação base (gNB) agenda explicitamente os recursos de \textit{Sidelink} para os veículos através da interface Uu, exigindo que todos os nós estejam sob rigorosa cobertura celular \cite{garcia2021}. 
+% A Figura \ref{fig:arquitetura_cv2x} apresenta essas conexões.
 
-Por outro lado, o \textbf{Modo 2} foi projetado para cenários autônomos ou locais onde a cobertura celular é intermitente, severamente congestionada ou inexistente. Neste modo, os próprios veículos selecionam os recursos de rádio de forma distribuída \cite{garcia2021, cox2025}. Para evitar colisões destrutivas no ar e equilibrar o uso do espectro, o Modo 2 impõe que o terminal realize um sensoriamento prévio do canal (\textit{Channel Sensing}), escutando o ambiente por uma janela de tempo determinada para avaliar a disponibilidade de blocos livres antes de efetuar a transmissão \cite{garcia2021}.
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.78, transform shape]
+
+% ==============================
+% CALÇADA SUPERIOR (onde fica a torre)
+% ==============================
+\fill[brown!8] (-7.5, 1.6) rectangle (8.5, 2.1);
+\draw[brown!30, thick] (-7.5, 1.6) -- (8.5, 1.6);
+% Meio-fio
+\fill[gray!35] (-7.5, 1.55) rectangle (8.5, 1.65);
+
+% ==============================
+% ESTRADA (duas faixas)
+% ==============================
+\fill[gray!20] (-7.5, -1.2) rectangle (8.5, 1.55);
+% Bordas da estrada
+\draw[gray!45, line width=1.5pt] (-7.5, 1.55) -- (8.5, 1.55);
+\draw[gray!45, line width=1.5pt] (-7.5, -1.2) -- (8.5, -1.2);
+% Faixa central tracejada (amarela)
+\foreach \x in {-7.2, -5.6, -4.0, -2.4, -0.8, 0.8, 2.4, 4.0, 5.6, 7.2} {
+    \draw[yellow!70!orange, line width=2.2pt] (\x, 0.17) -- (\x+1.0, 0.17);
+}
+
+% ==============================
+% CALÇADA INFERIOR (onde fica o pedestre)
+% ==============================
+\fill[brown!8] (-7.5, -2.2) rectangle (8.5, -1.2);
+% Meio-fio
+\fill[gray!35] (-7.5, -1.15) rectangle (8.5, -1.25);
+% Faixa de pedestre (crosswalk) à direita
+\foreach \y in {-1.15, -0.9, -0.65, -0.4, -0.15, 0.1, 0.35, 0.6, 0.85, 1.1, 1.35} {
+    \fill[white, opacity=0.6] (6.3, \y) rectangle (7.0, \y+0.15);
+}
+
+% ==============================
+% VEÍCULO 1 — Faixa superior (indo para a direita →)
+% ==============================
+% Sombra sutil
+\fill[black, opacity=0.06, rounded corners=3pt] (-5.55, 0.48) rectangle (-2.35, 1.38);
+% Corpo principal
+\fill[blue!18, rounded corners=4pt] (-5.5, 0.55) rectangle (-2.4, 1.35);
+\draw[blue!65!black, thick, rounded corners=4pt] (-5.5, 0.55) rectangle (-2.4, 1.35);
+% Cabine / Teto
+\fill[blue!10, rounded corners=3pt] (-4.85, 1.35) rectangle (-3.05, 1.95);
+\draw[blue!65!black, thick, rounded corners=3pt] (-4.85, 1.35) rectangle (-3.05, 1.95);
+% Janela traseira
+\fill[cyan!18] (-4.7, 1.43) rectangle (-4.0, 1.82);
+\draw[cyan!45, thin] (-4.7, 1.43) rectangle (-4.0, 1.82);
+% Janela dianteira
+\fill[cyan!18] (-3.9, 1.43) rectangle (-3.2, 1.82);
+\draw[cyan!45, thin] (-3.9, 1.43) rectangle (-3.2, 1.82);
+% Farol traseiro
+\fill[red!50] (-5.5, 0.75) rectangle (-5.35, 1.0);
+% Farol dianteiro
+\fill[yellow!60] (-2.55, 0.75) rectangle (-2.4, 1.0);
+% Rodas
+\fill[black!80] (-4.85, 0.55) circle (0.22);
+\fill[gray!50] (-4.85, 0.55) circle (0.10);
+\fill[black!80] (-3.05, 0.55) circle (0.22);
+\fill[gray!50] (-3.05, 0.55) circle (0.10);
+% Antena veicular
+\draw[blue!65!black, thick] (-3.95, 1.95) -- (-3.95, 2.35);
+\fill[blue!65!black] (-3.95, 2.35) circle (0.06);
+\node (v1_ant) at (-3.95, 2.35) {};
+% Label
+\node[font=\footnotesize\bfseries, text=blue!65!black, fill=white, inner sep=1.5pt, rounded corners=2pt, opacity=0.85, text opacity=1] at (-3.95, 0.95) {Veículo 1};
+
+% ==============================
+% VEÍCULO 2 — Faixa inferior (indo para a esquerda ←)
+% ==============================
+% Sombra sutil
+\fill[black, opacity=0.06, rounded corners=3pt] (1.95, -1.12) rectangle (5.15, -0.22);
+% Corpo principal
+\fill[green!15, rounded corners=4pt] (2.0, -1.05) rectangle (5.1, -0.25);
+\draw[green!55!black, thick, rounded corners=4pt] (2.0, -1.05) rectangle (5.1, -0.25);
+% Cabine / Teto
+\fill[green!8, rounded corners=3pt] (2.65, -0.25) rectangle (4.45, 0.35);
+\draw[green!55!black, thick, rounded corners=3pt] (2.65, -0.25) rectangle (4.45, 0.35);
+% Janela traseira
+\fill[cyan!18] (3.7, -0.17) rectangle (4.3, 0.22);
+\draw[cyan!45, thin] (3.7, -0.17) rectangle (4.3, 0.22);
+% Janela dianteira
+\fill[cyan!18] (2.8, -0.17) rectangle (3.6, 0.22);
+\draw[cyan!45, thin] (2.8, -0.17) rectangle (3.6, 0.22);
+% Farol traseiro (lado direito do carro, pois vai ←)
+\fill[red!50] (5.0, -0.85) rectangle (5.1, -0.6);
+% Farol dianteiro
+\fill[yellow!60] (2.0, -0.85) rectangle (2.15, -0.6);
+% Rodas
+\fill[black!80] (2.65, -1.05) circle (0.22);
+\fill[gray!50] (2.65, -1.05) circle (0.10);
+\fill[black!80] (4.45, -1.05) circle (0.22);
+\fill[gray!50] (4.45, -1.05) circle (0.10);
+% Antena veicular
+\draw[green!55!black, thick] (3.55, 0.35) -- (3.55, 0.75);
+\fill[green!55!black] (3.55, 0.75) circle (0.06);
+\node (v2_ant) at (3.55, 0.75) {};
+% Label
+\node[font=\footnotesize\bfseries, text=green!55!black, fill=white, inner sep=1.5pt, rounded corners=2pt, opacity=0.85, text opacity=1] at (3.55, -0.65) {Veículo 2};
+
+% ==============================
+% PEDESTRE (V2P) — na calçada inferior
+% ==============================
+% Cabeça
+\fill[orange!65!black] (6.65, -1.4) circle (0.22);
+% Pescoço
+\draw[orange!65!black, line width=1.5pt] (6.65, -1.62) -- (6.65, -1.68);
+% Tronco
+\draw[orange!65!black, line width=2pt] (6.65, -1.68) -- (6.65, -2.35);
+% Braço esquerdo (segurando smartphone)
+\draw[orange!65!black, line width=1.3pt] (6.65, -1.85) -- (6.35, -2.05);
+% Braço direito
+\draw[orange!65!black, line width=1.3pt] (6.65, -1.85) -- (6.95, -2.15);
+% Perna esquerda
+\draw[orange!65!black, line width=1.5pt] (6.65, -2.35) -- (6.45, -2.85);
+% Perna direita (passo)
+\draw[orange!65!black, line width=1.5pt] (6.65, -2.35) -- (6.85, -2.85);
+% Smartphone
+\fill[gray!70, rounded corners=1pt] (6.18, -2.15) rectangle (6.38, -1.95);
+\draw[cyan!50, thin] (6.2, -2.13) rectangle (6.36, -1.97);
+\node (ped) at (6.65, -1.2) {};
+\node[font=\scriptsize\bfseries, text=orange!65!black, anchor=north] at (6.65, -2.85) {Pedestre (UE)};
+
+% ==============================
+% TORRE gNB — sobre a calçada superior
+% ==============================
+% Base da torre (concreto)
+\fill[gray!30, rounded corners=1pt] (-0.5, 2.1) rectangle (0.5, 2.3);
+% Mastro principal (treliça)
+\fill[gray!45] (-0.18, 2.3) rectangle (0.18, 4.8);
+\draw[gray!55, thick] (-0.18, 2.3) rectangle (0.18, 4.8);
+% Treliças em X
+\foreach \yb in {2.4, 2.9, 3.4, 3.9, 4.4} {
+    \draw[gray!50, thin] (-0.18, \yb) -- (0.18, \yb+0.4);
+    \draw[gray!50, thin] (0.18, \yb) -- (-0.18, \yb+0.4);
+}
+% Barras horizontais
+\foreach \yh in {2.8, 3.3, 3.8, 4.3} {
+    \draw[gray!55, thin] (-0.18, \yh) -- (0.18, \yh);
+}
+% Plataforma superior
+\fill[gray!40] (-0.6, 4.8) rectangle (0.6, 4.9);
+% Antenas setorizadas (três painéis)
+\draw[thick, fill=green!20, rounded corners=1pt] (-0.7, 4.9) rectangle (-0.35, 5.65);
+\draw[green!50!black, thin] (-0.525, 5.0) -- (-0.525, 5.55);
+\draw[thick, fill=green!20, rounded corners=1pt] (-0.15, 4.9) rectangle (0.15, 5.75);
+\draw[green!50!black, thin] (0, 5.0) -- (0, 5.65);
+\draw[thick, fill=green!20, rounded corners=1pt] (0.35, 4.9) rectangle (0.7, 5.65);
+\draw[green!50!black, thin] (0.525, 5.0) -- (0.525, 5.55);
+% Indicadores de radiação (ondas concêntricas)
+\foreach \r in {0.3, 0.5, 0.7} {
+    \draw[green!40!black, thin, opacity=0.4] (-0.525, 5.65) ++(200:\r) arc (200:340:\r);
+}
+\foreach \r in {0.3, 0.5, 0.7} {
+    \draw[green!40!black, thin, opacity=0.4] (0.525, 5.65) ++(200:\r) arc (200:340:\r);
+}
+\node (gnb_top) at (0, 5.85) {};
+% Label gNB
+\node[font=\small\bfseries, text=green!45!black, fill=white, inner sep=2pt, rounded corners=2pt, anchor=south] at (1, 5.95) {gNB};
+
+% ==============================
+% INFRAESTRUTURA (Nuvem + MEC)
+% ==============================
+% Núcleo 5GC (Nuvem)
+\node[draw=gray!60, fill=white, thick, ellipse, minimum width=3.5cm, minimum height=1.5cm, align=center] (core) at (0, 8.5) {\textbf{Núcleo 5GC}};
+
+% Servidor MEC
+\node[draw=orange!75!black, fill=orange!6, thick, rounded corners=4pt, minimum width=2.8cm, minimum height=1.2cm, align=center] (mec) at (-5.0, 7.2) {\small\textbf{Servidor MEC}\\\scriptsize(Computação de Borda)};
+
+% ==============================
+% CONEXÕES DE INFRAESTRUTURA
+% ==============================
+% Core <-> gNB (Interface NG)
+\draw[<->, thick, dashed, gray!55] (core.south) -- node[right, font=\scriptsize, text=gray!50, fill=white, inner sep=1pt] {NG} (gnb_top);
+% MEC <-> gNB
+\draw[<->, thick, dashed, orange!65!black] (mec.south east) -- node[above, font=\scriptsize, text=orange!65!black, sloped, fill=white, inner sep=1pt] {N6 local} ([yshift=0.5cm, xshift=-0.3cm]gnb_top);
+
+% ==============================
+% ENLACES V2I / V2N (Interface Uu) — Azul
+% ==============================
+\draw[<->, line width=1.8pt, blue!60!black] (v1_ant) -- node[left, font=\scriptsize\bfseries, align=center, xshift=-0.2cm, text=blue!60!black, fill=white, inner sep=1.5pt, rounded corners=1pt, opacity=0.9, text opacity=1] {V2I / V2N\\(Interface Uu)} (-0.45, 5.1);
+\draw[<->, line width=1.8pt, blue!60!black] (v2_ant) -- node[right, font=\scriptsize\bfseries, align=center, xshift=0.2cm, text=blue!60!black, fill=white, inner sep=1.5pt, rounded corners=1pt, opacity=0.9, text opacity=1] {V2I / V2N\\(Interface Uu)} (0.45, 5.1);
+
+% ==============================
+% ENLACE V2V (Interface PC5 Sidelink) — Roxo
+% ==============================
+% Linha curva para não se sobrepor a estrada
+\draw[<->, line width=2pt, purple!75!black] (v1_ant) .. controls (-1, 3.0) and (1, 3.0) .. (v2_ant);
+\node[font=\scriptsize\bfseries, text=purple!75!black, fill=white, inner sep=2pt, rounded corners=2pt] at (0, 3.2) {V2V Direto (PC5 Sidelink)};
+
+% ==============================
+% ENLACE V2P (Interface PC5 Sidelink) — Laranja
+% ==============================
+\draw[<->, line width=1.4pt, orange!75!black, densely dashed] (v2_ant) .. controls (5.5, -0.3) and (6.8, -0.5) .. (ped);
+\node[font=\scriptsize\bfseries, text=orange!75!black, fill=white, inner sep=1.5pt, rounded corners=1pt] at (5.8, -0.6) {V2P (PC5)};
+
+% ==============================
+% LEGENDA COMPACTA
+% ==============================
+\node[draw=gray!45, fill=white, thick, rounded corners=5pt, inner sep=6pt, anchor=north west, font=\scriptsize] at (-7.5, -3.3) {
+\begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
+    \textcolor{blue!60!black}{\rule[0.3ex]{1.0cm}{1.8pt}} & Interface Uu (V2I / V2N) \\[3pt]
+    \textcolor{purple!75!black}{\rule[0.3ex]{1.0cm}{2.0pt}} & Interface PC5 --- V2V \\[3pt]
+    \textcolor{orange!75!black}{\rule[0.3ex]{0.4cm}{1.2pt}\hspace{2pt}\rule[0.3ex]{0.4cm}{1.2pt}} & Interface PC5 --- V2P \\[3pt]
+    \textcolor{gray!55}{\rule[0.3ex]{0.4cm}{0.8pt}\hspace{2pt}\rule[0.3ex]{0.4cm}{0.8pt}} & Infraestrutura (NG / N6) \\
+\end{tabular}
+};
+
+% Nota sobre Modos do Sidelink
+\node[draw=purple!30, fill=purple!3, rounded corners=4pt, inner sep=5pt, font=\scriptsize, text=purple!65!black, align=left, anchor=north west] at (1.5, -3.3) {
+    \textbf{Modos de Operação do Sidelink (PC5):}\\[2pt]
+    \textbf{Modo 1:} Alocação centralizada pela gNB\\
+    \textbf{Modo 2:} Sensoriamento autônomo (distribuído)
+};
+
+\end{tikzpicture}
+\Caption{\label{fig:arquitetura_cv2x} Arquitetura das comunicações 5G C-V2X: coexistência da interface celular Uu (V2I/V2N) com a interface direta PC5 \textit{Sidelink} (V2V/V2P), integrando o núcleo 5GC, o servidor MEC de borda e os elementos veiculares e pedestres.}
+\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
+\end{figure}
+
+Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiza a troca de dados em três canais físicos complementares que operam sequencialmente dentro de um mesmo \textit{slot} de transmissão: o \textbf{PSCCH} (\textit{Physical Sidelink Control Channel}), o \textbf{PSSCH} (\textit{Physical Sidelink Shared Channel}), que transporta efetivamente a carga útil de dados e o \textbf{PSFCH} (\textit{Physical Sidelink Feedback Channel}). A Figura~\ref{fig:slot_sidelink} ilustra a coexistência e a multiplexação temporal desses canais dentro de um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=Latex, scale=0.9, transform shape]
+
+% Eixos e bordas do slot
+\draw[thick] (0,0) rectangle (12, 4);
+\node[above, font=\small\bfseries] at (6, 4) {Duração de 1 Slot (14 Símbolos OFDM)};
+\draw[->, thick] (0, -0.5) -- (12, -0.5) node[right, font=\small] {Tempo};
+\draw[->, thick] (-0.5, 0) -- (-0.5, 4) node[above, font=\small] {Frequência};
+
+% Simbolo AGC (Controle de Ganho)
+\filldraw[fill=gray!30, draw=black, thick] (0,0) rectangle (0.8, 4);
+\node[rotate=90, font=\scriptsize] at (0.4, 2) {AGC};
+
+% PSCCH (1º Estágio SCI)
+\filldraw[fill=blue!20, draw=blue!80!black, thick] (0.8, 1.2) rectangle (3.5, 3.5);
+\node[align=center, font=\footnotesize\bfseries, blue!80!black] at (2.15, 2.35) {PSCCH\\(1º Estágio\\SCI)};
+
+% PSSCH (Dados + 2º Estágio SCI)
+\filldraw[fill=cyan!10, draw=cyan!80!black, thick] (0.8, 0) rectangle (9.5, 1.2);
+\filldraw[fill=cyan!10, draw=cyan!80!black, thick] (3.5, 1.2) rectangle (9.5, 4);
+\node[align=center, font=\footnotesize, cyan!80!black] at (6.5, 2.5) {\textbf{PSSCH} \\ (Carga Útil de Dados + 2º Estágio SCI)};
+
+% Símbolo de Guarda (Gap)
+\filldraw[fill=gray!10, draw=black, thick, dashed] (9.5, 0) rectangle (10.2, 4);
+\node[rotate=90, font=\tiny] at (9.85, 2) {Guarda};
+
+% PSFCH (Feedback HARQ)
+\filldraw[fill=red!20, draw=red!80!black, thick] (10.2, 0) rectangle (11.3, 4);
+\node[rotate=90, align=center, font=\footnotesize\bfseries, red!80!black] at (10.75, 2) {PSFCH\\(HARQ)};
+
+% Símbolo de Guarda Final
+\filldraw[fill=gray!10, draw=black, thick, dashed] (11.3, 0) rectangle (12, 4);
+\node[rotate=90, font=\tiny] at (11.65, 2) {Guarda};
+
+\end{tikzpicture}
+\caption{Estrutura temporal básica da camada física em um \textit{slot} do 5G NR \textit{Sidelink}, ilustrando a multiplexação dos canais físicos PSCCH, PSSCH e PSFCH \cite{cox2025, garcia2021}.}
+\label{fig:slot_sidelink}
+\end{figure}
+
+
+O canal de controle (\textbf{PSCCH}) anuncia publicamente a reserva de recursos de tempo e frequência (\gls{PRB}), permitindo aos veículos vizinhos realizarem o sensoriamento do meio para evitar colisões de dados e encontrar blocos de rádio livres para transmissão. Em seguida, o canal compartilhado (\textbf{PSSCH}) transmite a carga útil da aplicação e as instruções para o destinatário processar e responder às requisições. Essas instruções incluem o identificador do emissor, um indicador que avisa ao receptor se o pacote contém novos dados ou é uma retransmissão, o tipo de comunicação (\textit{broadcast}, \textit{unicast} ou \textit{groupcast}), dados geográficos e uma requisição ao receptor sobre as condições físicas do enlace de dados. Por último, o canal de \textit{feedback} (\textbf{PSFCH}) opera confirmando ou não, quase que instantaneamente, o sucesso ou a falha da recepção daquele pacote (ACK/NACK). A Figura~\ref{fig:dinamica_canais_pc5} ilustra essa dinâmica sequencial entre dois veículos.
+
+\begin{figure}[htpb]
+\centering
+\Caption{\label{fig:dinamica_canais_pc5} Dinâmica sequencial de operação dos canais físicos PSCCH, PSSCH e PSFCH na interface PC5 do 5G NR \textit{Sidelink}. A comunicação ocorre em três fases: anúncio de controle, transmissão de dados e confirmação de recepção. Em caso de falha (NACK), o ciclo de dados é repetido via retransmissão HARQ.}
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.82, transform shape]
+
+% ===================== FAIXAS DE FUNDO =====================
+\fill[blue!4, rounded corners=3pt]  (-2.5, -1.0) rectangle (13.5, -3.8);
+\fill[cyan!4, rounded corners=3pt]  (-2.5, -4.0) rectangle (13.5, -8.6);
+\fill[red!4, rounded corners=3pt]   (-2.5, -8.8) rectangle (13.5, -13.0);
+
+% Rótulos laterais
+\node[font=\scriptsize\bfseries, text=blue!70!black, rotate=90] at (-2.2, -2.4) {FASE 1: PSCCH};
+\node[font=\scriptsize\bfseries, text=cyan!70!black, rotate=90] at (-2.2, -6.3) {FASE 2: PSSCH};
+\node[font=\scriptsize\bfseries, text=red!70!black, rotate=90]  at (-2.2, -10.9) {FASE 3: PSFCH};
+
+% Bolinhas numéricas
+\node[circle, draw=blue!70!black, fill=blue!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=blue!80!black] at (-1.2, -1.3) {1};
+\node[circle, draw=cyan!70!black, fill=cyan!10, font=\footnotesize\bfseries, inner sep=1.5pt, text=cyan!80!black] at (-1.2, -4.3) {2};
+\node[circle, draw=red!70!black, fill=red!10, font=\footnotesize\bfseries, inner sep=1.5pt, text=red!80!black]   at (-1.2, -9.1) {3};
+
+% ===================== LIFELINES =====================
+% UE Tx
+\draw[thick, blue!50!black] (0, 0) -- (0, -14.5);
+\node[draw=blue!60!black, fill=blue!15, minimum width=2.4cm, minimum height=0.9cm,
+      rounded corners=2pt, thick, align=center, font=\small\bfseries] at (0, 0.6) {UE Tx\\{\footnotesize (Veículo 1)}};
+
+% Veículos Vizinhos
+\draw[thick, gray!60, dashed] (5.5, 0) -- (5.5, -14.5);
+\node[draw=gray!60, fill=gray!10, minimum width=2.4cm, minimum height=0.9cm,
+      rounded corners=2pt, thick, align=center, font=\small\bfseries, dashed] at (5.5, 0.6) {Vizinhos\\{\footnotesize (Sensoriamento)}};
+
+% UE Rx
+\draw[thick, blue!50!black] (11, 0) -- (11, -14.5);
+\node[draw=blue!60!black, fill=blue!15, minimum width=2.4cm, minimum height=0.9cm,
+      rounded corners=2pt, thick, align=center, font=\small\bfseries] at (11, 0.6) {UE Rx\\{\footnotesize (Veículo 2)}};
+
+% ===================== FASE 1: PSCCH =====================
+% Transmissão process block UE Tx
+\filldraw[fill=blue!20, draw=blue!50!black, thick] (-0.15, -1.3) rectangle (0.15, -2.1);
+
+% Seta broadcast SCI-1
+\draw[->, blue!70!black, very thick] (0.15, -1.5) -- node[above, font=\scriptsize\bfseries, text=blue!70!black, align=center]
+      {SCI 1\textsuperscript{o} Est\'{a}gio (\textit{broadcast})}  (10.8, -1.5);
+\node[font=\tiny, text=blue!80!black, align=center, fill=blue!4, inner sep=1pt] at (5.3, -2.12) {Reserva de PRBs + Modula\c{c}\~{a}o + Prioridade};
+\draw[->, blue!70!black, thick, dotted] (0.15, -1.9) -- (5.35, -1.9);
+
+% Vizinhos decodificam
+\filldraw[fill=gray!20, draw=gray!50, thick] (5.35, -2.3) rectangle (5.65, -3.3);
+\node[draw=gray!50, fill=white, rounded corners=2pt, font=\tiny, align=left,
+      inner sep=3pt] at (7.8, -2.8) {Sensoriamento contínuo:\\$\rightarrow$ Evita colis\~{a}o\\$\rightarrow$ Marca PRBs ocupados};
+\draw[-, gray!50, thin] (5.65, -2.8) -- (6.0, -2.8);
+
+% ===================== FASE 2: PSSCH =====================
+\filldraw[fill=cyan!20, draw=cyan!50!black, thick] (-0.15, -4.5) rectangle (0.15, -6.0);
+
+% Seta de dados
+\draw[->, cyan!70!black, very thick] (0.15, -4.7) -- node[above, font=\scriptsize\bfseries, text=cyan!70!black, align=center]
+      {Bloco de Transporte (Carga \'{U}til)} (10.8, -4.7);
+
+% Seta SCI-2
+\draw[->, cyan!60!black, thick] (0.15, -5.7) -- node[above, font=\scriptsize, text=cyan!70!black, align=center]
+      {SCI 2\textsuperscript{o} Est\'{a}gio (\textit{unicast}/\textit{groupcast})}  (10.8, -5.7);
+
+% Detalhes do SCI-2
+\node[draw=cyan!50!black, fill=white, rounded corners=2pt, font=\tiny, align=left,
+      inner sep=3pt] at (5.5, -7.2) {%
+\textbf{Parâmetros do Enlace:}\\
+$\cdot$ ID transmissor / receptor\\
+$\cdot$ NDI (Novo dado ou retransmissão)\\
+$\cdot$ Dados do processo HARQ\\
+$\cdot$ Requisi\c{c}\~{a}o de \textit{feedback} CSI};
+\draw[->, cyan!50!black, thin] (5.5, -6.0) -- (5.5, -6.3);
+
+% UE Rx processa
+\filldraw[fill=blue!20, draw=blue!50!black, thick] (10.85, -6.2) rectangle (11.15, -8.0);
+\node[draw=blue!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
+      inner sep=2pt] at (9.0, -7.1) {Decodifica e\\avalia pacote};
+\draw[-, blue!50!black, thin] (10.85, -7.1) -- (9.8, -7.1);
+
+% ===================== FASE 3: PSFCH =====================
+\filldraw[fill=red!20, draw=red!50!black, thick] (10.85, -9.1) rectangle (11.15, -11.5);
+
+% Decisão visual
+\node[font=\footnotesize\bfseries, text=gray!70!black] at (11, -8.7) {Decisão};
+
+% Caso SUCESSO (ACK)
+\draw[<-, green!60!black, very thick] (0.15, -9.5) -- node[above, font=\scriptsize\bfseries, text=green!60!black]
+      {ACK -- Recep\c{c}\~{a}o bem-sucedida} (10.85, -9.5);
+\node[draw=green!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
+      inner sep=2pt] at (2.0, -10.2) {Sucesso!\\Libera recursos};
+
+% OU lógico
+\node[font=\footnotesize\bfseries, text=red!60!black] at (5.5, -10.4) {OU};
+
+% Caso FALHA (NACK)
+\draw[<-, red!70!black, very thick, dashed] (0.15, -11.3) -- node[above, font=\scriptsize\bfseries, text=red!70!black]
+      {NACK -- Falha na decodifica\c{c}\~{a}o} (10.85, -11.3);
+\node[draw=red!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
+      inner sep=2pt] at (2.0, -12.1) {Retransmiss\~{a}o\\agendada};
+
+% ===================== RETRANSMISSÃO (loop) =====================
+\filldraw[fill=orange!20, draw=orange!60!black, thick] (-0.15, -11.3) rectangle (0.15, -13.0);
+\draw[->, red!50, thick, dashed, out=180, in=180, looseness=1.5] (-0.15, -12.5) to
+      node[left, font=\tiny, text=red!50, align=center] {Volta ao\\passo 2} (-0.15, -5.0);
+
+% Separadores visuais
+\draw[gray!30, thick, dashed] (-2.5, -3.8) -- (13.5, -3.8);
+\draw[gray!30, thick, dashed] (-2.5, -8.6) -- (13.5, -8.6);
+
+% Eixo temporal
+\draw[->, thick, gray!80] (13.2, 0.5) -- (13.2, -14.5) node[below, font=\small\bfseries, text=gray!70!black] {Eixo do Tempo};
+
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
+\end{figure}
+
+
+
+% Com o fluxo de comunicação compreendido de ponta a ponta, as especificidades e papéis de cada canal são detalhados a seguir:
+
+% \begin{itemize}
+%     \item \textbf{PSCCH (\textit{Physical Sidelink Control Channel}):} Responsável por carregar o \textbf{primeiro estágio} da Informação de Controle do Sidelink (SCI). Ele possui um tamanho fixo e anuncia a alocação de recursos, modulação e a prioridade da transmissão iminente. O particionamento do SCI no 5G NR permite que veículos vizinhos realizem o sensoriamento do canal decodificando apenas este pequeno estágio, reduzindo drasticamente a complexidade de processamento \cite{garcia2021, cox2025}.
+    
+%     \item \textbf{PSSCH (\textit{Physical Sidelink Shared Channel}):} Canal principal que transporta a carga útil de dados (Blocos de Transporte) das aplicações veiculares. Adicionalmente, transporta o \textbf{segundo estágio} do SCI, contendo o identificador do veículo de origem, de destino e os dados do processo HARQ, sendo decodificado apenas pelos veículos diretamente endereçados na comunicação \cite{garcia2021}.
+    
+%     \item \textbf{PSFCH (\textit{Physical Sidelink Feedback Channel}):} Uma adição crucial do 5G NR para garantir a ultraconfiabilidade (URLLC). Ele transporta as confirmações do protocolo HARQ (ACK/NACK), informando imediatamente o transmissor em caso de corrupção do pacote. Em comunicações \textit{groupcast} (como pelotões), o PSFCH pode operar com \textit{feedbacks} baseados em distância -- onde apenas veículos próximos que não entenderam a mensagem transmitem falha (NACK) -- otimizando severamente o uso do espectro e a latência de retransmissão \cite{cox2025, garcia2021}.
+% \end{itemize}
+
 
 
 % ==============================================================================
 % 2.2 MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G NR
 % ==============================================================================
 
-\subsection{Modelagem de Desempenho e Latência em Redes 5G NR}
-\label{sec:modelagem_latencia}
+\section{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_v2x}
 
 A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação em cenários de missão crítica (\textit{worst-case}), é imprescindível formular os modelos de propagação estocásticos, as restrições matemáticas de latência e suas respectivas integrações computacionais.
 
@@ -983,27 +1368,165 @@ Além do bloqueio físico, a operação no Modo 2 do Sidelink não conta com um 
 
 \begin{figure}[htpb]
 \centering
-\Caption{\label{fig:worst_case_v2x_math} Representação topológica dos piores cenários V2I e V2X. O V2I experimenta sombreamento predial severo. O C-V2X (Sidelink) experimenta atenuação por bloqueio dinâmico ($A_{block}$), acionando o canal PSFCH para \textit{feedback} de erros.}
-\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.95]
-% Infraestrutura
-\node[draw, fill=orange!20, minimum width=2.5cm, minimum height=1.2cm, align=center, rounded corners] (mec) at (0, 5.5) {\textbf{Servidor MEC}\\(Baixa Latência E2E)};
-\node[draw, fill=gray!20, minimum width=1cm, minimum height=2.5cm] (mast) at (-4.5, 2.5) {};
-\node[draw, fill=green!30, regular polygon, regular polygon sides=3, inner sep=1pt, rotate=180] (ant) at (-4.5, 4.5) {gNB};
-\draw[<->, thick, blue] (ant.north) |- node[near end, above, font=\footnotesize] {Backhaul ideal} (mec.west);
-% Veículos
-\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue1) at (-2, 0) {\textbf{UE 1 (Tx)}};
-\node[draw, fill=blue!15, minimum width=2cm, minimum height=1cm, rounded corners] (ue2) at (4, 0) {\textbf{UE 2 (Rx)}};
-% Obstáculos do Pior Cenário
-\node[draw, fill=gray!50, minimum width=1.5cm, minimum height=2.5cm, align=center] (building) at (-3, 1.5) {Prédio\\UMi NLOS};
-\node[draw, fill=red!30, minimum width=2.2cm, minimum height=1.5cm, rounded corners, align=center] (truck) at (1, 0) {Caminhão\\$A_{block}$};
-% Enlaces
-\draw[->, thick, dashed, orange!80!black] (ant.east) -- node[above, sloped, font=\footnotesize] {V2I (Uu) - Erro Alto} (building.north west);
-\draw[->, thick, dashed, orange!80!black] (building.east) -- (ue1.north);
-\draw[->, thick, purple] (ue1.east) -- node[above, font=\footnotesize] {PC5 Modo 2} (ue2.west);
-\node[text=purple, font=\scriptsize, align=center] at (1, -1.5) {Difração ($PL_{NLOSv}$) + \\ Interferência $I_{SL}$};
-\draw[<-, thick, dotted, purple] ([yshift=-0.3cm]ue1.east) -- node[below, font=\scriptsize] {HARQ NACK (PSFCH)} ([yshift=-0.3cm]ue2.west);
+\Caption{\label{fig:worst_case_v2x_math} Representação topológica dos piores cenários V2I e V2X. O enlace V2I (Uu) experimenta sombreamento predial severo (UMi NLOS). O enlace C-V2X (Sidelink PC5) experimenta atenuação por bloqueio dinâmico ($A_{block}$) de veículos pesados, acionando o canal PSFCH para \textit{feedback} de erros e retransmissão HARQ lateral.}
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.82, transform shape]
+
+% ===================== PISO / VIA URBANA =====================
+% Calçada superior
+\fill[gray!15] (-2, 1.2) rectangle (14, 2.0);
+\draw[gray!40, thick] (-2, 2.0) -- (14, 2.0);
+% Pista
+\fill[gray!25] (-2, -0.8) rectangle (14, 1.2);
+% Linha tracejada central da via
+\draw[white, thick, dashed] (-2, 0.2) -- (14, 0.2);
+% Calçada inferior
+\fill[gray!15] (-2, -1.6) rectangle (14, -0.8);
+\draw[gray!40, thick] (-2, -0.8) -- (14, -0.8);
+
+% ===================== PRÉDIO (UMi NLOS) =====================
+% Corpo principal
+\fill[gray!45] (-1.6, 2.0) rectangle (0.8, 6.5);
+\draw[gray!70, thick] (-1.6, 2.0) rectangle (0.8, 6.5);
+% Janelas (grade 2x5)
+\foreach \yy in {2.6, 3.4, 4.2, 5.0, 5.8} {
+  \fill[cyan!25] (-1.2, \yy) rectangle (-0.7, {\yy+0.5});
+  \draw[gray!60] (-1.2, \yy) rectangle (-0.7, {\yy+0.5});
+  \fill[cyan!25] (0.0, \yy) rectangle (0.5, {\yy+0.5});
+  \draw[gray!60] (0.0, \yy) rectangle (0.5, {\yy+0.5});
+}
+% Rótulo
+\node[font=\footnotesize\bfseries, text=gray!80!black, align=center, rotate=90] at (-0.4, 4.3) {Prédio};
+\node[font=\scriptsize, text=gray!70, align=center] at (-0.4, 2.35) {UMi NLOS};
+
+% ===================== TORRE gNB =====================
+% Mastro treliçado
+\fill[gray!30] (3.8, 2.0) rectangle (4.2, 7.0);
+\draw[gray!60, thick] (3.8, 2.0) -- (3.8, 7.0);
+\draw[gray!60, thick] (4.2, 2.0) -- (4.2, 7.0);
+% Treliça
+\foreach \yy in {2.0, 2.5,...,6.5} {
+  \draw[gray!50, thin] (3.8, \yy) -- (4.2, {\yy+0.5});
+  \draw[gray!50, thin] (4.2, \yy) -- (3.8, {\yy+0.5});
+}
+% Antena setor (triângulo apontando para baixo-esquerda)
+\fill[green!50!black] (4.0, 7.0) -- (3.2, 7.8) -- (4.8, 7.8) -- cycle;
+\draw[green!70!black, thick] (4.0, 7.0) -- (3.2, 7.8) -- (4.8, 7.8) -- cycle;
+% Radiação da antena
+\draw[green!40, thick, dashed] (3.2, 7.8) .. controls (2.0, 8.6) and (1.0, 8.6) .. (0.5, 8.2);
+\draw[green!40, thick, dashed] (4.8, 7.8) .. controls (6.0, 8.6) and (7.0, 8.6) .. (7.5, 8.2);
+% Rótulo gNB
+\node[font=\small\bfseries, text=green!50!black] at (4.0, 8.2) {gNB};
+
+% ===================== SERVIDOR MEC =====================
+\node[draw=orange!70!black, fill=orange!10, minimum width=3.0cm, minimum height=1.1cm,
+      align=center, rounded corners=4pt, thick, font=\small] (mec) at (9.0, 8.0)
+      {\textbf{Servidor MEC}\\{\footnotesize (Baixa Latência E2E)}};
+
+% Backhaul gNB -> MEC
+\draw[<->, blue!70!black, very thick] (4.8, 7.8) -- node[above, font=\footnotesize, text=blue!70!black] {\textit{Backhaul} fibra} (mec.west);
+
+% ===================== VEÍCULO 1 (Tx) =====================
+% Corpo do carro
+\fill[blue!25] (1.5, -0.5) rectangle (3.8, 0.5);
+\draw[blue!60!black, thick, rounded corners=2pt] (1.5, -0.5) rectangle (3.8, 0.5);
+% Cabine
+\fill[blue!15] (2.0, 0.5) -- (2.4, 1.0) -- (3.4, 1.0) -- (3.8, 0.5) -- cycle;
+\draw[blue!60!black, thick] (2.0, 0.5) -- (2.4, 1.0) -- (3.4, 1.0) -- (3.8, 0.5);
+% Vidro
+\fill[cyan!20] (2.15, 0.55) -- (2.5, 0.92) -- (3.3, 0.92) -- (3.65, 0.55) -- cycle;
+% Rodas
+\fill[gray!70] (2.0, -0.5) circle (0.22);
+\fill[gray!70] (3.3, -0.5) circle (0.22);
+% Antena
+\draw[red!70!black, thick] (3.2, 1.0) -- (3.2, 1.4);
+\fill[red!70!black] (3.2, 1.4) circle (0.06);
+% Rótulo
+\node[font=\footnotesize\bfseries, text=blue!70!black] at (2.65, -1.1) {UE$_1$ (Tx)};
+
+% ===================== CAMINHÃO OBSTRUTOR =====================
+% Carroceria (grande, bloqueia visão)
+\fill[red!15] (6.5, -0.6) rectangle (9.0, 1.6);
+\draw[red!60!black, thick, rounded corners=1pt] (6.5, -0.6) rectangle (9.0, 1.6);
+% Hachurado para destacar obstrução
+\foreach \xx in {6.7, 7.1,...,8.9} {
+  \draw[red!30, thin] (\xx, -0.6) -- ({\xx+0.3}, 1.6);
+}
+% Cabine do caminhão
+\fill[red!25] (6.0, -0.6) rectangle (6.5, 0.8);
+\draw[red!60!black, thick] (6.0, -0.6) rectangle (6.5, 0.8);
+% Rodas
+\fill[gray!70] (6.8, -0.6) circle (0.25);
+\fill[gray!70] (8.6, -0.6) circle (0.25);
+\fill[gray!70] (6.3, -0.6) circle (0.2);
+% Rótulo caminhão
+\node[font=\footnotesize\bfseries, text=red!70!black, align=center] at (7.75, 0.5) {Caminhão\\Obstrutor};
+\node[font=\scriptsize, text=red!60!black] at (7.75, -0.2) {$A_{block}$};
+
+% ===================== VEÍCULO 2 (Rx) =====================
+% Corpo
+\fill[blue!25] (10.5, -0.5) rectangle (12.8, 0.5);
+\draw[blue!60!black, thick, rounded corners=2pt] (10.5, -0.5) rectangle (12.8, 0.5);
+% Cabine
+\fill[blue!15] (11.0, 0.5) -- (11.4, 1.0) -- (12.4, 1.0) -- (12.8, 0.5) -- cycle;
+\draw[blue!60!black, thick] (11.0, 0.5) -- (11.4, 1.0) -- (12.4, 1.0) -- (12.8, 0.5);
+% Vidro
+\fill[cyan!20] (11.15, 0.55) -- (11.5, 0.92) -- (12.3, 0.92) -- (12.65, 0.55) -- cycle;
+% Rodas
+\fill[gray!70] (11.0, -0.5) circle (0.22);
+\fill[gray!70] (12.3, -0.5) circle (0.22);
+% Antena
+\draw[red!70!black, thick] (12.2, 1.0) -- (12.2, 1.4);
+\fill[red!70!black] (12.2, 1.4) circle (0.06);
+% Rótulo
+\node[font=\footnotesize\bfseries, text=blue!70!black] at (11.65, -1.1) {UE$_2$ (Rx)};
+
+% ===================== ENLACE V2I (Uu) - SOMBREADO =====================
+% Sinal do UE1 tentando chegar ao gNB, bloqueado pelo prédio
+\draw[->, orange!80!black, very thick, dashed]
+  (3.2, 1.4) .. controls (2.5, 3.5) and (1.5, 5.5) .. (0.6, 5.8);
+\node[font=\tiny, text=orange!80!black, fill=white, inner sep=1pt, rotate=-55] at (2.1, 3.8) {Sombreamento severo};
+
+% X vermelho sobre o prédio indicando bloqueio
+\node[font=\Large\bfseries, text=red!70] at (0.0, 5.5) {$\boldsymbol{\times}$};
+
+% Seta pontilhada do gNB ao MEC (caminho real quando funciona)
+\draw[->, orange!50, thick, dotted] (3.0, 1.4) .. controls (3.5, 4.0) and (3.8, 5.5) .. (3.9, 6.9);
+\node[font=\scriptsize, text=orange!70!black, align=center, fill=white, inner sep=1pt] at (1.8, 4.2) {V2I (Uu)\\$X_\sigma$, NLOS};
+
+% ===================== ENLACE PC5 SIDELINK (Modo 2) =====================
+% Seta principal de dados: UE1 -> UE2 (bloqueado pelo caminhão)
+\draw[->, purple!80!black, very thick]
+  (3.8, 0.0) -- node[above, font=\footnotesize\bfseries, yshift=6pt, text=purple!80!black] {PC5 Sidelink (Modo 2)} (6.0, 0.0);
+% Seta tracejada passando sobre/ao redor do caminhão (difração)
+\draw[->, purple!60, thick, dashed]
+  (3.8, 0.3) .. controls (5.5, 2.8) and (8.5, 2.8) .. (10.5, 0.3);
+\node[font=\scriptsize, text=purple!70!black, fill=white, inner sep=1pt, align=center] at (7.2, 2.9) {Difração\\$PL_{NLOSv}(d)$};
+
+% X vermelho sobre o caminhão indicando bloqueio direto
+\node[font=\Large\bfseries, text=red!70] at (7.75, 1.2) {$\boldsymbol{\times}$};
+
+% Seta de feedback HARQ (PSFCH): UE2 -> UE1
+\draw[<-, purple!60!black, thick, dotted]
+  (3.8, -0.3) .. controls (5.5, -2.0) and (8.5, -2.0) .. (10.5, -0.3);
+\node[font=\scriptsize\bfseries, text=purple!60!black, fill=white, inner sep=1pt, align=center] at (7.2, -2.1) {HARQ NACK (PSFCH)\\$N_{harq} \times T_{RTT}$};
+
+% Anotação: Interferência co-canal
+\node[draw=red!50!black, fill=red!5, rounded corners=3pt, font=\scriptsize,
+      align=center, inner sep=3pt, thick] at (12.5, 2.6)
+      {Interferência\\Intra-Sidelink\\$I_{SL} \gg N_0 B$};
+\draw[->, red!50!black, thick] (12.5, 2.1) -- (12.2, 1.45);
+
+% ===================== LEGENDA =====================
+\node[draw=gray!60, fill=white, rounded corners=3pt, inner sep=5pt,
+      font=\scriptsize, align=left] at (12.0, 5.5) {%
+\tikz\draw[->, orange!80!black, very thick, dashed] (0,0) -- (0.7,0); Enlace Uu (V2I)\\[2pt]
+\tikz\draw[->, purple!80!black, very thick] (0,0) -- (0.7,0); Enlace PC5 (V2V)\\[2pt]
+\tikz\draw[->, purple!60!black, thick, dotted] (0,0) -- (0.7,0); Feedback PSFCH\\[2pt]
+\tikz\node[font=\bfseries, text=red!70] {$\times$}; Bloqueio / NLOS%
+};
+
 \end{tikzpicture}
-\Fonte{Elaborado pelo autor}
+\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
 \end{figure}
 
 % ------------------------------------------------------------------------------
