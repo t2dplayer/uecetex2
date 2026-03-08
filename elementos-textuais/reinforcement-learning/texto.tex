@@ -1,577 +1,229 @@
-Nesta subseção, apresentam-se os conceitos fundamentais sobre aprendizado por reforço (\textit{Reinforcement Learning} – RL), destacando as características que tornam esse paradigma adequado à resolução de problemas com premissas dinâmicas.
+\section*{Fundamentos}
 
-Inicialmente, é importante distinguir os conceitos de \textit{algoritmo} e \textit{modelo}. Na computação clássica, um algoritmo consiste em uma sequência finita de instruções lógicas destinadas a converter entradas em uma solução determinada explicitamente. Contudo, no Aprendizado de Máquina (\textit{Machine Learning} - ML), o processo torna-se indutivo, algoritmos são utilizados para processar grandes volumes de dados (\textit{datasets}) e extrair correlações intrínsecas, muitas vezes complexas demais para a análise humana direta. 
+O \gls{RL} é um paradigma de \gls{ML} onde o treinamento dos modelos se dá com a interação direta com o ambiente através de ações e a observação da recompensa ou penalização por tal ato \cite{sutton2018}. Nela, o agente (aquele que procura aprender as relações intrínsecas do problema que se busca resolver) não tem acesso a nenhum supervisor que indique qual a melhor ação a ser tomada, e nem mesmo a um conjunto de dados de partida rotulados para que ele possa analisar e buscar reconhecer padrões \cite{hu2024, sutton2018}.
 
-O produto desse esforço computacional é o \textit{modelo}, que é     uma representação das relações aprendidas, capaz de generalizar o conhecimento para inferir respostas a partir de novos dados. Com base na natureza dessa interação, as soluções de ML classificam-se em três paradigmas fundamentais: aprendizado supervisionado, não-supervisionado e aprendizado por reforço.
+De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um ciclo de interação contínua entre o agente e o ambiente, dinâmica que pode ser observada na Figura \ref{fig:rl_loop} \cite{hu2024, sutton2018}. Embora esse mecanismo iterativo de tentativa e erro seja conceitualmente simples, ele serve de base para o desenvolvimento de modelos de \gls{IA} capazes de resolver problemas complexos de tomada de decisão em áreas desafiadoras, como robótica, condução autônoma e jogos de alto desempenho \cite{hu2024}. Além disso, essa mesma interação tem sido fundamental para auxiliar no treinamento e alinhamento de \glspl{LLM}, empregando algoritmos de otimização de políticas aliados ao \gls{RLHF} para refinar e instruir sistemas avançados, a exemplo do InstructGPT e do ChatGPT \cite{ouyang2022, hu2024}.
 
-O paradigma supervisionado assemelha-se intuitivamente ao aprendizado guiado por um ``tutor''. Dispõe-se de um conjunto de dados, composto por variáveis preditoras (entradas) e suas respectivas variáveis-alvo (saídas desejadas) fornecidas pela ``tutor'', permitindo que o algoritmo aprenda a relação entre entrada e saída.
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.9, transform shape]
 
-O objetivo é criar um modelo que minimize a discrepância (erro) entre a resposta predita e a variável-alvo. A Tabela \ref{tab:exemplo_supervisionado} exemplifica um conjunto de dados composto por múltiplos previsores ($x_1, \dots, x_n$) e uma variável-alvo (rótulo) ($y$).
+% Faixas de fundo
+\fill[blue!5, rounded corners=4pt]  (-4.5, 0.6) rectangle (4.5, -1.4);
+\fill[green!5, rounded corners=4pt] (-4.5, -2.6) rectangle (4.5, -4.6);
 
-\begin{table}[htbp]
-    \centering
-    \UECEtab{
-        \caption{Exemplo de conjunto de dados supervisionado com múltiplos previsores e um alvo.}
-        \label{tab:exemplo_supervisionado}
-    }{
-        \begin{tabular*}{0.85\textwidth}{@{\extracolsep{\fill}}cccc}
-            \toprule
-            \textbf{Previsor 1 ($x_1$)} & \textbf{$\dots$} & \textbf{Previsor $n$ ($x_n$)} & \textbf{Alvo ($y$)} \\
-            \midrule
-            1.0 & $\dots$ & 0.5 & 2.2 \\
-            2.0 & $\dots$ & 1.2 & 2.8 \\
-            3.0 & $\dots$ & 1.8 & 4.2 \\
-            $\vdots$ & $\ddots$ & $\vdots$ & $\vdots$ \\
-            5.0 & $\dots$ & 3.1 & 6.1 \\
-            \bottomrule
-        \end{tabular*}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{table}
+% Separador
+\draw[gray!30, thick, dashed] (-4.5, -2.0) -- (4.5, -2.0);
 
-A relação entre as variáveis preditoras e a variável-alvo pode ser visualizada através da Figura \ref{fig:exemplo_regressao} e nela são exibidos os dados e a reta de regressão ajustada. A linha representa a tendência aprendida que minimiza a distância média para os pontos observados. Vale ressaltar que, para fins de visualização gráfica (Figura \ref{fig:exemplo_regressao}), utilizou-se apenas uma variável preditora.
+% Nós principais
+\node[draw=blue!60!black, fill=blue!12, minimum width=4.5cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (agent) at (0, -0.4) {Agente\\{\footnotesize Observa o estado e escolhe uma ação}};
 
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Regressão linear simples: Dados observados (pontos) e reta de regressão ($y \approx x + 1$) ajustada pelo modelo supervisionado.}
-        \label{fig:exemplo_regressao}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.8\textwidth,
-                height=7cm,
-                xlabel={Previsor ($x$)},
-                ylabel={Alvo ($y$)},
-                grid=major,
-                legend pos=north west,
-                legend style={draw=none},
-                thick
-            ]
-                % Scatter Plot (Dados)
-                \addplot[
-                    only marks,
-                    mark=*,
-                    color=black,
-                    mark size=2.5pt
-                ] coordinates {
-                    (1.0, 2.2)
-                    (2.0, 2.8)
-                    (3.0, 4.2)
-                    (4.0, 4.8)
-                    (5.0, 6.1)
-                };
-                \addlegendentry{Dados Reais}
+\node[draw=green!60!black, fill=green!12, minimum width=4.5cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (env) at (0, -3.6) {Ambiente\\{\footnotesize Executa a ação e retorna o resultado}};
 
-                % Linha de Regressão
-                \addplot[
-                    color=black!70,
-                    domain=0.5:5.5,
-                    samples=2,
-                    thick
-                ] {1.0*x + 1.0}; % y = x + 1 (Aprox)
-                \addlegendentry{Linha de Regressão}
-                
-                % Ilustração dos resíduos (opcional, para didática)
-                \draw[dashed, gray] (axis cs:3.0, 4.0) -- (axis cs:3.0, 4.2);
+% Seta: Agente -> Ambiente (Ação)
+\draw[->, blue!60!black, very thick] (agent.east) -- ++(2.0,0) |- node[pos=0.25, right, font=\small\bfseries, text=blue!60!black] {Ação} (env.east);
 
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
+% Seta: Ambiente -> Agente (Estado + Recompensa)
+\draw[->, green!60!black, very thick] (env.west) -- ++(-2.0,0) |- node[pos=0.25, left, align=center, font=\small\bfseries, text=green!60!black] {Novo Estado\\Recompensa} (agent.west);
+
+\end{tikzpicture}
+\caption{Ciclo básico de interação Agente-Ambiente no \gls{RL}. A cada passo, o agente observa o estado atual, escolhe uma ação, e o ambiente responde com uma recompensa e um novo estado.}
+\label{fig:rl_loop}
+\Fonte{Elaborado pelo autor com base em \cite{hu2024, sutton2018}.}
 \end{figure}
 
+\section*{Processos de Decisão de Markov (MDP) e seus Componentes}
 
-No aprendizado não supervisionado, opera-se sobre um conjunto de dados sem rótulos (sem tutor). O objetivo é identificar correlações ou estruturas subjacentes, como o agrupamento de dados semelhantes. Esta abordagem busca descobrir padrões em grandes volumes de dados, como na detecção de anomalias financeiras \cite{deng2009clustering}. Na Figura \ref{fig:exemplo_cluster}, observa-se um conjunto de dados ilustrativo. O objetivo de algoritmos não supervisionados é identificar e delimitar agrupamentos (\textit{clusters}) automaticamente, baseando-se apenas nas características compartilhadas entre as amostras.
+Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente \cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição \cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$ \cite{hu2024}. 
 
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Conceito de agrupamento (clustering): identificação de estruturas latentes em dados não rotulados.}
-        \label{fig:exemplo_cluster}
-    }{
-        \begin{tikzpicture}[
-            scale=0.8,
-            point/.style={circle, fill=black!60, inner sep=2pt},
-            centroid/.style={},
-            box/.style={draw=black!30, line width=1.5pt, rectangle}
-        ]
-            % Painel Esquerdo: Unlabelled Data
-            \node[box, minimum width=6cm, minimum height=5cm] (left) at (0,0) {};
-            \node[font=\bfseries, above=0.1cm of left] {Dados não rotulados};
-            
-            % Pontos não rotulados (cinza)
-            \foreach \x/\y in {-1.5/1.0, -1.2/1.5, -1.8/1.3, -1.4/0.8, -1.6/1.7,
-                               1.2/1.2, 1.6/1.5, 1.4/0.9, 1.8/1.3, 1.5/1.6,
-                               -0.2/-0.8, 0.1/-1.0, 0.3/-0.6, -0.1/-1.2, 0.4/-0.9}
-                \fill[black!60] (\x,\y) circle (2.5pt);
-            
-            % Seta K-means
-            \draw[-stealth, line width=1.2pt] (3.0, 0) -- node[above, font=\bfseries] {Algoritmo} (5, 0);
-            
-            % Painel Direito: Labelled Clusters
-            \begin{scope}[shift={(8.5,0)}]
-                \node[box, minimum width=6cm, minimum height=5cm] (right) at (0,0) {};
-                \node[font=\bfseries, above=0.1cm of right] {Agrupamentos Rotulados};
-                
-                % Cluster 1 (Verde - superior esquerdo)
-                \fill[green!20, draw=green!70!black, line width=1.2pt] (-1.5, 1.25) circle (1cm);
-                \foreach \x/\y in {-1.5/1.0, -1.2/1.5, -1.8/1.3, -1.4/0.8, -1.6/1.7}
-                    \fill[green!60!black] (\x,\y) circle (2.5pt);
-                \draw[black, very thick] (-1.65, 1.1) -- (-1.35, 1.4);
-                \draw[black, very thick] (-1.35, 1.1) -- (-1.65, 1.4);
-                
-                % Cluster 2 (Azul - superior direito)  
-                \fill[cyan!20, draw=cyan!70!black, line width=1.2pt] (1.5, 1.25) circle (1cm);
-                \foreach \x/\y in {1.2/1.2, 1.6/1.5, 1.4/0.9, 1.8/1.3, 1.5/1.6}
-                    \fill[cyan!60!black] (\x,\y) circle (2.5pt);
-                \draw[black, very thick] (1.35, 1.1) -- (1.65, 1.4);
-                \draw[black, very thick] (1.65, 1.1) -- (1.35, 1.4);
-                
-                % Cluster 3 (Vermelho - inferior centro)
-                \fill[red!20, draw=red!70!black, line width=1.2pt] (0.1, -0.9) circle (1cm);
-                \foreach \x/\y in {-0.2/-0.8, 0.1/-1.0, 0.3/-0.6, -0.1/-1.2, 0.4/-0.9}
-                    \fill[red!60!black] (\x,\y) circle (2.5pt);
-                \draw[black, very thick] (-0.05, -1.05) -- (0.25, -0.75);
-                \draw[black, very thick] (0.25, -1.05) -- (-0.05, -0.75);
-                
-                % Legenda
-                \draw[black, very thick] (0.85, -2.95) -- (1.15, -2.65);
-                \draw[black, very thick] (1.15, -2.95) -- (0.85, -2.65);
-                \node[anchor=west, font=\small\bfseries] at (1.3, -2.8) {Centróide};
-            \end{scope}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
+O parâmetro $\gamma \in [0, 1]$ atua como um fator de desconto, controlando o peso que o agente dará às recompensas futuras em comparação às imediatas \cite{sutton2018}. Além disso, o agente pode seguir uma estratégia para mapear estados e tomar suas ações, mecanismo este conhecido como política ($\pi$) \cite{hu2024}. A dinâmica desse sistema atende rigorosamente à Propriedade de Markov, a qual postula que o futuro independe do passado dado o estado e a ação presentes \cite{sutton2018}. Por fim, em cenários onde o agente não observa o estado real, mas recebe apenas uma observação corrompida ou baseada em probabilidades, o modelo é generalizado para os \glspl{POMDP} \cite{sutton2018, hu2024}.
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.85, transform shape]
+
+% ===================== FAIXAS DE FUNDO =====================
+\fill[blue!5, rounded corners=4pt]    (-5.5, 0.8) rectangle (5.5, -1.8);
+\fill[yellow!5, rounded corners=4pt]  (-5.5, -2.1) rectangle (5.5, -4.2);
+\fill[green!5, rounded corners=4pt]   (-5.5, -4.5) rectangle (5.5, -6.6);
+\fill[orange!5, rounded corners=4pt]  (-5.5, -6.9) rectangle (5.5, -9.0);
+\fill[cyan!5, rounded corners=4pt]    (-5.5, -9.3) rectangle (5.5, -11.4);
+
+% Rótulos laterais
+\node[font=\scriptsize\bfseries, text=blue!70!black, rotate=90, align=center]   at (-5.1, -0.5) {PASSO 1};
+\node[font=\scriptsize\bfseries, text=yellow!70!black, rotate=90, align=center] at (-5.1, -3.15) {PASSO 2};
+\node[font=\scriptsize\bfseries, text=green!70!black, rotate=90, align=center]  at (-5.1, -5.55) {PASSO 3};
+\node[font=\scriptsize\bfseries, text=orange!70!black, rotate=90, align=center] at (-5.1, -7.95) {PASSO 4};
+\node[font=\scriptsize\bfseries, text=cyan!70!black, rotate=90, align=center]   at (-5.1, -10.35) {PASSO 5};
+
+% Separadores
+\draw[gray!30, thick, dashed] (-5.5, -1.95) -- (5.5, -1.95);
+\draw[gray!30, thick, dashed] (-5.5, -4.35) -- (5.5, -4.35);
+\draw[gray!30, thick, dashed] (-5.5, -6.75) -- (5.5, -6.75);
+\draw[gray!30, thick, dashed] (-5.5, -9.15) -- (5.5, -9.15);
+
+% ===================== PASSO 1: OBSERVAÇÃO DO ESTADO =====================
+\node[draw=blue!60!black, fill=blue!12, minimum width=7cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (obs) at (0, -0.5)
+      {Observação do Estado ($S_t$)\\{\footnotesize O agente percebe a configuração atual do ambiente}};
+
+% ===================== PASSO 2: SELEÇÃO DA AÇÃO =====================
+\node[draw=yellow!60!black, fill=yellow!12, minimum width=7cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (pol) at (0, -3.15)
+      {Seleção da Ação pela Política $\pi(a|s)$\\{\footnotesize O agente escolhe a ação $A_t$ conforme sua política}};
+
+% ===================== PASSO 3: EXECUÇÃO NO AMBIENTE =====================
+\node[draw=green!60!black, fill=green!12, minimum width=7cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (exec) at (0, -5.55)
+      {Execução da Ação no Ambiente\\{\footnotesize O ambiente aplica a transição $P(s'|s,a)$}};
+
+% ===================== PASSO 4: RETORNO DA RECOMPENSA =====================
+\node[draw=orange!60!black, fill=orange!12, minimum width=7cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (rew) at (0, -7.95)
+      {Retorno da Recompensa ($R_{t+1}$)\\{\footnotesize O ambiente sinaliza o ganho ou custo da transição}};
+
+% ===================== PASSO 5: NOVO ESTADO =====================
+\node[draw=cyan!60!black, fill=cyan!12, minimum width=7cm, minimum height=1.2cm,
+      rounded corners=4pt, thick, align=center, font=\small\bfseries]
+      (new) at (0, -10.35)
+      {Transição para Novo Estado ($S_{t+1}$)\\{\footnotesize O ciclo recomeça a partir do novo estado}};
+
+% ===================== SETAS =====================
+\draw[->, blue!60!black, very thick] (obs.south) -- (pol.north);
+\draw[->, yellow!60!black, very thick] (pol.south) -- (exec.north);
+\draw[->, green!60!black, very thick] (exec.south) -- (rew.north);
+\draw[->, orange!60!black, very thick] (rew.south) -- (new.north);
+
+% Seta de retorno (ciclo)
+\draw[->, cyan!60!black, very thick, dashed] (new.east) -- ++(1.5,0) |- node[pos=0.07, right, font=\scriptsize\bfseries, text=cyan!60!black, align=center] {Próximo\\passo ($t{+}1$)} (obs.east);
+
+% Bolinhas numéricas
+\node[circle, draw=blue!70!black, fill=blue!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=blue!80!black] at (5.0, -0.5) {1};
+\node[circle, draw=yellow!70!black, fill=yellow!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=yellow!80!black] at (5.0, -3.15) {2};
+\node[circle, draw=green!70!black, fill=green!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=green!80!black] at (5.0, -5.55) {3};
+\node[circle, draw=orange!70!black, fill=orange!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=orange!80!black] at (5.0, -7.95) {4};
+\node[circle, draw=cyan!70!black, fill=cyan!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=cyan!80!black] at (5.0, -10.35) {5};
+
+\end{tikzpicture}
+\caption{Sequência de interação em um \gls{MDP}.}
+\Fonte{Elaborado pelo autor com base em \cite{sutton2018}.}
 \end{figure}
 
-Enquanto os paradigmas supervisionado e não supervisionado focam na análise estática de dados --- seja para predição ou descoberta de padrões ---, o terceiro paradigma aborda o problema da tomada de decisão sequencial.
+\section*{Retorno Esperado, Fator de Desconto e Horizontes}
 
-No aprendizado por reforço clássico, a criação do modelo é realizada de forma diferente, pois não há um \textit{dataset} fixo entregue ao algoritmo. O aprendizado emerge da experiência direta de um \textit{agente} (algoritmo de decisão) com um \textit{ambiente} dinâmico (o mundo e suas regras). Neste ciclo, o agente observa o estado atual do ambiente, decide uma ação com base em sua estratégia (\textit{política}) e recebe uma resposta na forma de recompensa (ou penalidade). O objetivo final não é apenas acertar um rótulo imediato, mas refinar a política para maximizar as recompensas acumuladas ao longo do tempo (Figura \ref{fig:rl_cycle}).
+O \gls{MDP} é capaz de modelar problemas que possuem um final natural bem definido, conhecidos na literatura como tarefas episódicas (Horizonte Finito), como uma partida de xadrez, ou problemas em que o agente continua interagindo com o ambiente perpetuamente, chamados de tarefas contínuas (Horizonte Infinito) \cite{sutton2018, hu2024}. Em tarefas episódicas, que finalizam em um passo de tempo terminal $T$, o agente busca maximizar o retorno cumulativo simples, dado pela soma $G_t = R_{t+1} + R_{t+2} + \dots + R_T$ \cite{sutton2018}. 
 
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Ciclo de interação agente-ambiente no aprendizado por reforço: o agente observa o estado do ambiente, seleciona uma ação segundo sua política aprendida, executa a ação e recebe uma recompensa (consequência), iniciando um novo ciclo.}
-        \label{fig:rl_cycle}
-    }{
-        \begin{tikzpicture}[
-            node distance=4cm,
-            >=stealth,
-            box/.style={
-                rectangle, 
-                rounded corners=3mm, 
-                minimum width=3.5cm, 
-                minimum height=2.5cm, 
-                align=center,
-                font=\bfseries,
-                line width=1.2pt
-            },
-            agent/.style={box, draw=blue!60!black, fill=blue!5},
-            env/.style={box, draw=green!60!black, fill=green!5},
-            arrow/.style={->, line width=1.5pt, draw=black!80}
-        ]
-            % Nós
-            \node[agent] (agent) {AGENTE\\[0.5em]\small\normalfont (Tomada de Decisão)};
-            \node[env] (env) [right=of agent] {AMBIENTE\\[0.5em]\small\normalfont (Regras do Mundo)};
-
-            % Setas curvas enfatizando o ciclo
-            
-            % Ação (Agente -> Ambiente)
-            \draw[arrow] (agent.south) .. controls +(down:1.5cm) and +(down:1.5cm) .. (env.south) 
-                node[midway, below=2pt] {\textbf{Ação}};
-
-            % Estado e Recompensa (Ambiente -> Agente)
-            \draw[arrow] (env.north) .. controls +(up:1.5cm) and +(up:1.5cm) .. (agent.north)
-                node[midway, above=2pt] {\textbf{Estado}}
-                node[midway, below=2pt, font=\small] {$\pm$ Recompensa};
-            
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
-
-Para fundamentar o funcionamento de decisão no RL, apresenta-se inicialmente o cenário mais elementar: o problema do \textit{k-armed bandit} (k-braços). Neste problema, o agente dispõe de $k$ opções e deve realizar escolhas sequenciais ao longo de um horizonte de tempo finito. Cada opção retorna uma recompensa regida por uma distribuição de probabilidade desconhecida e que não varia ao longo do tempo (\textbf{estacionária}). Neste exemplo, ainda não é necessário utilizar o conceito do estado pois todas as ações são independentes. O importante é que esse problema permite isolar e analisar exclusivamente o dilema fundamental do paradigma: decidir entre explorar (\textit{explore}) novas opções ou explorar intensivamente (\textit{exploit}) uma opção conhecida vantajosa.
-
-Segundo \cite{sutter2022reinforcement}, define-se o valor de uma ação como a recompensa esperada ao escolhê-la. Matematicamente, isso corresponde à esperança condicional da recompensa $R_t$, dado que a ação $a$ foi selecionada na interação $t$ (Equação \ref{eq:action_value}):
+No entanto, para tarefas contínuas (Horizonte Infinito), a simples soma das recompensas ao longo do tempo poderia divergir e tender ao infinito \cite{hu2024, sutton2018}. Para solucionar esse problema, aplica-se o Fator de Desconto $\gamma \in [0,1)$ \cite{sutton2018, zhao2024}. O Retorno Descontado $G_t$, iniciado no passo $t$, é calculado como a soma infinita das recompensas futuras, onde cada recompensa é penalizada exponencialmente pelo quão distante no futuro ela for recebida \cite{sutton2018}:
 
 \begin{equation}
-    \label{eq:action_value}
-    q_*(a) \doteq \mathbb{E}[R_t | A_t = a]
+    G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+    \label{eq:retorno_descontado_infinito}
 \end{equation}
 
-Para ilustrar a incerteza inerente ao processo de decisão, a Figura \ref{fig:k-armed-bandit} apresenta um exemplo visual de um problema de $k$-braços com $k=4$. Cada curva representa a densidade de probabilidade das recompensas associadas a uma ação específica. Observe que, embora a ação $a_3$ possua o maior valor esperado ($q_*(a_3) = 2.5$), sua alta variância ($\sigma=1.5$) implica que, em uma única jogada, ela pode retornar uma recompensa inferior à de uma ação subótima, mas mais estável, como a ação $a_4$. Cabe ao agente, através de repetidas interações, estimar esses valores esperados para convergir à escolha ótima.
+Para garantir matematicamente que o valor desse retorno descontado seja finito, utiliza-se a convergência das séries geométricas \cite{sutton2018, zhao2024}. Caso a recompensa máxima possível do ambiente seja um valor constante $R$ não nulo (por exemplo, se o agente receber $+1$ a cada passo), a soma infinita converge limitando o retorno a $G_t = \sum_{k=0}^{\infty} \gamma^k R = \frac{R}{1-\gamma}$ \cite{sutton2018, zhao2024}. 
 
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Distribuições de probabilidade de recompensa para um problema de 4-braços ($k=4$). Cada curva representa a densidade de probabilidade da recompensa para uma ação específica, ilustrando diferentes médias ($\mu$) e desvios padrão ($\sigma$).}
-        \label{fig:k-armed-bandit}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.7\textwidth,
-                height=7cm,
-                xlabel={Recompensa ($R_t$)},
-                ylabel={Densidade de Probabilidade},
-                domain=-5:8,
-                samples=200,
-                axis lines=left,
-                grid=major,
-                ymax=0.95, % Aumentado para evitar corte dos rótulos
-                enlargelimits=false,
-                % Legenda configurada para ficar abaixo do gráfico, centralizada
-                legend style={
-                    at={(0.5,-0.2)},
-                    anchor=north,
-                    legend columns=2, 
-                    draw=none,
-                    column sep=10pt
-                },
-                thick
-            ]
-                % Ação 1 (Baseline)
-                \addplot [blue] {1/(1*sqrt(2*pi)) * exp(-((x-0)^2)/(2*1^2))};
-                \addlegendentry{Ação 1 ($\mu=0, \sigma=1$)}
-                
-                % Ação 2 (Pior média, menor variância)
-                \addplot [red] {1/(0.5*sqrt(2*pi)) * exp(-((x+1.5)^2)/(2*0.5^2))};
-                \addlegendentry{Ação 2 ($\mu=-1.5, \sigma=0.5$)}
-                
-                % Ação 3 (Melhor média, maior variância)
-                \addplot [green!60!black] {1/(1.5*sqrt(2*pi)) * exp(-((x-2.5)^2)/(2*1.5^2))};
-                \addlegendentry{Ação 3 ($\mu=2.5, \sigma=1.5$)}
-                
-                % Ação 4 (Média boa, variância média)
-                \addplot [orange] {1/(0.8*sqrt(2*pi)) * exp(-((x-1.0)^2)/(2*0.8^2))};
-                \addlegendentry{Ação 4 ($\mu=1.0, \sigma=0.8$)}
-                
-                \node[anchor=south] at (axis cs: 0, 0.40) {$q_*(a_1)$};
-                \node[anchor=south] at (axis cs: -1.5, 0.80) {$q_*(a_2)$};
-                \node[anchor=south] at (axis cs: 2.5, 0.27) {$q_*(a_3)$};
-                \node[anchor=south] at (axis cs: 1.0, 0.50) {$q_*(a_4)$};
-
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
-
-Como exemplo, considere a evolução da recompensa acumulada apresentada na Figura \ref{fig:greedy_cumulative}. Esse resultado reflete o comportamento de um agente que, inicialmente desconhecendo as recompensas associadas às ações, experimenta cada opção uma única vez e registra qual delas retornou o maior valor. Suponha que, nessa tentativa preliminar, a ação $a_3$ tenha se mostrado a mais vantajosa (devido à sua alta variância, que permitiu um retorno alto pontual). Adotando uma estratégia gananciosa, o agente passaria a selecionar $a_3$ em todas as interações subsequentes. Com isso, perde-se a oportunidade de explorar outras opções que poderiam se revelar superiores a longo prazo --- como a ação $a_4$, que, apesar de ter retornado menos na primeira tentativa, possui uma média de recompensa robusta e menor variabilidade.
-
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Recompensa acumulada utilizando a estratégia gananciosa (Greedy).}
-        \label{fig:greedy_cumulative}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.7\textwidth, height=5.5cm,
-                xlabel={Interações ($t$)},
-                ylabel={Recompensa Acumulada},
-                grid=major,
-                legend pos=north west
-            ]
-                \addplot[no markers, thick, black] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
-                \addlegendentry{Estratégia Greedy}
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
-
-Para lidar com esse dilema, uma estratégia melhor e computacionalmente eficiente, segundo \cite{sutter2022reinforcement}, seria estimar o valor de cada ação na interação $t$ utilizando o Algoritmo \ref{alg:efficient_action_value}. Neste algoritmo, a ação escolhida seria aquela com a melhor média acumulada até o momento. Para garantir a exploração contínua do espaço de ações, o agente escolhe uma ação aleatória com probabilidade $\epsilon$.
-
-\begin{algorithm}[htbp]
-    \caption{Algoritmo $\epsilon$-Greedy para o problema $k$-armed bandit}
-    \label{alg:efficient_action_value}
-    \begin{algorithmic}[1]
-        \REQUIRE Número de ações $k$, valor de exploração $\epsilon$
-        \ENSURE Estimativas de valor $Q(a)$ para cada ação
-        \STATE \textbf{Inicializar}, para $a = 1$ até $k$:
-        \STATE \hspace{\algorithmicindent} $Q(a) \leftarrow 0$
-        \STATE \hspace{\algorithmicindent} $N(a) \leftarrow 0$
-        \STATE
-        \STATE \textbf{Laço}:
-        \STATE \hspace{\algorithmicindent} $A \leftarrow \begin{cases}
-            \arg\max_a Q(a) & \text{com probabilidade } 1-\varepsilon \\
-            \text{uma ação aleatória} & \text{com probabilidade } \varepsilon
-        \end{cases}$
-        \STATE \hspace{\algorithmicindent} $R \leftarrow bandit(A)$
-        \STATE \hspace{\algorithmicindent} $N(A) \leftarrow N(A) + 1$
-        \STATE \hspace{\algorithmicindent} $Q(A) \leftarrow Q(A) + \frac{1}{N(A)} [R - Q(A)]$
-    \end{algorithmic}
-\end{algorithm}
-
-O Algoritmo \ref{alg:efficient_action_value} funciona armazenando o número de vezes que cada ação foi selecionada ($N(a)$) e atualizando a estimativa do valor da ação ($Q(a)$) com base na média incremental das recompensas recebidas. A escolha da ação é feita de forma $\epsilon$-Greedy, com probabilidade $1-\epsilon$. O agente seleciona a ação com o maior valor estimado, enquanto com probabilidade $\epsilon$, ele escolhe uma ação aleatória, promovendo a exploração.
-
-A Figura \ref{fig:average_cumulative} ilustra o desempenho de um agente que adota essa abordagem em comparação com outro que utilizada a estratégia gananciosa. Note que, ao longo do tempo, a recompensa acumulada cresce de forma mais consistente ($\epsilon$-Greedy), refletindo uma estratégia mais robusta.
-
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Comparação de desempenho: Agente Ganancioso (Greedy) vs. Agente $\epsilon$-Ganancioso ($\epsilon$-Greedy).}
-        \label{fig:average_cumulative}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.7\textwidth, height=5.5cm,
-                xlabel={Interações ($t$)},
-                ylabel={Recompensa Acumulada},
-                grid=major,
-                legend pos=north west,
-                legend style={font=\footnotesize}
-            ]
-                % Linha do Greedy (Referência Baseline)
-                \addplot[thick, black, dashed] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
-                \addlegendentry{Greedy ($\epsilon=0$)}
-                
-                % Linha do Epsilon-Greedy (Melhor desempenho esperado)
-                \addplot[thick, orange]        table [x=step, y=epsilon_greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
-                \addlegendentry{$\epsilon$-Greedy ($\epsilon=0.1$)}
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
-
-Até então não foi necessário lidar com problemas onde as premissas mudam com o tempo, os chamados problemas \textbf{não-estacionários}. Em ambientes reais, contudo, as condições podem variar, exigindo que o agente busque estratégias para tratar essas mudanças de comportamento (regime). No contexto do problema $k$-\textit{armed bandit}, a não-estacionariedade manifesta-se quando cada $k$-braço tem sua distribuição de probabilidade de recompensa modificada ao longo do tempo. A Figura \ref{fig:non_stationary_bandit} ilustra esse cenário, onde as médias das recompensas associadas a cada ação variam temporalmente, evidenciando mudanças de regime que tornam diferentes ações ótimas em diferentes períodos.
-
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Exemplo de um problema $k$-armed bandit não-estacionário: as médias das recompensas ($q_*(a)$) variam ao longo do tempo, caracterizando diferentes regimes onde ações distintas se tornam ótimas. Note como a Ação 3 (verde) inicia inferior mas torna-se dominante após $t \approx 500$, enquanto a Ação 1 (azul) degrada-se.}
-        \label{fig:non_stationary_bandit}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.85\textwidth,
-                height=8cm,
-                xlabel={Interações ($t$)},
-                ylabel={Valor Verdadeiro da Ação $q_*(a)$},
-                grid=major,
-                thick,
-                domain=0:1000,
-                samples=200,
-                legend pos=north east,
-                legend style={font=\footnotesize},
-                ymin=-1.5,
-                ymax=3.5
-            ]
-                % Ação 1 - Começa bem mas degrada
-                \addplot [blue, thick, smooth] {2.0 - 0.0035*x + 0.3*sin(deg(x/50))};
-                \addlegendentry{Ação 1}
-                
-                % Ação 2 - Oscila em torno de um valor baixo
-                \addplot [red, thick, smooth] {-0.5 + 0.4*sin(deg(x/80)) + 0.0008*x};
-                \addlegendentry{Ação 2}
-                
-                % Ação 3 - Começa ruim mas melhora significativamente
-                \addplot [green!60!black, thick, smooth] {-1.0 + 0.004*x + 0.25*sin(deg(x/60))};
-                \addlegendentry{Ação 3}
-                
-                % Ação 4 - Mantém-se mediano com pequenas variações
-                \addplot [orange, thick, smooth] {0.8 + 0.3*sin(deg(x/100)) - 0.0005*x};
-                \addlegendentry{Ação 4}
-                
-                % Adicionar anotações para destacar mudanças de regime
-                \draw[dashed, gray, line width=0.8pt] (axis cs:500,-1.5) -- (axis cs:500,3.5);
-                \node[font=\scriptsize, align=center] at (axis cs:250, 3.2) {Regime 1\\Ação 1 ótima};
-                \node[font=\scriptsize, align=center] at (axis cs:750, 3.2) {Regime 2\\Ação 3 ótima};
-
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
-
-Isto induz um novo desafio, o agente deve utilizar estratégias onde a recompensa recebida em uma interação recente possui maior importância do que recompensas obtidas anteriormente. Uma forma simples de implementar isso é substituir a média aritmética por uma atualização com taxa de aprendizado constante (Equação \ref{eq:exponential_moving_average}). Nesta formulação, $\alpha \in (0,1]$ é a taxa de aprendizado que determina o peso dado às recompensas recentes. Valores maiores de $\alpha$ fazem o agente reagir mais rapidamente a mudanças, mas aumentam a variabilidade das estimativas.
+Além disso, uma propriedade algébrica fundamental do retorno em \gls{RL} é que a Equação \ref{eq:retorno_descontado_infinito} pode ser reescrita de forma exata como uma relação recursiva \cite{hu2024, sutton2018}. Ela separa a recompensa imediatamente recebida do retorno descontado do próximo passo de tempo \cite{sutton2018, hu2024}.
 
 \begin{equation}
-    \label{eq:exponential_moving_average}
-    Q_{n+1}(A) = Q_n(A) + \alpha [R_n - Q_n(A)]
+    G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots = R_{t+1} + \gamma G_{t+1}
+    \label{eq:retorno_recursivo}
 \end{equation}
 
-\noindent onde $Q_n(A)$ é a estimativa do valor da ação $A$ após ela ter sido selecionada $n$ vezes, e $R_n$ é a recompensa recebida na $n$-ésima vez que a ação $A$ foi escolhida. O índice $n$ refere-se ao número de vezes que a ação específica $A$ foi selecionada, não ao passo $t$ de tempo global do agente.
+Esta decomposição recursiva forma a base matemática que torna possíveis as Equações de Bellman e a atualização iterativa das estimativas das funções de valor nos algoritmos de aprendizado \cite{hu2024, sutton2018}. Em última análise, o objetivo central do agente é maximizar o retorno esperado $\mathbb{E}[G_t]$, ponderando tanto a dinâmica estocástica do ambiente quanto as ações definidas pela sua política, que pode ser determinística ($a = \pi(s)$) ou estocástica ($\pi(a|s) = P(A_t = a | S_t = s)$) \cite{sutton2018, hu2024}.
 
-O Algoritmo \ref{alg:non_stationary_action_value} apresenta a versão modificada do Algoritmo \ref{alg:efficient_action_value} para lidar com ambientes não-estacionários, utilizando a atualização exponencialmente ponderada da Equação \ref{eq:exponential_moving_average}.
+\section*{Funções de Valor e Equações de Bellman}
 
-\begin{algorithm}[htbp]
-    \caption{Algoritmo $\epsilon$-Greedy para o problema $k$-armed bandit não-estacionário}
-    \label{alg:non_stationary_action_value}
-    \begin{algorithmic}[1]
-        \REQUIRE Número de ações $k$, valor de exploração $\epsilon$, taxa de aprendizado $\alpha$
-        \ENSURE Estimativas de valor $Q(a)$ para cada ação
-        \STATE \textbf{Inicializar}, para $a = 1$ até $k$:
-        \STATE \hspace{\algorithmicindent} $Q(a) \leftarrow 0$
-        \STATE
-        \STATE \textbf{Laço}:
-        \STATE \hspace{\algorithmicindent} $A \leftarrow \begin{cases}
-            \arg\max_a Q(a) & \text{com probabilidade } 1-\varepsilon\\
-            \text{uma ação aleatória} & \text{com probabilidade } \varepsilon
-        \end{cases}$
-        \STATE \hspace{\algorithmicindent} $R \leftarrow bandit(A)$
-        \STATE \hspace{\algorithmicindent} $Q(A) \leftarrow Q(A) + \alpha [R - Q(A)]$
-    \end{algorithmic}
-\end{algorithm}
+Para quantificar o desempenho, o RL estima as \textbf{Funções de Valor de Estado (V)} e \textbf{Funções de Valor de Ação (Q)}. Elas obedecem às \textbf{Equações de Expectativa de Bellman} recursivas \cite{sutton2018}:
+\begin{align}
+    V^\pi(s) &= \sum_{a} \pi(a|s) \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^\pi(s') \right] \\
+    Q^\pi(s,a) &= \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \sum_{a'} \pi(a'|s') Q^\pi(s',a') \right]
+\end{align}
 
-A Figura \ref{fig:non_stationary_comparison} ilustra o desempenho comparativo das três estratégias em um ambiente fortemente não-estacionário, onde as médias das recompensas dos braços evoluem continuamente através de um passeio aleatório (\textit{random walk}) aplicado a cada interação, além de mudanças bruscas de regime (\textit{regime shifts}) a cada 1000 interações. Observe que a estratégia com taxa de aprendizado constante ($\alpha=0.1$) demonstra superior capacidade de adaptação às mudanças, alcançando a maior recompensa acumulada final (aproximadamente 21\% superior ao Greedy).
+As \textbf{Equações de Otimidade de Bellman} encontram o máximo valor possível da política ótima inserindo o operador $\max$:
+\begin{equation}
+    Q^*(s,a) = \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right]
+\end{equation}
 
-\begin{figure}[htbp]
-    \centering
-    \UECEfig{
-        \caption{Comparação de estratégias em ambiente não-estacionário: Greedy vs. $\epsilon$-Greedy com média amostral vs. $\epsilon$-Greedy com taxa constante ($\alpha=0.1$). A estratégia com taxa constante demonstra melhor adaptação às mudanças dinâmicas.}
-        \label{fig:non_stationary_comparison}
-    }{
-        \begin{tikzpicture}
-            \begin{axis}[
-                width=0.85\textwidth, 
-                height=7cm,
-                xlabel={Interações ($t$)},
-                ylabel={Recompensa Acumulada},
-                grid=major,
-                legend pos=north west,
-                legend style={font=\footnotesize},
-                thick
-            ]
-                % Greedy
-                \addplot[black, dashed, thick] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
-                \addlegendentry{Greedy ($\varepsilon=0$)}
-                
-                % Epsilon-Greedy com sample average
-                \addplot[blue, thick] table [x=step, y=epsilon_sample_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
-                \addlegendentry{$\varepsilon$-Greedy (média amostral, $\varepsilon=0.1$)}
-                
-                % Constant Alpha
-                \addplot[red, thick] table [x=step, y=constant_alpha_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
-                \addlegendentry{$\varepsilon$-Greedy ($\alpha=0.1$ constante)}
-                
-            \end{axis}
-        \end{tikzpicture}
-    }{
-        \Fonte{Elaborado pelo autor.}
-    }
-\end{figure}
+Também define-se a \textbf{Função de Vantagem (Advantage)}, que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado \cite{wang2016dueling}:
+\begin{equation}
+    A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)
+\end{equation}
 
-O ambiente não-estacionário é implementado através de dois mecanismos complementares: (i) um \textit{random walk} gaussiano contínuo aplicado a cada interação ($\mu_t \leftarrow \mu_{t-1} + \mathcal{N}(0, 0.1^2)$ para cada braço), e (ii) \textit{regime shifts} periódicos a cada 1000 interações, aplicando perturbações mais bruscas ($\mu_t \leftarrow \mu_{t-1} + \mathcal{N}(0, 2.0^2)$). Os resultados apresentados correspondem à média de 50 execuções independentes com \textit{seeds} distintas (42--91), garantindo robustez estatística dos resultados observados.
+\subsection{Métodos de Aprendizado e Diferença Temporal}
+O RL requer balanço com o \textbf{Dilema Exploração-Explotação}. Em abordagens sem conhecimento dinâmico (\textbf{Model-Free}), ao contrário da Programação Dinâmica (\textbf{Model-Based}), aplicam-se os \textbf{Métodos de Monte Carlo} (atualizam usando retornos completos do episódio) ou \textbf{Aprendizagem por Diferença Temporal (TD Learning)} (atualizam usando "bootstrapping" de estimativas de apenas um passo) \cite{sutton2018}. A unificação entre ambos se dá com \textbf{Traços de Elegibilidade (TD($\lambda$))}, controlados pela taxa de decaimento $\lambda$.
 
-% Requer no preâmbulo:
-% \usepackage{tikz}
-% \usetikzlibrary{arrows.meta, positioning, calc}
+Algoritmos TD clássicos, fundamentais em ambientes \textbf{Estacionários}, incluem o \textbf{SARSA} (aprendizado \textbf{On-policy}):
+\begin{equation}
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
+\end{equation}
+E o clássico \textbf{Q-Learning} (aprendizado \textbf{Off-policy}) \cite{watkins1992}:
+\begin{equation}
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
+\end{equation}
+Para evitar a viés de superestimação na operação do máximo acima, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção de qual é a melhor ação, da avaliação de valor dessa ação com duas tabelas diferentes \cite{hasselt2010double}.
 
-\begin{figure}[ht]
+
+\section{Tópicos de Aprendizagem por Reforço Profundo (DRL)}
+
+\subsection{DQN e Variantes}
+A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (DQN)} \cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
+\begin{equation}
+    L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right]
+\end{equation}
+
+Evoluções incluem a \textbf{Repetição de Experiência Priorizada (PER)}, que amostra transições com base na magnitude do erro TD em vez de uniforme \cite{schaul2016per}, a já citada \textbf{Double DQN}, e a \textbf{Dueling DQN} que ramifica a rede neural final estimando separadamente valor ($V$) e vantagem ($A$) \cite{wang2016dueling}.
+
+\subsection{Policy Gradients e REINFORCE}
+Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair política; otimizamos diretamente uma política parametrizada $\pi_\theta$. O \textbf{Teorema do Gradiente de Política} embasa essas atualizações estocásticas. Utiliza-se o \textbf{Truque da Razão de Verossimilhança} $\nabla_\theta P = P \nabla_\theta \log P$ para derivar a expectativa \cite{sutton2018}:
+\begin{equation}
+    \nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \nabla_\theta \log \pi_\theta(A_t|S_t) Q^\pi(S_t, A_t) \right]
+\end{equation}
+A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$ \cite{williams1992}.
+
+\subsection{Actor-Critic, PPO, TRPO e SAC}
+Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico} \cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como baseline para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
+
+\begin{figure}[ht!]
 \centering
 \begin{tikzpicture}[
-  >={Stealth[length=2.2mm]},
-  node distance=35mm,
-  font=\small,
-  state/.style={circle, draw, thick, minimum size=14mm, inner sep=0pt},
-  action/.style={rectangle, draw, rounded corners=2mm, thick,
-                 minimum width=12mm, minimum height=7mm, inner sep=2pt},
-  lab/.style={font=\small, fill=white, inner sep=1pt}
+    >=Latex,
+    node distance=2.5cm,
+    box/.style={draw, rectangle, rounded corners, minimum width=2.5cm, minimum height=1cm, font=\bfseries, thick, align=center},
+    arrow/.style={->, thick}
 ]
+    \node[box, fill=purple!15] (actor) {Ator (Policy)\\ $\pi_\theta(a|s)$};
+    \node[box, fill=orange!15, below of=actor, yshift=-1.5cm] (critic) {Crítico (Value)\\ $V_w(s)$};
+    \node[box, fill=green!15, right of=actor, xshift=3.5cm, yshift=-1.25cm] (env) {Ambiente};
 
-% --- Estados ---
-\node[state] (A) {$\alpha$};
-\node[state, right=45mm of A] (B) {$\beta$};
-
-% --- Ações (colocadas diretamente abaixo dos estados para evitar cruzamento) ---
-\node[action, below=18mm of A, xshift=-10mm] (lam) {$\lambda$};
-\node[action, below=18mm of A, xshift=+10mm] (nu)  {$\nu$};
-\node[action, below=18mm of B] (mu) {$\mu$};
-
-% --- Ligações: estado -> ação (decisão) ---
-\draw[->, thick] (A) -- (lam);
-\draw[->, thick] (A) -- (nu);
-\draw[->, thick] (B) -- (mu);
-
-% =========================
-% Transições induzidas por λ
-% =========================
-
-% λ : alpha -> alpha (0.7, 0)  (loop via curva curta)
-\draw[->]
-  (lam.north west) to[bend left=15]
-  node[lab, left] {$0.7,\,0$}
-  (A.south west);
-
-% λ : alpha -> beta (0.3, -1)  (curva por cima, rótulo no meio)
-\draw[->]
-  (lam.north) to[bend left=18]
-  node[lab, above] {$0.3,\,-1$}
-  (B.west);
-
-% =========================
-% Transições induzidas por ν
-% =========================
-
-% ν : alpha -> alpha (1.0, 0) (loop via curva do outro lado)
-\draw[->]
-  (nu.north east) to[bend right=15]
-  node[lab, right] {$1.0,\,0$}
-  (A.south east);
-
-% =========================
-% Transições induzidas por μ
-% =========================
-
-% μ : beta -> beta (0.6, +2) (loop curto à direita)
-\draw[->]
-  (mu.north east) to[bend left=15]
-  node[lab, right] {$0.6,\,+2$}
-  (B.south east);
-
-% μ : beta -> alpha (0.4, +1) (curva por baixo, rótulo embaixo)
-\draw[->]
-  (mu.north) to[bend right=20]
-  node[lab, below] {$0.4,\,+1$}
-  (A.east);
+    \draw[arrow] (actor.0) -| node[pos=0.2, above] {Ação} (env.90);
+    \draw[arrow] (env.270) |- node[pos=0.8, below] {Estado, Recompensa} (critic.0);
+    \draw[arrow] (env.180) -- ++(-2,0) |- (actor.345); 
     
+    \draw[arrow, dashed, red] (critic.90) -- node[left] {Erro TD ($\delta$)} (actor.270);
 \end{tikzpicture}
-\caption{MDP didático com dois estados ($\alpha$, $\beta$), ações explícitas ($\lambda$, $\nu$, $\mu$),
-probabilidades de transição e recompensas associadas.}
+\caption{Dinâmica Ator-Crítico.}
+\Fonte{Elaborado pelo autor com base em \cite{sutton2018}.}
 \end{figure}
 
+Para mitigar o colapso por passos muito largos nas atualizações de gradiente contínuo:
+\begin{itemize}
+    \item \textbf{TRPO:} Impõe uma restrição (Trust Region) usando Divergência KL para travar passos agressivos \cite{schulman2015trpo}.
+    \item \textbf{PPO:} Muito mais simples que TRPO, ele "corta" (clip) a função objetivo de modo a desincentivar uma política nova de se afastar demais da antiga \cite{schulman2017ppo}:
+    \begin{equation}
+        L^{CLIP}(\theta) = \mathbb{E}\left[ \min(r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t) \right]
+    \end{equation}
+    onde $r_t(\theta) = \frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$.
+    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do DQN \cite{sutton2018}.
+    \item \textbf{SAC:} Abordagem focada em regularização de entropia; o agente tenta escalar recompensas ao máximo mas preservando a máxima entropia (agindo aleatoriamente onde possível) \cite{haarnoja2018sac}.
+\end{itemize}
 
-
-% Na terminologia de RL, tarefas em que a melhor ação não depende de um estado variante (o ambiente possui um único estado) são denominadas \textbf{não-associativas}, como no caso clássico dos k-bandidos. Em contraste, em tarefas \textbf{associativas}, a ação ótima depende do estado atual do ambiente. Por exemplo, no Xadrez, a melhor jogada é condicionada pela configuração momentânea das peças no tabuleiro.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\subsection{Avanços e Extensões}
+Dentre outras áreas sofisticadas constam o \textbf{Aprendizado por Reforço Multi-Agente (MARL)}, onde agentes interagem no mesmo ambiente. O \textbf{Independent Q-Learning} treina agentes individuais tratando os outros como parte estacionária do ambiente, o que na prática gera um POMDP instável. O \textbf{Curriculum Learning} ataca a \textbf{Lida com Recompensas Esparsas} submetendo o agente a tarefas crescentemente difíceis. \textbf{Aprendizado por Reforço Inverso (IRL)} decodifica a função de recompensa baseando-se num especialista humano, enquanto o \textbf{Aprendizado por Reforço Offline} procura aprender comportamentos unicamente consumindo um dataset preexistente gigante, sem tocar ou explorar ativamente o simulador ao vivo.
