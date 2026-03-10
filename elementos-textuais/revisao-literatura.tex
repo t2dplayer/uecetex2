@@ -2,17 +2,445 @@
 \label{chap:revisao-literatura}
 
 
-\section{Aplicações em Redes Veiculares}
-\label{sec:aplicacoes-em-redes-veiculares}
+% \section{Aplicações em Redes Veiculares}
+% \label{sec:aplicacoes-em-redes-veiculares}
 
-\section{Técnicas de Offloading em Ambientes Veiculares}
-\label{sec:tecnicas-de-offloading-em-ambientes-veiculares}
+% \section{Técnicas de Offloading em Ambientes Veiculares}
+% \label{sec:tecnicas-de-offloading-em-ambientes-veiculares}
 
-\section{Modelos Híbridos Fuzzy e Aprendizado por Reforço}
-\label{sec:modelos-hibridos-fuzzy-e-aprendizado-por-reforco}
+% \section{Modelos Híbridos Fuzzy e Aprendizado por Reforço}
+% \label{sec:modelos-hibridos-fuzzy-e-aprendizado-por-reforco}
 
-\section{Problemas e Desafios Atuais}
-\label{sec:problemas-e-desafios-atuais}
+% \section{Problemas e Desafios Atuais}
+% \label{sec:problemas-e-desafios-atuais}
 
 
-\section{Considerações Finais}
+% \section{Considerações Finais}
+
+Para classificar e relacionar o estado da arte das soluções de descarregamento de tarefas em ambientes de \gls{VEC} e \gls{MEC}, adotou-se uma versão adaptada da taxonomia proposta em \cite{de2020computation}. Aqui, onde ela é dividida em duas vertentes estruturais: \textbf{Padrão de Comunicação}, que avalia as tecnologias de rede e os servidores utilizados; \textbf{Problema}, que analisa as estratégias \gls{DRL} e outras abordagens. Nesta proposta, a taxonomia, no que tange ao problema, foca nos tópicos aqui abordados, como DRL, TOPSIS e Fuzzy-TOPSIS. Dessa maneira, os artigos relacionados foram classificados conforme a Figura~\ref{fig:taxonomia_adaptada}.
+
+\begin{figure}[ht!]
+\centering
+\resizebox{0.9\textwidth}{!}{%
+\begin{forest}
+  for tree={
+    font=\sffamily\footnotesize,
+    draw=teal!80!black,
+    very thick,
+    rounded corners=4pt,
+    fill=teal!70!black,
+    text=white,
+    align=center,
+    edge={draw=teal!60!black, thick},
+    l sep=6mm,
+    s sep=2mm,
+    if level=0{
+      minimum height=8mm,
+      font=\sffamily\footnotesize\bfseries,
+    }{
+      if level=1{
+        fill=teal!60!black,
+        font=\sffamily\footnotesize\bfseries,
+        minimum height=7mm,
+      }{
+        if level=2{
+          fill=teal!50!black,
+          font=\sffamily\scriptsize\bfseries,
+          minimum height=6mm,
+        }{
+          % Leaf nodes
+          fill=teal!40!black,
+          font=\sffamily\tiny,
+          draw=teal!50!black,
+          rounded corners=3pt,
+          align=left,
+          inner sep=2pt,
+          thin,
+        }
+      }
+    }
+  }
+  [Descarregamento\\Computacional Veicular
+    [Padrão de\\Comunicação
+      [Tecnologia
+        [{$\triangleright$ V2I\\$\triangleright$ C-V2X}]
+      ]
+      [Servidor
+        [{$\triangleright$ MEC\\$\triangleright$ VEC}]
+      ]
+    ]
+    [Problema
+      [Objetivo
+        [{$-$ Tempo de\\~~~Resposta\\$-$ Consumo\\~~~Energético\\$-$ Sobrecarga\\$+$ Utilidade do\\~~~Sistema\\$+$ Incentivo\\~~~Financeiro}]
+      ]
+      [Estratégia
+        [Eng. de Estado
+          [{$\triangleright$ Canal, Latência\\$\triangleright$ Buffer, CPU}]
+        ]
+        [Eng. de Recompensa
+          [{$\triangleright$ Função Custo\\$\triangleright$ Latência, Energia}]
+        ]
+        [Modelos
+          [{$\triangleright$ SAC, TD3, PPO\\$\triangleright$ DRL/TOPSIS\\$\triangleright$ DRL/Fuzzy TOPSIS\\$\triangleright$ GNN\\$\triangleright$ Transformers}]
+        ]
+      ]
+      [Ambiente
+        [{$\triangleright$ Estocático,\\~~~~Determinístico\\$\triangleright$ Incerteza\\$\triangleright$ Carga de Trabalho}]
+      ]
+    ]
+  ]
+\end{forest}
+}
+\Caption{\label{fig:taxonomia_adaptada} Taxonomia adaptada para classificação dos trabalhos relacionados em descarregamento computacional veicular, com ênfase nas estratégias de DRL, TOPSIS e Fuzzy-TOPSIS.}
+\Fonte{Adaptado de \citeonline{de2020computation}.}
+\end{figure}
+
+\section{Padrão de Comunicação}
+
+No descarregamento de tarefas, o cenário de comunicação celular vem ganhando bastante destaque. Neste quesito, suas tecnologias vêm evoluindo rapidamente e ditam a maioria das pesquisas aqui apresentadas. A seguir são apresentados alguns trabalhos que utilizam tecnologias \gls{5G} e além (\gls{B5G}/\gls{6G}) para atender às exigentes demandas relacionadas a aplicações veiculares.
+
+\subsection{Tecnologia}
+A evolução das tecnologias de comunicação veicular destaca a transição de padrões tradicionais, como o \gls{DSRC} e o IEEE 802.11bd, para a comunicação celular aliada à \gls{IA}. Essa mudança visa, sobretudo, possibilitar baixas latências e alta vazão de dados em cenários de alta mobilidade, contribuindo para resolver o problema de descarregamento de tarefas. Nesse contexto, diversos trabalhos, como os de \cite{Moghaddasi2023, sidwini, li2025, meghamala2025}, utilizam interfaces \gls{C-V2X} e arquiteturas de borda para o compartilhamento de informações em aplicações veiculares avançadas. 
+
+O estudo de \cite{Moghaddasi2023} propõe um algoritmo de \gls{DRL}, especificamente o \gls{DDQN}, em redes \gls{5G} para solucionar o problema de descarregamento de tarefas utilizando a comunicação \gls{V2I} para alcançar eficiência energética e a diminuição da latência. Já em \cite{sidwini}, explora-se o uso de algoritmos avançados de \gls{DRL}, como o \gls{SAC}, para otimizar o descarregamento de tarefas dinâmico entre dispositivos locais, servidores de borda e a nuvem, equilibrando o consumo de energia e o atraso na execução. Em um cenário direcionado aos sistemas \gls{6G}, \cite{li2025} introduz um esquema inteligente baseado em \gls{DQN} em redes \gls{V2X} assistidas por \gls{MEC} para otimizar conjuntamente a associação aos servidores (\gls{RSU}s e \gls{BS}), a taxa de descarregamento de tarefas e a aceleração dos veículos. Essa abordagem visa minimizar o atraso do sistema e evitar colisões de trânsito, utilizando uma função de recompensa segmentada que respeita restrições de atraso, energia e segurança. Por fim, \cite{meghamala2025} propõe um framework de \gls{MARL} para redes \gls{5G} que combina o algoritmo \gls{SAC} com arquiteturas hierárquicas (\gls{MATD3} e \gls{TD2PG}). Essa solução visa a alocação dinâmica de subcanais, potência de transmissão e recursos computacionais em servidores \gls{MEC}, levando em consideração a mobilidade dos usuários e o isolamento das fatias de rede (\textit{network slicing}).
+
+% \begin{table}[h] 
+%     \centering \caption{Comparativa de Padrões e Tecnologias de Comunicação} 
+%     \begin{tabular}{|l|l|l|l|c|} 
+%         \hline \textbf{Artigo} & \textbf{Tecnologia} & \textbf{Servidor} & \textbf{Principal Inovação} & \textbf{Latência} \\ 
+%         \hline 
+%         \cite{Moghaddasi2023} & 5G / V2I & BS / Edge & Data Offloading via DDQN & Melhoria de 9,8\% \\ 
+%         \hline \cite{sidwini} & Edge / Cloud & Edge / Cloud & Descarregamento de tarefas Otimizado via SAC & Var. \\ 
+%         \hline \cite{li2025} & 6G / V2X & MEC (RSU/BS) & Offloading e Associação via DQN & Redução de 16,4\% \\ 
+%         \hline \cite{meghamala2025} & 5G / MEC & gNodeB & Alocação de Recursos via MARL & Otimizada \\ 
+%         \hline 
+%     \end{tabular} 
+% \end{table}
+
+% O estudo de \cite{mondal2025} aborda o desafio de utilizar Aprendizado por Reforço Profundo (\gls{DRL}), especificamente um controlador DDQN, para orquestrar de forma inteligente o \textit{handover} e a seleção entre as interfaces \gls{Uu} (celular) e \gls{PC5} (sidelink). 
+
+% Por sua vez, \cite{heo2026} foca no \textit{streaming} de vídeo interveicular, propondo um framework híbrido que utiliza a via \gls{V2V} como primária e a via \gls{V2N2V} (apoiada por \gls{MEC}) para retransmissões seletivas, garantindo uma latência sob o limite crítico de 50 ms. 
+
+
+% apresenta o framework \gls{3M}, que integra o Gerenciamento de Mobilidade, tecnologia Multi-RAT e Aprendizado de Máquina (\gls{ML}), buscando garantir um suporte hiper-rápido e ultraconfiável para redes veiculares \gls{6G}, com a projeção de latências que podem chegar a $< 1$ ms para comunicações críticas.
+
+\section{Servidor}
+
+Quando há necessidade de transferência de responsabilidade de processamento de tarefas, há duas opções viáveis: (i) processar em um dispositivo de borda ou (ii) utilizar recursos ociosos das \gls{OBU} dos veículos vizinhos. A seguir, é descrito como estas opções foram utilizadas.
+
+\section*{\gls{MEC}}
+
+Servidores \gls{MEC} contribuem significativamente para atender exigências de \gls{URLLC} em \gls{5G} \gls{NR}. Eles ficam localizados na borda da rede e podem ser constituídos de equipamentos robustos, capazes de auxiliar no processamento pesado de tarefas delegadas por outros dispositivos com recursos limitados.
+
+Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e estações base para oferecer suporte computacional de baixa latência aos veículos. Aproveitando essa infraestrutura de borda, o estudo de \cite{zhao2025} propõe o esquema \gls{PDQKM} para otimizar o descarregamento de múltiplas tarefas, permitindo reduzir a latência total do sistema. Já em \cite{wu2025}, utiliza-se \gls{GAN} para expandir amostras de tarefas evitando o desequilíbrio de dados, criando um modelo de \gls{FL} para realizar o descarregamento de tarefas de forma energeticamente eficiente em servidores \gls{MEC}. O estudo de \cite{mohammad2025} apresenta o framework EMEC-IoVTOF, que integra \gls{DRL} com a técnica de \gls{PSO} para otimizar a alocação de recursos em sistemas \gls{IoV}. A solução calcula custos de descarregamento para evitar a convergência para ótimos locais, conseguindo reduções significativas de latência e consumo de energia, além de contornar restrições de largura de banda em cenários veiculares dinâmicos. Por sua vez, o estudo de \cite{liu2025} utiliza o método de aproximação de Bernstein para converter restrições probabilísticas de interferência em formato tratável, minimizando uma função de utilidade que equilibra atrasos na transmissão e na computação para o \gls{C-MEC}.
+
+
+% \begin{table}[h]
+% \centering
+% \caption{Comparativa das Abordagens de \textit{Task Offloading} Assistidas por MEC}
+% \label{tab:comparativa_mec}
+% \renewcommand{\arraystretch}{1.3} % Melhora o espaçamento interno das linhas
+% \begin{tabular}{|p{2.5cm}|p{3cm}|p{3.5cm}|p{6cm}|}
+% \hline
+% \textbf{Artigo} & \textbf{Arquitetura} & \textbf{Algoritmos Base} & \textbf{Foco e Uso do \gls{MEC}} \\ \hline
+
+% Zhao et al. \cite{zhao2025} & \gls{VEC} (\gls{MEC} em \gls{RSU}) & \gls{DQN} + Algoritmo \gls{KM} + \gls{LSTM} & Otimiza o descarregamento de múltiplas tarefas na borda. Utiliza detecção de distância (via predição) para evitar falhas por \textit{handover} frequente entre \gls{RSU}s, focando em minimizar a latência total. \\ \hline
+
+% Wu et al. \cite{wu2025} & \gls{MEC} (5G/6G) & \gls{GAN} + Aprendizado Federado (\gls{FL}) & Foca em implantação leve e eficiência energética. Usa o \gls{MEC} para gerenciar \gls{FL} e \gls{GAN} na expansão de amostras, resolvendo o desequilíbrio de dados sem sobrecarregar a rede. \\ \hline
+
+% Mohammad et al. \cite{mohammad2025} & EMEC (\gls{MEC} para \gls{IoV}) & \gls{DRL} + \gls{PSO} & Apresenta framework EMEC-IoVTOF que delega tarefas para a borda visando reduzir latência e energia. O uso do \gls{PSO} ajuda as decisões de \gls{DRL} a fugirem de armadilhas de ótimos locais. \\ \hline
+
+% Liu et al. \cite{liu2025} & \gls{C-MEC} (Colaboração Nuvem-Borda) & Aproximação de Bernstein + SCA & Divide o esforço: tarefas sensíveis a atraso vão para \gls{MEC}, e tarefas tolerantes vão para nuvem. Lida com incertezas de canal (mobilidade) e restrições de interferência de forma probabilística. \\ \hline
+% \end{tabular}
+% \end{table}
+
+\section*{\gls{VEC}}
+
+\gls{VEC} distribui poder computacional utilizando \gls{RSU}, estações base celulares e até micro-nuvens formadas pelos próprios veículos, que empregam recursos ociosos de processamento para auxiliar veículos vizinhos. O estudo de \cite{xie2025} propõe utilizar \gls{RIS} juntamente com \gls{VEC} para reduzir custos de implantação, ao mesmo tempo que busca maximizar \gls{SOE} via algoritmo \gls{PPO}, otimizando conjuntamente decisões de descarregamento, alocação de recursos computacionais e vetores de mudança de fase. Já em \cite{wu2025ava}, utiliza-se \gls{FL} e \gls{MADDPG}, empregando mecanismos de incentivo baseados em reputação para determinar proporção ideal de recursos cedidos por veículos vizinhos, visando minimizar latência e consumo de energia, garantindo alta taxa de conclusão em tarefas computacionalmente intensivas. O trabalho de \cite{long2025} desenvolve algoritmo \gls{CTSRAO}, que integra dispositivos finais, borda veicular e nuvem para realizar descarregamento parcial de tarefas, separando o problema em subproblemas convexos para otimizar de forma colaborativa a taxa de divisão das tarefas (\textit{task splitting}) e a alocação de recursos computacionais, alcançando equilíbrio de desempenho global do sistema. Em \cite{abbas2025}, propõe-se um algoritmo baseado em aprendizado descentralizado. A solução integra \gls{RSU} com áreas de cobertura sobrepostas para receber tarefas fragmentadas e executar processamento paralelo. Essa abordagem evita sobrecarga em servidores de borda individuais e otimiza conjuntamente alocação de canais sem fio e recursos computacionais, minimizando latência total e consumo de energia em ambientes veiculares dinâmicos.
+
+\section*{Discussão}
+
+% A Tabela~\ref{tab:padrao_comunicacao} sumariza os aspectos de padrão de comunicação e servidor dos trabalhos relacionados mencionados nas subseções anteriores.
+
+\begin{table}[h]
+    \centering
+    \caption{Resumo dos aspectos de Padrão de Comunicação, Servidor e Condições de Ambiente dos trabalhos relacionados}
+    \label{tab:padrao_comunicacao}
+    \renewcommand{\arraystretch}{1.2}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+        \hline
+        \multirow{2}{*}{\textbf{Referência}} & \multicolumn{2}{c|}{\textbf{Tecnologia}} & \multicolumn{3}{c|}{\textbf{Servidor}} & \textbf{Observabilidade Parcial} & \multirow{2}{*}{\textbf{Canal Perfeito}} & \textbf{Carga de Trabalho} \\ 
+                                             & \textbf{V2I} & \textbf{\gls{C-V2X}} & \textbf{\gls{MEC}} & \textbf{\gls{VEC}} & \textbf{Nuvem} & \textbf{(Incerteza de Estado)} & & \textbf{(Diferentes regimes)} \\ \hline
+        \cite{Moghaddasi2023} & \checkmark & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+        \cite{sidwini}           & \checkmark & & \checkmark & & \checkmark & & \checkmark & \\ \hline
+        \cite{li2025}                 & & \checkmark & \checkmark & & & & \checkmark & \\ \hline
+        \cite{meghamala2025}   & \checkmark & & \checkmark & & & & \checkmark & \\ \hline
+        \cite{zhao2025}             & \checkmark & & \checkmark & & & & \checkmark & \\ \hline
+        \cite{wu2025}                 & \checkmark & & \checkmark & & & & \checkmark & \\ \hline
+        \cite{mohammad2025}     & & \checkmark & \checkmark & & & & \checkmark & \\ \hline
+        \cite{liu2025}               & \checkmark & & \checkmark & & \checkmark & & & \\ \hline
+        \cite{xie2025}               & \checkmark & & & \checkmark & & & \checkmark & \\ \hline
+        \cite{wu2025ava}              & & \checkmark & & \checkmark & & & \checkmark & \\ \hline
+        \cite{long2025}             & \checkmark & \checkmark & & \checkmark & \checkmark & & \checkmark & \\ \hline
+        \cite{abbas2025}           & \checkmark & & & \checkmark & & & \checkmark & \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+Analisando a Tabela \ref{tab:padrao_comunicacao}, constata-se forte tendência de padronização de tecnologias celulares avançadas para comunicação veicular. Grande parte dos trabalhos recentes analisados concentra-se na utilização de conectividade \gls{V2I} via redes \gls{5G} e \gls{6G}. Em relação à comunicação entre os nós, diversos trabalhos utilizam paradigma \gls{C-V2X}. Já em relação à infraestrutura, a adoção de servidores \gls{MEC} centralizados em unidades \gls{RSU} ainda é predominante, mas observa-se tendência crescente de pesquisas que exploram \gls{VEC}, tratando os próprios veículos como provedores de recursos. Trabalhos como os de \cite{liu2025} e \cite{long2025} adotam arquiteturas colaborativas integrando \gls{MEC} com nuvem e \gls{VEC} com nuvem, respectivamente.
+
+Outro aspecto identificado foi a ausência de tratamento para a observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Todos os trabalhos identificados na tabela modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de CPU dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
+
+Outra limitação identificada diz respeito à modelagem de cargas de trabalho. Com exceção do estudo de \cite{Moghaddasi2023}, os demais trabalhos avaliam seus algoritmos sob regimes de tráfego constantes ou com taxa de chegada fixa por episódio. Em cenários de tráfego reais, eventos imprevisíveis podem causar rajadas instantâneas (\textit{bursts}) no envio de pacotes críticos, alterando a distribuição de chegada das tarefas. Modelos \gls{DRL} treinados exclusivamente sem variação dinâmica de carga tendem a sofrer degradação de desempenho com tais mudanças de regime.
+
+Nesse contexto, o modelo proposto neste trabalho visa preencher essas lacunas ao assumir, desde o princípio, tais dificuldades inerentes a redes veiculares reais.
+
+
+
+
+
+\section{Problema: Objetivos e Estratégias de Otimização}
+
+O descarregamento veicular é intrinsecamente um problema de otimização multi-objetivo onde o tempo de resposta, o consumo energético e a sobrecarga do sistema são frequentemente conflitantes. As estratégias modernas focam na engenharia de estado (capturando canal e CPU) e engenharia de recompensa para equilibrar utilidade e custo.
+
+\section{Artigos em Objetivos e Estratégias}
+
+\paragraph{Artigo 7: Shuja et al. (2025) - Otimização Multi-objetivo em VEC Hierárquico}
+A pesquisa aborda a limitação de modelos de objetivo único que falham em considerar métricas de desempenho diversificadas em camadas computacionais intermediárias. A metodologia propõe um framework de descarregamento multi-nível utilizando Proximal Policy Optimization (PPO) que descarrega tarefas dinamicamente entre borda veicular, camadas regionais e nuvem. A estratégia de engenharia de estado inclui feedback em tempo real sobre atraso, congestionamento, custo, utilização de CPU e disponibilidade de memória. Resultados obtidos no simulador RegionalEdgeSimPy mostram que o modelo reduz drasticamente o congestionamento e melhora a distribuição de carga através das camadas, superando o desempenho de modelos DQN e DRQN tradicionais.
+
+\paragraph{Artigo 8: Miriyala e Chirra (2025) - DCEDRL para Maximização de Receita de Offloading}
+Este artigo introduz o método DCEDRL, baseado em clustering de densidade e aprendizado de conjunto (ensemble learning), para tomada de decisão em MEC. A motivação é evitar que dispositivos móveis preencham recursos limitados de largura de banda de forma descuidada, resultando em alocações ineficientes. A metodologia utiliza múltiplas redes neurais profundas para explorar o ambiente e classificar tarefas com características semelhantes, otimizando o agendamento subsequente. Os resultados indicam uma redução de mais de 21\% no backlog de tarefas em comparação com algoritmos de linha de base, demonstrando eficácia na conservação de recursos energéticos e aumento da utilidade do sistema.
+
+\paragraph{Artigo 9: Long et al. (2025) - Minimização de AoI em Sistemas MEC Multi-dispositivo}
+A pesquisa investiga a pontualidade da informação através da métrica Age of Information (AoI) em cenários onde atualizações de status são geradas via computação de tarefas. A metodologia formula um problema de otimização conjunta de geração de tarefas, descarregamento computacional e alocação de recursos para minimizar o AoI médio. O algoritmo proposto considera restrições de latência e energia, ajustando dinamicamente a taxa de amostragem de dados para garantir que as decisões de controle veicular sejam baseadas nas informações mais recentes possíveis. Este enfoque é crucial para a segurança, pois a obsolescência da informação pode levar a erros de decisão em manobras de direção autônoma.
+
+\paragraph{Artigo 10: Fofana et al. (2025/2026) - Pesquisa sobre KPI e Sustentabilidade em VEC}
+Este trabalho fornece uma visão unificada voltada para KPIs de IA aplicada ao descarregamento veicular, explicitamente ligando ganhos de desempenho a objetivos de sustentabilidade em cidades inteligentes. A metodologia analisa como decisões de descarregamento impactam dimensões de latência ponta-a-ponta, eficiência energética, confiabilidade e taxa de sucesso de tarefas. O estudo formaliza um modelo KPI mínimo que vincula rádio e computação a métricas de emissões de gases de efeito estufa. A discussão destaca que estratégias de descarregamento convencionais falham em se adaptar à natureza dinâmica de topologias imprevisíveis, defendendo o uso de DRL e variantes multi-agente para políticas sequenciais adaptativas.
+
+\paragraph{Artigo 11: Zhao et al. (2025) - Engenharia de Recompensas via LLM para Detecção de Objetos}
+A motivação deste estudo inovador é a dependência excessiva de funções de recompensa projetadas manualmente, que precisam ser redesenhadas sempre que os objetivos de serviço mudam. A metodologia introduz um framework onde Large Language Models (LLMs) geram e refinam automaticamente funções de recompensa a partir de instruções em linguagem natural. O sistema interpreta o objetivo atual (ex: priorizar latência em horários de pico), gera código compatível com o ambiente e o refina via feedback de simulação em malha fechada. Resultados mostram que as recompensas geradas por LLM superam as projetadas por especialistas humanos em termos de vazão e latência, reduzindo o overhead de engenharia significativamente.
+
+\paragraph{Artigo 12: Zhang et al. (2025) - Alocação de Recursos Sensível à Prioridade em Redes IoV}
+Este trabalho propõe um esquema de descarregamento e alocação de recursos em cenários de Vehicular Fog Computing (VFC), onde veículos compartilham recursos ociosos. A metodologia utiliza Beacon Messages periódicas para informar a disponibilidade de serviços e um algoritmo DRL baseado em Soft Actor-Critic (SAC) para classificar tarefas por prioridade e tamanho computacional. O objetivo principal é maximizar a utilidade média da rede sem afetar a QoS dos veículos a bordo, estimulando a cooperação através de incentivos financeiros implícitos na eficiência de processamento. O estudo conclui que a colaboração V2V é essencial para tarefas sensíveis ao atraso em áreas sem cobertura de RSU, reduzindo a carga nos servidores de nuvem.
+
+\begin{table}[h]
+\centering
+\caption{Comparativa de Objetivos e Estratégias (2023-2026)}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Artigo} & \textbf{Objetivo Principal} & \textbf{Estratégia de Eng.} & \textbf{Modelo IA / Ferramenta} \\ \hline
+Shuja  & Latência e Sobrecarga & Estado (Hierárquico) & PPO / SimPy \\ \hline
+Miriyala  & Utilidade e Backlog & Estado (Clustering) & DCEDRL (Ensemble) \\ \hline
+Long  & Pontualidade (AoI) & Transmissão/Execução & Algoritmo Online \\ \hline
+Fofana  & Sustentabilidade/KPI & Híbrida (V2I/V2V) & DRL / Survey AI \\ \hline
+Zhao  & Adaptabilidade de Meta & Recompensa (LLM-driven) & LLM + DRL \\ \hline
+Zhang  & Utilidade do Sistema & Recompensa (Prioridade) & SAC / DDPG / TD3 \\ \hline
+\end{tabular}
+\end{table}
+
+III. Modelos de Aprendizado por Reforço Profundo (SAC, TD3, PPO)
+A classe de modelos Ator-Crítico, como SAC, TD3 e PPO, tornou-se o padrão para resolver problemas de descarregamento devido à sua capacidade de lidar com espaços de ação contínuos e garantir convergência estável em ambientes altamente ruidosos.\section{Artigos em Modelos SAC, TD3 e PPO}
+
+\paragraph{Artigo 13: Adil Khan et al. (2025/2026) - Comparação de SAC, TD3 e PPO em Redes Celulares}
+A pesquisa realiza uma avaliação abrangente de algoritmos modernos de RL para minimizar latência em MEC utilizando um simulador realista (LWMECPS) com métodos de geometria estocástica. A metodologia revela que o SAC atinge o maior pico de desempenho (38\% de redução de latência), mas sofre de instabilidade na inicialização. O TD3 demonstra resiliência moderada ao ruído, sendo ideal para ajustes finos de parâmetros de CPU e RAM devido ao seu mecanismo de redução de viés de superestimação. O PPO, por ser um método on-policy com mecanismo de clipping, é apontado como o mais adequado para implementação prática por oferecer atualizações de política "suaves" que protegem contra degradações súbitas nos objetivos de nível de serviço (SLO).
+
+\paragraph{Artigo 14: Wei et al. (2025) - B-COTD: TD3 Assistido por Blockchain para IoV}
+Este estudo aborda a segurança no descarregamento, propondo uma estratégia assistida por blockchain para garantir a integridade dos dados e resultados computacionais. A metodologia utiliza o algoritmo Twin Delayed Deep Deterministic Policy Gradient (TD3) para gerenciar o descarregamento em ambientes multi-veículo onde o algoritmo de consenso DBFT assegura a confiabilidade. O modelo TD3 resolve um problema de otimização multi-objetivo que equilibra latência, consumo de energia e custos de transação da blockchain. Resultados experimentais mostram que o B-COTD reduz o custo total do sistema em 23,89\% em média e aumenta a taxa de sucesso de descarregamento em 11,02\% comparado a métodos como TODQN.
+
+\paragraph{Artigo 15: Li et al. (2025) - Constrained SAC (C-SAC) para AEC auxiliado por UAV}
+A motivação deste trabalho é a flutuação rápida dos canais sem fio ar-terra, onde políticas determinísticas frequentemente falham. A metodologia propõe o Constrained Soft Actor-Critic (C-SAC), que utiliza um crítico de restrição dedicado para estimar violações de prazo de latência a longo prazo e um multiplicador de Lagrange adaptativo para equilibrar automaticamente energia e desempenho. O uso de políticas estocásticas e o framework de máxima entropia do SAC garantem robustez intrínseca contra a alta variância do ambiente. Experimentos extensivos demonstram que o C-SAC atinge uma taxa de violação de restrição de apenas 18,9\%, sendo particularmente eficaz para cenários onde a segurança depende de prazos rigorosos de processamento.
+
+\paragraph{Artigo 16: Han et al. (2024/2025) - SAC-PVS para Entrega de Conteúdo em CIoV}
+O estudo investiga o caching e descarregamento de conteúdo em redes veiculares conectadas inteligentes (CIoV) utilizando SAC para gerenciar espaços de ação contínuos. A metodologia foca na determinação precisa dos veículos de cache ideais e das quantidades de conteúdo correspondentes. Uma estrutura de recompensa hierárquica é projetada para penalizar o desperdício de tráfego e recompensar a entrega bem-sucedida em zonas de sombra de rede. Simulações indicam que o SAC-PVS supera abordagens de aprendizado não-contínuo ao reduzir a latência de entrega e melhorar a utilização de recursos em condições dinâmicas de tráfego veicular.
+
+\paragraph{Artigo 17: Zhou et al. (2025) - SD3: Softmax Deep Double Deterministic Policy Gradient}
+Este artigo propõe o algoritmo SD3 para lidar com viés de superestimação e subestimação em sistemas MEC dinâmicos. A metodologia utiliza um operador softmax que suaviza as atualizações de valor de Q, permitindo uma otimização conjunta mais estável da proporção de descarregamento, taxa de compressão de dados e recursos computacionais. O modelo estabelece uma minimização da latência total sob restrições de capacidade de bateria e poder de processamento do servidor. Resultados mostram que o SD3 converge para políticas de melhor qualidade do que o DDPG padrão, especialmente quando as condições de canal mudam rapidamente em intervalos curtos de tempo.
+
+\paragraph{Artigo 18: Wang et al. (2024) - MATD3 para Offloading em Ambientes de Alta Dimensão}
+O trabalho foca na aplicação de Multi-Agent Twin Delayed Deep Deterministic Policy Gradient (MATD3) para resolver problemas de otimização inerentemente não-convexos em redes VEC. A motivação é a coordenação de múltiplos veículos que competem por recursos limitados em RSUs. A metodologia desenvolve uma abordagem distribuída onde cada agente TD3 compartilha informações críticas através de um buffer de experiência global, permitindo aprendizado cooperativo. Resultados comparativos revelam uma redução de até 16\% no atraso do sistema em comparação com versões de agente único, demonstrando a escalabilidade do modelo MATD3 em cenários densos.
+
+\begin{table}[h]
+\centering
+\caption{Comparativa de Modelos DRL (SAC, TD3, PPO) (2023-2026)}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Artigo} & \textbf{Modelo IA} & \textbf{Vantagem Principal} & \textbf{Cenário de Aplicação} \\ \hline
+Adil Khan  & PPO / SAC / TD3 & Estabilidade de Convergência & Redes Celulares Realistas \\ \hline
+Wei  & TD3 + Blockchain & Segurança e Baixo Viés & Internet dos Veículos (IoV) \\ \hline
+Li  & C-SAC & Tratamento de Restrições & UAV-assisted VEC \\ \hline
+Han  & SAC & Espaço de Ação Contínuo & CIoV Content Caching \\ \hline
+Zhou  & SD3 (Softmax) & Estabilidade de Valor Q & Dynamic MEC / Compressão \\ \hline
+Wang  & MATD3 & Coordenação Multi-agente & MEC Distribuído / Gaming \\ \hline
+\end{tabular}
+\end{table}
+
+IV. Arquiteturas de Grafo (GNN) e Transformers no Contexto VeicularA natureza estrutural e sequencial dos dados veiculares levou à adoção de Redes Neurais de Grafo (GNN) para capturar a topologia de rede e Transformers para modelar dependências temporais complexas em tarefas de visão computacional e controle.
+
+\section{Artigos em Modelos GNN e Transformers}
+\paragraph{Artigo 19: Babar Hayat et al. (2025) - GAPO: GNN-based Policy Optimization}
+Este estudo aborda o desafio de congestionamento em redes VEC de múltiplos saltos (multi-hop) onde a mobilidade é alta. A metodologia propõe o GAPO, que utiliza uma GNN para aprender uma representação do estado da rede que captura a estrutura topológica global e informações contextuais dos nós. Um framework Ator-Crítico baseado em atenção faz decisões conjuntas de destino de descarregamento e alocação de recursos, mitigando proativamente gargalos de links. Simulações mostram que o GAPO reduz significativamente a latência de conclusão de tarefas e o congestionamento de backbone comparado a heurísticas e DRL padrão que usam vetores de estado "achatados".
+
+\paragraph{Artigo 20: Chen et al. (2025) - Offloading de Multimídia orientado a GNN}
+A pesquisa foca em tarefas complexas de computação multimídia que possuem dependências internas (DAGs). A metodologia propõe um framework que integra DRL e GNNs, onde a GNN captura as interdependências entre sub-tarefas e o DRL otimiza as decisões de descarregamento em tempo real. O modelo utiliza estruturas de grafos para representar a topologia da rede e a precedência das tarefas, melhorando a eficiência de alocação de recursos. Resultados demonstram melhorias na estabilidade do modelo e na redução de atrasos de processamento, provando ser superior em cenários de Realidade Aumentada Móvel (WebAR) veicular.
+
+\paragraph{Artigo 21: NVIDIA Corporation (2024/2025) - ViTs em Dispositivos de Borda via Offloading}
+Este artigo investiga o desafio de implantar Vision Transformers (ViTs) em dispositivos de borda com recursos limitados. A metodologia propõe um paradigma de inferência colaborativa "borda para quase-borda" (edge to near-edge). Dispositivos de borda executam ViTs simples para amostras fáceis e descarregam amostras incertas para aceleradores próximos (como Orin Nano) que executam modelos mais pesados e precisos. O uso de mecanismos de roteamento baseados em Mixture-of-Experts (MoE) permite escalabilidade sem aumentar a latência de comunicação inerente ao descarregamento total para a nuvem.
+
+\paragraph{Artigo 22: Zhao et al. (2025) - DTAC: Distributed Transformer-based Actor-Critic}
+O estudo propõe o algoritmo DTAC para gestão de recursos em redes de nuvem-borda voltadas para ICPS. A metodologia integra o modelo Transformer com a arquitetura ator-crítico para resolver o problema de espaço de ação híbrido de alta dimensionalidade. Inicialmente, um modelo centralizado aprende a coordenação, seguido por aprendizado por transferência descentralizado que permite que cada terminal gerencie recursos locais baseado apenas em observações parciais. Resultados em larga escala mostram que o DTAC supera esquemas MARL tradicionais, exibindo fortes capacidades de generalização em ambientes não experimentados.
+
+\paragraph{Artigo 23: Sami et al. (2026) - Gated Transformer MADDPG para Digital Twin}
+Este trabalho apresenta o Dynamic DT Edge Air-Ground Network (D2TEAGN) para offloading em redes 6G industriais. A metodologia combina Gated Transformers com Multi-agent DRL (MADDPG) para gerenciar o descarregamento consciente de latência e energia em um ambiente de Gêmeo Digital. O Gêmeo Digital fornece uma réplica virtual da topologia, facilitando o controle em tempo real de UAVs que auxiliam no processamento de tarefas críticas em cenários onde a infraestrutura terrestre está comprometida. Simulações mostram que a arquitetura reduz drasticamente o custo de consumo de energia e atraso em comparação com algoritmos AC e gananciosos.
+
+\paragraph{Artigo 24: Li et al. (2025) - HGT-DQN-NEI: Heterogeneous Graph Transformer}
+A motivação desta pesquisa é a ineficácia dos mecanismos atuais em lidar com topologias 6G complexas e observabilidade parcial. A metodologia propõe o HGT-DQN-NEI, que combina Transformers de grafos heterogêneos com redes Q-Transformer profundas e integração de Equilíbrio de Nash. O modelo captura correlações de longo alcance e evita o fenômeno de over-smoothing comum em GNNs, garantindo coordenação estável entre agentes em infraestruturas Edge-Fog-Cloud hierárquicas. O framework atinge latência de 8 ms e 85% de eficiência de utilização de recursos, processando até 600 tarefas por segundo.
+
+\begin{table}[h]
+\centering
+\caption{Comparativa de GNNs e Transformers (2023-2026)}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Artigo} & \textbf{Arquitetura} & \textbf{Representação de Estado} & \textbf{Aplicação} \\ \hline
+Hayat  & GAPO (GNN+Attn) & Grafo Atribuído (VEC) & Congestionamento Multi-hop \\ \hline
+Chen  & GNN + DRL & DAG (Dependência Tarefas) & Multimídia / WebAR \\ \hline
+NVIDIA  & ViT / MoE & Top-k Predictions / Tokens & Visão Computacional de Borda \\ \hline
+Zhao  & Transformer AC & Observação Local Descentralizada & Cloud-Edge ICPS \\ \hline
+Sami  & Gated Transformer & Réplica Virtual (Digital Twin) & AEC (UAV) / IIoT \\ \hline
+Li  & HGT-DQN-NEI & Grafo Heterogêneo (6G) & Smart City / Hierarchical Edge \\ \hline
+\end{tabular}
+\end{table}
+
+V. Ambiente: Incerteza, Estocasticidade e Carga de Trabalho
+
+O ambiente veicular é marcado por flutuações estocásticas de canal e incertezas na chegada de tarefas. Abordagens modernas utilizam modelos de risco (CVaR) e redes preditivas para estabilizar o desempenho do sistema.\section{Artigos em Ambientes Estocásticos e Incerteza}
+
+\paragraph{Artigo 25: Shuhang Li et al. (2025/2026) - SA-TD3 Consciente do Ambiente para MIoT}
+Embora focado no cenário marítimo, o trabalho propõe um framework de decisão híbrida altamente aplicável a VEC, integrando Simulated Annealing (SA) com TD3. A metodologia introduz uma função de vantagem de canal duplo consciente do ambiente e um mecanismo de replay priorizado dinâmico baseado em GNN para capturar correlações entre nós. O modelo otimiza a partir da perspectiva do nó terminal, garantindo robustez contra turbulências e interferências imprevisíveis do canal de comunicação. Resultados demonstram redução de 19,7% na latência média, provando que o SA-TD3 é uma solução escalável para ambientes estocásticos complexos.
+
+\paragraph{Artigo 26: Yan et al. (2025/2026) - Framework de Offloading Consciente de Risco via CVaR}
+Este estudo aborda a incerteza de latência e energia em redes veiculares acopladas à mobilidade. A metodologia utiliza o Conditional Value-at-Risk (CVaR) para capturar o custo esperado em condições adversas, indo além da otimização de valores médios. O sistema modela a associação estocástica veículo-RSU através de probabilidades de conectividade espaço-temporais e utiliza SAC-BNN (Bayesian Neural Networks) para lidar com a incerteza dos parâmetros do modelo. Resultados experimentais mostram que o SAC-BNN reduz o CVaR em pelo menos 0,9 e melhora a taxa de conclusão de tarefas em 13,86% comparado a algoritmos de linha de base.
+
+\paragraph{Artigo 27: Fofana et al. (2025/2026) - AICDQN para Ambientes Estocásticos de Nuvem-Borda}
+A pesquisa propõe o AICDQN, que integra um módulo de predição GRU-LSTM para antecipar flutuações de carga de trabalho e tendências de urgência de tarefas. A metodologia formula o descarregamento como um MDP e utiliza um agente Dueling Double Deep Q-Network dinâmico para tomar decisões informadas entre camadas locais, borda e nuvem. O sistema modela nós computacionais usando filas M/M/c conscientes de prioridade, permitindo uma gestão eficiente da escassez de recursos. Simulações extensivas mostram que o AICDQN atinge 33,39% de redução no atraso e 57,74% de melhoria na eficiência energética em ambientes de rede incertos.
+
+\paragraph{Artigo 28: Wang et al. (2024/2025) - QFRL: Quantum Federated RL para URLLC}
+A motivação é a necessidade de descarregamento de tarefas ultra-confiáveis e de baixa latência em redes 6G. A metodologia propõe o Aprendizado por Reforço Federado Quântico (Q-FDRL) para maximizar a capacidade do usuário mantendo a privacidade. O descarregamento é modelado como um jogo de Markov multi-agente e resolvido via atualizações de A2C local em veículos e RSUs facilitadas por circuitos quânticos. Em simulações, o Q-FDRL converge 27,27% mais rápido e reduz a variância em estágios iniciais, demonstrando a eficácia da computação quântica em gerenciar a estocasticidade de recursos veiculares de forma escalável e privada.
+
+\paragraph{Artigo 29: Zhang et al. (2025) - SC-DRL para Correção de Status em Offloading de Sub-tarefas}
+Este trabalho identifica que funções de recompensa tradicionais falham em desacoplar dependências históricas, impedindo atualizações precisas de estado. A metodologia propõe o Status Correction-empowered DRL (SC-DRL), integrando uma Equação de Bellman Ajustada pelo Estado (SABE) e um Módulo de Observação Dinâmica (DOM). O sistema corrige transições de estado atrasadas causadas pela latência de transmissão, garantindo que o agente aprenda a dinâmica real do ambiente estocástico. O SC-DRL é agnóstico ao modelo e demonstra melhorias significativas na adaptabilidade de decisões de descarregamento em aplicações dependentes.
+
+\paragraph{Artigo 30: Li et al. (2025) - Otimização via Geometria Estocástica em Edge-AI}
+A pesquisa foca na modelagem de sistemas MEC sob configurações de descarregamento parcial para resolver desafios de desempenho de aprendizado e eficiência. A metodologia utiliza modelos de geometria estocástica para caracterizar a aleatoriedade espacial dos veículos e servidores. A análise garante analiticamente que usuários possam ser servidos por pelo menos um servidor local a qualquer momento, otimizando decisões baseadas em correlações direcionais e espaciais. Simulações mostram que a abordagem cooperativa atinge um atraso equilibrado de 0,042 s, reduzindo a carga do servidor central pela metade enquanto melhora a precisão do clustering em 15%.
+
+\begin{table}[h]
+\centering
+\caption{Comparativa de Ambientes e Incerteza (2023-2026)}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Artigo} & \textbf{Tipo de Ambiente} & \textbf{Tratamento de Incerteza} & \textbf{Inovação Principal} \\ \hline
+Li  & Estocástico (MIoT) & Replay Priorizado GNN & SA-TD3 Hybrid Decision \\ \hline
+Yan  & Mobilidade-Coupled & Métrica de Risco CVaR & SAC-BNN (Bayesian RL) \\ \hline
+Fofana  & Carga Flutuante & Predição GRU-LSTM & AICDQN (Dueling Double) \\ \hline
+Wang  & Dinâmico (6G) & Circuitos Quânticos / FL & Quantum-FDRL \\ \hline
+Zhang  & Transições Atrasadas & Equação de Bellman (SABE) & Status Correction (SC-DRL) \\ \hline
+Li  & Aleatoriedade Espacial & Geometria Estocástica & Cooperativa Edge-AI \\ \hline
+\end{tabular}
+\end{table}
+
+Conclusão e Perspectivas FuturasA análise exaustiva dos 30 artigos apresentados revela que o descarregamento computacional veicular evoluiu de simples algoritmos de decisão local para sistemas autônomos e estruturalmente inteligentes. A convergência entre Redes de Grafo e Transformers permite agora que veículos operem com consciência topológica e sequencial, superando as limitações das redes neurais densas tradicionais. Simultaneamente, a introdução de Blockchain e Computação Quântica endereça as crescentes demandas por segurança e velocidade em cenários URLLC para a era 6G. O futuro do descarregamento veicular reside na capacidade de autoconfiguração via LLMs e na resiliência absoluta através de modelos de risco estocástico, garantindo que as cidades inteligentes de 2026 sejam não apenas eficientes, mas inerentemente sustentáveis e seguras.
+
+% Dos artigos selecionados, sete focam diretamente nesse escopo de \gls{IoV} e VEC. A seguir, integram-se os resumos e as contribuições essenciais de cada um desses trabalhos à análise das tabelas comparativas.
+
+% \section{Padrão de Comunicação}
+% A Tabela \ref{tab:comm} resume as tecnologias de comunicação adotadas e o destino do processamento das tarefas, seja utilizando os recursos da Nuvem Veicular (\textit{Vehicular Cloud} - VC) ou da Computação de Borda (\textit{Edge}).
+
+% \begin{table}[h]
+% \centering
+% \caption{Resumo dos aspectos de padrão de comunicação dos trabalhos.}
+% \label{tab:comm}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{lcccccc}
+% \toprule
+% \multirow{2}{*}{\textbf{Referência}} & \multicolumn{3}{c}{\textbf{Tecnologia}} & & \multicolumn{2}{c}{\textbf{Servidor}} \\
+% \cmidrule{2-4} \cmidrule{6-7}
+% & \textbf{WAVE/DSRC} & \textbf{Celular (4G/5G)} & \textbf{Simultâneo/Híbrido} & & \textbf{VC} & \textbf{Edge} \\
+% \midrule
+% Haq et al. (2025) \cite{haq2025} & \cmark & \cmark & \cmark & & \cmark & \cmark \\
+% Chen et al. (2025) \cite{chen2025} & & \cmark & & & & \cmark \\
+% Zou et al. (2025) \cite{zou2025} & & \cmark & & & & \cmark \\
+% Wu et al. (2024) \cite{wu2024} & & \cmark & & & & \cmark \\
+% Fofana et al. (2024) \cite{fofana2024} & \cmark & \cmark & \cmark & & \cmark & \cmark \\
+% Moghaddasi et al. (2024) \cite{moghaddasi2024}& \cmark & \cmark & \cmark & & \cmark & \cmark \\
+% Xiang et al. (2026) \cite{xiang2026} & & \cmark & & & & \cmark \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+% A utilização simultânea de múltiplas tecnologias e locais de processamento é uma tendência para contornar gargalos de latência. O modelo ANS-V2X proposto por \citeonline{haq2025} integra tecnologias heterogêneas de Acesso de Rádio (RATs), suportando transferências contínuas entre DSRC (WAVE), LTE e 5G NR. Isso permite que os veículos aloquem tarefas tanto para a borda quanto para outros veículos (VC) de maneira flexível e simultânea. \citeonline{fofana2024} também exploram os dois ambientes, aproveitando veículos ociosos no trânsito e transformando-os em ``veículos de serviço'' (VC) via V2V, além de utilizar as infraestruturas das RSUs via V2I. A comunicação híbrida é igualmente adotada por \citeonline{moghaddasi2024} para transferências seguras na Internet dos Veículos.
+
+% Por outro lado, trabalhos como os de \citeonline{chen2025}, \citeonline{zou2025}, \citeonline{wu2024} e \citeonline{xiang2026} delimitam suas abordagens ao uso exclusivo de redes celulares para enviar as requisições computacionais a servidores de borda fixos (MEC/Edge). Nesses casos, o objetivo recai em otimizar a triagem e o particionamento (\textit{split offloading}) sem depender da disponibilidade de veículos vizinhos. 
+
+% \section{Aspectos do Problema}
+% A Tabela \ref{tab:problem} detalha as estratégias algorítmicas, o uso de informações de contexto (como fila, CPU e bateria) e os mecanismos de suporte adicional.
+
+% \begin{table}[h]
+% \centering
+% \caption{Resumo das estratégias e modelagem do problema.}
+% \label{tab:problem}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{llcc}
+% \toprule
+% \textbf{Referência} & \textbf{Estratégia Principal} & \textbf{Info. de Contexto} & \textbf{Suporte Extra} \\
+% \midrule
+% Haq et al. (2025) \cite{haq2025} & Otimização (MILP) e Heurística & \cmark & \\
+% Chen et al. (2025) \cite{chen2025} & Metaheurística (MO-HGA) + TOPSIS & \cmark & \\
+% Zou et al. (2025) \cite{zou2025} & DRL (PER-iSAC) & \cmark & \\
+% Wu et al. (2024) \cite{wu2024} & DRL (TD3) + TOPSIS & \cmark & \\
+% Fofana et al. (2024) \cite{fofana2024}& DRL Multiagente + Jogo de Stackelberg& \cmark & \\
+% Moghaddasi et al. (2024) \cite{moghaddasi2024}& DRL (DDQN) & \cmark & Segurança (Blockchain) \\
+% Xiang et al. (2026) \cite{xiang2026} & Deep Learning (VAE-LSTM) & \cmark & \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+% A evolução em direção ao \textit{Deep Reinforcement Learning} (DRL) é notável. Enquanto a revisão de \citeonline{de2020computation} apontava para o uso frequente de metaheurísticas tradicionais, os artigos recentes incorporam IA para lidar com a volatilidade do sistema. \citeonline{wu2024}, por exemplo, atacam o desequilíbrio de carga na borda modelando a rede via Processo de Decisão de Markov e resolvendo-o com o algoritmo TD3, empregando também a técnica TOPSIS para selecionar servidores. \citeonline{zou2025} focam especificamente em tarefas de segmentação de imagem pesadas, aprimorando o \textit{Soft Actor-Critic} com \textit{Prioritized Experience Replay} (PER-iSAC) para minimizar erros na alocação sob limitações de servidor. \citeonline{fofana2024} aplicam o Aprendizado por Reforço Profundo Multiagente combinado com a Teoria dos Jogos (Jogo de Stackelberg) para tarifar a capacidade computacional e atingir um Equilíbrio de Nash entre RSUs e veículos ociosos.
+
+% Destaca-se também o trabalho de \citeonline{moghaddasi2024}, que introduz suporte extra de segurança empregando a tecnologia Blockchain aliada a uma rede \textit{Double Deep Q-Network} (DDQN) para otimizar os \textit{trade-offs} entre confiabilidade, latência e energia na \gls{IoV}. Fugindo um pouco do reforço contínuo, \citeonline{xiang2026} utilizam \textit{Deep Learning} híbrido (VAE-LSTM) focado na análise de séries temporais para modelar estados dinâmicos e incertos.
+
+% Ainda há, contudo, espaço para metaheurísticas e modelos determinísticos modernizados. \citeonline{chen2025} utilizam o TOPSIS ponderado por entropia em uma primeira etapa de triagem de urgência, seguido por um algoritmo genético (MO-HGA) auxiliado pela Entropia Máxima Bayesiana (BME) para alocação multiobjetivo. Já \citeonline{haq2025} garantem um tempo de execução de decisão inferior a 15~milissegundos utilizando heurística rápida comparada à Programação Linear Inteira Mista (MILP).
+
+% \section{Aspectos do Experimento}
+% A validação das soluções é evidenciada na Tabela \ref{tab:experiment}, observando-se os cenários urbanos e rodoviários (\textit{Highway}), além da variação da densidade de veículos.
+
+% \begin{table}[h]
+% \centering
+% \caption{Resumo dos aspectos do experimento e ambiente de simulação.}
+% \label{tab:experiment}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{lcccc}
+% \toprule
+% \multirow{2}{*}{\textbf{Referência}} & \multicolumn{2}{c}{\textbf{Cenário}} & \multirow{2}{*}{\textbf{Densidade Veicular}} & \textbf{Info. Contexto} \\
+% \cmidrule{2-3}
+% & \textbf{Urbano} & \textbf{Rodovia} & & \textbf{(Rotas Conhecidas)} \\
+% \midrule
+% Haq et al. (2025) \cite{haq2025} & \cmark & & Variável (N=5 a 12) & \\
+% Chen et al. (2025) \cite{chen2025} & \cmark & & 50 a 150 & \\
+% Zou et al. (2025) \cite{zou2025} & \cmark & \cmark & Variável & \\
+% Wu et al. (2024) \cite{wu2024} & & \cmark & 5 a 30 & \\
+% Fofana et al. (2024) \cite{fofana2024} & \cmark & \cmark & Média (24 TVs / 5 SVs) & \\
+% Moghaddasi et al. (2024) \cite{moghaddasi2024}& \cmark & \cmark & Alta (50, 100, 150) & \\
+% Xiang et al. (2026) \cite{xiang2026} & \cmark & \cmark & Variável & \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+% A densidade e o relevo geográfico influenciam diretamente o contato das redes. \citeonline{chen2025} conferem grande realismo ao experimento utilizando rastros verídicos de mobilidade de táxis de um cruzamento na cidade de Wuhan, simulando tráfego urbano intenso entre 50 e 150 veículos conectados. \citeonline{wu2024} concentraram a validação de seu algoritmo de balanceamento de carga numa via expressa reta (rodovia), onde a locomoção obedece a um fluxo linear e a densidade é variada progressivamente de 5 a 30 nós para observar o estresse dos servidores MEC de beira de estrada. 
+
+% \citeonline{moghaddasi2024} geraram um \textit{dataset} sintético extensivo focado na interação Blockchain-IoV-MEC, simulando densidades altas e exigentes (até 150 veículos simultâneos). \citeonline{fofana2024} delimitaram a simulação a uma proporção específica (24 veículos com tarefas e 5 servindo de suporte) para mapear estritamente o equilíbrio financeiro do jogo de Stackelberg proposto. Ao contrário do modelo proposto por \citeonline{de2020computation}, que utilizava a informação de ``Rotas Conhecidas'' (\textit{Known Routes}) para o algoritmo de roteamento BCV evitar nós perdidos, todos os artigos recentes tabulados confiam na robustez contínua da atualização de estado (como \textit{experience replay} nos algoritmos DRL) para mitigar falhas de \textit{handovers}.
+
+% \section{Conclusão}
+% Os resumos e as proposições individuais de cada artigo, quando contrapostos à taxonomia base~\cite{de2020computation}, demonstram uma acentuada evolução tecnológica no estado da arte. A consolidação do \textit{Deep Reinforcement Learning} superou a predominância histórica das metaheurísticas clássicas como principal ferramenta para lidar com o problema NP-Hard de descarregamento de tarefas na borda. Ademais, arquiteturas como IA Generativa, Blockchain e hibridização massiva de tecnologias (WAVE e 5G juntos) provam que o ambiente \gls{IoV} está sendo rapidamente preparado para demandas veiculares densas de missão crítica e latência ultrabaixa.
