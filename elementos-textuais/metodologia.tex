@@ -42,8 +42,8 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
         1.4.1 Incerteza no tempo de processamento
         1.4.2 Incerteza no tempo de transmissão
         1.4.3 Incerteza no consumo energético
-    1.4 Protocolo de Offloading, na camada de aplicação
-        1.4.1 Pedido de Offload
+    1.4 Protocolo de descarregamento, na camada de aplicação
+        1.4.1 Pedido de descarregamento
         1.4.2 Resposta ao Pedido (Aceite/Rejeição)
             1.4.2.1 Rejeição por fila cheia
             1.4.2.2 Rejeição por energia insuficiente
@@ -54,7 +54,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
         1.4.6 Timeouts e Retransmissões
         1.4.7 Medição de Métricas de Desempenho (latência, consumo energético, taxa de falhas, tamanho média das filas)
         1.4.8 Considerações sobre Simulador de Eventos Discretos
-            1.4.8.1 Enviar pedido de offload
+            1.4.8.1 Enviar pedido de descarregamento
             1.4.8.2 Aguardar resposta
     1.5 Protocolo de Descoberta de Vizinhança, na camada de aplicação
         1.5.1 Emissão de Beacons Periódicos (via 5G NR e V2X Sidelink)
@@ -74,25 +74,25 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
         2.2.3 Mobilidade Veicular e Variação do Canal
     2.3 Modelagem de Ambientes Não-Estacionários
         2.3.1 Drift nos Atributos do Canal durante a simulação
-3. Task Offloading
+3. Descarregamento de tarefas
     3.1 Modos de Execução
         3.1.1 Processamento Local
-        3.1.2 Offloading V2I (para RSU via 5G NR)
-        3.1.3 Offloading V2V (para veículo vizinho via Sidelink)
+        3.1.2 Descarregamento V2I (para RSU via 5G NR)
+        3.1.3 Descarregamento V2V (para veículo vizinho via Sidelink)
     3.2
-4. Coleta de métricas de desempenho do task offloading
+4. Coleta de métricas de desempenho do descarregamento de tarefas
     4.1 Métricas Globais
         4.1.1 Atraso Total do Sistema
         4.1.2 Consumo Energético Total do Sistema
         4.1.3 Índice de Justiça de Jain
-        4.1.4 Taxa de Sucesso no Offloading
+        4.1.4 Taxa de Sucesso no descarregamento
         4.1.5 Total de Tarefas Processadas Localmente
-        4.1.6 Total de Tarefas Offloadadas via V2I
-        4.1.7 Total de Tarefas Offloadadas via V2V
-    4.2 Métricas por Política de Offloading
+        4.1.6 Total de Tarefas descarregadas via V2I
+        4.1.7 Total de Tarefas descarregadas via V2V
+    4.2 Métricas por Política de descarregamento
         4.2.1 Atraso Médio por Política
         4.2.2 Consumo Energético Médio por Política
-        4.2.3 Taxa de Sucesso no Offloading por Política
+        4.2.3 Taxa de Sucesso no descarregamento por Política
         4.3.4 Tamanho Médio das Filas por Política
         4.3.5 Índice de justiça de Jain por Política
     4.3 Análise de Sensibilidade
@@ -106,11 +106,11 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
     5.1 Geração de Cenários Veiculares Realistas
         5.1.1 Cenário urbano com tráfego intenso, trafego moderado, tráfego leve
     5.2 Execução da simulação utilizando o SUMO para mobilidade veicular
-6. Políticas de Decisão de Offloading
+9. Políticas de Decisão de descarregamento
     6.1 Políticas Heurísticas
         6.1.1 Processamento Local
-        6.1.2 Offloading Aleatório
-        6.1.3 Offloading Ganancioso
+        6.1.2 Descarregamento aleatório
+        6.1.3 Descarregamento ganancioso
             6.1.3.1 Baseado na distancia ao VEC
             6.1.3.2 Baseado na qualidade do canal
             6.1.3.3 Baseado na latência
@@ -121,12 +121,12 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 6. Criação de testes unitários para validação dos módulos desenvolvidos
     6.1 Testes para o módulo de geração de tarefas
     6.2 Testes para o módulo de modelagem do canal
-    6.3 Testes para o módulo de offloading
+    6.3 Testes para o módulo de descarregamento
     6.4 Testes para o protocolo de descoberta de vizinhança
-    6.5 Testes para coleta de métricas de desempenho do task offloading
+    6.5 Testes para coleta de métricas de desempenho do descarregamento de tarefas
 7. Usar docker para facilitar a reprodução dos experimentos
 8. Usar script em bash e python para automatizar a execução dos experimentos e análise dos resultados
-9. Criar logs para facilitar o rastreamento da execuçao offloading (fim a fim)
+9. Criar logs para facilitar o rastreamento da execuçao do descarregamento (fim a fim)
 10. Documentar o código desenvolvido utilizando Doxygen
 11. Tratar exceções e erros durante a simulação para garantir robustez do sistema
     11.1 Não confiar 100 porcento nas entradas das funções, tratar todas as exceções possíveis
@@ -260,7 +260,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % \begin{itemize}
 %     \item \textbf{Descoberta de Vizinhança:} A aplicação emite periodicamente pacotes de \textit{beacon} (via 5G NR e Sidelink V2X) que contêm o estado atual do nó, incluindo suas especificações de dispositivo (\texttt{DeviceSpecs}: capacidade de CPU, nível de energia, tempo de fila). Os nós receptores utilizam essas informações para manter uma tabela de vizinhos (\texttt{NeighborTable}), que também calcula o tempo de vida estimado do enlace.
 %     \item \textbf{Geração de Tarefas:} O \texttt{TaskGenerator} é responsável por criar novas tarefas (\texttt{Task}) em cada UE, com base em distribuições estocásticas para definir seus atributos: tamanho de entrada (bytes), tamanho de saída (bytes), ciclos de processamento (CPU cycles) e \textit{deadline} (ms). Este componente é capaz de simular ambientes não-estacionários, aplicando um "drift" aos parâmetros das tarefas ao longo do tempo, o que é crucial para validar a robustez do modelo Fuzzy-DRL.
-%     \item \textbf{Protocolo de Offloading:} Um protocolo de comunicação baseado em UDP foi definido para gerenciar a negociação. O fluxo consiste em \texttt{TASK\_REQUEST} (pedido de offload), \texttt{TASK\_RESPONSE} (aceite ou rejeição, ex: \texttt{REJECTED\_QUEUE\_FULL}), \texttt{TASK\_DATA} (envio dos dados da tarefa), \texttt{TASK\_RESULT} (retorno do resultado) e \texttt{TASK\_ACK} (confirmação).
+%     \item \textbf{Protocolo de descarregamento:} Um protocolo de comunicação baseado em UDP foi definido para gerenciar a negociação. O fluxo consiste em \texttt{TASK\_REQUEST} (pedido de descarregamento), \texttt{TASK\_RESPONSE} (aceite ou rejeição, ex: \texttt{REJECTED\_QUEUE\_FULL}), \texttt{TASK\_DATA} (envio dos dados da tarefa), \texttt{TASK\_RESULT} (retorno do resultado) e \texttt{TASK\_ACK} (confirmação).
 % \end{itemize}
 
 % \section{Integração do Modelo Fuzzy-DRL}

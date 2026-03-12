@@ -141,39 +141,46 @@ Esta decomposição recursiva forma a base matemática que torna possíveis as E
 
 \section*{Funções de Valor e Equações de Bellman}
 
-Para quantificar o desempenho, o RL estima as \textbf{Funções de Valor de Estado (V)} e \textbf{Funções de Valor de Ação (Q)}. Elas obedecem às \textbf{Equações de Expectativa de Bellman} recursivas \cite{sutton2018}:
+Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao seguir uma determinada política por meio da estimativa do retorno esperado a longo prazo \cite{sutton2018}. Para quantificar formalmente esse desempenho, a literatura estabelece duas abordagens principais: estimar o valor de estar no estado atual ($s$), ou estimar o valor de selecionar uma ação específica ($a$) a partir desse estado ($s$) \cite{hu2024, sutton2018}. A primeira estimativa é calculada utilizando a Função de Valor de Estado ($V^\pi$), enquanto a segunda é obtida por meio da Função de Valor de Ação ($Q^\pi$) \cite{hu2024, sutton2018}. Ambas as funções fundamentam-se em uma propriedade de consistência recursiva, expressas matematicamente pelas Equações de Expectativa de Bellman \cite{sutton2018}:
+
 \begin{align}
     V^\pi(s) &= \sum_{a} \pi(a|s) \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^\pi(s') \right] \\
     Q^\pi(s,a) &= \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \sum_{a'} \pi(a'|s') Q^\pi(s',a') \right]
 \end{align}
 
-As \textbf{Equações de Otimidade de Bellman} encontram o máximo valor possível da política ótima inserindo o operador $\max$:
-\begin{equation}
-    Q^*(s,a) = \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right]
-\end{equation}
+% As \textbf{Equações de Otimidade de Bellman} encontram o máximo valor possível da política ótima inserindo o operador $\max$:
+% \begin{equation}
+%     Q^*(s,a) = \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right]
+% \end{equation}
 
-Também define-se a \textbf{Função de Vantagem (Advantage)}, que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado \cite{wang2016dueling}:
+Também é possível definir a Função de Vantagem (\textit{Advantage}), que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado \cite{wang2016dueling}:
 \begin{equation}
     A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)
 \end{equation}
 
-\subsection{Métodos de Aprendizado e Diferença Temporal}
-O RL requer balanço com o \textbf{Dilema Exploração-Explotação}. Em abordagens sem conhecimento dinâmico (\textbf{Model-Free}), ao contrário da Programação Dinâmica (\textbf{Model-Based}), aplicam-se os \textbf{Métodos de Monte Carlo} (atualizam usando retornos completos do episódio) ou \textbf{Aprendizagem por Diferença Temporal (TD Learning)} (atualizam usando "bootstrapping" de estimativas de apenas um passo) \cite{sutton2018}. A unificação entre ambos se dá com \textbf{Traços de Elegibilidade (TD($\lambda$))}, controlados pela taxa de decaimento $\lambda$.
+\section*{Métodos de Aprendizado e Diferença Temporal}
 
-Algoritmos TD clássicos, fundamentais em ambientes \textbf{Estacionários}, incluem o \textbf{SARSA} (aprendizado \textbf{On-policy}):
-\begin{equation}
-    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
-\end{equation}
-E o clássico \textbf{Q-Learning} (aprendizado \textbf{Off-policy}) \cite{watkins1992}:
-\begin{equation}
-    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
-\end{equation}
-Para evitar a viés de superestimação na operação do máximo acima, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção de qual é a melhor ação, da avaliação de valor dessa ação com duas tabelas diferentes \cite{hasselt2010double}.
+% O RL requer balanço com o \textbf{Dilema Exploração-Explotação}. 
+De forma geral, durante o ciclo de interação, o agente enfrenta o \textbf{Dilema Exploração-Explotação} (\textit{Exploration-Exploitation Dilemma}), precisando decidir continuamente entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa \cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é fundamental para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões \cite{hu2024}.
 
+Quanto ao conhecimento prévio sobre as dinâmicas do ambiente (as regras de transição e recompensa), a literatura divide os métodos em duas categorias principais \cite{sutton2018, moerland2023}. Em abordagens \textit{Model-Based} (Baseadas em Modelo), o agente possui ou aprende um modelo matemático do ambiente, permitindo o uso de técnicas de planejamento como a Programação Dinâmica para simular trajetórias e antecipar ações \cite{sutton2018, hu2024}. Por outro lado, nas abordagens \textit{Model-Free} (Livres de Modelo), o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente \cite{hu2024, sutton2018}.
 
-\section{Tópicos de Aprendizagem por Reforço Profundo (DRL)}
+Para resolver problemas \textit{Model-Free}, destacam-se duas estratégias: os \textit{Métodos de Monte Carlo}, que atualizam as estimativas de valor apenas ao final de um episódio, utilizando o retorno total e real acumulado \cite{sutton2018, hu2024} e através da \textit{Aprendizagem por Diferença Temporal (TD Learning)}, que atualiza suas estimativas a cada passo, utilizando o retrocesso (\textit{bootstrapping}) embasado na estimativa de valor do próximo estado e na recompensa imediata \cite{sutton2018}. 
 
-\subsection{DQN e Variantes}
+% A unificação formal entre essas suas técnicas se dá por meio dos \textit{Traços de Elegibilidade (TD($\lambda$))}, onde a taxa de decaimento $\lambda$ atua como uma ponte contínua entre o passo único e o episódio completo \cite{sutton2018, zhao2024}.
+
+% Dentro do TD Learning voltado para controle, existem dois algoritmos clássicos \cite{sutton2018} [20, 21]. O \textbf{SARSA} realiza um aprendizado \textbf{On-policy}, onde o agente estima o valor e otimiza a exata mesma política exploratória que utiliza para interagir com o ambiente \cite{hu2024, sutton2018} [22-24]:
+% \begin{equation}
+%     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
+% \end{equation}
+% E o clássico \textbf{Q-Learning} \cite{watkins1992}, que opera de forma \textbf{Off-policy}, aproximando a função de valor da política ótima independentemente da política comportamental utilizada para explorar o ambiente \cite{sutton2018, hu2024} [21, 25, 26]:
+% \begin{equation}
+%     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
+% \end{equation}
+% Por fim, para evitar o viés de superestimação matemática causado pela operação do máximo no Q-Learning clássico, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção da melhor ação da avaliação do seu valor real, usando duas tabelas ou funções independentes \cite{hasselt2010double, hu2024} [27-30].
+
+\section*{Aprendizagem por Reforço Profundo (DRL)}
+
 A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (DQN)} \cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
 \begin{equation}
     L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right]
