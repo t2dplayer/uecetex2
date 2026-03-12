@@ -1,3 +1,256 @@
+% ==============================================================================
+% 2.2 MODELAGEM DE DESEMPENHO E LATÊNCIA EM REDES 5G NR
+% ==============================================================================
+
+\section{Modelagem de Desempenho e Latência em Redes 5G NR}
+\label{sec:modelagem_v2x}
+
+A avaliação analítica do tempo de resposta nas comunicações veiculares \gls{V2X} exige a modelagem simultânea de suas duas interfaces operacionais sob a égide do padrão 5G \textit{New Radio} (NR): a interface Uu, direcionada ao enlace \gls{V2I} (Veículo-Infraestrutura), e a interface PC5, direcionada ao \textit{Sidelink} \gls{V2V} (Veículo-Veículo). Para garantir o rigor da simulação em cenários de missão crítica (\textit{worst-case}), é imprescindível formular os modelos de propagação estocásticos, as restrições matemáticas de latência e suas respectivas integrações computacionais.
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem de Propagação e Balanço de Potência}
+\label{sec:propagacao_potencia}
+
+Para representar o canal de rádio de forma fidedigna em ambas as interfaces, adotam-se os modelos estocásticos estabelecidos no documento 3GPP TR 38.901 \cite{3gpp38901}. No cenário de comunicação Veículo-Infraestrutura (V2I), o pior caso é modelado pela topologia \textit{Urban Micro} de Não-Linha de Visada (\textbf{UMi NLOS}). Nesta situação, o veículo encontra-se na borda da célula e sob severo sombreamento de edificações. A perda de percurso tridimensional $PL_{\text{UMi-NLOS}}(d)$ e a potência de recepção linear $P_{rx}$ no \gls{gNB} são expressas pelas Equações \ref{eq:pl_v2i} e \ref{eq:prx_v2i}:
+
+\begin{equation}
+    PL_{\text{UMi-NLOS}}(d) = 32.4 + 31.9 \log_{10}(d) + 20 \log_{10}(f_c) + X_{\sigma}
+    \label{eq:pl_v2i}
+\end{equation}
+\begin{equation}
+    P_{rx (\text{dBm})} = P_{tx} + 10\log_{10}(N_t) + G_{tx} + G_{rx} - PL_{\text{UMi-NLOS}}(d) - L_{pen}
+    \label{eq:prx_v2i}
+\end{equation}
+
+Onde $X_{\sigma} \sim \mathcal{N}(0, \sigma_{SF}^2)$ modela o desvanecimento lento (\textit{shadow fading}) com $\sigma_{SF} = 8.2$ dB, e $L_{pen}$ insere as perdas por penetração da lataria veicular. A qualidade do sinal V2I é governada pela Relação Sinal-Interferência-Ruído (\gls{SINR}), calculada pela razão entre a potência recebida e o somatório do ruído térmico base ($N_0 B$) com a interferência intercelular ($\sum I_k$).
+
+Em contrapartida, para as comunicações diretas \gls{D2D} sob a interface PC5 \textit{Sidelink} (Modo 2), o pior cenário corresponde ao ambiente veicular \textbf{NLOSv}, causado por obstruções dinâmicas de grande porte, como caminhões. A difração (\textit{knife-edge}) gerada insere uma severa perda por bloqueio ($A_{block}$), redefinindo a atenuação conforme a Equação \ref{eq:pl_nlosv}:
+
+\begin{equation}
+    PL_{NLOSv}(d) = PL_{LOS}(d) + A_{block} + X_{\sigma}
+    \label{eq:pl_nlosv}
+\end{equation}
+
+Além do bloqueio físico, a operação no Modo 2 do Sidelink não conta com um gNB coordenando o espectro; os próprios veículos realizam o sensoriamento de canal. Sob tráfego urbano intenso, o sistema entra em um regime dominado por interferência, onde as colisões intra-Sidelink ($I_{SL}$) esmagam o limiar do ruído térmico ($I_{SL} \gg N_0 B$). Consequentemente, o SINR degradado ($\text{SINR}_{SL} \approx P_{rx\_SL} / I_{SL}$) força uma regressão imediata da modulação e frequentemente causa a perda do pacote de controle \cite{garcia2021}. A Figura \ref{fig:worst_case_v2x_math} ilustra as dinâmicas físicas e os obstáculos que compõem esses dois enlaces críticos.
+
+\begin{figure}[htpb]
+\centering
+\Caption{\label{fig:worst_case_v2x_math} Representação topológica dos piores cenários V2I e V2X. O enlace V2I (Uu) experimenta sombreamento predial severo (UMi NLOS). O enlace C-V2X (Sidelink PC5) experimenta atenuação por bloqueio dinâmico ($A_{block}$) de veículos pesados, acionando o canal PSFCH para \textit{feedback} de erros e retransmissão HARQ lateral.}
+\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.82, transform shape]
+
+% ===================== PISO / VIA URBANA =====================
+% Calçada superior
+\fill[gray!15] (-2, 1.2) rectangle (14, 2.0);
+\draw[gray!40, thick] (-2, 2.0) -- (14, 2.0);
+% Pista
+\fill[gray!25] (-2, -0.8) rectangle (14, 1.2);
+% Linha tracejada central da via
+\draw[white, thick, dashed] (-2, 0.2) -- (14, 0.2);
+% Calçada inferior
+\fill[gray!15] (-2, -1.6) rectangle (14, -0.8);
+\draw[gray!40, thick] (-2, -0.8) -- (14, -0.8);
+
+% ===================== PRÉDIO (UMi NLOS) =====================
+% Corpo principal
+\fill[gray!45] (-1.6, 2.0) rectangle (0.8, 6.5);
+\draw[gray!70, thick] (-1.6, 2.0) rectangle (0.8, 6.5);
+% Janelas (grade 2x5)
+\foreach \yy in {2.6, 3.4, 4.2, 5.0, 5.8} {
+  \fill[cyan!25] (-1.2, \yy) rectangle (-0.7, {\yy+0.5});
+  \draw[gray!60] (-1.2, \yy) rectangle (-0.7, {\yy+0.5});
+  \fill[cyan!25] (0.0, \yy) rectangle (0.5, {\yy+0.5});
+  \draw[gray!60] (0.0, \yy) rectangle (0.5, {\yy+0.5});
+}
+% Rótulo
+\node[font=\footnotesize\bfseries, text=gray!80!black, align=center, rotate=90] at (-0.4, 4.3) {Prédio};
+\node[font=\scriptsize, text=gray!70, align=center] at (-0.4, 2.35) {UMi NLOS};
+
+% ===================== TORRE gNB =====================
+% Mastro treliçado
+\fill[gray!30] (3.8, 2.0) rectangle (4.2, 7.0);
+\draw[gray!60, thick] (3.8, 2.0) -- (3.8, 7.0);
+\draw[gray!60, thick] (4.2, 2.0) -- (4.2, 7.0);
+% Treliça
+\foreach \yy in {2.0, 2.5,...,6.5} {
+  \draw[gray!50, thin] (3.8, \yy) -- (4.2, {\yy+0.5});
+  \draw[gray!50, thin] (4.2, \yy) -- (3.8, {\yy+0.5});
+}
+% Antena setor (triângulo apontando para baixo-esquerda)
+\fill[green!50!black] (4.0, 7.0) -- (3.2, 7.8) -- (4.8, 7.8) -- cycle;
+\draw[green!70!black, thick] (4.0, 7.0) -- (3.2, 7.8) -- (4.8, 7.8) -- cycle;
+% Radiação da antena
+\draw[green!40, thick, dashed] (3.2, 7.8) .. controls (2.0, 8.6) and (1.0, 8.6) .. (0.5, 8.2);
+\draw[green!40, thick, dashed] (4.8, 7.8) .. controls (6.0, 8.6) and (7.0, 8.6) .. (7.5, 8.2);
+% Rótulo gNB
+\node[font=\small\bfseries, text=green!50!black] at (4.0, 8.2) {gNB};
+
+% ===================== SERVIDOR MEC =====================
+\node[draw=orange!70!black, fill=orange!10, minimum width=3.0cm, minimum height=1.1cm,
+      align=center, rounded corners=4pt, thick, font=\small] (mec) at (9.0, 8.0)
+      {\textbf{Servidor MEC}\\{\footnotesize (Baixa Latência E2E)}};
+
+% Backhaul gNB -> MEC
+\draw[<->, blue!70!black, very thick] (4.8, 7.8) -- node[above, font=\footnotesize, text=blue!70!black] {\textit{Backhaul} fibra} (mec.west);
+
+% ===================== VEÍCULO 1 (Tx) =====================
+% Corpo do carro
+\fill[blue!25] (1.5, -0.5) rectangle (3.8, 0.5);
+\draw[blue!60!black, thick, rounded corners=2pt] (1.5, -0.5) rectangle (3.8, 0.5);
+% Cabine
+\fill[blue!15] (2.0, 0.5) -- (2.4, 1.0) -- (3.4, 1.0) -- (3.8, 0.5) -- cycle;
+\draw[blue!60!black, thick] (2.0, 0.5) -- (2.4, 1.0) -- (3.4, 1.0) -- (3.8, 0.5);
+% Vidro
+\fill[cyan!20] (2.15, 0.55) -- (2.5, 0.92) -- (3.3, 0.92) -- (3.65, 0.55) -- cycle;
+% Rodas
+\fill[gray!70] (2.0, -0.5) circle (0.22);
+\fill[gray!70] (3.3, -0.5) circle (0.22);
+% Antena
+\draw[red!70!black, thick] (3.2, 1.0) -- (3.2, 1.4);
+\fill[red!70!black] (3.2, 1.4) circle (0.06);
+% Rótulo
+\node[font=\footnotesize\bfseries, text=blue!70!black] at (2.65, -1.1) {UE$_1$ (Tx)};
+
+% ===================== CAMINHÃO OBSTRUTOR =====================
+% Carroceria (grande, bloqueia visão)
+\fill[red!15] (6.5, -0.6) rectangle (9.0, 1.6);
+\draw[red!60!black, thick, rounded corners=1pt] (6.5, -0.6) rectangle (9.0, 1.6);
+% Hachurado para destacar obstrução
+\foreach \xx in {6.7, 7.1,...,8.9} {
+  \draw[red!30, thin] (\xx, -0.6) -- ({\xx+0.3}, 1.6);
+}
+% Cabine do caminhão
+\fill[red!25] (6.0, -0.6) rectangle (6.5, 0.8);
+\draw[red!60!black, thick] (6.0, -0.6) rectangle (6.5, 0.8);
+% Rodas
+\fill[gray!70] (6.8, -0.6) circle (0.25);
+\fill[gray!70] (8.6, -0.6) circle (0.25);
+\fill[gray!70] (6.3, -0.6) circle (0.2);
+% Rótulo caminhão
+\node[font=\footnotesize\bfseries, text=red!70!black, align=center] at (7.75, 0.5) {Caminhão\\Obstrutor};
+\node[font=\scriptsize, text=red!60!black] at (7.75, -0.2) {$A_{block}$};
+
+% ===================== VEÍCULO 2 (Rx) =====================
+% Corpo
+\fill[blue!25] (10.5, -0.5) rectangle (12.8, 0.5);
+\draw[blue!60!black, thick, rounded corners=2pt] (10.5, -0.5) rectangle (12.8, 0.5);
+% Cabine
+\fill[blue!15] (11.0, 0.5) -- (11.4, 1.0) -- (12.4, 1.0) -- (12.8, 0.5) -- cycle;
+\draw[blue!60!black, thick] (11.0, 0.5) -- (11.4, 1.0) -- (12.4, 1.0) -- (12.8, 0.5);
+% Vidro
+\fill[cyan!20] (11.15, 0.55) -- (11.5, 0.92) -- (12.3, 0.92) -- (12.65, 0.55) -- cycle;
+% Rodas
+\fill[gray!70] (11.0, -0.5) circle (0.22);
+\fill[gray!70] (12.3, -0.5) circle (0.22);
+% Antena
+\draw[red!70!black, thick] (12.2, 1.0) -- (12.2, 1.4);
+\fill[red!70!black] (12.2, 1.4) circle (0.06);
+% Rótulo
+\node[font=\footnotesize\bfseries, text=blue!70!black] at (11.65, -1.1) {UE$_2$ (Rx)};
+
+% ===================== ENLACE V2I (Uu) - SOMBREADO =====================
+% Sinal do UE1 tentando chegar ao gNB, bloqueado pelo prédio
+\draw[->, orange!80!black, very thick, dashed]
+  (3.2, 1.4) .. controls (2.5, 3.5) and (1.5, 5.5) .. (0.6, 5.8);
+\node[font=\tiny, text=orange!80!black, fill=white, inner sep=1pt, rotate=-55] at (2.1, 3.8) {Sombreamento severo};
+
+% X vermelho sobre o prédio indicando bloqueio
+\node[font=\Large\bfseries, text=red!70] at (0.0, 5.5) {$\boldsymbol{\times}$};
+
+% Seta pontilhada do gNB ao MEC (caminho real quando funciona)
+\draw[->, orange!50, thick, dotted] (3.0, 1.4) .. controls (3.5, 4.0) and (3.8, 5.5) .. (3.9, 6.9);
+\node[font=\scriptsize, text=orange!70!black, align=center, fill=white, inner sep=1pt] at (1.8, 4.2) {V2I (Uu)\\$X_\sigma$, NLOS};
+
+% ===================== ENLACE PC5 SIDELINK (Modo 2) =====================
+% Seta principal de dados: UE1 -> UE2 (bloqueado pelo caminhão)
+\draw[->, purple!80!black, very thick]
+  (3.8, 0.0) -- node[above, font=\footnotesize\bfseries, yshift=6pt, text=purple!80!black] {PC5 Sidelink (Modo 2)} (6.0, 0.0);
+% Seta tracejada passando sobre/ao redor do caminhão (difração)
+\draw[->, purple!60, thick, dashed]
+  (3.8, 0.3) .. controls (5.5, 2.8) and (8.5, 2.8) .. (10.5, 0.3);
+\node[font=\scriptsize, text=purple!70!black, fill=white, inner sep=1pt, align=center] at (7.2, 2.9) {Difração\\$PL_{NLOSv}(d)$};
+
+% X vermelho sobre o caminhão indicando bloqueio direto
+\node[font=\Large\bfseries, text=red!70] at (7.75, 1.2) {$\boldsymbol{\times}$};
+
+% Seta de feedback HARQ (PSFCH): UE2 -> UE1
+\draw[<-, purple!60!black, thick, dotted]
+  (3.8, -0.3) .. controls (5.5, -2.0) and (8.5, -2.0) .. (10.5, -0.3);
+\node[font=\scriptsize\bfseries, text=purple!60!black, fill=white, inner sep=1pt, align=center] at (7.2, -2.1) {HARQ NACK (PSFCH)\\$N_{harq} \times T_{RTT}$};
+
+% Anotação: Interferência co-canal
+\node[draw=red!50!black, fill=red!5, rounded corners=3pt, font=\scriptsize,
+      align=center, inner sep=3pt, thick] at (12.5, 2.6)
+      {Interferência\\Intra-Sidelink\\$I_{SL} \gg N_0 B$};
+\draw[->, red!50!black, thick] (12.5, 2.1) -- (12.2, 1.45);
+
+% ===================== LEGENDA =====================
+\node[draw=gray!60, fill=white, rounded corners=3pt, inner sep=5pt,
+      font=\scriptsize, align=left] at (12.0, 5.5) {%
+\tikz\draw[->, orange!80!black, very thick, dashed] (0,0) -- (0.7,0); Enlace Uu (V2I)\\[2pt]
+\tikz\draw[->, purple!80!black, very thick] (0,0) -- (0.7,0); Enlace PC5 (V2V)\\[2pt]
+\tikz\draw[->, purple!60!black, thick, dotted] (0,0) -- (0.7,0); Feedback PSFCH\\[2pt]
+\tikz\node[font=\bfseries, text=red!70] {$\times$}; Bloqueio / NLOS%
+};
+
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
+\end{figure}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Modelagem Matemática da Latência}
+\label{sec:modelagem_matematica_latencia}
+
+Para o dimensionamento de serviços \gls{URLLC}, a latência de plano de usuário exige uma modelagem estrita. Embora a capacidade do canal possa ser teoricamente aproximada pelo Teorema de Shannon-Hartley -- penalizado pelos \textit{overheads} nativos de sinalização ($OH$) --, a alocação prática no 5G NR ocorre através de blocos temporais indivisíveis. Sendo a duração de um \textit{slot} $T_{slot} = 2^{-\mu}$~ms, o número de blocos necessários ($N_{slots}$) e o tempo nominal de antena ($T_{tx}$) para transmitir uma carga de $L$ bits obedecem ao Tamanho do Bloco de Transporte suportado ($TBS_{slot}$), conforme as Equações \ref{eq:n_slots} e \ref{eq:t_tx}:
+
+\begin{equation}
+    N_{slots} = \left\lceil \frac{L}{TBS_{slot}} \right\rceil
+    \label{eq:n_slots}
+\end{equation}
+\begin{equation}
+    T_{tx} = N_{slots} \times T_{slot}
+    \label{eq:t_tx}
+\end{equation}
+
+Além da transmissão bruta, as restrições de \textit{hardware} do 3GPP impõem o tempo de processamento algorítmico do terminal ($T_{proc}$). A norma determina esse atraso como um número mínimo fixo de símbolos \gls{OFDM} exigidos ($N_{symb}$) para o preparo dos canais. A conversão dessa carga matricial em tempo é dada pela Equação \ref{eq:t_proc}:
+
+\begin{equation}
+    T_{proc} = N_{symb} \times \left( \frac{T_{slot}}{14} \right)
+    \label{eq:t_proc}
+\end{equation}
+
+Com as componentes físicas definidas, a latência real na infraestrutura V2I (Equação \ref{eq:t_v2i}) consolida a propagação tridimensional de voo ($T_{prop}$) e as penalidades do protocolo \gls{HARQ}, que reage às falhas injetando retransmissões associadas ao tempo de ida e volta (\textit{Round-Trip Time}) do sistema ($T_{RTT\_HARQ}$):
+
+\begin{equation}
+    T_{UP\_V2I} = T_{tx} + T_{proc} + T_{prop} + (N_{harq} \times T_{RTT\_HARQ})
+    \label{eq:t_v2i}
+\end{equation}
+
+Diferentemente da topologia celular V2I, a interface PC5 exige que o veículo adicione uma janela temporal estrita de observação preventiva ($T_{sensing}$) para avaliar e reservar os recursos de forma autônoma. Somado a isso, no Release 16, a notificação de erros disparada por perdas decorrentes de obstáculos ocorre via canal \gls{PSFCH}, regendo a latência fim-a-fim da comunicação direta ($T_{e2e\_SL}$) pela Equação \ref{eq:t_pc5}:
+
+\begin{equation}
+    T_{e2e\_SL} = T_{sensing} + T_{tx} + T_{proc} + T_{prop} + (N_{harq\_sl} \times T_{RTT\_PSFCH})
+    \label{eq:t_pc5}
+\end{equation}
+
+% ------------------------------------------------------------------------------
+\subsubsection{Integração Computacional e Constantes do Simulador}
+\label{sec:integracao_computacional}
+
+Para viabilizar a avaliação empírica das métricas propostas nesta fundamentação teórica, a formulação analítica foi traduzida para um ambiente computacional orientado a objetos desenvolvido em Python, encapsulado através da classe \texttt{SimuladorLatenciaV2X}. Essa estrutura algorítmica aplica o cálculo de balanço de potência e aloca recursos temporalmente utilizando as operações de teto matemático da teoria de blocos (\texttt{math.ceil}). O impacto das restrições de confiabilidade é codificado em rotinas distintas para Uu e PC5, agregando os mecanismos de espera passiva e os protocolos HARQ.
+
+Para a consolidação da execução dessa simulação, os seguintes parâmetros referenciais e restrições de pior caso foram estipulados em aderência à literatura normativa e física \cite{stallings2021, cox2025, fowdur2025}:
+
+\begin{itemize}
+    \item \textbf{\texttt{N0\_dBm\_Hz = -174} e Transformações de Potência:} Valor fixo derivado do limite físico de Johnson-Nyquist em temperatura ambiente ($\approx 290$ K). A conversão computacional de dBm para escala linear (Watts) realiza-se dividindo a potência por 10 e adicionando-se a constante 30 (referente à base logarítmica de miliwatts) para viabilizar o cálculo do denominador do SINR.
+    
+    \item \textbf{\texttt{L\_bits = 12000} e \texttt{TBS\_slot = 8000}:} O tamanho do pacote (12.000 bits) reflete um pacote IP sob \textit{Maximum Transmission Unit} (MTU) transportando telemetria automotiva prioritária. O bloco de transporte restrito a 8.000 bits representa a borda de célula (canal degradado), onde o sistema regride para modulação QPSK. Este valor de \textit{slot} já embute e desconta o desperdício (\textit{overhead}) das sinalizações de controle.
+    
+    \item \textbf{\texttt{T\_slot = 0.25 ms} e Processamento Normativo ($\mu=2$):} Apoiado na numerologia estrita $2^{-\mu}$ ms com espaçamento de 60 kHz. O nó veicular autônomo foi tipificado como \textit{Low Latency Capability}, demandando a preparação de matrizes de rádio em ultrarrápidos 11 símbolos OFDM, o que computa um fardo de processamento de hardware temporal $T_{proc} \approx 0,196$ ms.
+    
+    \item \textbf{Penalidades de Controle de Acesso ao Meio (MAC):} A obrigação estatutária de sensoriamento contínuo no Modo 2 impõe uma restrição de \texttt{T\_sensing = 10.0 ms}. Em eventos de bloqueios dinâmicos $NLOSv$, a tolerância foi limitada a duas falhas (\texttt{N\_harq\_sl = 2}), impondo um salto temporal estrito de \texttt{3.0 ms} por retransmissão atrelada às janelas de notificação do PSFCH.
+\end{itemize}
+
+
 Para mitigar a \gls{ISI}, o \gls{5G} utiliza a técnica de inserção do Prefixo Cíclico (\gls{CP}) \cite{stallings2021}. O \gls{CP} atua como um intervalo de guarda protetor onde a porção final do símbolo \gls{OFDM} é copiada e inserida no início desse mesmo símbolo \cite{cox2025}. Contanto que a duração do \gls{CP} seja maior que o \gls{Delay Spread} do canal, os ecos do multipercurso são totalmente absorvidos dentro desse intervalo de guarda, permitindo que o receptor processe o sinal sem sofrer interferência de símbolos anteriores \cite{morais2025}. Fisicamente, a duração total de um símbolo transmitido na interface aérea engloba tanto o seu tempo útil quanto o tempo de guarda, dada pela equação $T_s = \frac{1}{\Delta f} + T_{CP}$ \cite{cox2025}. A Figura~\ref{fig:prefixo_ciclico} detalha o mecanismo de inserção do \gls{CP} e como ele absorve os ecos do multipercurso.
 
 % =========================================================================
