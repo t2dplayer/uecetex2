@@ -1,5 +1,5 @@
 \chapter{Revisão de Literatura  }
-\label{chap:revisao-literatura}
+\label{cap:revisao-literatura}
 
 % \section{Aplicações em Redes Veiculares}
 % \label{sec:aplicacoes-em-redes-veiculares}
@@ -104,12 +104,12 @@ O estudo de~\cite{Moghaddasi2023} propõe um algoritmo de \gls{DRL}, especificam
 \subsection{Servidor}
 Quando há necessidade de transferência de responsabilidade de processamento de tarefas, existem três opções viáveis: processar as tarefas em (i) um dispositivo de infraestrutura de borda, (ii) recursos ociosos das unidades processadoras dos veículos vizinhos, ou (iii) uma robusta infraestrutura de nuvem, que apresenta maior capacidade, mas latência consideravelmente superior. A seguir, é descrito como as principais opções locais foram modeladas.
 
-\subsection*{\textbf{MEC}}
+\subsection*{\textbf{\gls{MEC}}}
 Servidores \gls{MEC} contribuem significativamente para atender exigências de \gls{URLLC} em \gls{5G} \gls{NR}. Eles ficam localizados na borda da rede e podem ser constituídos de equipamentos robustos, capazes de auxiliar no processamento pesado de tarefas delegadas por outros dispositivos com recursos limitados.
 
 Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e estações base para oferecer suporte computacional de baixa latência aos veículos. Aproveitando essa infraestrutura de borda, o estudo de~\cite{zhao2025} propõe o esquema \gls{PDQKM} para otimizar o descarregamento de múltiplas tarefas, permitindo reduzir a latência total do sistema. Por outro lado, o trabalho de~\cite{wu2025} utiliza \gls{GAN} para expandir amostras de tarefas evitando o desequilíbrio de dados, criando um modelo de \gls{FL} para realizar o descarregamento de tarefas de forma energeticamente eficiente em servidores \gls{MEC}. O estudo de~\cite{mohammad2025} apresenta o \textit{framework} EMEC-IoVTOF, que integra \gls{DRL} com a técnica de \gls{PSO} para otimizar a alocação de recursos em sistemas \gls{IoV}. A solução calcula custos de descarregamento para evitar a convergência para ótimos locais, conseguindo reduções significativas de latência e consumo de energia, além de contornar restrições de largura de banda em cenários veiculares dinâmicos. Por sua vez, o estudo de~\cite{liu2025} utiliza o método de aproximação de Bernstein para converter restrições probabilísticas de interferência em formato tratável, minimizando uma função de utilidade que equilibra atrasos na transmissão e na computação para o \gls{C-MEC}.
 
-\subsection*{\textbf{VEC}}
+\subsection*{\textbf{\gls{VEC}}}
 
 \gls{VEC} distribui poder computacional formando micro-nuvens entre os próprios veículos na estrada, empregando recursos ociosos de suas unidades embarcadas (\gls{OBU}) para auxiliar vizinhos próximos através de canais de comunicação direta, frequentemente desassociados de infraestruturas estáticas da pista. O estudo de~\cite{xie2025} propõe utilizar \gls{RIS} juntamente com \gls{VEC} para reduzir custos de implantação, ao mesmo tempo que busca maximizar \gls{SOE} via algoritmo \gls{PPO}, otimizando conjuntamente decisões de descarregamento, alocação de recursos computacionais e vetores de mudança de fase. Por sua vez,~\cite{wu2025ava} utiliza \gls{FL} e \gls{MADDPG}, empregando mecanismos de incentivo baseados em reputação para determinar a proporção ideal de recursos cedidos por veículos vizinhos, visando minimizar latência e consumo de energia e garantindo alta taxa de conclusão em tarefas computacionalmente intensivas. O trabalho de~\cite{long2025} desenvolve o algoritmo \gls{CTSRAO}, que integra dispositivos finais, borda veicular e nuvem para realizar descarregamento parcial de tarefas, separando o problema em subproblemas convexos para otimizar de forma colaborativa o \textit{task splitting} (taxa de divisão de tarefas) e a alocação de recursos computacionais, alcançando equilíbrio de desempenho global do sistema. Em~\cite{abbas2025}, propõe-se um algoritmo baseado em aprendizado descentralizado colaborativo, que orquestra a execução concorrente de tarefas fragmentadas pelos veículos presentes na área de cobertura, otimizando conjuntamente a alocação de canais sem fio com os recursos computacionais. Dessa forma, minimiza-se a latência total e o consumo de energia em ambientes veiculares dinâmicos.
 
@@ -142,7 +142,7 @@ Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e 
 
 Analisando a Tabela \ref{tab:padrao_comunicacao}, constata-se forte tendência de padronização de tecnologias celulares avançadas para comunicação veicular. Grande parte dos trabalhos recentes analisados concentra-se na utilização de conectividade \gls{V2I} via redes \gls{5G} e \gls{6G}. Em relação à comunicação entre os nós, embora o padrão \gls{C-V2X} englobe diferentes interfaces, diversos trabalhos referem-se estritamente à utilização das interfaces \textit{Sidelink} destas comunicações para troca direta de dados (\gls{V2V}). Já em relação à infraestrutura, a adoção de servidores \gls{MEC} centralizados em unidades \gls{RSU} ainda é predominante, mas observa-se tendência crescente de pesquisas que exploram \gls{VEC}, tratando os próprios veículos como provedores de recursos. Trabalhos como os de~\cite{liu2025} e~\cite{long2025} adotam arquiteturas colaborativas integrando \gls{MEC} com nuvem e \gls{VEC} com nuvem, respectivamente.
 
-Outro aspecto identificado foi a ausência de tratamento para a observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Todos os trabalhos identificados na tabela modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de CPU dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
+Outro aspecto identificado foi a ausência de tratamento para a observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Todos os trabalhos identificados na tabela modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de \gls{CPU} dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
 
 Outra limitação identificada diz respeito à modelagem de cargas de trabalho. Com exceção do estudo de~\cite{Moghaddasi2023}, os demais trabalhos avaliam seus algoritmos sob regimes de tráfego constantes ou com taxa de chegada fixa por episódio. Em cenários de tráfego reais, eventos imprevisíveis podem causar rajadas instantâneas (\textit{bursts}) no envio de pacotes críticos, alterando a distribuição de chegada das tarefas. Modelos \gls{DRL} treinados exclusivamente sem variação dinâmica de carga tendem a sofrer degradação de desempenho com tais mudanças de regime.
 
@@ -176,11 +176,11 @@ No que tange aos modelos, existem diversos trabalhos focados em otimizar a forma
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|l|c|l|}
         \hline
-        \textbf{Algoritmo DRL} & \textbf{Espaço de Ação} & \textbf{Referência Base} \\ \hline
+        \textbf{Algoritmo \gls{DRL}} & \textbf{Espaço de Ação} & \textbf{Referência Base} \\ \hline
         \gls{DQN} (\textit{Deep Q-Network}) & Discreto &~\cite{uddin2025, farimani2024} \\ \hline
         Double \gls{DQN} & Discreto &~\cite{uddin2025} \\ \hline
         Dueling \gls{DQN} & Discreto &~\cite{uddin2025} \\ \hline
-        DDPG (\textit{Deep Deterministic Policy Gradient}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
+        \gls{DDPG} (\textit{Deep Deterministic Policy Gradient}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
         \gls{TD3} (\textit{Twin Delayed DDPG}) & Contínuo &~\cite{uddin2025} \\ \hline
         \gls{PPO} (\textit{Proximal Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
         TRPO (\textit{Trust Region Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
@@ -197,7 +197,7 @@ Para modelar a mobilidade com precisão, simuladores de tráfego microscópico, 
 
 Em relação ao treinamento do modelo de inteligência artificial, o ambiente de simulação é abstraído matematicamente para que o agente observe os estados e tome decisões. Para viabilizar esse treinamento, trabalhos recentes constroem ambientes customizados baseados em padrões como o \textit{OpenAI Gym} (recentemente sucedido pelo \textit{Gymnasium})~\cite{brockman2016openai}, que gerenciam o ciclo de observação do estado, execução da ação e recebimento da recompensa~\cite{uddin2025} para treinar e otimizar os pesos das redes neurais~\cite{moghaddasi2024, kumar2023, wu2025}.
 
-Por fim, para evitar que o treinamento ocorra de forma puramente teórica, a literatura atual enfatiza o uso de dados do mundo real (\textit{real-world traces}) dentro do ambiente de simulação~\cite{farimani2024}. Algumas abordagens incorporam trajetórias extraídas de frotas reais ou bases de dados de servidores comerciais --- como o \textit{Google Cluster Dataset} --- para emular as flutuações estocásticas na geração de tarefas e a exigência de recursos de CPU, Memória e Largura de Banda~\cite{long2025}. Essa imersão de dados reais no ambiente simulado garante que as políticas de descarregamento aprendidas pelo agente \gls{DRL} sejam aplicáveis e estáveis diante das dinâmicas de arquiteturas \gls{VEC} no mundo físico.
+Por fim, para evitar que o treinamento ocorra de forma puramente teórica, a literatura atual enfatiza o uso de dados do mundo real (\textit{real-world traces}) dentro do ambiente de simulação~\cite{farimani2024}. Algumas abordagens incorporam trajetórias extraídas de frotas reais ou bases de dados de servidores comerciais --- como o \textit{Google Cluster Dataset} --- para emular as flutuações estocásticas na geração de tarefas e a exigência de recursos de \gls{CPU}, Memória e Largura de Banda~\cite{long2025}. Essa imersão de dados reais no ambiente simulado garante que as políticas de descarregamento aprendidas pelo agente \gls{DRL} sejam aplicáveis e estáveis diante das dinâmicas de arquiteturas \gls{VEC} no mundo físico.
 
 \subsection*{\textbf{Discussão}}
 \begin{landscape}

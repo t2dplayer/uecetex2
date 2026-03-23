@@ -1,6 +1,6 @@
 % \input{elementos-textuais/5g-nr-v2x/stallings-5g}
 
-\section{Arquitetura e Modelagem 5G \gls{V2I} e C-V2X}
+\section{Arquitetura e Modelagem \gls{5G} \gls{V2I} e \gls{C-V2X}}
 \label{sec:comunicacao-5g-e-sidelink}
 
 A quinta geração de comunicações móveis celulares, o \gls{5G}, representou um avanço tecnológico disruptivo, projetado para revolucionar não apenas o setor de telecomunicações, mas também a sociedade como um todo~\cite{stallings2021}. Suas especificações foram fundamentadas pelo padrão internacional IMT-2020, sob avaliação e monitoramento da \gls{ITU}~\cite{itu2015m2083, itu2017m2410, itu2021m2150}, e formalizadas pelo \gls{3GPP} em sucessivos \textit{Releases}~\cite{asplund2025, cox2025}.
@@ -23,8 +23,8 @@ Para suportar tais exigências, a arquitetura do \gls{5G} foi subdividida em doi
   \draw[<->, very thick] (ran) -- node[above, font=\small] {Backhaul} (core);
   \draw[<->, very thick] (core) -- (dn);
 \end{tikzpicture}
-\Caption{\label{fig:arquitetura_5g_macro} Modelo de sistema básico 3GPP evidenciando os dois grandes blocos operacionais do \gls{5G}.}
-\Fonte{Baseado no modelo de sistema 3GPP \cite{fowdur2025}.}
+\Caption{\label{fig:arquitetura_5g_macro} Modelo de sistema básico \gls{3GPP} evidenciando os dois grandes blocos operacionais do \gls{5G}.}
+\Fonte{Baseado no modelo de sistema \gls{3GPP}~\cite{fowdur2025}.}
 \end{figure}
 
 Para garantir baixas latências, foi necessário distribuir as funções de processamento e armazenamento da nuvem para dispositivos mais próximos do cliente do serviço. Na prática, isso significou que as aplicações não precisariam mais enviar seus dados para \textit{datacenters} distantes, evitando latências elevadas. Essa solução foi materializada com a integração do \gls{MEC} à rede móvel \gls{5G}, onde a \gls{UPF} é distribuída localmente para rotear os dados diretamente aos servidores periféricos, possibilitando a resposta em tempo real. A Figura~\ref{fig:arquitetura_mec_5g} ilustra a arquitetura do \gls{5GC} com a integração do \gls{MEC}.
@@ -79,7 +79,7 @@ Para garantir baixas latências, foi necessário distribuir as funções de proc
 
 Na rede de acesso \gls{5G}, a estação base \gls{gNB} adotou uma arquitetura modular que separa suas funções em duas unidades. A \gls{CU} processa serviços em tempo não real, hospedando os protocolos de maior nível como \gls{RRC}, \gls{PDCP} e \gls{SDAP}. Já as \glspl{DU} operam localmente próximas às antenas, executando serviços de tempo real como agendamento de recursos de rádio, correção de erros e processamento de sinais --- responsabilidade dos protocolos \gls{RLC}, \gls{MAC} e da camada Física (\gls{PHY})~\cite{fowdur2025, cox2025}.
 
-\subsection{Interface Aérea 5G NR: OFDMA e Adaptação de Enlace}
+\subsection{Interface Aérea \gls{5G} \gls{NR}: \gls{OFDMA} e Adaptação de Enlace}
 \label{subsec:interface-aerea-5g}
 
 Os sinais transmitidos pela interface aérea do \gls{5G} \gls{NR} utilizam o esquema de \gls{OFDMA}. Esse esquema divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados como uma matriz bidimensional de tempo e frequência, agrupados em \glspl{RB} com 12 subportadoras cada, permitindo que diferentes fatias do espectro sejam alocadas simultaneamente a diferentes usuários~\cite{stallings2021, asplund2025}. O \gls{5G} \gls{NR} introduziu ainda uma numerologia escalável, com espaçamento de subportadoras $\Delta f = 15 \times 2^{\mu}$~kHz para $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, permitindo adaptar a latência e a capacidade de acordo com a faixa de frequência e o cenário de uso~\cite{cox2025}. O espectro suportado abrange a faixa \gls{FR1} (sub-6~GHz, até 100~MHz de largura de banda) e a faixa \gls{FR2} ou \gls{mmWave} (24,25~GHz a 71~GHz, até 400~MHz), com o emprego de \textit{Massive} \gls{MIMO} e \textit{beamforming} para compensar a atenuação nas frequências milimétricas~\cite{stallings2021, asplund2025}.
@@ -147,14 +147,14 @@ Na camada física, a informação digital é mapeada em ondas eletromagnéticas 
 
 Para contornar a degradação, a rede emprega o mecanismo de adaptação de enlace (\textit{Link Adaptation}): avalia continuamente a qualidade do canal e regride dinamicamente para esquemas de modulação mais simples (como QPSK) em condições adversas, preservando a confiabilidade da entrega dos pacotes~\cite{cox2025, stallings2021}. É essa dinâmica de seleção do \gls{MCS} que determina a taxa de canal instantânea --- um dos critérios multicritério avaliados pelo \gls{TOPSIS} na seleção do melhor candidato ao descarregamento de tarefas neste trabalho.
 
-\subsection{Comunicação Veicular C-V2X e Interface \textit{Sidelink} PC5}
+\subsection{Comunicação Veicular \gls{C-V2X} e Interface \textit{Sidelink} \gls{PC5}}
 \label{subsec:cv2x-sidelink}
 
 O próximo passo natural, após essa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \glspl{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração consolidou o paradigma \gls{C-V2X}~\cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.
 
-O \gls{C-V2X} opera fundamentalmente sobre duas interfaces: (i) a \gls{Uu}, conectando o veículo à infraestrutura da rede celular (\gls{V2I}/\gls{V2N}), e (ii) a PC5 (\textit{Sidelink}), que estabelece um enlace direto veículo-veículo (\gls{V2V}) e veículo-pedestre (\gls{V2P}) sem que os dados precisem transitar pelas antenas ou pelo núcleo da rede \gls{5GC}. No \textit{Release} 16 do \gls{3GPP}, o \textit{Sidelink} do \gls{5G} \gls{NR} foi aprimorado para suportar não apenas transmissões abertas (\textit{broadcast}), mas também comunicações \textit{unicast} e \textit{groupcast}, garantindo maior controle de \gls{QoS} em manobras cooperativas, como a formação de pelotões (\textit{platooning}).
+O \gls{C-V2X} opera fundamentalmente sobre duas interfaces: (i) a \gls{Uu}, conectando o veículo à infraestrutura da rede celular (\gls{V2I}/\gls{V2N}), e (ii) a \gls{PC5} (\textit{Sidelink}), que estabelece um enlace direto veículo-veículo (\gls{V2V}) e veículo-pedestre (\gls{V2P}) sem que os dados precisem transitar pelas antenas ou pelo núcleo da rede \gls{5GC}. No \textit{Release} 16 do \gls{3GPP}, o \textit{Sidelink} do \gls{5G} \gls{NR} foi aprimorado para suportar não apenas transmissões abertas (\textit{broadcast}), mas também comunicações \textit{unicast} e \textit{groupcast}, garantindo maior controle de \gls{QoS} em manobras cooperativas, como a formação de pelotões (\textit{platooning}).
 
-O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5} \textit{Sidelink} operam sob dois modos distintos. No Modo 1, a alocação de recursos é centralizada: a \gls{gNB} agenda os recursos para os veículos através da \gls{Uu}, garantindo baixa ocorrência de colisões, mas exigindo que os veículos estejam sob cobertura celular ininterrupta. No \textbf{Modo 2}, os próprios veículos gerenciam os recursos de rádio de forma autônoma por meio de sensoriamento prévio do canal (\textit{Channel Sensing}), sendo a base para a cooperação distribuída em zonas sem cobertura celular. A Figura~\ref{fig:arquitetura_cv2x} apresenta essas conexões.
+O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5} \textit{Sidelink} operam sob dois modos distintos. No Modo 1, a alocação de recursos é centralizada: a \gls{gNB} agenda os recursos para os veículos através da \gls{Uu}, garantindo baixa ocorrência de colisões, mas exigindo que os veículos estejam sob cobertura celular ininterrupta. No Modo 2, os próprios veículos gerenciam os recursos de rádio de forma autônoma por meio de sensoriamento prévio do canal (\textit{Channel Sensing}), sendo a base para a cooperação distribuída em zonas sem cobertura celular. A Figura~\ref{fig:arquitetura_cv2x} apresenta essas conexões.
 
 \begin{figure}[htpb]
 \centering
@@ -331,11 +331,11 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 {\color{cyan!70!black}---} PC5: Sidelink (V2P)};
 
 \end{tikzpicture}
-\Caption{\label{fig:arquitetura_cv2x} Arquitetura das comunicações 5G C-V2X: coexistência da interface celular Uu (V2I/V2N) com a interface direta PC5 \textit{Sidelink} (V2V/V2P), integrando o núcleo 5GC, o servidor MEC de borda e os elementos veiculares e pedestres.}
+\Caption{\label{fig:arquitetura_cv2x} Arquitetura das comunicações \gls{5G} \gls{C-V2X}: coexistência da interface celular \gls{Uu} (\gls{V2I}/\gls{V2N}) com a interface direta \gls{PC5} \textit{Sidelink} (\gls{V2V}/\gls{V2P}), integrando o núcleo \gls{5GC}, o servidor \gls{MEC} de borda e os elementos veiculares e pedestres.}
 \Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
 \end{figure}
 
-Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiza a troca de dados em três canais físicos complementares que operam sequencialmente dentro de um mesmo \textit{slot} de transmissão: o \textbf{\gls{PSCCH}} (\textit{Physical Sidelink Control Channel}), o \textbf{\gls{PSSCH}} (\textit{Physical Sidelink Shared Channel}), que transporta efetivamente a carga útil de dados, e o \textbf{\gls{PSFCH}} (\textit{Physical Sidelink Feedback Channel}). A Figura~\ref{fig:slot_sidelink} ilustra a coexistência e a multiplexação temporal desses canais dentro de um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}.
+Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiza a troca de dados em três canais físicos complementares que operam sequencialmente dentro de um mesmo \textit{slot} de transmissão: o \gls{PSCCH}, o \gls{PSSCH}, que transporta efetivamente a carga útil de dados, e o \gls{PSFCH}. A Figura~\ref{fig:slot_sidelink} ilustra a coexistência e a multiplexação temporal desses canais dentro de um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}.
 
 \begin{figure}[htpb]
 \centering
@@ -373,110 +373,9 @@ Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiz
 \node[rotate=90, font=\tiny] at (11.65, 2) {Guarda};
 
 \end{tikzpicture}
-\caption{Estrutura temporal básica da camada física em um \textit{slot} do 5G NR \textit{Sidelink}, ilustrando a multiplexação dos canais físicos PSCCH, PSSCH e PSFCH \cite{cox2025, garcia2021}.}
+\caption{Estrutura temporal básica da camada física em um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}, ilustrando a multiplexação dos canais físicos \gls{PSCCH}, \gls{PSSCH} e \gls{PSFCH} \cite{cox2025, garcia2021}.}
 \label{fig:slot_sidelink}
 \end{figure}
 
-O canal de controle (\gls{PSCCH}) anuncia publicamente a reserva de recursos de tempo e frequência (\glspl{PRB}), permitindo que veículos vizinhos realizem o sensoriamento do meio para evitar colisões de dados e encontrar blocos de rádio livres para transmissão. Em seguida, o canal compartilhado (\gls{PSSCH}) transmite a carga útil da aplicação e as instruções para o destinatário processar e responder às requisições. Essas instruções incluem o identificador do emissor, um indicador que avisa ao receptor se o pacote contém novos dados ou é uma retransmissão, o tipo de comunicação (\textit{broadcast}, \textit{unicast} ou \textit{groupcast}), dados geográficos e uma requisição ao receptor sobre as condições físicas do enlace. Por último, o canal de \textit{feedback} (\gls{PSFCH}) confirma, quase instantaneamente, o sucesso ou a falha da recepção do pacote (ACK/NACK). A Figura~\ref{fig:dinamica_canais_pc5} ilustra essa dinâmica sequencial entre dois veículos.
+O \gls{PSCCH} anuncia publicamente a reserva de recursos de tempo e frequência (\glspl{PRB}), permitindo que veículos vizinhos realizem o sensoriamento do meio para evitar colisões de dados e encontrar blocos de rádio livres para transmissão. Em seguida, o canal compartilhado (\gls{PSSCH}) transmite a carga útil da aplicação e as instruções para o destinatário processar e responder às requisições. Essas instruções incluem o identificador do emissor, um indicador que avisa ao receptor se o pacote contém novos dados ou é uma retransmissão, o tipo de comunicação (\textit{broadcast}, \textit{unicast} ou \textit{groupcast}), dados geográficos e uma requisição ao receptor sobre as condições físicas do enlace. Por último, o canal de \textit{feedback} (\gls{PSFCH}) confirma, quase instantaneamente, o sucesso ou a falha da recepção do pacote (ACK/NACK). 
 
-\begin{figure}[htpb]
-\centering
-\Caption{\label{fig:dinamica_canais_pc5} Dinâmica sequencial de operação dos canais físicos PSCCH, PSSCH e PSFCH na interface PC5 do 5G NR \textit{Sidelink}. A comunicação ocorre em três fases: anúncio de controle, transmissão de dados e confirmação de recepção. Em caso de falha (NACK), o ciclo de dados é repetido via retransmissão HARQ.}
-\begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.82, transform shape]
-
-% ===================== FAIXAS DE FUNDO =====================
-\fill[blue!4, rounded corners=3pt]  (-2.5, -1.0) rectangle (13.5, -3.8);
-\fill[cyan!4, rounded corners=3pt]  (-2.5, -4.0) rectangle (13.5, -8.6);
-\fill[red!4, rounded corners=3pt]   (-2.5, -8.8) rectangle (13.5, -13.0);
-
-% Rótulos laterais
-\node[font=\scriptsize\bfseries, text=blue!70!black, rotate=90] at (-2.2, -2.4) {FASE 1: PSCCH};
-\node[font=\scriptsize\bfseries, text=cyan!70!black, rotate=90] at (-2.2, -6.3) {FASE 2: PSSCH};
-\node[font=\scriptsize\bfseries, text=red!70!black, rotate=90]  at (-2.2, -10.9) {FASE 3: PSFCH};
-
-% Bolinhas numéricas
-\node[circle, draw=blue!70!black, fill=blue!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=blue!80!black] at (-1.2, -1.3) {1};
-\node[circle, draw=cyan!70!black, fill=cyan!10, font=\footnotesize\bfseries, inner sep=1.5pt, text=cyan!80!black] at (-1.2, -4.3) {2};
-\node[circle, draw=red!70!black, fill=red!10, font=\footnotesize\bfseries, inner sep=1.5pt, text=red!80!black]   at (-1.2, -9.1) {3};
-
-% ===================== LIFELINES =====================
-\draw[thick, blue!50!black] (0, 0) -- (0, -14.5);
-\node[draw=blue!60!black, fill=blue!15, minimum width=2.4cm, minimum height=0.9cm,
-      rounded corners=2pt, thick, align=center, font=\small\bfseries] at (0, 0.6) {UE Tx\\{\footnotesize (Veículo 1)}};
-
-\draw[thick, gray!60, dashed] (5.5, 0) -- (5.5, -14.5);
-\node[draw=gray!60, fill=gray!10, minimum width=2.4cm, minimum height=0.9cm,
-      rounded corners=2pt, thick, align=center, font=\small\bfseries, dashed] at (5.5, 0.6) {Vizinhos\\{\footnotesize (Sensoriamento)}};
-
-\draw[thick, blue!50!black] (11, 0) -- (11, -14.5);
-\node[draw=blue!60!black, fill=blue!15, minimum width=2.4cm, minimum height=0.9cm,
-      rounded corners=2pt, thick, align=center, font=\small\bfseries] at (11, 0.6) {UE Rx\\{\footnotesize (Veículo 2)}};
-
-% ===================== FASE 1: PSCCH =====================
-\filldraw[fill=blue!20, draw=blue!50!black, thick] (-0.15, -1.3) rectangle (0.15, -2.1);
-
-\draw[->, blue!70!black, very thick] (0.15, -1.5) -- node[above, font=\scriptsize\bfseries, text=blue!70!black, align=center]
-      {SCI 1\textsuperscript{o} Est\'{a}gio (\textit{broadcast})}  (10.8, -1.5);
-\node[font=\tiny, text=blue!80!black, align=center, fill=blue!4, inner sep=1pt] at (5.3, -2.12) {Reserva de PRBs + Modula\c{c}\~{a}o + Prioridade};
-\draw[->, blue!70!black, thick, dotted] (0.15, -1.9) -- (5.35, -1.9);
-
-\filldraw[fill=gray!20, draw=gray!50, thick] (5.35, -2.3) rectangle (5.65, -3.3);
-\node[draw=gray!50, fill=white, rounded corners=2pt, font=\tiny, align=left,
-      inner sep=3pt] at (7.8, -2.8) {Sensoriamento contínuo:\\$\rightarrow$ Evita colis\~{a}o\\$\rightarrow$ Marca PRBs ocupados};
-\draw[-, gray!50, thin] (5.65, -2.8) -- (6.0, -2.8);
-
-% ===================== FASE 2: PSSCH =====================
-\filldraw[fill=cyan!20, draw=cyan!50!black, thick] (-0.15, -4.5) rectangle (0.15, -6.0);
-
-\draw[->, cyan!70!black, very thick] (0.15, -4.7) -- node[above, font=\scriptsize\bfseries, text=cyan!70!black, align=center]
-      {Bloco de Transporte (Carga \'{U}til)} (10.8, -4.7);
-
-\draw[->, cyan!60!black, thick] (0.15, -5.7) -- node[above, font=\scriptsize, text=cyan!70!black, align=center]
-      {SCI 2\textsuperscript{o} Est\'{a}gio (\textit{unicast}/\textit{groupcast})}  (10.8, -5.7);
-
-\node[draw=cyan!50!black, fill=white, rounded corners=2pt, font=\tiny, align=left,
-      inner sep=3pt] at (5.5, -7.2) {%
-\textbf{Parâmetros do Enlace:}\\
-$\cdot$ ID transmissor / receptor\\
-$\cdot$ NDI (Novo dado ou retransmissão)\\
-$\cdot$ Dados do processo HARQ\\
-$\cdot$ Requisi\c{c}\~{a}o de \textit{feedback} CSI};
-\draw[->, cyan!50!black, thin] (5.5, -6.0) -- (5.5, -6.3);
-
-\filldraw[fill=blue!20, draw=blue!50!black, thick] (10.85, -6.2) rectangle (11.15, -8.0);
-\node[draw=blue!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
-      inner sep=2pt] at (9.0, -7.1) {Decodifica e\\avalia pacote};
-\draw[-, blue!50!black, thin] (10.85, -7.1) -- (9.8, -7.1);
-
-% ===================== FASE 3: PSFCH =====================
-\filldraw[fill=red!20, draw=red!50!black, thick] (10.85, -9.1) rectangle (11.15, -11.5);
-
-\node[font=\footnotesize\bfseries, text=gray!70!black] at (11, -8.7) {Decisão};
-
-\draw[<-, green!60!black, very thick] (0.15, -9.5) -- node[above, font=\scriptsize\bfseries, text=green!60!black]
-      {ACK -- Recep\c{c}\~{a}o bem-sucedida} (10.85, -9.5);
-\node[draw=green!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
-      inner sep=2pt] at (2.0, -10.2) {Sucesso!\\Libera recursos};
-
-\node[font=\footnotesize\bfseries, text=red!60!black] at (5.5, -10.4) {OU};
-
-\draw[<-, red!70!black, very thick, dashed] (0.15, -11.3) -- node[above, font=\scriptsize\bfseries, text=red!70!black]
-      {NACK -- Falha na decodifica\c{c}\~{a}o} (10.85, -11.3);
-\node[draw=red!50!black, fill=white, rounded corners=2pt, font=\tiny, align=center,
-      inner sep=2pt] at (2.0, -12.1) {Retransmiss\~{a}o\\agendada};
-
-% ===================== RETRANSMISSÃO (loop) =====================
-\filldraw[fill=orange!20, draw=orange!60!black, thick] (-0.15, -11.3) rectangle (0.15, -13.0);
-\draw[->, red!50, thick, dashed, out=180, in=180, looseness=1.5] (-0.15, -12.5) to
-      node[left, font=\tiny, text=red!50, align=center] {Volta ao\\passo 2} (-0.15, -5.0);
-
-% Separadores visuais
-\draw[gray!30, thick, dashed] (-2.5, -3.8) -- (13.5, -3.8);
-\draw[gray!30, thick, dashed] (-2.5, -8.6) -- (13.5, -8.6);
-
-% Eixo temporal
-\draw[->, thick, gray!80] (13.2, 0.5) -- (13.2, -14.5) node[below, font=\small\bfseries, text=gray!70!black] {Eixo do Tempo};
-
-\end{tikzpicture}
-\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
-\end{figure}

@@ -195,7 +195,7 @@ Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair polí
 \end{equation}
 A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$ \cite{williams1992}.
 
-\subsection{Actor-Critic, \gls{PPO}, TRPO e SAC}
+\subsection{Actor-Critic, \gls{PPO}, TRPO e \gls{SAC}}
 Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico} \cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como \textit{baseline} para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
 
 \begin{figure}[ht!]
