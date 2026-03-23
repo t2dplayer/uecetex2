@@ -178,7 +178,7 @@ Neste cenário, a viabilização da IoV é intrinsecamente dependente da maturid
 \Fonte{Adaptado de \cite{zheng2015}}
 \end{figure}
 
-A partir do legado do DSRC, a evolução tecnológica da comunicação veicular ramificou-se em dois eixos técnicos distintos. O primeiro, o padrão \textbf{IEEE 802.11bd} (\textit{Next Generation V2X} - NGV), surge como uma melhoria incremental do IEEE 802.11p. Conforme \cite{naik2019}, a demanda por maior vazão de dados (\textit{throughput}) e a necessidade de robustez contra o desvanecimento rápido em cenários de alta mobilidade foram os principais motivadores desta evolução, integrando técnicas para suporte a velocidades de até 250 km/h. 
+A partir do legado do DSRC, a evolução tecnológica da comunicação veicular ramificou-se em dois eixos técnicos distintos. O primeiro, o padrão \textbf{IEEE 802.11bd} (\textit{Next Generation V2X} - NGV), surge como uma melhoria incremental do IEEE 802.11p. Conforme \cite{naik2019}, a demanda por maior vazão de dados (\textit{throughput}) e a necessidade de robustez contra o desvanecimento rápido em cenários de alta mobilidade foram os principais motivadores desta evolução, integrando técnicas para suporte a velocidades de até 250~km/h.
 
 O segundo eixo representa uma mudança de paradigma com o surgimento do \textbf{C-V2X} (\textit{Cellular V2X}) e sua posterior transição para o \textbf{5G NR-V2X} e o horizonte do \textbf{6G} \cite{rodriguez2025_6genabled}. As limitações do DSRC em termos de escalabilidade e custo de implantação impulsionaram o desenvolvimento do C-V2X pelo 3GPP \cite{chen2017}. Sob uma perspectiva regulatória atual, a disputa tecnológica foi amplamente resolvida em mercados-chave; nos Estados Unidos, a FCC estabeleceu o C-V2X como padrão obrigatório para segurança ITS com descontinuação oficial do DSRC em dezembro de 2026 \cite{fcc2024_59ghz}, enquanto no Brasil a ANATEL, através da Resolução nº 772/2025 \cite{anatel2025_res772}, harmonizou os requisitos técnicos nacionais com os padrões globais celular e radar automotivo \cite{anatel2025_ato14158}. A Tabela \ref{tab:radio-tech-comparison} sintetiza a evolução e as divergências técnicas entre essas abordagens.
 
@@ -193,8 +193,8 @@ O segundo eixo representa uma mudança de paradigma com o surgimento do \textbf{
             \midrule \midrule
             Acesso MAC & CSMA/CA & CSMA/CA+ & CP-OFDM & Holístico/Cognit. \\
             Código Canal & BCC & LDPC & LDPC & Polar / AI-based \\
-            Latência & ~100 ms & < 50 ms & 3 - 10 ms & < 1 ms \\
-            Taxa Dados & 6 - 27 Mbps & Até 90 Mbps & Mbps a Gbps & > 1 Tbps \\
+            Latência & $\sim$100~ms & $<$~50~ms & 3--10~ms & $<$~1~ms \\
+            Taxa Dados & 6--27~Mbps & Até 90~Mbps & Mbps a Gbps & $>$~1~Tbps \\
             Transmissão & Broadcast & Broadcast & Uni/Groupcast & Semântica / ISAC \\
             Conectividade & Ad-hoc & Ad-hoc & Nativa Sidelink & Integrada (Sat.) \\
             Robustez Doppler& Moderada & Alta & Muito Alta & Extrema \\
