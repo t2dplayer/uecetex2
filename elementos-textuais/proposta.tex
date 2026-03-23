@@ -121,7 +121,7 @@ Este capítulo apresenta uma proposta de solução para o problema de descarrega
             (workload) at (2.5,2.0) {Carga de Trabalho\\(Tra\c{c}os Reais / Estoc\'astico)};
         \draw[->, dotted, thick, blue!70] (workload.north east) -- (3.0,6.2);
 
-        % ---- V2I / V2E ----
+        % ---- \gls{V2I} / V2E ----
         \draw[<->, dashed, line width=1.5pt, red!70!black]
             (3.5,7.8) -- (edge.south);
         \node[fill=white, draw=red!60, rounded corners=2pt,
@@ -136,14 +136,14 @@ Este capítulo apresenta uma proposta de solução para o problema de descarrega
             (throttle) at (4.5,16.8) {\textit{Throttling}\\Limita\c{c}\~oes de Processamento};
         \draw[->, dotted, thick, red!70] (throttle.south) -- (edge.north);
 
-        % ---- V2V: Agente <-> V3 ----
+        % ---- \gls{V2V}: Agente <-> V3 ----
         \draw[<->, dashed, line width=1.5pt, purple!80]
             (4.8,6.4) -- (10.3,3.5);
         \node[fill=white, draw=purple!70, rounded corners=2pt,
               font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
             at (7.3,4.3) {V2V};
 
-        % ---- V2V: Agente <-> V2 ----
+        % ---- \gls{V2V}: Agente <-> V2 ----
         \draw[<->, dashed, line width=1.5pt, purple!80]
             (5.2,7.6) -- (14.6,8.5);
         \node[fill=white, draw=purple!70, rounded corners=2pt,
@@ -171,7 +171,7 @@ Este capítulo apresenta uma proposta de solução para o problema de descarrega
         \draw[thick] (0,0) rectangle (20,18);
     \end{tikzpicture}%
     }
-    \caption{Representação do ambiente de simulação: um cruzamento veicular contemplando comunicação V2I, V2V e os principais componentes do cenário estocástico.}
+    \caption{Representação do ambiente de simulação: um cruzamento veicular contemplando comunicação \gls{V2I}, \gls{V2V} e os principais componentes do cenário estocástico.}
     \label{fig:ambiente_simulacao}
 \end{figure}
 
@@ -179,7 +179,7 @@ Este capítulo apresenta uma proposta de solução para o problema de descarrega
 
 O ambiente de treinamento e avaliação é implementado como um \textbf{Simulador de Eventos Discretos} (\textit{Discrete Event Simulation}, DES) desenvolvido em C++20 com co-rotinas, utilizando a biblioteca \texttt{simcpp20}. Cada tarefa gerada pelos veículos é modelada como um processo concorrente que: (i)~aguarda o instante de chegada $t_j$; (ii)~consome o estado global do sistema para construir o vetor de observação; (iii)~executa a política de escalonamento; (iv)~atualiza as filas dos servidores; e (v)~registra as métricas reais de JCT e energia ao término.
 
-O servidor RSU é modelado como um processador DVFS de frequência nominal $F_{\text{RSU}} = 1{,}2\,\text{GHz}$, com fila compartilhada de capacidade $Q_{\max} = 100$ tarefas. Os veículos possuem frequências heterogêneas, amostradas no intervalo $[0{,}3;\,1{,}5]\,\text{GHz}$, conforme o arquivo \texttt{vehicle\_clocks.csv} de cada cenário. A comunicação V2I utiliza largura de banda $B = 20\,\text{MHz}$, potência de transmissão $P_{\text{tx}} = 0{,}2\,\text{W}$ e modelo de perda de percurso conforme 3GPP TR 38.901 (UMi Street Canyon). As mesmas especificações valem para V2V, com altura de antena de $1{,}5\,\text{m}$ e fator de ruído de $9\,\text{dB}$.
+O servidor \gls{RSU} é modelado como um processador DVFS de frequência nominal $F_{\text{RSU}} = 1{,}2\,\text{GHz}$, com fila compartilhada de capacidade $Q_{\max} = 100$ tarefas. Os veículos possuem frequências heterogêneas, amostradas no intervalo $[0{,}3;\,1{,}5]\,\text{GHz}$, conforme o arquivo \texttt{vehicle\_clocks.csv} de cada cenário. A comunicação \gls{V2I} utiliza largura de banda $B = 20\,\text{MHz}$, potência de transmissão $P_{\text{tx}} = 0{,}2\,\text{W}$ e modelo de perda de percurso conforme 3GPP TR 38.901 (UMi Street Canyon). As mesmas especificações valem para \gls{V2V}, com altura de antena de $1{,}5\,\text{m}$ e fator de ruído de $9\,\text{dB}$.
 
 \subsection{Cenários de Teste e Treinamento}
 
@@ -215,12 +215,12 @@ Cada cenário é representado por três arquivos: \texttt{workload\_distribuido.
 \toprule
 \textbf{Parâmetro} & \textbf{Descrição} & \textbf{Valor} \\
 \midrule
-$F_{\text{RSU}}$      & Frequência de clock da RSU                & $1{,}2\,\text{GHz}$   \\
+$F_{\text{RSU}}$      & Frequência de clock da \gls{RSU}                & $1{,}2\,\text{GHz}$   \\
 $F_{\text{veh}}$      & Freq.\ dos veículos (heterogênea)         & $[0{,}3;\,1{,}5]\,\text{GHz}$ \\
 $B_{\text{V2I/V2V}}$  & Largura de banda dos canais               & $20\,\text{MHz}$      \\
-$P_{\text{tx}}$       & Potência de transmissão V2I e V2V         & $0{,}2\,\text{W}$    \\
-$R_{\max}$            & Raio de cobertura RSU                     & $300\,\text{m}$      \\
-$V_{\text{V2V}}$      & Alcance V2V                               & $300\,\text{m}$      \\
+$P_{\text{tx}}$       & Potência de transmissão \gls{V2I} e \gls{V2V}         & $0{,}2\,\text{W}$    \\
+$R_{\max}$            & Raio de cobertura \gls{RSU}                     & $300\,\text{m}$      \\
+$V_{\text{V2V}}$      & Alcance \gls{V2V}                               & $300\,\text{m}$      \\
 $\alpha_c$            & Coef.\ energia dinâmica (CMOS)            & $6 \times 10^{-9}$   \\
 $\eta_{\text{DL}}$    & Fator de multiplicação do \textit{deadline} & $1{,}2\times D_j$ \\
 $Q_{\max}$            & Capacidade máxima das filas               & $100$ tarefas        \\
@@ -242,7 +242,7 @@ A Tabela~\ref{tab:sac-hparams} lista os hiperparâmetros do \gls{SAC} utilizados
 
 \begin{table}[htb]
 \centering
-\caption{Hiperparâmetros do SAC compartilhados por todas as políticas DRL.}
+\caption{Hiperparâmetros do \gls{SAC} compartilhados por todas as políticas \gls{DRL}.}
 \label{tab:sac-hparams}
 \begin{tabular}{llr}
 \toprule
@@ -255,7 +255,7 @@ $\alpha_{\text{ent}}$   & Temperatura de entropia            & $0{,}10$         
 $|\mathcal{B}|$         & Capacidade do \textit{replay buffer} & $50\,000$        \\
 $B$                     & Tamanho do mini-lote               & $1\,024$           \\
 \textit{warmup}         & Transições antes do 1º update      & $1\,024$           \\
-Neurônios por camada    & Arquitetura MLP (2 camadas ocultas)& $64$               \\
+Neurônios por camada    & Arquitetura \gls{MLP} (2 camadas ocultas)& $64$               \\
 \midrule
 $\alpha$ (custo JCT)    & Peso do JCT na função objetivo     & $0{,}35$           \\
 $\beta$ (custo energia) & Peso da energia na função objetivo & $0{,}35$           \\
@@ -278,8 +278,8 @@ onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a primazia da taxa de sucesso sobre 
 
 Para resolver esse problema, a arquitetura proposta é dividida em duas fases:
 \begin{itemize}
-    \item \textbf{Fase de Treinamento (Offline):} O algoritmo \gls{SAC} (\textit{Soft Actor-Critic}) interage com um simulador estocástico para otimizar os pesos de uma rede neural Perceptron Multicamadas (MLP). O ambiente simula a heterogeneidade dos servidores, a dinâmica autorregressiva (AR-1) das filas e as perdas de percurso realistas baseadas nos padrões \gls{3GPP} TR 38.901.
-    \item \textbf{Fase de Implantação (Online):} Em tempo real, o módulo \gls{TOPSIS} ranqueia os $N$ candidatos disponíveis (servidores RSU ou veículos vizinhos V2V), convertendo-os em um vetor de estado compacto de 6 dimensões $\mathbf{S}_t \in \mathbb{R}^6$. A MLP treinada recebe esse vetor e emite a decisão binária $a_t \in \{0, 1\}$ (executar localmente ou descarregar para o candidato de maior escore).
+    \item \textbf{Fase de Treinamento (Offline):} O algoritmo \gls{SAC} (\textit{Soft Actor-Critic}) interage com um simulador estocástico para otimizar os pesos de uma rede neural Perceptron Multicamadas (\gls{MLP}). O ambiente simula a heterogeneidade dos servidores, a dinâmica autorregressiva (AR-1) das filas e as perdas de percurso realistas baseadas nos padrões \gls{3GPP} TR 38.901.
+    \item \textbf{Fase de Implantação (Online):} Em tempo real, o módulo \gls{TOPSIS} ranqueia os $N$ candidatos disponíveis (servidores \gls{RSU} ou veículos vizinhos \gls{V2V}), convertendo-os em um vetor de estado compacto de 6 dimensões $\mathbf{S}_t \in \mathbb{R}^6$. A \gls{MLP} treinada recebe esse vetor e emite a decisão binária $a_t \in \{0, 1\}$ (executar localmente ou descarregar para o candidato de maior escore).
 \end{itemize}
 
 A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arquitetura SAC-TOPSIS em tempo de inferência.
@@ -300,14 +300,14 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
 %% Bloco 1: Tarefa
 \node[box, fill=gray!12, draw=gray!60!black] (tarefa) at (0,0)
     {\textbf{Tarefa} $j$\quad
-     $C_j$ (ciclos CPU) $\cdot$ $D_j$ (deadline) $\cdot$ posição $\mathbf{x}_j$};
+     $C_j$ (ciclos CPU) $\cdot$ $D_j$ (\textit{deadline}) $\cdot$ posição $\mathbf{x}_j$};
 
 %% Bloco 2: Candidatos
 \node[box, fill=blue!12, draw=blue!60!black, below=of tarefa] (cands)
     {\textbf{Candidatos de offload} ($N$ nós)\\[3pt]
-     Servidores RSU (V2I) \quad e \quad Veículos vizinhos (V2V)};
+     Servidores \gls{RSU} (\gls{V2I}) \quad e \quad Veículos vizinhos (\gls{V2V})};
 
-%% Bloco 3: TOPSIS
+%% Bloco 3: \gls{TOPSIS}
 \node[box, fill=teal!12, draw=teal!60!black, minimum height=2.2cm,
       below=of cands] (topsis)
     {\textbf{Módulo TOPSIS} --- avaliação multicritério\\[4pt]
@@ -327,14 +327,14 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
      $s_5 = \dfrac{Q_{\ell}}{Q_{\max}}$\quad
      $s_6 = \dfrac{C_j}{C_{\max}}$};
 
-%% Bloco 5: SAC Actor
+%% Bloco 5: \gls{SAC} \textit{Actor}
 \node[box, fill=purple!12, draw=purple!60!black, minimum height=1.8cm,
       below=of estado] (mlp)
-    {\textbf{SAC Actor} --- Rede Neural (MLP)\\[4pt]
+    {\textbf{SAC Actor} --- Rede Neural (\gls{MLP})\\[4pt]
      Arquitetura: $6 \to 64 \to 64 \to 2$\quad
      Ativação: ReLU\quad Saída: Softmax\\[2pt]
      $\pi_\theta(a_t \mid \mathbf{S}_t)$\quad
-     treinado offline com replay buffer ($|\mathcal{B}|{=}50\,000$, batch$\,{=}\,1024$)};
+     treinado \textit{offline} com \textit{replay buffer} ($|\mathcal{B}|{=}50\,000$, batch$\,{=}\,1024$)};
 
 %% Bloco 6: Ação
 \node[box, fill=red!12, draw=red!60!black, below=of mlp] (acao)
@@ -350,7 +350,7 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
 %% Bloco 7b: OFFLOAD
 \node[box, fill=green!10, draw=green!50!black, minimum width=4.0cm,
       below right=1.2cm and 0.2cm of acao] (offload)
-    {\textbf{OFFLOAD}\\[3pt]rank$_1$: RSU ou V2V};
+    {\textbf{OFFLOAD}\\[3pt]rank$_1$: \gls{RSU} ou V2V};
 
 %% Setas verticais principais
 \draw[seta] (tarefa)  -- node[rot,right]{dados da tarefa} (cands);
@@ -365,24 +365,24 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
 \draw[seta] (acao.south) -- ++(0,-0.5) -| (offload.north)
     node[rot, pos=0.25, above]{$a_t{=}1$};
 
-%% Bypass: C_j e D_j da tarefa vão direto para o estado (sem TOPSIS)
+%% Bypass: C_j e D_j da tarefa vão direto para o estado (sem \gls{TOPSIS})
 \draw[->, thick, gray!55, dashed]
     (tarefa.west) -- ++(-1.5,0) |-
-    node[rot, pos=0.3, left]{$C_j,\,D_j$ (bypass)} (estado.west);
+    node[rot, pos=0.3, left]{$C_j,\,D_j$ (\textit{bypass})} (estado.west);
 
-%% Feedback de recompensa (treino offline)
+%% Feedback de recompensa (treino \textit{offline})
 \draw[->, thick, dashed, color=gray!55]
     (offload.east) -- ++(1.2,0) |-
-    node[rot, pos=0.2, right]{recompensa $r_t$ (treino offline)} (mlp.east);
+    node[rot, pos=0.2, right]{recompensa $r_t$ (treino \textit{offline})} (mlp.east);
 
 \end{tikzpicture}%
 }
-\caption{Arquitetura SAC-TOPSIS: fluxo vertical de decisão. O módulo TOPSIS comprime $N$ candidatos em vetor fixo $\mathbb{R}^6$; o SAC Actor decide binariamente entre execução local e offload para o rank$_1$. A seta tracejada cinza indica bypass direto de $C_j$ e $D_j$; a tracejada direita mostra o loop de recompensa durante o treinamento offline.}
+\caption{Arquitetura SAC-TOPSIS: fluxo vertical de decisão. O módulo \gls{TOPSIS} comprime $N$ candidatos em vetor fixo $\mathbb{R}^6$; o \gls{SAC} \textit{Actor} decide binariamente entre execução local e \textit{offload} para o rank$_1$. A seta tracejada cinza indica \textit{bypass} direto de $C_j$ e $D_j$; a tracejada direita mostra o loop de recompensa durante o treinamento \textit{offline}.}
 \label{fig:sac-topsis-arch}
 \end{figure}
 
 % ============================================================
-\section{Módulo TOPSIS e a Engenharia de Estado Compacto}
+\section{Módulo \gls{TOPSIS} e a Engenharia de Estado Compacto}
 % ============================================================
 Um dos maiores desafios em \gls{VEC} é a variabilidade do número de candidatos ($N$) ao longo do tempo. Abordagens baseadas em Grafos (\gls{GNN}) resolvem isso ao custo de alta complexidade computacional \cite{miriyala2026}. A nossa abordagem propõe uma extração de características invariante à escala através do \gls{TOPSIS}, que reduz os $N$ candidatos a um único vetor de estado de dimensão fixa, independente de $N$.
 
@@ -391,7 +391,7 @@ O \gls{TOPSIS} avalia os $N$ nós candidatos por meio de três critérios, todos
 
 \begin{table}[htb]
 \centering
-\caption{Critérios e pesos do módulo TOPSIS.}
+\caption{Critérios e pesos do módulo \gls{TOPSIS}.}
 \label{tab:topsis-criterios}
 \begin{tabular}{clcc}
 \hline
@@ -409,7 +409,7 @@ O procedimento segue os passos clássicos do \gls{TOPSIS}: (i)~normalização ve
     C^*_i = \frac{d^-_i}{d^+_i + d^-_i} \in [0,\,1], \qquad d^\pm_i = \sum_{j=1}^{3} |v_{ij} - a^\pm_j|
     \label{eq:topsis_score}
 \end{equation}
-onde $v_{ij}$ é o elemento normalizado e ponderado. O candidato de maior $C^*_i$ (\textit{rank}$_1$) é selecionado como alvo de offload.
+onde $v_{ij}$ é o elemento normalizado e ponderado. O candidato de maior $C^*_i$ (\textit{rank}$_1$) é selecionado como alvo de \textit{offload}.
 
 \subsection{O Estado Compacto 6D Invariante à Escala}
 Independentemente de existirem $2$ ou $50$ candidatos, o estado entregue à rede neural é sempre um vetor fixo de 6 dimensões construído a partir do resultado do \gls{TOPSIS}:
@@ -420,10 +420,10 @@ Independentemente de existirem $2$ ou $50$ candidatos, o estado entregue à rede
 
 Cada dimensão carrega uma semântica irredutível para a decisão:
 \begin{enumerate}
-    \item $\Delta_{\text{obj}}$: \textbf{vantagem relativa do offload} — diferença normalizada entre o custo estimado de execução local e o custo do candidato \textit{rank}$_1$ segundo o \gls{TOPSIS}. Valor positivo indica que o offload é vantajoso.
+    \item $\Delta_{\text{obj}}$: \textbf{vantagem relativa do offload} — diferença normalizada entre o custo estimado de execução local e o custo do candidato \textit{rank}$_1$ segundo o \gls{TOPSIS}. Valor positivo indica que o \textit{offload} é vantajoso.
     \item $\widehat{\text{JCT}}_{\text{local}}/D_i$: \textbf{urgência local} — razão entre o tempo de conclusão estimado localmente e o prazo. Valores $> 1{,}0$ sinalizam violação iminente.
     \item $\widehat{\text{JCT}}_{\text{rank}_1}/D_i$: \textbf{urgência do offload} — razão análoga para o melhor candidato; permite ao agente comparar diretamente as duas opções.
-    \item $|Q_{\text{rank}_1}|/Q_{\max}$: \textbf{congestionamento do candidato de maior escore} — fila do nó classificado em primeiro lugar pelo \gls{TOPSIS} (RSU ou veículo V2V), normalizada por $Q_{\max} = 25$ tarefas; sinal de deterioração futura da latência de offload caso o agente decida descarregar.
+    \item $|Q_{\text{rank}_1}|/Q_{\max}$: \textbf{congestionamento do candidato de maior escore} — fila do nó classificado em primeiro lugar pelo \gls{TOPSIS} (\gls{RSU} ou veículo \gls{V2V}), normalizada por $Q_{\max} = 25$ tarefas; sinal de deterioração futura da latência de \textit{offload} caso o agente decida descarregar.
     \item $|Q_{\text{local}}|/Q_{\max}$: \textbf{congestionamento do veículo} — ocupação da fila local, reflete o custo de aguardar execução no próprio dispositivo.
     \item $C_j/C_{\max}$: \textbf{complexidade da tarefa} — número de ciclos de CPU normalizados, ancora o contexto computacional da decisão.
 \end{enumerate}
@@ -440,11 +440,11 @@ O agente \gls{SAC} opera sobre um espaço de ação discreto binário $a_t \in \
     \label{eq:acao}
 \end{equation}
 
-Quando $a_t = 1$, a tarefa é encaminhada ao candidato de maior $C^*_i$ (Equação~\ref{eq:topsis_score}), que pode ser o servidor RSU (via V2I) ou um veículo vizinho (via V2V), conforme determinado pelo \gls{TOPSIS} antes da inferência da rede neural. Caso nenhum candidato de offload seja viável ($N = 0$), $a_t = 1$ é tratado como \textsc{LOCAL} por \textit{fallback}. Essa separação de responsabilidades — \gls{TOPSIS} decide \textit{para onde} descarregar, \gls{SAC} decide \textit{se} descarregar — reduz o espaço de busca do agente de $N+1$ para $2$ ações, independente de $N$.
+Quando $a_t = 1$, a tarefa é encaminhada ao candidato de maior $C^*_i$ (Equação~\ref{eq:topsis_score}), que pode ser o servidor \gls{RSU} (via \gls{V2I}) ou um veículo vizinho (via \gls{V2V}), conforme determinado pelo \gls{TOPSIS} antes da inferência da rede neural. Caso nenhum candidato de \textit{offload} seja viável ($N = 0$), $a_t = 1$ é tratado como \textsc{LOCAL} por \textit{fallback}. Essa separação de responsabilidades — \gls{TOPSIS} decide \textit{para onde} descarregar, \gls{SAC} decide \textit{se} descarregar — reduz o espaço de busca do agente de $N+1$ para $2$ ações, independente de $N$.
 
 \textbf{Generalização Zero-Shot:} Como o \gls{TOPSIS} comprime qualquer conjunto de $N$ candidatos em um único vetor $\mathbb{R}^6$ constante, a política treinada interpola naturalmente para cenários com topologias distintas sem retreinamento.
 
-A Figura~\ref{fig:mlp-arch} detalha como o vetor $\mathbf{S}_t$ alimenta a rede \textit{Actor} do SAC e como a camada de saída produz a decisão binária.
+A Figura~\ref{fig:mlp-arch} detalha como o vetor $\mathbf{S}_t$ alimenta a rede \textit{Actor} do \gls{SAC} e como a camada de saída produz a decisão binária.
 
 \begin{figure}[htb]
 \centering
@@ -494,7 +494,7 @@ A Figura~\ref{fig:mlp-arch} detalha como o vetor $\mathbf{S}_t$ alimenta a rede 
 
 %% Rótulos de saída
 \node[lbl, right=0.2cm of O1] {\textbf{LOCAL} --- executa no veículo};
-\node[lbl, right=0.2cm of O2] {\textbf{OFFLOAD} --- rank$_1$: RSU ou V2V};
+\node[lbl, right=0.2cm of O2] {\textbf{OFFLOAD} --- rank$_1$: \gls{RSU} ou V2V};
 
 %% Conexões entrada -> H1
 \foreach \i in {1,...,6}{
@@ -520,11 +520,11 @@ A Figura~\ref{fig:mlp-arch} detalha como o vetor $\mathbf{S}_t$ alimenta a rede 
 \draw[decorate, decoration={brace, amplitude=5pt, mirror}, thick, gray!65]
     (I6.south west) -- (I1.north west)
     node[midway, left=7pt, font=\sffamily\scriptsize, align=right]
-    {$\mathbf{S}_t \in \mathbb{R}^6$\\(saída do TOPSIS)};
+    {$\mathbf{S}_t \in \mathbb{R}^6$\\(saída do \gls{TOPSIS})};
 
 \end{tikzpicture}%
 }
-\caption{Arquitetura da rede \textit{Actor} (MLP $6 \to 64 \to 64 \to 2$): o vetor de estado compacto $\mathbf{S}_t$ produzido pelo TOPSIS alimenta duas camadas ocultas com ativação ReLU; a camada Softmax final emite as probabilidades das ações $a_0$ (LOCAL) e $a_1$ (OFFLOAD rank$_1$).}
+\caption{Arquitetura da rede \textit{Actor} (\gls{MLP} $6 \to 64 \to 64 \to 2$): o vetor de estado compacto $\mathbf{S}_t$ produzido pelo \gls{TOPSIS} alimenta duas camadas ocultas com ativação ReLU; a camada Softmax final emite as probabilidades das ações $a_0$ (LOCAL) e $a_1$ (OFFLOAD rank$_1$).}
 \label{fig:mlp-arch}
 \end{figure}
 
@@ -552,7 +552,7 @@ O \gls{SAC} (\textit{Soft Actor-Critic}) resolve ambos os problemas simultaneame
 % ============================================================
 \section{Complexidade Computacional}
 % ============================================================
-Ao evitar o uso de \glspl{GNN} e optar pelo precondicionamento via \gls{TOPSIS}, a complexidade assintótica de tomada de decisão a cada instante de tempo é regida quase exclusivamente pela ordenação dos $N$ candidatos, operando em $O(N \log N)$. A inferência da MLP (\textit{Actor network}), com duas camadas ocultas de $64$ neurônios e entrada de 6 dimensões, possui complexidade $O(1)$ e ocupa menos de $0{,}1$ MB de memória, tornando a abordagem altamente escalável e compatível com os requisitos de latência de hardware de borda do ecossistema \gls{6G}.
+Ao evitar o uso de \glspl{GNN} e optar pelo precondicionamento via \gls{TOPSIS}, a complexidade assintótica de tomada de decisão a cada instante de tempo é regida quase exclusivamente pela ordenação dos $N$ candidatos, operando em $O(N \log N)$. A inferência da \gls{MLP} (\textit{Actor network}), com duas camadas ocultas de $64$ neurônios e entrada de 6 dimensões, possui complexidade $O(1)$ e ocupa menos de $0{,}1$ MB de memória, tornando a abordagem altamente escalável e compatível com os requisitos de latência de \textit{hardware} de borda do ecossistema \gls{6G}.
 
 % ============================================================
 \section{Estudo de Ablação}
@@ -575,8 +575,8 @@ SAC-Base   & 11D (bruto)     & 3 classes  & WSM           & --- \\
 SAC-A1     & 11D (bruto)     & binária    & WSM           & --- \\
 SAC-S1     & 6D (manual)     & 3 classes  & WSM           & --- \\
 SAC-R1     & 11D (bruto)     & 3 classes  & Deadline-aware& --- \\
-SAC-T1     & 6D (TOPSIS)     & 3 classes  & Deadline-aware& Feature \\
-\textbf{SAC-TOPSIS} & \textbf{6D (TOPSIS)} & \textbf{binária} & \textbf{Deadline-aware} & \textbf{Decisão} \\
+SAC-T1     & 6D (\gls{TOPSIS})     & 3 classes  & Deadline-aware& Feature \\
+\textbf{SAC-TOPSIS} & \textbf{6D (\gls{TOPSIS})} & \textbf{binária} & \textbf{Deadline-aware} & \textbf{Decisão} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -587,7 +587,7 @@ SAC-T1     & 6D (TOPSIS)     & 3 classes  & Deadline-aware& Feature \\
 \label{tab:ablacao-resultados}
 \begin{tabular}{lrrr}
 \toprule
-\textbf{Política} & \textbf{Taxa deadline (\%)} & \textbf{JCT médio (s)} & \textbf{Energia média (J)} \\
+\textbf{Política} & \textbf{Taxa \textit{deadline} (\%)} & \textbf{JCT médio (s)} & \textbf{Energia média (J)} \\
 \midrule
 SAC-Base       &  4{,}6 & 57{,}1 & 2422 \\
 SAC-A1         & 39{,}2 & 13{,}7 & 2106 \\
@@ -622,25 +622,25 @@ O SAC-Base é o ponto de partida do estudo e serve de referência para medir o g
     \right]
     \label{eq:estado-base}
 \end{equation}
-onde $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Quando nenhum vizinho V2V está disponível, as três últimas componentes recebem o valor sentinela $-1{,}0$ para distinguir "ausência de V2V" de "V2V com métrica zero".
+onde $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Quando nenhum vizinho \gls{V2V} está disponível, as três últimas componentes recebem o valor sentinela $-1{,}0$ para distinguir "ausência de \gls{V2V}" de "\gls{V2V} com métrica zero".
 
 O espaço de ação é ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{rsu},\, 2\!=\!\textsc{v2v}\}$: o agente deve aprender simultaneamente a \emph{decisão} de descarregar e a \emph{escolha do destino}. A recompensa usa o Método de Soma Ponderada (WSM) com pesos iguais sobre três critérios — JCT estimado, energia total e ocupação de fila do executor escolhido — normalizados pelo valor máximo de cada coluna e mapeados para $[-1, 1]$:
 \begin{equation}
     r^{\text{wsm}}_t = 2\,\max\!\left(0,\, \min\!\left(1,\, 1 - \tfrac{1}{3}\sum_{j=1}^{3}\tilde{x}_{aj}\right)\right) - 1, \quad \tilde{x}_{aj} = \frac{x_{aj}}{\max_i x_{ij}}
     \label{eq:reward-wsm}
 \end{equation}
-Esse sinal não distingue violações de deadline de execuções lentas porém viáveis: uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
+Esse sinal não distingue violações de \textit{deadline} de execuções lentas porém viáveis: uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
 
 \subsubsection*{SAC-A1 — Redução do Espaço de Ação sem TOPSIS}
 
-A variante A1 mantém inalterados o estado 11D (Equação~\ref{eq:estado-base}) e a recompensa WSM (Equação~\ref{eq:reward-wsm}), alterando \emph{apenas} o espaço de ação para binário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{offload}\}$. Quando $a_t = 1$, o destino de offload é determinado por uma regra de prioridade estática — RSU primeiro (se viável), V2V caso contrário — sem qualquer análise multicritério:
+A variante A1 mantém inalterados o estado 11D (Equação~\ref{eq:estado-base}) e a recompensa WSM (Equação~\ref{eq:reward-wsm}), alterando \emph{apenas} o espaço de ação para binário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{offload}\}$. Quando $a_t = 1$, o destino de \textit{offload} é determinado por uma regra de prioridade estática — \gls{RSU} primeiro (se viável), \gls{V2V} caso contrário — sem qualquer análise multicritério:
 \begin{equation}
     \text{modo}^{\text{A1}}_t =
     \begin{cases}
         \textsc{local} & \text{se } a_t = 0 \\
-        \textsc{rsu}   & \text{se } a_t = 1 \text{ e RSU viável} \\
-        \textsc{v2v}   & \text{se } a_t = 1,\; \text{RSU inviável e V2V viável} \\
-        \textsc{local} & \text{se } a_t = 1 \text{ e nenhum offload viável (fallback)}
+        \textsc{rsu}   & \text{se } a_t = 1 \text{ e \gls{RSU} viável} \\
+        \textsc{v2v}   & \text{se } a_t = 1,\; \text{RSU inviável e \gls{V2V} viável} \\
+        \textsc{local} & \text{se } a_t = 1 \text{ e nenhum \textit{offload} viável (fallback)}
     \end{cases}
     \label{eq:acao-a1}
 \end{equation}
@@ -648,7 +648,7 @@ O objetivo é isolar o efeito de reduzir o espaço de busca de 3 para 2 ações,
 
 \subsubsection*{SAC-S1 — Estado Compacto 6D Manual sem TOPSIS}
 
-A variante S1 mantém o espaço de ação ternário e a recompensa WSM do baseline, mas substitui o estado 11D por um vetor compacto de 6 dimensões construído manualmente com \textit{features} de maior relevância semântica:
+A variante S1 mantém o espaço de ação ternário e a recompensa WSM do \textit{baseline}, mas substitui o estado 11D por um vetor compacto de 6 dimensões construído manualmente com \textit{features} de maior relevância semântica:
 \begin{equation}
     \mathbf{S}^{\text{S1}} = \left[
         \frac{C_j}{C_{\max}},\;
@@ -660,11 +660,11 @@ A variante S1 mantém o espaço de ação ternário e a recompensa WSM do baseli
     \right]
     \label{eq:estado-s1}
 \end{equation}
-A segunda componente — urgência relativa $\widehat{\text{JCT}}_{\text{local}}/D_i$ — comprime em uma única dimensão a pergunta "a execução local vai estourar o prazo?", substituindo as entradas brutas de deadline ($D_j$) e frequência separadas do estado 11D. Comparado ao estado bruto, S1 elimina as redundâncias entre frequência e JCT e satura as filas em $1{,}0$ para evitar valores fora da escala. Nota-se que S1 não inclui informações de V2V (frequência, fila, distância do vizinho), forçando o agente a decidir entre RSU e V2V apenas pela congestão do RSU. A ausência do TOPSIS significa que nenhum escore multicritério está disponível; o estado captura urgência e congestão local, mas não a vantagem objetiva do offload.
+A segunda componente — urgência relativa $\widehat{\text{JCT}}_{\text{local}}/D_i$ — comprime em uma única dimensão a pergunta "a execução local vai estourar o prazo?", substituindo as entradas brutas de \textit{deadline} ($D_j$) e frequência separadas do estado 11D. Comparado ao estado bruto, S1 elimina as redundâncias entre frequência e JCT e satura as filas em $1{,}0$ para evitar valores fora da escala. Nota-se que S1 não inclui informações de \gls{V2V} (frequência, fila, distância do vizinho), forçando o agente a decidir entre \gls{RSU} e \gls{V2V} apenas pela congestão do \gls{RSU}. A ausência do \gls{TOPSIS} significa que nenhum escore multicritério está disponível; o estado captura urgência e congestão local, mas não a vantagem objetiva do \textit{offload}.
 
 \subsubsection*{SAC-R1 — Recompensa Deadline-Aware sem Mudança de Estado ou Ação}
 
-A variante R1 mantém o estado 11D (Equação~\ref{eq:estado-base}) e o espaço de ação ternário idênticos ao baseline, alterando \emph{apenas} a função de recompensa para a formulação sensível ao prazo:
+A variante R1 mantém o estado 11D (Equação~\ref{eq:estado-base}) e o espaço de ação ternário idênticos ao \textit{baseline}, alterando \emph{apenas} a função de recompensa para a formulação sensível ao prazo:
 \begin{equation}
     r^{\text{R1}}_t =
     \begin{cases}
@@ -673,18 +673,18 @@ A variante R1 mantém o estado 11D (Equação~\ref{eq:estado-base}) e o espaço 
     \end{cases}
     \label{eq:reward-r1}
 \end{equation}
-A lacuna mínima de $1{,}5$ unidades entre o maior valor de falha ($-1{,}0$) e o menor valor de sucesso ($+0{,}5$) cria uma barreira de deadline dominante na função de valor do agente. Quando o prazo é cumprido, a recompensa é contínua e proporcional ao custo ponderado $(\alpha\,\text{JCT} + \beta\,E)$, incentivando eficiência mesmo dentro do regime de sucesso. Quando violado, a penalidade cresce proporcionalmente ao excesso de tempo, evitando o platô de recompensa negativa constante do WSM e ensinando o agente a "falhar por pouco" se inevitável. O objetivo é medir o ganho atribuível \emph{exclusivamente} à função de recompensa, sem alterar o estado nem o espaço de ação.
+A lacuna mínima de $1{,}5$ unidades entre o maior valor de falha ($-1{,}0$) e o menor valor de sucesso ($+0{,}5$) cria uma barreira de \textit{deadline} dominante na função de valor do agente. Quando o prazo é cumprido, a recompensa é contínua e proporcional ao custo ponderado $(\alpha\,\text{JCT} + \beta\,E)$, incentivando eficiência mesmo dentro do regime de sucesso. Quando violado, a penalidade cresce proporcionalmente ao excesso de tempo, evitando o platô de recompensa negativa constante do WSM e ensinando o agente a "falhar por pouco" se inevitável. O objetivo é medir o ganho atribuível \emph{exclusivamente} à função de recompensa, sem alterar o estado nem o espaço de ação.
 
-\subsubsection*{SAC-T1 — TOPSIS como \textit{Feature} de Estado com Ação de 3 Classes}
+\subsubsection*{SAC-T1 — \gls{TOPSIS} como \textit{Feature} de Estado com Ação de 3 Classes}
 
-A variante T1 combina o estado compacto 6D calculado \emph{via} TOPSIS (idêntico ao da proposta, Equação~\ref{eq:estado6d}) com a recompensa deadline-aware (Equação~\ref{eq:reward-r1}), mas mantém o espaço de ação ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{rsu},\, 2\!=\!\textsc{v2v}\}$. O TOPSIS calcula internamente os escores de todos os candidatos e usa o resultado para construir o vetor de estado — incluindo a vantagem objetiva $\Delta_{\text{obj}}$ e o JCT normalizado do \textit{rank}$_1$ — mas a decisão final de escolher RSU ou V2V permanece com o agente \gls{SAC}.
+A variante T1 combina o estado compacto 6D calculado \emph{via} \gls{TOPSIS} (idêntico ao da proposta, Equação~\ref{eq:estado6d}) com a recompensa deadline-aware (Equação~\ref{eq:reward-r1}), mas mantém o espaço de ação ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{rsu},\, 2\!=\!\textsc{v2v}\}$. O \gls{TOPSIS} calcula internamente os escores de todos os candidatos e usa o resultado para construir o vetor de estado — incluindo a vantagem objetiva $\Delta_{\text{obj}}$ e o JCT normalizado do \textit{rank}$_1$ — mas a decisão final de escolher \gls{RSU} ou \gls{V2V} permanece com o agente \gls{SAC}.
 
 O contraste essencial entre T1 e a proposta completa é portanto:
 \begin{itemize}
-    \item \textbf{T1:} TOPSIS gera \textit{features} semânticas para o estado; agente decide entre \textsc{local}, \textsc{rsu} e \textsc{v2v} diretamente (3 ações).
-    \item \textbf{SAC-TOPSIS:} TOPSIS seleciona o \textit{rank}$_1$ e define o destino de offload; agente decide apenas \textsc{local} vs.\ \textsc{offload-para-rank}$_1$ (2 ações).
+    \item \textbf{T1:} \gls{TOPSIS} gera \textit{features} semânticas para o estado; agente decide entre \textsc{local}, \textsc{rsu} e \textsc{v2v} diretamente (3 ações).
+    \item \textbf{SAC-TOPSIS:} \gls{TOPSIS} seleciona o \textit{rank}$_1$ e define o destino de \textit{offload}; agente decide apenas \textsc{local} vs.\ \textsc{offload-para-rank}$_1$ (2 ações).
 \end{itemize}
-Essa variante permite quantificar separadamente quanto do ganho do SAC-TOPSIS provém do TOPSIS como \emph{compressor de estado semântico} versus o TOPSIS como \emph{prior de decisão de destino}.
+Essa variante permite quantificar separadamente quanto do ganho do SAC-TOPSIS provém do \gls{TOPSIS} como \emph{compressor de estado semântico} versus o \gls{TOPSIS} como \emph{prior de decisão de destino}.
 
 % ─────────────────────────────────────────────────────────────
 \subsection{Decomposição Causal}
@@ -714,23 +714,23 @@ A soma $4{,}6 + 24{,}2 + 4{,}3 + 12{,}2 = 45{,}3\%$ é exata, confirmando que o 
 Estado 6D compacto manual (Base $\to$ S1) &
     $+24{,}2$ pp &
     Substituir o vetor 11D bruto por 6 \textit{features} semanticamente compactas — especialmente a urgência relativa $\widehat{\text{JCT}}/D_i$ — reduz a dimensionalidade e melhora a generalização entre cenários \\[4pt]
-TOPSIS como \textit{feature} + deadline reward (S1 $\to$ T1) &
+\gls{TOPSIS} como \textit{feature} + \textit{deadline} reward (S1 $\to$ T1) &
     $+4{,}3$ pp &
-    Incorporar o escore $\Delta_{\text{obj}}$ e o JCT do \textit{rank}$_1$ no estado e substituir WSM pela recompensa deadline-aware acrescenta contexto semântico moderado; o ganho é limitado pois o agente ainda precisa resolver a escolha RSU vs.\ V2V \\[4pt]
-TOPSIS como prior de decisão (T1 $\to$ SAC-TOPSIS) &
+    Incorporar o escore $\Delta_{\text{obj}}$ e o JCT do \textit{rank}$_1$ no estado e substituir WSM pela recompensa deadline-aware acrescenta contexto semântico moderado; o ganho é limitado pois o agente ainda precisa resolver a escolha \gls{RSU} vs.\ \gls{V2V} \\[4pt]
+\gls{TOPSIS} como prior de decisão (T1 $\to$ SAC-TOPSIS) &
     $+12{,}2$ pp &
-    Transferir a escolha de destino do agente para o TOPSIS e reduzir o espaço de ação de 3 para 2 é o maior salto marginal: elimina a ambiguidade RSU/V2V e garante que o destino seja sempre o candidato de menor custo multicritério \\
+    Transferir a escolha de destino do agente para o \gls{TOPSIS} e reduzir o espaço de ação de 3 para 2 é o maior salto marginal: elimina a ambiguidade RSU/V2V e garante que o destino seja sempre o candidato de menor custo multicritério \\
 \midrule
 \textbf{Ganho total} & $\mathbf{+40{,}7}$ \textbf{pp} & SAC-TOPSIS vs.\ SAC-Base \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Para isolar o efeito da recompensa \textit{deadline-aware} sem alterar o estado, a variante SAC-R1 atinge $38{,}4\%$ ($+33{,}8$ pp sobre o baseline com estado 11D e ação ternária). Esse valor é maior que o de S1 ($28{,}8\%$), evidenciando que o sinal de recompensa assimétrico é individualmente mais poderoso que a compressão de estado quando aplicados em isolamento. Entretanto, no caminho sequencial, a maior parte do ganho de R1 é compartilhada com S1: o estado 6D já codifica urgência temporal em $\widehat{\text{JCT}}/D_i$, de modo que acrescentar a recompensa deadline-aware sobre S1 produz um incremento marginal de apenas $+4{,}3$ pp (transição S1$\to$T1, que combina as duas mudanças).
+Para isolar o efeito da recompensa \textit{deadline-aware} sem alterar o estado, a variante SAC-R1 atinge $38{,}4\%$ ($+33{,}8$ pp sobre o \textit{baseline} com estado 11D e ação ternária). Esse valor é maior que o de S1 ($28{,}8\%$), evidenciando que o sinal de recompensa assimétrico é individualmente mais poderoso que a compressão de estado quando aplicados em isolamento. Entretanto, no caminho sequencial, a maior parte do ganho de R1 é compartilhada com S1: o estado 6D já codifica urgência temporal em $\widehat{\text{JCT}}/D_i$, de modo que acrescentar a recompensa deadline-aware sobre S1 produz um incremento marginal de apenas $+4{,}3$ pp (transição S1$\to$T1, que combina as duas mudanças).
 
 \subsection{Análise dos Resultados}
 
-Três achados principais emergem do estudo. Primeiro, a variante SAC-A1 ($39{,}2\%$) demonstra que binarizar a ação \emph{sem} critério de seleção de destino já supera o baseline em $+34{,}6$ pp — a simples redução do espaço de busca tem efeito expressivo — mas não alcança a proposta ($45{,}3\%$) porque a regra estática RSU$\succ$V2V ignora condições dinâmicas de fila e distância no momento da decisão. Segundo, a variante SAC-T1 ($33{,}1\%$) mostra que usar o TOPSIS apenas como \textit{feature} de estado contribui com $+4{,}3$ pp sobre S1, enquanto usar o TOPSIS como \textit{prior} de decisão (SAC-TOPSIS) adiciona $+12{,}2$ pp sobre T1: a eficácia do TOPSIS é quase três vezes maior quando ele assume o controle do destino do que quando fornece apenas informação semântica ao agente. Terceiro, o JCT médio do SAC-TOPSIS ($6{,}6$ s) é $8{,}6\times$ menor que o do SAC-Base ($57{,}1$ s), indicando que a combinação TOPSIS$+$estado compacto$+$reward deadline-aware produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores.
+Três achados principais emergem do estudo. Primeiro, a variante SAC-A1 ($39{,}2\%$) demonstra que binarizar a ação \emph{sem} critério de seleção de destino já supera o \textit{baseline} em $+34{,}6$ pp — a simples redução do espaço de busca tem efeito expressivo — mas não alcança a proposta ($45{,}3\%$) porque a regra estática RSU$\succ$V2V ignora condições dinâmicas de fila e distância no momento da decisão. Segundo, a variante SAC-T1 ($33{,}1\%$) mostra que usar o \gls{TOPSIS} apenas como \textit{feature} de estado contribui com $+4{,}3$ pp sobre S1, enquanto usar o \gls{TOPSIS} como \textit{prior} de decisão (SAC-TOPSIS) adiciona $+12{,}2$ pp sobre T1: a eficácia do \gls{TOPSIS} é quase três vezes maior quando ele assume o controle do destino do que quando fornece apenas informação semântica ao agente. Terceiro, o JCT médio do SAC-TOPSIS ($6{,}6$ s) é $8{,}6\times$ menor que o do SAC-Base ($57{,}1$ s), indicando que a combinação TOPSIS$+$estado compacto$+$reward deadline-aware produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores.
 
 Em suma, a hierarquia de contribuição dos componentes é:
 \[
@@ -762,61 +762,61 @@ A Figura~\ref{fig:swq} apresenta o SWQ médio das vinte políticas avaliadas sob
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{figuras/performance_09_swq.png}
-\caption{SWQ médio por política sobre 661 cenários de teste ($\alpha=0{,}35$, $\beta=0{,}35$, $\gamma=0{,}30$). Barras em cinza representam heurísticas; barras escuras representam políticas DRL. A borda dourada indica a melhor política. Maior é melhor.}
+\caption{SWQ médio por política sobre 661 cenários de teste ($\alpha=0{,}35$, $\beta=0{,}35$, $\gamma=0{,}30$). Barras em cinza representam heurísticas; barras escuras representam políticas \gls{DRL}. A borda dourada indica a melhor política. Maior é melhor.}
 \label{fig:swq}
 \end{figure}
 
-\section{Por que o TOPSIS agrega valor ao SAC mas não ao PPO?}
+\section{Por que o \gls{TOPSIS} agrega valor ao \gls{SAC} mas não ao \gls{PPO}?}
 \label{sec:sac-topsis-sinergia}
 
-Os resultados experimentais revelam uma assimetria marcante: o \gls{TOPSIS} eleva a taxa de deadline do \gls{SAC} de $4{,}6\%$ (SAC-Base) para $45{,}3\%$ (SAC-TOPSIS), um ganho de $+40{,}7$ pontos percentuais, enquanto o \gls{PPO} com TOPSIS regride. Para isolar a causa desta assimetria, foram realizados dois experimentos controlados. Primeiro, o PPO-TOPSIS original com estado 12D e ação ternária --- que permitia ao agente escolher entre rank$_1$, rank$_2$ e rank$_3$ --- obteve $18{,}4\%$, abaixo do PPO-Base ($42{,}4\%$). Segundo, o PPO-TOPSIS foi refatorado para utilizar \emph{exatamente} o mesmo estado 6D, ação binária $\{0\!=\!\text{LOCAL},\, 1\!=\!\text{rank}_1\}$ e função de recompensa do SAC-TOPSIS, diferindo apenas no algoritmo de otimização (\gls{PPO} vs.\ \gls{SAC}). O resultado deste experimento controlado foi igualmente $18{,}4\%$, com a política colapsando para $86\%$ de offload via rank$_1$ --- o oposto do PPO-Compact ($100\%$ LOCAL), porém igualmente disfuncional. O PPO-TOPSIS-Compact, que usa o estado 6D mas foi treinado em cenários distintos, apenas iguala o PPO-Base. Em síntese: \textbf{o TOPSIS é uma alavanca decisiva para o SAC e um fator neutro ou prejudicial para o PPO, independentemente do design do estado}. Esta seção analisa as causas estruturais desta assimetria.
+Os resultados experimentais revelam uma assimetria marcante: o \gls{TOPSIS} eleva a taxa de \textit{deadline} do \gls{SAC} de $4{,}6\%$ (SAC-Base) para $45{,}3\%$ (SAC-TOPSIS), um ganho de $+40{,}7$ pontos percentuais, enquanto o \gls{PPO} com \gls{TOPSIS} regride. Para isolar a causa desta assimetria, foram realizados dois experimentos controlados. Primeiro, o PPO-TOPSIS original com estado 12D e ação ternária --- que permitia ao agente escolher entre rank$_1$, rank$_2$ e rank$_3$ --- obteve $18{,}4\%$, abaixo do PPO-Base ($42{,}4\%$). Segundo, o PPO-TOPSIS foi refatorado para utilizar \emph{exatamente} o mesmo estado 6D, ação binária $\{0\!=\!\text{LOCAL},\, 1\!=\!\text{rank}_1\}$ e função de recompensa do SAC-TOPSIS, diferindo apenas no algoritmo de otimização (\gls{PPO} vs.\ \gls{SAC}). O resultado deste experimento controlado foi igualmente $18{,}4\%$, com a política colapsando para $86\%$ de \textit{offload} via rank$_1$ --- o oposto do PPO-Compact ($100\%$ LOCAL), porém igualmente disfuncional. O PPO-TOPSIS-Compact, que usa o estado 6D mas foi treinado em cenários distintos, apenas iguala o PPO-Base. Em síntese: \textbf{o \gls{TOPSIS} é uma alavanca decisiva para o \gls{SAC} e um fator neutro ou prejudicial para o \gls{PPO}, independentemente do design do estado}. Esta seção analisa as causas estruturais desta assimetria.
 
 \subsection{O problema do aprendizado redundante no PPO-TOPSIS}
 
-O PPO-TOPSIS foi implementado com um estado de 12 dimensões --- três alternativas (LOCAL, RSU, V2V) ordenadas pelo escore TOPSIS, cada uma descrita por quatro atributos normalizados (JCT estimado, energia, distância, \textit{link lifetime}) --- e um espaço de ação ternário $a_t \in \{0\!=\!\text{rank}_1,\, 1\!=\!\text{rank}_2,\, 2\!=\!\text{rank}_3\}$. Esse design cria um problema de \textbf{aprendizado redundante}: o TOPSIS já determina deterministicamente que o candidato na posição 0 é o melhor segundo critérios multicritério rigorosos. O agente PPO, portanto, é treinado por reforço para redescobrir, por tentativa e erro, o que o TOPSIS já computou de forma ótima. A informação de valor genuíno que o agente deveria aprender --- se há benefício em descarregar para o melhor candidato dado o estado da fila e a urgência do \textit{deadline} --- está enterrada sob o sinal dominante de que rank$_1$ é sempre superior a rank$_2$ e rank$_3$ em custo multicritério.
+O PPO-TOPSIS foi implementado com um estado de 12 dimensões --- três alternativas (LOCAL, \gls{RSU}, \gls{V2V}) ordenadas pelo escore \gls{TOPSIS}, cada uma descrita por quatro atributos normalizados (JCT estimado, energia, distância, \textit{link lifetime}) --- e um espaço de ação ternário $a_t \in \{0\!=\!\text{rank}_1,\, 1\!=\!\text{rank}_2,\, 2\!=\!\text{rank}_3\}$. Esse design cria um problema de \textbf{aprendizado redundante}: o \gls{TOPSIS} já determina deterministicamente que o candidato na posição 0 é o melhor segundo critérios multicritério rigorosos. O agente \gls{PPO}, portanto, é treinado por reforço para redescobrir, por tentativa e erro, o que o \gls{TOPSIS} já computou de forma ótima. A informação de valor genuíno que o agente deveria aprender --- se há benefício em descarregar para o melhor candidato dado o estado da fila e a urgência do \textit{deadline} --- está enterrada sob o sinal dominante de que rank$_1$ é sempre superior a rank$_2$ e rank$_3$ em custo multicritério.
 
-O SAC-TOPSIS resolve este problema por projeto: delega a pergunta \emph{``para onde descarregar?''} inteiramente ao TOPSIS e reserva ao agente apenas a pergunta \emph{``descarregar ou não?''} --- uma decisão genuinamente nova, que o TOPSIS não responde, pois envolve a comparação entre o melhor candidato de offload e a execução local ponderada pela urgência temporal, pelo congestionamento da fila e pela vantagem objetiva $\Delta_{\text{obj}}$ codificada no estado 6D.
+O SAC-TOPSIS resolve este problema por projeto: delega a pergunta \emph{``para onde descarregar?''} inteiramente ao \gls{TOPSIS} e reserva ao agente apenas a pergunta \emph{``descarregar ou não?''} --- uma decisão genuinamente nova, que o \gls{TOPSIS} não responde, pois envolve a comparação entre o melhor candidato de \textit{offload} e a execução local ponderada pela urgência temporal, pelo congestionamento da fila e pela vantagem objetiva $\Delta_{\text{obj}}$ codificada no estado 6D.
 
 \subsection{Colapso de política induzido pelo sinal TOPSIS}
 
-O segundo mecanismo de falha do PPO-TOPSIS é o \textbf{colapso de política}. Com o estado 12D, a posição rank$_1$ exibe consistentemente JCT menor, energia menor e distância menor que rank$_2$ e rank$_3$. Isso gera um gradiente de política fortemente unidirecional desde as primeiras iterações: $P(a\!=\!0) \to 1$. O PPO utiliza coeficiente de entropia $\alpha_{\text{ent}} = 0{,}01$, dez vezes menor que o do SAC ($\alpha_{\text{ent}} = 0{,}10$ com ajuste automático via gradiente dual). Com entropia tão fraca, uma vez que a distribuição de política colapsa para $P(\text{rank}_1) \approx 1$, as trajetórias coletadas nas iterações seguintes são quase exclusivamente de escolhas rank$_1$, reforçando o colapso. O mecanismo de \textit{clipping} do PPO ($\epsilon = 0{,}2$) não reverte esse estado: ele apenas impede mudanças \emph{grandes} por passo, mas não impede a deriva acumulada durante os 400 episódios de treinamento.
+O segundo mecanismo de falha do PPO-TOPSIS é o \textbf{colapso de política}. Com o estado 12D, a posição rank$_1$ exibe consistentemente JCT menor, energia menor e distância menor que rank$_2$ e rank$_3$. Isso gera um gradiente de política fortemente unidirecional desde as primeiras iterações: $P(a\!=\!0) \to 1$. O \gls{PPO} utiliza coeficiente de entropia $\alpha_{\text{ent}} = 0{,}01$, dez vezes menor que o do \gls{SAC} ($\alpha_{\text{ent}} = 0{,}10$ com ajuste automático via gradiente dual). Com entropia tão fraca, uma vez que a distribuição de política colapsa para $P(\text{rank}_1) \approx 1$, as trajetórias coletadas nas iterações seguintes são quase exclusivamente de escolhas rank$_1$, reforçando o colapso. O mecanismo de \textit{clipping} do \gls{PPO} ($\epsilon = 0{,}2$) não reverte esse estado: ele apenas impede mudanças \emph{grandes} por passo, mas não impede a deriva acumulada durante os 400 episódios de treinamento.
 
-O \gls{SAC}, ao contrário, opera sobre um espaço de ação binário em que nenhuma das duas opções (LOCAL ou offload para rank$_1$) domina o outro de forma incondicional: há cenários em que a fila do RSU está saturada, ou o V2V está distante, ou o \textit{deadline} é tão apertado que mesmo o melhor candidato de offload não chega a tempo. Nesses casos, a resposta correta é LOCAL, e o sinal de recompensa deadline-aware --- com lacuna mínima de $1{,}5$ entre o melhor valor de falha e o pior valor de sucesso --- preserva um gradiente exploratório relevante. A alta temperatura entrópica do SAC garante que ambas as ações recebam probabilidade não nula ao longo do treinamento, evitando o colapso.
+O \gls{SAC}, ao contrário, opera sobre um espaço de ação binário em que nenhuma das duas opções (LOCAL ou \textit{offload} para rank$_1$) domina o outro de forma incondicional: há cenários em que a fila do \gls{RSU} está saturada, ou o \gls{V2V} está distante, ou o \textit{deadline} é tão apertado que mesmo o melhor candidato de \textit{offload} não chega a tempo. Nesses casos, a resposta correta é LOCAL, e o sinal de recompensa deadline-aware --- com lacuna mínima de $1{,}5$ entre o melhor valor de falha e o pior valor de sucesso --- preserva um gradiente exploratório relevante. A alta temperatura entrópica do \gls{SAC} garante que ambas as ações recebam probabilidade não nula ao longo do treinamento, evitando o colapso.
 
 \subsection{Assimetria de eficiência amostral com cenário único}
 
-O protocolo de treinamento emprega \textbf{um único cenário} (\texttt{cenario\_v2x\_10tps\_w01}) durante os 400 episódios, com generalização \textit{zero-shot} para os 661 cenários de teste. Essa escolha é compatível com o SAC, mas estruturalmente adversa ao PPO.
+O protocolo de treinamento emprega \textbf{um único cenário} (\texttt{cenario\_v2x\_10tps\_w01}) durante os 400 episódios, com generalização \textit{zero-shot} para os 661 cenários de teste. Essa escolha é compatível com o \gls{SAC}, mas estruturalmente adversa ao \gls{PPO}.
 
-O SAC mantém um \textit{replay buffer} de 50.000 transições e realiza atualizações com \textit{minibatch} de 1024 amostras por passo. Com aproximadamente 100 tarefas por episódio, as 40.000 transições coletadas ao longo dos 400 episódios são amostradas em média $\approx\!40$ vezes cada durante o treinamento --- uma reciclagem intensiva que extrai máxima informação de um conjunto de dados limitado. Além disso, a mistura de experiências de diferentes pontos do treinamento (política mais aleatória nos primeiros episódios, mais refinada nos últimos) cria uma diversidade implícita que previne o sobreajuste ao único cenário de treino.
+O \gls{SAC} mantém um \textit{replay buffer} de 50.000 transições e realiza atualizações com \textit{minibatch} de 1024 amostras por passo. Com aproximadamente 100 tarefas por episódio, as 40.000 transições coletadas ao longo dos 400 episódios são amostradas em média $\approx\!40$ vezes cada durante o treinamento --- uma reciclagem intensiva que extrai máxima informação de um conjunto de dados limitado. Além disso, a mistura de experiências de diferentes pontos do treinamento (política mais aleatória nos primeiros episódios, mais refinada nos últimos) cria uma diversidade implícita que previne o sobreajuste ao único cenário de treino.
 
-O PPO, sendo \textit{on-policy}, descarta cada lote de trajetórias após as $k\!=\!8$ épocas de atualização. Com um único cenário, cada episódio gera essencialmente o mesmo padrão de chegada de tarefas, o mesmo volume de tarefas e as mesmas condições de canal. A política converge rapidamente para a estratégia que maximiza a recompensa nesse cenário específico --- que, com a salência do sinal TOPSIS, é \emph{``sempre escolha rank$_1$''} --- e não tem como escapar desse ótimo local por falta de diversidade nos dados on-policy.
+O \gls{PPO}, sendo \textit{on-policy}, descarta cada lote de trajetórias após as $k\!=\!8$ épocas de atualização. Com um único cenário, cada episódio gera essencialmente o mesmo padrão de chegada de tarefas, o mesmo volume de tarefas e as mesmas condições de canal. A política converge rapidamente para a estratégia que maximiza a recompensa nesse cenário específico --- que, com a salência do sinal \gls{TOPSIS}, é \emph{``sempre escolha rank$_1$''} --- e não tem como escapar desse ótimo local por falta de diversidade nos dados on-policy.
 
-A evidência experimental confirma esta hipótese: o PPO-TOPSIS-Compact, que usa o estado 6D do SAC-TOPSIS (idêntico em conteúdo semântico) mas com algoritmo PPO, atinge $42{,}4\%$ --- o mesmo que o PPO-Base, que usa o estado bruto 11D. O estado TOPSIS mais informativo não agrega valor ao PPO porque o gargalo não é a qualidade do estado, mas a ineficiência amostral do algoritmo on-policy com cenário único.
+A evidência experimental confirma esta hipótese: o PPO-TOPSIS-Compact, que usa o estado 6D do SAC-TOPSIS (idêntico em conteúdo semântico) mas com algoritmo \gls{PPO}, atinge $42{,}4\%$ --- o mesmo que o PPO-Base, que usa o estado bruto 11D. O estado \gls{TOPSIS} mais informativo não agrega valor ao \gls{PPO} porque o gargalo não é a qualidade do estado, mas a ineficiência amostral do algoritmo on-policy com cenário único.
 
 \subsection{Síntese: complementaridade estrutural SAC--TOPSIS}
 
 A superioridade do SAC-TOPSIS não decorre de nenhum componente isolado, mas da \textbf{complementaridade estrutural} entre os dois módulos em três dimensões:
 
 \begin{enumerate}
-    \item \textbf{Divisão de responsabilidades}: O TOPSIS resolve deterministicamente a pergunta \emph{``qual candidato de offload é melhor?''}; o SAC aprende a resposta à pergunta complementar \emph{``vale a pena descarregar para esse candidato?''}. As duas perguntas são independentes e igualmente necessárias; nenhum dos dois módulos, isoladamente, as responde ambas.
+    \item \textbf{Divisão de responsabilidades}: O \gls{TOPSIS} resolve deterministicamente a pergunta \emph{``qual candidato de \textit{offload} é melhor?''}; o \gls{SAC} aprende a resposta à pergunta complementar \emph{``vale a pena descarregar para esse candidato?''}. As duas perguntas são independentes e igualmente necessárias; nenhum dos dois módulos, isoladamente, as responde ambas.
 
-    \item \textbf{Off-policy + replay buffer}: O SAC recicla cada transição $\approx\!40$ vezes no treinamento com um único cenário, alcançando uma eficiência amostral inacessível ao PPO on-policy. Essa reciclagem é segura porque o SAC aprende uma função de valor $Q(s,a)$ que é off-policy por construção --- ao contrário do PPO, cujo gradiente de política requer dados coletados pela política corrente.
+    \item \textbf{Off-policy + replay buffer}: O \gls{SAC} recicla cada transição $\approx\!40$ vezes no treinamento com um único cenário, alcançando uma eficiência amostral inacessível ao \gls{PPO} on-policy. Essa reciclagem é segura porque o \gls{SAC} aprende uma função de valor $Q(s,a)$ que é off-policy por construção --- ao contrário do \gls{PPO}, cujo gradiente de política requer dados coletados pela política corrente.
 
-    \item \textbf{Regularização entrópica intensa}: O SAC mantém $\alpha_{\text{ent}} = 0{,}10$ com ajuste automático, dez vezes superior ao coeficiente fixo do PPO. Essa entropia elevada é precisamente o que impede o colapso de política frente ao sinal claro fornecido por $\Delta_{\text{obj}}$ no estado 6D --- mantendo a exploração ativa mesmo quando o TOPSIS sugere fortemente que offload é melhor.
+    \item \textbf{Regularização entrópica intensa}: O \gls{SAC} mantém $\alpha_{\text{ent}} = 0{,}10$ com ajuste automático, dez vezes superior ao coeficiente fixo do \gls{PPO}. Essa entropia elevada é precisamente o que impede o colapso de política frente ao sinal claro fornecido por $\Delta_{\text{obj}}$ no estado 6D --- mantendo a exploração ativa mesmo quando o \gls{TOPSIS} sugere fortemente que \textit{offload} é melhor.
 \end{enumerate}
 
-Em contraste, o PPO-TOPSIS sofre das três falhas simétricas: aprende uma pergunta que o TOPSIS já responde (redundância), colapsa para uma estratégia degenerada com entropia insuficiente para resistir ao sinal TOPSIS (colapso), e sobreajusta ao único cenário de treino sem o mecanismo de reciclagem do replay buffer (ineficiência amostral). O experimento controlado confirma inequivocamente este diagnóstico: ao trocar \emph{apenas} o algoritmo --- mantendo estado 6D, ação binária e recompensa idênticos --- o SAC-TOPSIS atinge $45{,}3\%$ enquanto o PPO-TOPSIS obtém $18{,}4\%$, um déficit de $26{,}9$ pontos percentuais atribuível exclusivamente à natureza on-policy do \gls{PPO} e à sua baixa temperatura entrópica. O TOPSIS, portanto, não é neutro quando mal integrado: \emph{amplifica} as fraquezas do algoritmo hospedeiro.
+Em contraste, o PPO-TOPSIS sofre das três falhas simétricas: aprende uma pergunta que o \gls{TOPSIS} já responde (redundância), colapsa para uma estratégia degenerada com entropia insuficiente para resistir ao sinal \gls{TOPSIS} (colapso), e sobreajusta ao único cenário de treino sem o mecanismo de reciclagem do \textit{replay buffer} (ineficiência amostral). O experimento controlado confirma inequivocamente este diagnóstico: ao trocar \emph{apenas} o algoritmo --- mantendo estado 6D, ação binária e recompensa idênticos --- o SAC-TOPSIS atinge $45{,}3\%$ enquanto o PPO-TOPSIS obtém $18{,}4\%$, um déficit de $26{,}9$ pontos percentuais atribuível exclusivamente à natureza on-policy do \gls{PPO} e à sua baixa temperatura entrópica. O \gls{TOPSIS}, portanto, não é neutro quando mal integrado: \emph{amplifica} as fraquezas do algoritmo hospedeiro.
 
 % ──────────────────────────────────────────────────────────────────────────────
 \section{Avaliação Comparativa de Políticas}
 \label{sec:ranking-completo}
 
-As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são: taxa de deadline (\%), SWQ ($= \hat{\tau}\cdot\overline{(D_j - \text{JCT}_j)/D_j}_{\text{sucesso}}$), JCT médio em segundos, energia média por tarefa em joules e o objetivo $J(\pi) = 0{,}60\cdot\hat{\tau} - 0{,}40\cdot\overline{(0{,}35\,\text{JCT} + 0{,}35\,E)/(D + 0{,}35\,E_{\max})}$ com $E_{\max} = 432{,}6\,\text{J}$ (percentil 99 global).
+As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são: taxa de \textit{deadline} (\%), SWQ ($= \hat{\tau}\cdot\overline{(D_j - \text{JCT}_j)/D_j}_{\text{sucesso}}$), JCT médio em segundos, energia média por tarefa em joules e o objetivo $J(\pi) = 0{,}60\cdot\hat{\tau} - 0{,}40\cdot\overline{(0{,}35\,\text{JCT} + 0{,}35\,E)/(D + 0{,}35\,E_{\max})}$ com $E_{\max} = 432{,}6\,\text{J}$ (percentil 99 global).
 
 \begin{landscape}
 \begin{table}[htbp]
 \centering
-\caption{Ranking completo das 25 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa TOPSIS.}
+\caption{Ranking completo das 25 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa \gls{TOPSIS}.}
 \label{tab:ranking-completo}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{clrrrrrrrrr}
@@ -858,7 +858,7 @@ A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada famíli
 
 \begin{table}[htbp]
 \centering
-\caption{Ganho do TOPSIS por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
+\caption{Ganho do \gls{TOPSIS} por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
 \label{tab:ganho-topsis}
 \small
 \resizebox{\textwidth}{!}{%
@@ -866,10 +866,10 @@ A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada famíli
 \toprule
 \multirow{2}{*}{\textbf{Algoritmo}} & \multirow{2}{*}{\textbf{Versão}} & \multicolumn{2}{c}{\textbf{Taxa\%}} & \multicolumn{2}{c}{\textbf{SWQ}} & \multicolumn{2}{c}{\textbf{J($\pi$)}} & \multirow{2}{*}{\textbf{Destaques}} \\
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
- & & Base & TOPSIS & Base & TOPSIS & Base & TOPSIS & \\
+ & & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & \\
 \midrule
 \multirow{2}{*}{SAC}
- & base   & 4,52  & ---    & 0,0119 & ---    & $-$0,042 & --- & colapso total (94,9\% V2V) \\
+ & base   & 4,52  & ---    & 0,0119 & ---    & $-$0,042 & --- & colapso total (94,9\% \gls{V2V}) \\
  & topsis & ---   & \textbf{45,21} & ---    & \textbf{0,1484} & --- & \textbf{0,2454} & \textbf{$+$40,7 pp / $+$1147\% SWQ} \\
 \midrule
 \multirow{2}{*}{PPO}
@@ -881,11 +881,11 @@ A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada famíli
  & topsis & ---   & 43,91  & ---    & 0,1388 & --- & 0,2424 & $+$1,6 pp taxa; JCT $-44{,}5\%$ \\
 \midrule
 \multirow{2}{*}{DQN}
- & base   & 22,10 & ---    & 0,0686 & ---    & 0,0839 & --- & 78,5\% V2V sem critério \\
+ & base   & 22,10 & ---    & 0,0686 & ---    & 0,0839 & --- & 78,5\% \gls{V2V} sem critério \\
  & topsis & ---   & 25,90  & ---    & 0,0997 & --- & 0,1161 & $+$3,8 pp / $+$45\% SWQ \\
 \midrule
 \multirow{2}{*}{A2C}
- & base   & 21,74 & ---    & 0,0772 & ---    & 0,0785 & --- & 79,7\% V2V, energia alta \\
+ & base   & 21,74 & ---    & 0,0772 & ---    & 0,0785 & --- & 79,7\% \gls{V2V}, energia alta \\
  & topsis & ---   & 42,32  & ---    & 0,1418 & --- & 0,2295 & \textbf{$+$20,6 pp / $+$84\% SWQ} \\
 \bottomrule
 \end{tabular}%
