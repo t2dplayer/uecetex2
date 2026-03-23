@@ -11,7 +11,7 @@ A convergência entre tecnologias de comunicação, eletrificação veicular e c
 
 Veículos modernos são equipados com múltiplos sensores, unidades de processamento e interfaces de comunicação, permitindo a coleta e o processamento de grandes volumes de dados. Contudo, a complexidade das aplicações e a quantidade crescente de dados a serem processados podem exceder a capacidade computacional das \glspl{OBU} instaladas.
 
-Uma solução imediata seria aumentar a capacidade computacional dessas OBUs, possibilitando maior processamento local. No entanto, o atual período de transição tecnológica resulta em cenários heterogêneos, no qual coexistem OBUs com diferentes capacidades computacionais~\cite{luo2024} e distintas tecnologias de comunicação~\cite{zheng2015}. Essa diversidade representa um desafio para a implementação de aplicações veiculares em larga escala, especialmente no contexto das cidades inteligentes (\textit{Smart Cities})~\cite{luo2024}.
+Uma solução imediata seria aumentar a capacidade computacional dessas OBUs, possibilitando maior processamento local. No entanto, o atual período de transição tecnológica resulta em cenários heterogêneos, no qual coexistem OBUs com diferentes capacidades computacionais~\cite{luo2024} e distintas tecnologias de comunicação~\cite{zheng2015}. Essa diversidade representa um desafio para a implementação de aplicações veiculares em larga escala, especialmente no contexto das cidades inteligentes (\textit{\textit{Smart Cities}})~\cite{luo2024}.
 
 Nesse ambiente fortemente dinâmico e caótico, muitas aplicações, em particular aquelas voltadas à condução autônoma, impõem requisitos rigorosos de latência~\cite{chao2025}. A execução integral do processamento nos dispositivos embarcados frequentemente inviabiliza o atendimento a tais requisitos, devido às limitações físicas de energia e capacidade computacional~\cite{luo2024}.
 
@@ -26,6 +26,16 @@ Essa limitação tem impulsionado a busca por soluções adaptativas e mais robu
 \section{Motivação}
 \label{sec:motivacao}
 
+A motivação para esta pesquisa fundamenta-se em quatro pilares críticos que representam lacunas tecnológicas e científicas no estado da arte de redes veiculares:
+
+Primeiramente, existe a necessidade de viabilizar soluções de descarregamento de tarefas em cenários de alta heterogeneidade computacional. O atual período de transição tecnológica resulta na coexistência de veículos com \glspl{OBU} de capacidades distintas, exigindo modelos de decisão que operem de forma eficiente independentemente do \textit{\textit{hardware}} disponível~\cite{zheng2015,luo2024}.
+
+Em segundo lugar, identifica-se um importante \textit{\textit{gap}} de pesquisa relacionado à escalabilidade do \gls{DRL} em cenários de mundo real. Como o \gls{DRL} utiliza redes neurais que dependem de entradas de dimensão fixa, a maioria das soluções existentes exige o retreinamento do agente sempre que o número de veículos vizinhos (agentes) varia~\cite{uddin2025,tang2024}. Desenvolver uma abordagem que lide com essa variação sem necessidade de retreinamento é um dos principais desafios abordados neste trabalho~\cite{ma2025}.
+
+Adicionalmente, a realização de reengenharia de estado e de recompensa em \gls{DRL} é frequentemente descrita como um processo empírico e complexo devido à alta dimensionalidade e à falta de estruturação dos dados de entrada~\cite{shi2023}. Esta pesquisa propõe mitigar esse problema ao utilizar o método de ranqueamento multicritério \gls{TOPSIS}~\cite{hwang1981} como um facilitador da engenharia de estado, reduzindo a complexidade da entrada da rede neural e estruturando a tomada de decisão~\cite{vieira2025}.
+
+Por fim, este trabalho de qualificação propõe uma abordagem evolutiva: inicialmente, emprega-se o \gls{TOPSIS} auxiliando o agente de decisão para validar a arquitetura proposta. Como etapa subsequente da pesquisa de doutorado, planeja-se a evolução para a lógica \textit{Fuzzy}-TOPSIS, visando incorporar a capacidade de lidar com a incerteza e a imprecisão inerentes aos cenários veiculares reais, aumentando a robustez do modelo final.
+
 \section{Definição do Problema}
 \label{sec:definicao-do-problema}
 
@@ -35,11 +45,9 @@ Diante das limitações de processamento local e da elevada variabilidade do amb
 \textbf{Como tomar decisões de descarregamento de tarefas em redes \gls{VEC}/\gls{V2X}, com número variável de candidatos (\glspl{RSU} e veículos vizinhos), de forma confiável e adaptativa, cumprindo restrições de prazo e minimizando latência e consumo energético, sem necessidade de retreinamento diante de variações na densidade veicular?}
 \end{quote}
 
-Estudos recentes reforçam que a alta mobilidade, a intermitência dos enlaces e a heterogeneidade de recursos tornam esse desafio ainda mais complexo~\cite{liu2021,mao2017,shi2023,nieto2024}.
+Estudos recentes reforçam que a alta mobilidade, a intermitência dos enlaces e a heterogeneidade de recursos tornam esse desafio ainda mais complexo~\cite{liu2021,mao2017,shi2023,nieto2024}. Para delimitar o escopo da solução proposta, é importante destacar que o problema de descarregamento de tarefas, em sua essência, configura-se como um problema de otimização \textit{NP-hard}~\cite{mao2017,feng2017}. Isso implica que soluções exatas em tempo polinomial são inviáveis para cenários dinâmicos como o veicular, o que direciona a busca por métodos de baixa complexidade computacional e boa capacidade de adaptação. 
 
-Para delimitar o escopo da solução proposta, é importante destacar que o problema de descarregamento de tarefas, em sua essência, configura-se como um problema de otimização \textit{NP-hard}~\cite{mao2017,feng2017}. Isso implica que soluções exatas em tempo polinomial são inviáveis para cenários dinâmicos como o veicular, o que direciona a busca por métodos de baixa complexidade computacional e boa capacidade de adaptação. 
-
-Outro aspecto importante refere-se a maneira na qual o descarregamento é realizado, podendo ser classificado em três categorias principais: descarregamento total (\textit{full offloading}), descarregamento parcial (\textit{partial offloading}) e descarregamento adaptativo (\textit{adaptive offloading})~\cite{wang2022} como pode ser observado na Figura~\ref{fig:offloading_categories}. Cada abordagem apresenta vantagens e desvantagens específicas, influenciando diretamente a formulação do problema e as estratégias de solução adotadas.
+O processo de descarregamento de tarefas pode ser classificado em três categorias principais: total (\textit{full offloading}), parcial (\textit{partial offloading}) e adaptativo (\textit{adaptive offloading})~\cite{wang2022}, conforme ilustrado na Figura~\ref{fig:offloading_categories}. A escolha entre essas abordagens impacta diretamente a complexidade da formulação do problema, especialmente em ambientes dinâmicos.
 
 \begin{figure}[ht!]
     \centering
@@ -51,135 +59,129 @@ Outro aspecto importante refere-se a maneira na qual o descarregamento é realiz
     }
 \end{figure}
 
-Nesse contexto, a literatura apresenta diversas abordagens para modelar e melhorar a tomada de decisão de descarregamento de tarefas, por exemplo: programação linear e inteira para cenários de \gls{MEC}~\cite{khan2020energy}, meta-heurísticas como algoritmos genéticos~\cite{li2020genetic}, PSO~\cite{you2021efficient} e colônia de formigas~\cite{kishor2022task} para problemas de grande escala, além de abordagens baseadas em aprendizado de máquina e aprendizado por reforço profundo, adequadas para ambientes altamente variáveis e parcialmente observáveis~\cite{huang2020,shi2023,nieto2024}.
+Além disso, as estratégias de decisão variam entre abordagens que processam conjuntos de tarefas em lote (\textit{batch}) ou aquelas que decidem dinamicamente para cada tarefa individual, o que impacta diretamente a arquitetura e a complexidade das soluções propostas. O ambiente alvo desta pesquisa caracteriza-se por uma rede \gls{VEC} altamente heterogênea e volátil, operando sob cobertura 5G NR para comunicação com infraestruturas de borda e interfaces \gls{V2X} \textit{\textit{Sidelink}} para cooperação entre veículos vizinhos. A principal dificuldade reside na modelagem de um cenário onde a densidade veicular e a topologia da rede mudam abruptamente, alterando o número de candidatos disponíveis para o descarregamento e a estabilidade dos enlaces de comunicação~\cite{chao2025,luo2024}.
 
-Outra consideração fundamental diz respeito à modelagem do ambiente veicular. Cada solução proposta na literatura assume combinações específicas de tecnologias de comunicação, capacidades computacionais e modelos de consumo energético, o que impacta diretamente a forma como o problema é otimizado~\cite{liu2021}. Além disso, deve-se definir se o descarregamento será realizado apenas para servidores de borda, para veículos vizinhos (descarregamento colaborativo) ou para ambos, como no paradigma de \gls{VFC}~\cite{keshari2022}. Essa escolha é influenciada pela disponibilidade de recursos, pelo perfil da aplicação e pela estabilidade dos enlaces, variando conforme o cenário de estudo.
+Nesse contexto, aplicações com alta demanda computacional e baixa carga de dados --- como visão computacional e algoritmos de navegação --- impõem restrições de latência que superam a capacidade de processamento das \glspl{OBU} locais. Para viabilizar tais aplicações, a tomada de decisão deve integrar, em tempo real, múltiplos indicadores conflitantes (latência, energia, carga de CPU e qualidade do canal) sob forte incerteza de medição~\cite{liu2021}. 
 
-A mobilidade veicular constitui outro elemento crítico. Diferentes cenários, como os urbanos, suburbanos e  rodoviários, apresentam padrões distintos de flutuação do canal, densidade de veículos e comportamento do tráfego. Em áreas urbanas, fatores como congestionamentos, presença de pedestres, ônibus e motocicletas podem alterar significativamente a dinâmica da conectividade e, consequentemente, as estratégias de descarregamento~\cite{chao2025,luo2024}. Tais aspectos precisam ser considerados para que a tomada de decisão seja realista e eficaz.
+Embora a literatura apresente métodos baseados em programação linear ou meta-heurísticas~\cite{li2020genetic,you2021efficient}, tais abordagens operam majoritariamente sobre instantes isolados da rede (\textit{snapshots}). Essa natureza míope limita sua eficácia em cenários veiculares, pois falham em considerar a evolução futura da topologia e o impacto de longo prazo das decisões sequenciais. Por outro lado, soluções de \textit{Deep Reinforcement Learning} (\gls{DRL}) puro, embora capazes de otimizar recompensas futuras, enfrentam o problema da entrada de dimensão variável. Assim, a integração de métodos de ranqueamento multicritério (\gls{TOPSIS}) com \gls{DRL} surge como a estratégia necessária para estruturar esse ambiente caótico em uma representação de estado compacta e invariante à densidade, permitindo decisões robustas e escaláveis. 
 
-A viabilização do processo de decisão depende de mecanismos eficientes de comunicação e descoberta de recursos. Neste trabalho, assume-se comunicação via \gls{5G} \gls{NR} entre os veículos e os servidores de borda, e comunicação \gls{V2X} entre os veículos, alinhado às diretrizes das arquiteturas 3GPP Release 16/17~\cite{3gppRel17}. Além disso, protocolos de descoberta e anúncios de recursos são necessários para que os veículos obtenham informações sobre capacidade de CPU, características relacionadas ao estado energético e qualidade do enlace dos dispositivos vizinhos~\cite{zhou2019,liu2021}.
+% Os principais desafios inerentes a esse ambiente são sintetizados na Figura~\ref{fig:problems}.
 
-Outro ponto essencial refere-se ao perfil das aplicações beneficiadas pelo descarregamento. A popularização de \textit{hardware} embarcado mais poderoso em OBUs permite o processamento local de aplicações leves; contudo, aplicações com baixa carga de dados, mas com alta demanda computacional, como visão computacional, detecção de objetos, fusão sensorial, criptografia e algoritmos de navegação autônoma, são candidatas naturais ao descarregamento~\cite{shi2023,nieto2024}. Para evitar latências excessivas, é necessário equilibrar o custo de transmissão com o ganho de processamento externo, preservando as restrições temporais impostas pela aplicação.
+% \begin{figure}[ht!]
+%     \centering
+%     \Caption{\label{fig:problems}Principais problemas inerentes ao descarregamento de tarefas veicular: mobilidade e instabilidade do enlace, heterogeneidade de recursos e filas, custos energéticos, incerteza de medições, dependência de tecnologias/protocolos e complexidade \textit{NP-hard} sob restrições de latência e confiabilidade.}
+%     \UECEfig{}{
+%         \fbox{%
+%         \resizebox{0.95\linewidth}{!}{%
+%         \begin{tikzpicture}[
+%           font=\scriptsize\sffamily,
+%           node distance=7mm and 9mm,
+%           >=Latex
+%         ]
+%           \tikzset{
+%             box/.style={
+%               draw, thick, rounded corners=2pt,
+%               align=left, inner sep=4pt,
+%               text width=3.4cm, minimum height=14mm
+%             },
+%             cbox/.style={
+%               draw, thick, rounded corners=2pt,
+%               align=center, inner sep=4pt,
+%               text width=3.8cm, minimum height=14mm
+%             },
+%             arrow/.style={-Latex, thick},
+%             group/.style={draw, thick, rounded corners=3pt, inner sep=6pt},
+%           }
 
-Somente após a coleta e integração dessas informações é possível realizar a tomada de decisão sobre o descarregamento. Essa decisão deve considerar a incerteza inerente às medições, a rápida variação do ambiente e a necessidade de minimizar falhas. Assim, soluções adaptativas baseadas em aprendizado de máquina e \gls{DRL} têm sido exploradas como alternativas promissoras para lidar com a incerteza, o dinamismo e a complexidade dos cenários veiculares~\cite{huang2020,shi2023,nieto2024}. A combinação dessas abordagens com métodos de ranqueamento multicritério --- como \gls{TOPSIS} e \textit{Fuzzy}-TOPSIS --- representa uma direção promissora para aprimorar a qualidade da representação de estado e a robustez das decisões em ambientes veiculares.
+%           % -----------------------------
+%           % Núcleo (centro)
+%           % -----------------------------
+%           \node[cbox] (decision) {\textbf{Decisão de descarregamento}\\local / MEC / V2V};
 
-De forma geral pode-se resumir os problemas enfrentados através da Figura~\ref{fig:problems} onde uma decisão de descarregamento de tarefa deve considerar o cenário observado, as tecnologias de comunicação empregadas, as aplicações utilizadas, a incerteza do ambiente, o custo e o objetivo buscado.
+%           \node[cbox, above=of decision] (goals)
+%             {\textbf{Objetivos / Restrições}\\
+%              Reduzir tempo e energia.\\
+%              Cumprir restrição de tempo das aplicações.\\
+%              Balancear a carga entre os dispositivos.};
 
-\begin{figure}[ht!]
-    \centering
-    \Caption{\label{fig:problems}Principais problemas inerentes ao descarregamento de tarefas veicular: mobilidade e instabilidade do enlace, heterogeneidade de recursos e filas, custos energéticos, incerteza de medições, dependência de tecnologias/protocolos e complexidade \textit{NP-hard} sob restrições de latência e confiabilidade.}
-    \UECEfig{}{
-        \fbox{%
-        \resizebox{0.95\linewidth}{!}{%
-        \begin{tikzpicture}[
-          font=\scriptsize\sffamily,
-          node distance=7mm and 9mm,
-          >=Latex
-        ]
-          \tikzset{
-            box/.style={
-              draw, thick, rounded corners=2pt,
-              align=left, inner sep=4pt,
-              text width=3.4cm, minimum height=14mm
-            },
-            cbox/.style={
-              draw, thick, rounded corners=2pt,
-              align=center, inner sep=4pt,
-              text width=3.8cm, minimum height=14mm
-            },
-            arrow/.style={-Latex, thick},
-            group/.style={draw, thick, rounded corners=3pt, inner sep=6pt},
-          }
+%           \node[cbox, above=of goals] (nphard)
+%             {\textbf{Complexidade}\\
+%              Otimização \textit{NP-hard}\\
+%              Exige soluções rápida e adaptativas.};
 
-          % -----------------------------
-          % Núcleo (centro)
-          % -----------------------------
-          \node[cbox] (decision) {\textbf{Decisão de descarregamento}\\local / MEC / V2V};
+%           \node[cbox, below=of decision] (model)
+%             {\textbf{Modelagem e Protocolos}\\
+%              5G NR / \gls{V2X}.\\
+%              Descoberta/anúncio de recursos.\\
+%              Protocolo para descarregamento.};
 
-          \node[cbox, above=of decision] (goals)
-            {\textbf{Objetivos / Restrições}\\
-             Reduzir tempo e energia.\\
-             Cumprir restrição de tempo das aplicações.\\
-             Balancear a carga entre os dispositivos.};
+%           % -----------------------------
+%           % Laterais (problemas do ambiente)
+%           % -----------------------------
+%           \node[box, left=of decision] (mob)
+%             {\textbf{Mobilidade / Canal}\\
+%              Flutuação do canal.\\
+%              Intermitência na comunicaçao.};
 
-          \node[cbox, above=of goals] (nphard)
-            {\textbf{Complexidade}\\
-             Otimização \textit{NP-hard}\\
-             Exige soluções rápida e adaptativas.};
+%           \node[box, right=of decision] (hetero)
+%             {\textbf{Recursos / Carga}\\
+%              CPUs distintas.\\
+%              Filas variáveis.\\
+%              Balanceamento de carga.};
 
-          \node[cbox, below=of decision] (model)
-            {\textbf{Modelagem e Protocolos}\\
-             5G NR / \gls{V2X}.\\
-             Descoberta/anúncio de recursos.\\
-             Protocolo para descarregamento.};
+%           % Contexto acima das laterais (sem aumentar largura)
+%           \node[box, above=of mob] (scen)
+%             {\textbf{Cenário}\\
+%              Urbano ou Rodoviário.\\
+%              Densidade e tráfego distintos.};
 
-          % -----------------------------
-          % Laterais (problemas do ambiente)
-          % -----------------------------
-          \node[box, left=of decision] (mob)
-            {\textbf{Mobilidade / Canal}\\
-             Flutuação do canal.\\
-             Intermitência na comunicaçao.};
+%           \node[box, above=of hetero] (apps)
+%             {\textbf{Aplicações}\\
+%              Diferentes perfis e requisitos. 
+%              Visão Computacional, Criptografia, Navegação etc.};
 
-          \node[box, right=of decision] (hetero)
-            {\textbf{Recursos / Carga}\\
-             CPUs distintas.\\
-             Filas variáveis.\\
-             Balanceamento de carga.};
+%           % Problemas inferiores
+%           \node[box, below=of mob] (energy)
+%             {\textbf{Energia}\\
+%              Custo variável por ciclo.\\
+%              Bateria / estado Energético.\\
+%              \textit{Trade-off} energia--tempo};
 
-          % Contexto acima das laterais (sem aumentar largura)
-          \node[box, above=of mob] (scen)
-            {\textbf{Cenário}\\
-             Urbano ou Rodoviário.\\
-             Densidade e tráfego distintos.};
+%           \node[box, below=of hetero] (unc)
+%             {\textbf{Incerteza}\\
+%              Medições ruidosas.\\
+%              Estimativas imperfeitas.\\
+%              Estado parcial.};
 
-          \node[box, above=of hetero] (apps)
-            {\textbf{Aplicações}\\
-             Diferentes perfis e requisitos. 
-             Visão Computacional, Criptografia, Navegação etc.};
+%           % -----------------------------
+%           % Setas (sem cruzamentos)
+%           % -----------------------------
+%           \draw[arrow] (nphard) -- (goals);
+%           \draw[arrow] (goals) -- (decision);
 
-          % Problemas inferiores
-          \node[box, below=of mob] (energy)
-            {\textbf{Energia}\\
-             Custo variável por ciclo.\\
-             Bateria / estado Energético.\\
-             \textit{Trade-off} energia--tempo};
+%           \draw[arrow] (model) -- (decision);
 
-          \node[box, below=of hetero] (unc)
-            {\textbf{Incerteza}\\
-             Medições ruidosas.\\
-             Estimativas imperfeitas.\\
-             Estado parcial.};
+%           \draw[arrow] (mob) -- (decision);
+%           \draw[arrow] (hetero) -- (decision);
 
-          % -----------------------------
-          % Setas (sem cruzamentos)
-          % -----------------------------
-          \draw[arrow] (nphard) -- (goals);
-          \draw[arrow] (goals) -- (decision);
+%           \draw[arrow] (energy.north east) -- ($(decision.south west)+(2mm,0mm)$);
+%           \draw[arrow] (unc.north west)   -- ($(decision.south east)+(-2mm,0mm)$);
 
-          \draw[arrow] (model) -- (decision);
+%           \draw[arrow] (scen) -- (mob);
+%           \draw[arrow] (apps) -- (hetero);
 
-          \draw[arrow] (mob) -- (decision);
-          \draw[arrow] (hetero) -- (decision);
+%           % Moldura (opcional)
+%           \begin{pgfonlayer}{background}
+%             \node[group, fit=(nphard)(goals)(decision)(model)(scen)(mob)(energy)(apps)(hetero)(unc)] {};
+%           \end{pgfonlayer}
 
-          \draw[arrow] (energy.north east) -- ($(decision.south west)+(2mm,0mm)$);
-          \draw[arrow] (unc.north west)   -- ($(decision.south east)+(-2mm,0mm)$);
-
-          \draw[arrow] (scen) -- (mob);
-          \draw[arrow] (apps) -- (hetero);
-
-          % Moldura (opcional)
-          \begin{pgfonlayer}{background}
-            \node[group, fit=(nphard)(goals)(decision)(model)(scen)(mob)(energy)(apps)(hetero)(unc)] {};
-          \end{pgfonlayer}
-
-        \end{tikzpicture}%
-        }%
-        }%
-    }{
-        \Fonte{Elaborado pelo autor}
-    }
-\end{figure}
+%         \end{tikzpicture}%
+%         }%
+%         }%
+%     }{
+%         \Fonte{Elaborado pelo autor}
+%     }
+% \end{figure}
 
 
 \section{Questões de Pesquisa}
@@ -196,7 +198,7 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 
     \item \textbf{Quais são os impactos do uso conjunto de comunicação 5G NR e \gls{V2X}, modelados no simulador NS-3 versão 3.42 com o módulo 5G-LENA, no desempenho da solução SAC-\textit{Fuzzy}-TOPSIS, especialmente na redução da latência, no consumo energético e na taxa de cumprimento de prazo (\textit{deadline})?}
 
-    \item \textbf{Como diferentes perfis de aplicação veicular, especialmente aquelas com baixa carga de dados e alta demanda computacional, influenciam a decisão de quando, para onde e quanto descarregar, considerando limites de latência, balanceamento de carga e consumo energético?}
+    % \item \textbf{Como diferentes perfis de aplicação veicular, especialmente aquelas com baixa carga de dados e alta demanda computacional, influenciam a decisão de quando, para onde e quanto descarregar, considerando limites de latência, balanceamento de carga e consumo energético?}
 
 \end{alineas}
 
@@ -215,7 +217,7 @@ A partir das questões acima e da fundamentação teórica apresentada, formulam
 
     \item \textbf{A validação da arquitetura SAC-\textit{Fuzzy}-TOPSIS no simulador NS-3 versão 3.42, com modelagem realista de 5G NR e comunicação \gls{V2X} (\textit{sidelink}), confirmará a viabilidade da solução proposta em condições de rede mais próximas do ambiente real, preservando as vantagens de generalização observadas na etapa intermediária.}
 
-    \item \textbf{Aplicações com baixa carga de dados e alta demanda computacional apresentam o maior ganho com o descarregamento, desde que o modelo consiga estimar adequadamente o custo energético e o impacto na latência de processamento.}
+    % \item \textbf{Aplicações com baixa carga de dados e alta demanda computacional apresentam o maior ganho com o descarregamento, desde que o modelo consiga estimar adequadamente o custo energético e o impacto na latência de processamento.}
 
 \end{alineas}
 
@@ -224,6 +226,7 @@ A partir das questões acima e da fundamentação teórica apresentada, formulam
 \section{Objetivos}
 \label{sec:objetivos}
 
+A fim de formalizar o propósito desta pesquisa e as etapas necessárias para sua execução, esta seção detalha os objetivos pretendidos. As metas são apresentadas seguindo uma abordagem \textit{top-down}, partindo de uma visão consolidada da solução proposta até o detalhamento das etapas técnicas e de validação.
 
 \subsection{Objetivo Geral}
 \label{sec:objetivo-geral}
@@ -248,7 +251,7 @@ Espera-se que este trabalho produza contribuições relevantes tanto do ponto de
 \begin{alineas}[label=\textbf{CE\arabic*.}]
 \item \textbf{Proposição e validação intermediária da arquitetura SAC-TOPSIS, que combina ranqueamento multicritério com \gls{DRL} de entropia máxima, demonstrando tomada de decisão adaptativa e generalização \textit{zero-shot} a cenários de densidades veiculares distintas. Essa etapa fundamenta e antecede a contribuição final: a arquitetura SAC-\textit{Fuzzy}-TOPSIS validada no NS-3 3.42}.
 
-\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do 3GPP Release~16/17), comunicação \gls{V2X} sidelink, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
+\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do \gls{3GPP} \textit{Release}~16), comunicação \textit{Sidelink} \gls{V2X}, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
 
 \item \textbf{Desenvolvimento do módulo \gls{TOPSIS} para avaliação multicritério dos candidatos ao descarregamento, considerando critérios como latência estimada, ocupação de fila, taxa de canal e consumo energético; e, como etapa final da dissertação, desenvolvimento do módulo \textit{Fuzzy}-TOPSIS, que incorporará incerteza linguística para maior robustez em cenários de alta mobilidade e informação imprecisa}.
 
@@ -271,22 +274,19 @@ Como parte do desenvolvimento deste trabalho, foi submetido e aceito um artigo n
 \section{Organização do Trabalho}
 \label{sec:organizacao}
 
-% Este documento está estruturado de forma a conduzir o leitor desde os fundamentos teóricos até os resultados e conclusões do trabalho. A organização segue o seguinte formato:
+Este documento está estruturado partindo dos fundamentos teóricos até o delineamento da solução proposta e o planejamento para a finalização da pesquisa. A organização segue o seguinte formato:
 
-% \begin{itemize}
-% \item Capítulo~\ref{cap:introducao} — Introdução: apresenta o contexto geral, a motivação, o problema investigado, as questões de pesquisa, as hipóteses e as contribuições esperadas, além desta descrição organizacional.
+\begin{itemize}
+    \item \textbf{Capítulo~\ref{cap:introducao} --- Introdução:} apresenta o contexto geral, a motivação, a definição do problema, as questões de pesquisa, hipóteses e objetivos, além das contribuições esperadas e publicações decorrentes.
 
-% \item **Capítulo~\ref{cap:fundamentacao-teorica} — Fundamentação Teórica:** discute os conceitos essenciais sobre IoV, \gls{VEC}, \gls{V2X}, 5G NR (3GPP Rel.~16/17), descarregamento de tarefas, lógica \textit{fuzzy}, aprendizado de máquina e modelagens energéticas e computacionais relevantes.
+    \item \textbf{Capítulo~\ref{cap:fundamentacao-teorica} --- Fundamentação Teórica:} discute os conceitos essenciais que sustentam este trabalho, abrangendo arquiteturas \gls{5G} \gls{NR} e \textit{Sidelink} \gls{V2X}, o paradigma de descarregamento de tarefas em ambientes \gls{VEC}, fundamentos de \textit{Deep Reinforcement Learning} (\gls{DRL}) e a lógica \textit{fuzzy}.
 
-% \item **Capítulo~\ref{cap:trabalhos-relacionados} — Trabalhos Relacionados:** apresenta uma análise crítica da literatura sobre técnicas determinísticas, meta-heurísticas, métodos baseados em aprendizado de máquina e abordagens híbridas para descarregamento de tarefas em cenários veiculares.
+        \item \textbf{Capítulo~\ref{cap:revisao-literatura} --- Revisão da Literatura:} realiza uma análise crítica de trabalhos recentes, explorando as principais técnicas e tendências voltadas ao descarregamento de tarefas em cenários veiculares altamente dinâmicos.
 
-% \item **Capítulo~\ref{cap:metodologia} — Metodologia Proposta:** detalha o modelo híbrido desenvolvido, incluindo sua arquitetura, modelos matemáticos, integração ML–Fuzzy, protocolos de comunicação, modelagem do ambiente e etapas do processo de decisão.
-
-% \item **Capítulo~\ref{cap:experimentacao} — Ambiente Experimental e Resultados:** descreve o ambiente de simulação em ns-3, os cenários avaliados, os parâmetros utilizados, os algoritmos comparados e os resultados experimentais, incluindo análise estatística e discussão dos achados.
-
-% \item **Capítulo~\ref{cap:conclusao} — Conclusão e Trabalhos Futuros:** sintetiza as contribuições alcançadas, responde às questões de pesquisa, discute limitações e apresenta direções promissoras para pesquisas futuras.
+        \item \textbf{Capítulo~\ref{chap:proposta} --- Proposta:} detalha a arquitetura \gls{SAC}-\textit{Fuzzy}-\gls{TOPSIS} desenvolvida, descrevendo a integração entre o algoritmo \textit{Soft Actor-Critic} e o ranqueamento multicritério, bem como a modelagem do ambiente de simulação.
 
 
-% \end{itemize}
+    \item \textbf{Capítulo~\ref{chap:cronograma} --- Cronograma:} descreve o planejamento das atividades futuras para a conclusão do doutorado, estabelecendo os prazos para experimentos finais, redação da tese e defesa.
 
-% Essa estrutura visa proporcionar fluidez na leitura, evidenciando os fundamentos, avanços e impactos científicos do trabalho de forma clara e organizada.
+    \item \textbf{Capítulo~\ref{chap:conclusoes} --- Conclusão:} sintetiza as principais descobertas desta etapa de qualificação, discute as limitações atuais e aponta os próximos passos para a validação final do modelo.
+\end{itemize}
