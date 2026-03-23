@@ -190,7 +190,7 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 \begin{alineas}[label=\textbf{QP\arabic*.}]
     \item \textbf{Como realizar o descarregamento de tarefas em ambientes VEC/V2X de maneira confiável e adaptativa, considerando a alta variabilidade da mobilidade veicular, do canal de comunicação e da carga computacional?}
 
-    \item \textbf{De que forma modelos híbridos, combinando aprendizado de máquina e lógica \textit{fuzzy}, podem melhorar a tomada de decisão de descarregamento de tarefas em cenários veiculares dinâmicos, mitigando incertezas na coleta de informação e na predição do estado futuro da rede?}
+    \item \textbf{De que forma a integração de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado em \gls{SAC} pode melhorar a tomada de decisão de \textit{offloading} em cenários veiculares dinâmicos, contornando o problema da entrada variável nas redes neurais e mantendo estabilidade de aprendizado independentemente da densidade veicular?}
 
     \item \textbf{Quais são os impactos do uso conjunto de comunicação 5G NR e \gls{V2X} no desempenho do descarregamento de tarefas, especialmente na redução da latência, no consumo energético e na taxa de falhas de descarregamento?}
 
@@ -205,9 +205,9 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 A partir das questões acima e da fundamentação teórica apresentada, formulam-se as seguintes hipóteses de pesquisa:
 
 \begin{alineas}[label=\textbf{H\arabic*.}]
-    \item \textbf{A integração de aprendizado de máquina com lógica \textit{fuzzy} é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários VEC/V2X altamente dinâmicos.}
+    \item \textbf{A combinação de \gls{TOPSIS} com \gls{SAC} é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários \gls{VEC}/\gls{V2X} altamente dinâmicos, graças à representação de estado compacta (6D) e à regularização por entropia máxima.}
 
-    \item \textbf{O uso de modelos híbridos reduz o impacto das incertezas inerentes à mobilidade veicular, permitindo estimar de forma mais robusta o melhor destino para o descarregamento de tarefas.}
+    \item \textbf{O ranqueamento multicritério por \gls{TOPSIS} reduz o impacto da variabilidade do número de candidatos a \textit{offloading}, permitindo que o agente \gls{SAC} generalize para cenários com densidades veiculares distintas sem necessidade de retreinamento.}
 
     \item \textbf{A utilização conjunta de 5G NR e \gls{V2X} proporciona atendimento as requisitos das aplicações mais estáveis e de menor latência, aumentando a confiabilidade do descarregamento e reduzindo a probabilidade de falhas decorrentes de desconexões súbitas.}
 
@@ -223,7 +223,7 @@ A partir das questões acima e da fundamentação teórica apresentada, formulam
 
 \subsection{Objetivo Geral}
 \label{sec:objetivo-geral}
-Desenvolver e avaliar um modelo híbrido de decisão, baseado na integração da lógica \textit{fuzzy} com o aprendizado por reforço, para otimizar o descarregamento de tarefas multiobjetivo em redes veiculares 5G NR (VEC/V2X).
+Desenvolver e avaliar uma solução de \textit{offloading} de tarefas em redes \gls{VEC}/\gls{V2X} que combina ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}, produzindo um vetor de estado compacto e invariante à escala que permita generalização \textit{zero-shot} a cenários com densidades veiculares variáveis; e, como extensão planejada, aprimorar a representação de estado substituindo o \gls{TOPSIS} por \textit{Fuzzy}-TOPSIS para incorporar incerteza linguística nos critérios de avaliação dos candidatos ao \textit{offloading}.
 
 
 \subsection{Objetivos Específicos}
@@ -231,10 +231,10 @@ Desenvolver e avaliar um modelo híbrido de decisão, baseado na integração da
 
 
 \begin{alineas}[label=\textbf{OE\arabic*.}]
-    \item \textbf{Realizar uma revisão sistemática de algoritmos de descarregamento de tarefas em cenários \gls{VEC}, focando em abordagens de \gls{DRL} e Lógica Fuzzy}.
-    \item \textbf{Modelar as incertezas do ambiente veicular (ex: qualidade do link, carga do servidor, mobilidade) usando Lógica \textit{Fuzzy}, projetando funções de pertinência e regras de inferência para gerar indicadores de estado robustos}.
-    \item \textbf{Desenvolver um agente Híbrido Fuzzy-RL que utilize os indicadores \textit{fuzzy} gerados como parte de seu vetor de estado, e que aprenda uma política de descarregamento para otimizar uma função de recompensa que equilibre latência, balanceamento de carga, taxa de sucesso no descarregamento e consumo energético}.
-    \item \textbf{Validar a arquitetura híbrida proposta em ambiente de simulação (NS-3), comparando seu desempenho (latência fim-a-fim, consumo de energia e taxa de sucesso no descarregamento) com algoritmos de \gls{DRL} puros (não-fuzzy) e heurísticas tradicionais}.
+    \item \textbf{Realizar uma revisão sistemática de algoritmos de descarregamento de tarefas em cenários \gls{VEC}, focando em abordagens de \gls{DRL}, métodos multicritério e técnicas de engenharia de estado}.
+    \item \textbf{Projetar e implementar um módulo \gls{TOPSIS} para ranqueamento multicritério dos candidatos ao \textit{offloading} (RSUs e veículos vizinhos), reduzindo o espaço de estado a um vetor 6D normalizado e invariante à escala, independentemente da densidade veicular}.
+    \item \textbf{Desenvolver e treinar um agente \gls{SAC} que utilize o vetor de estado produzido pelo \gls{TOPSIS} para aprender uma política de descarregamento que otimize simultaneamente latência, consumo energético e taxa de cumprimento de prazo (\textit{deadline})}.
+    \item \textbf{Validar a arquitetura proposta em ambiente de simulação customizado com comunicação \gls{V2X}, comparando o desempenho com outros algoritmos de \gls{DRL} e heurísticas de referência; e planejar a extensão para \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística nos critérios de avaliação}.
 \end{alineas}
 
 \section{Contribuições Esperadas}
@@ -242,15 +242,15 @@ Desenvolver e avaliar um modelo híbrido de decisão, baseado na integração da
 Espera-se que este trabalho produza contribuições relevantes tanto do ponto de vista científico quanto do ponto de vista prático, sobretudo no contexto de sistemas veiculares inteligentes e computação de borda. As principais contribuições previstas são:
 
 \begin{alineas}[label=\textbf{CE\arabic*.}]
-\item \textbf{Proposição de um modelo híbrido para descarregamento de tarefas em ambientes veiculares, integrando técnicas de aprendizado de máquina com lógica \textit{fuzzy}. O modelo pretende oferecer uma tomada de decisão mais robusta e adaptativa do que abordagens puramente determinísticas ou exclusivamente baseadas em ML, sobretudo em cenários com forte incerteza e alta mobilidade}.
+\item \textbf{Proposição de uma arquitetura SAC-TOPSIS para descarregamento de tarefas em ambientes veiculares, combinando ranqueamento multicritério com \gls{DRL} de entropia máxima. A abordagem oferece tomada de decisão adaptativa que supera métodos puramente determinísticos ou heurísticos, com generalização \textit{zero-shot} a cenários de densidades veiculares distintas sem necessidade de retreinamento}.
 
 \item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do 3GPP Release~17), comunicação \gls{V2X} sidelink, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
 
-\item \textbf{Desenvolvimento de um módulo \textit{fuzzy} para tratamento de incertezas e valores imprecisos, voltado para critérios críticos como latência, energia, estabilidade do canal e carga computacional. O módulo \textit{fuzzy} será integrado ao sistema de decisão, auxiliando na suavização das transições e na prevenção de falhas abruptas}.
+\item \textbf{Desenvolvimento do módulo \gls{TOPSIS} para avaliação multicritério dos candidatos ao \textit{offloading}, considerando critérios como latência estimada, ocupação de fila, taxa de canal e consumo energético; e planejamento da extensão para \textit{Fuzzy}-TOPSIS, que incorporará incerteza linguística para maior robustez em cenários de alta mobilidade e informação imprecisa}.
 
 \item \textbf{Construção e avaliação de um mecanismo de aprendizado por reforço capaz de identificar padrões dinâmicos e otimizar a ação de descarregamento em tempo real}.
 
-\item \textbf{Implementação do modelo completo em ambiente ns-3 (versão 3.42), utilizando o 5G-LENA e o suporte ao \gls{V2X}, permitindo avaliar de forma rigorosa métricas como latência, taxa de sucesso, consumo energético, \textit{throughput} e eficiência do uso do canal}.
+\item \textbf{Implementação e avaliação do modelo completo em simulador customizado com comunicação \gls{V2X}, permitindo avaliar de forma rigorosa métricas como taxa de cumprimento de prazo, \textit{Success-Weighted Quality} (SWQ), função objetivo $J(\pi)$, latência e consumo energético em 658 cenários distintos}.
 
 \item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais, algoritmos matemáticos e abordagens baseadas exclusivamente em heurísticas, destacando os ganhos obtidos pela integração híbrida ML–Fuzzy}.
 
