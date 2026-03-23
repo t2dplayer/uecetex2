@@ -21,12 +21,12 @@ O descarregamento de tarefas surge como o mecanismo central para operacionalizar
 
 O principal desafio, entretanto, está em decidir quando e para onde descarregar as tarefas, considerando múltiplos fatores conflitantes, como tempo limite de processamento, custo energético, balanceamento de carga e qualidade do enlace de comunicação. Abordagens determinísticas, baseadas exclusivamente em heurísticas, apresentam desempenho limitado diante da alta variabilidade espacial e temporal do ambiente veicular~\cite{ahmed2022}. Mobilidade intensa, flutuações do canal e mudanças abruptas na carga computacional tornam as decisões estáticas rapidamente obsoletas, comprometendo a eficiência do sistema.
 
-Essa limitação tem impulsionado a busca por soluções adaptativas e mais robustas, baseadas em aprendizado de máquina e sistemas inteligentes~\cite{mao2017,zhang2018,zhou2019,huang2020,shi2023,nieto2024}. Diante desse cenário, este trabalho de qualificação propõe uma solução para o descarregamento de tarefas em redes \gls{VEC} que integra ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}. O \gls{TOPSIS} reduz o conjunto variável de candidatos ao descarregamento --- \glspl{RSU} e veículos vizinhos --- a um vetor de estado compacto e de dimensão fixa (6D), contornando o problema da entrada variável nas redes neurais. O \gls{SAC}, por sua vez, aprende uma política de decisão binária (descarregar ou executar localmente) que se beneficia da regularização por entropia máxima para manter a exploração em ambientes não-estacionários. Como extensão planejada, o \gls{TOPSIS} será substituído por \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística aos critérios de avaliação dos candidatos.
+Essa limitação tem impulsionado a busca por soluções adaptativas e mais robustas, baseadas em aprendizado de máquina e sistemas inteligentes~\cite{mao2017,zhang2018,zhou2019,huang2020,shi2023,nieto2024}. Diante desse cenário, este trabalho de qualificação propõe uma solução para o descarregamento de tarefas em redes \gls{VEC} que integra ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}. O \gls{TOPSIS} avalia multicritérios como latência estimada, ocupação de fila, taxa de canal e consumo energético, reduzindo o conjunto variável de candidatos ao descarregamento --- \glspl{RSU} e veículos vizinhos --- a um vetor de estado compacto e de dimensão fixa (6D), contornando o problema da entrada variável nas redes neurais. Com o melhor candidato já identificado pelo \gls{TOPSIS}, o \gls{SAC} aprende uma política de decisão binária (descarregar para esse candidato ou executar localmente), beneficiando-se da regularização por entropia máxima para manter a exploração em ambientes não-estacionários. Como extensão planejada, o \gls{TOPSIS} será substituído por \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística aos critérios de avaliação dos candidatos.
 
 \section{Motivação}
 \label{sec:motivacao}
 
-\subsection{Definição do Problema}
+\section{Definição do Problema}
 \label{sec:definicao-do-problema}
 
 Diante das limitações de processamento local e da elevada variabilidade do ambiente veicular, o problema central investigado neste trabalho pode ser formulado da seguinte maneira:
@@ -61,7 +61,7 @@ A viabilização do processo de decisão depende de mecanismos eficientes de com
 
 Outro ponto essencial refere-se ao perfil das aplicações beneficiadas pelo descarregamento. A popularização de \textit{hardware} embarcado mais poderoso em OBUs permite o processamento local de aplicações leves; contudo, aplicações com baixa carga de dados, mas com alta demanda computacional, como visão computacional, detecção de objetos, fusão sensorial, criptografia e algoritmos de navegação autônoma, são candidatas naturais ao descarregamento~\cite{shi2023,nieto2024}. Para evitar latências excessivas, é necessário equilibrar o custo de transmissão com o ganho de processamento externo, preservando as restrições temporais impostas pela aplicação.
 
-Somente após a coleta e integração dessas informações é possível realizar a tomada de decisão sobre o descarregamento. Essa decisão deve considerar a incerteza inerente às medições, a rápida variação do ambiente e a necessidade de minimizar falhas. Assim, soluções adaptativas baseadas em aprendizado de máquina, reforço profundo ou lógica \textit{fuzzy} têm sido exploradas como alternativas promissoras para lidar com a incerteza, o dinamismo e a complexidade dos cenários veiculares~\cite{huang2020,shi2023,nieto2024}.
+Somente após a coleta e integração dessas informações é possível realizar a tomada de decisão sobre o descarregamento. Essa decisão deve considerar a incerteza inerente às medições, a rápida variação do ambiente e a necessidade de minimizar falhas. Assim, soluções adaptativas baseadas em aprendizado de máquina e \gls{DRL} têm sido exploradas como alternativas promissoras para lidar com a incerteza, o dinamismo e a complexidade dos cenários veiculares~\cite{huang2020,shi2023,nieto2024}. A combinação dessas abordagens com métodos de ranqueamento multicritério --- como \gls{TOPSIS} e \textit{Fuzzy}-TOPSIS --- representa uma direção promissora para aprimorar a qualidade da representação de estado e a robustez das decisões em ambientes veiculares.
 
 De forma geral pode-se resumir os problemas enfrentados através da Figura~\ref{fig:problems} onde uma decisão de descarregamento de tarefa deve considerar o cenário observado, as tecnologias de comunicação empregadas, as aplicações utilizadas, a incerteza do ambiente, o custo e o objetivo buscado.
 
@@ -190,7 +190,7 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 \begin{alineas}[label=\textbf{QP\arabic*.}]
     \item \textbf{Como realizar o descarregamento de tarefas em ambientes \gls{VEC}/\gls{V2X} de maneira confiável e adaptativa, considerando a alta variabilidade da mobilidade veicular, do canal de comunicação e da carga computacional?}
 
-    \item \textbf{De que forma a integração de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado em \gls{SAC} pode melhorar a tomada de decisão de descarregamento em cenários veiculares dinâmicos, contornando o problema da entrada variável nas redes neurais e mantendo estabilidade de aprendizado independentemente da densidade veicular? Essa combinação constitui uma etapa intermediária validada rumo à arquitetura final SAC-\textit{Fuzzy}-TOPSIS.}
+    \item \textbf{De que forma a integração de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado em \gls{SAC} pode melhorar a tomada de decisão de descarregamento em cenários veiculares dinâmicos, contornando o problema da entrada variável nas redes neurais e mantendo estabilidade de aprendizado independentemente da densidade veicular?}
 
     \item \textbf{Em que medida a substituição do \gls{TOPSIS} clássico por \textit{Fuzzy}-TOPSIS --- incorporando incerteza linguística nos critérios de avaliação dos candidatos ao descarregamento --- aprimora a robustez da representação de estado e o desempenho do agente \gls{SAC} em cenários de alta mobilidade e informação imprecisa?}
 
@@ -207,7 +207,7 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 A partir das questões acima e da fundamentação teórica apresentada, formulam-se as seguintes hipóteses de pesquisa:
 
 \begin{alineas}[label=\textbf{H\arabic*.}]
-    \item \textbf{A combinação de \gls{TOPSIS} com \gls{SAC} é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários \gls{VEC}/\gls{V2X} altamente dinâmicos, graças à representação de estado compacta (6D) e à regularização por entropia máxima. Essa etapa intermediária valida a engenharia de estado multicritério como base para a arquitetura final.}
+    \item \textbf{A combinação de \gls{TOPSIS} com \gls{SAC} é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários \gls{VEC}/\gls{V2X} altamente dinâmicos, graças à representação de estado compacta (6D) e à regularização por entropia máxima do \gls{SAC}.}
 
     \item \textbf{O ranqueamento multicritério por \gls{TOPSIS} reduz o impacto da variabilidade do número de candidatos ao descarregamento, permitindo que o agente \gls{SAC} generalize para cenários com densidades veiculares distintas sem necessidade de retreinamento.}
 
@@ -248,17 +248,17 @@ Espera-se que este trabalho produza contribuições relevantes tanto do ponto de
 \begin{alineas}[label=\textbf{CE\arabic*.}]
 \item \textbf{Proposição e validação intermediária da arquitetura SAC-TOPSIS, que combina ranqueamento multicritério com \gls{DRL} de entropia máxima, demonstrando tomada de decisão adaptativa e generalização \textit{zero-shot} a cenários de densidades veiculares distintas. Essa etapa fundamenta e antecede a contribuição final: a arquitetura SAC-\textit{Fuzzy}-TOPSIS validada no NS-3 3.42}.
 
-\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do 3GPP Release~17), comunicação \gls{V2X} sidelink, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
+\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do 3GPP Release~16/17), comunicação \gls{V2X} sidelink, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
 
 \item \textbf{Desenvolvimento do módulo \gls{TOPSIS} para avaliação multicritério dos candidatos ao descarregamento, considerando critérios como latência estimada, ocupação de fila, taxa de canal e consumo energético; e, como etapa final da dissertação, desenvolvimento do módulo \textit{Fuzzy}-TOPSIS, que incorporará incerteza linguística para maior robustez em cenários de alta mobilidade e informação imprecisa}.
 
-\item \textbf{Construção e avaliação de um mecanismo de aprendizado por reforço capaz de identificar padrões dinâmicos e otimizar a ação de descarregamento em tempo real}.
+\item \textbf{Treinamento e avaliação do agente \gls{SAC}, cujo mecanismo de regularização por entropia máxima previne o colapso de política em ambientes não-estacionários e cuja aprendizagem \textit{off-policy} confere eficiência amostral superior à de algoritmos \textit{on-policy} como o \gls{PPO}}.
 
 \item \textbf{Implementação e avaliação da arquitetura SAC-TOPSIS em simulador customizado com comunicação \gls{V2X} (etapa intermediária), e implementação final da arquitetura SAC-\textit{Fuzzy}-TOPSIS no NS-3 versão 3.42 com 5G-LENA, avaliando métricas como taxa de cumprimento de prazo, \textit{Success-Weighted Quality} (SWQ) e função objetivo $J(\pi)$ em cenários de simulação distintos}.
 
-\item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais, algoritmos matemáticos e abordagens baseadas exclusivamente em heurísticas, destacando os ganhos obtidos pela integração híbrida ML–Fuzzy}.
+\item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais e outras famílias de algoritmos de \gls{DRL}, destacando os ganhos obtidos pela arquitetura SAC-TOPSIS na etapa intermediária e pela arquitetura SAC-\textit{Fuzzy}-TOPSIS na validação final}.
 
-\item \textbf{Produção de um conjunto de diretrizes práticas para pesquisadores e engenheiros interessados em projetar sistemas de descarregamento de tarefas veicular, evidenciando cenários onde o modelo híbrido apresenta maior vantagem}.
+\item \textbf{Produção de um conjunto de diretrizes práticas para pesquisadores e engenheiros interessados em projetar sistemas de descarregamento de tarefas veicular, evidenciando cenários onde a arquitetura SAC-\textit{Fuzzy}-TOPSIS apresenta maior vantagem em relação a heurísticas e algoritmos de \gls{DRL} sem ranqueamento multicritério}.
 
 
 \end{alineas}
