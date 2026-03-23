@@ -1,0 +1,162 @@
+% This template version by Robert Browder and Carrie Cross, adapted from OSU letter template by Brian Wood. 
+%
+% This template is designed to be easily modified so that it can be used by anyone at VT. The Department/School and College are easily modified in this file.
+
+\documentclass[11pt]{VTletter}
+\usepackage{fontspec} 
+\usepackage{xcolor}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+\usepackage{afterpage}
+\usepackage{lastpage}
+\usepackage{comment}
+\usepackage{hyperref}
+\hbadness=99999 %Suppresses underfull \hbox badness warnings. Comment out to remove.
+\usepackage[english]{babel}
+\usepackage[autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
+
+\pagestyle{fancy} 
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+%\fancyfoot[R]{\sffamily\thepage\ / \pageref{LastPage}}
+\fancyfoot[R]{\sffamily\thepage\ / \pageref*{LastPage}}
+  \fancyfoot[L]{ }
+
+\usepackage[framemethod=default]{mdframed}
+\global\mdfdefinestyle{review}{%
+     linecolor=gray!20,linewidth=0.05cm,backgroundcolor=gray!20,%
+     leftmargin=-0.5cm,rightmargin=-0.5cm, innerleftmargin=0.4cm,innerrightmargin=0.4cm
+}
+
+% Set custom fonts here. Virginia Tech uses Crimson Text font. Comment the below lines out if you do not have a Crimson Text font (originally included with this template) installed; computer modern (or whatever your current default font is) will be substituted.
+
+%Primary font
+%\newfontfamily\fromadd{CrimsonText-Regular.ttf}
+%\setmainfont{CrimsonText-Regular.ttf}[BoldFont  = CrimsonText-Bold.ttf, ItalicFont  = CrimsonText-Italic.ttf, BoldItalicFont = CrimsonText-BoldItalic.ttf ]
+
+% Secondary font
+%Use \myfont to set alternative fonts. 
+%\newfontfamily\myfont{GinesoCondRegular.otf}[BoldFont=GinesoCondDemi.otf]
+
+
+%%%%%%%%%%% Put Personal Information Here %%%%%%%%%%%
+%
+\def\name{Antônio Sérgio de Sousa Vieira}
+%
+% List your degree(s), licenses, etc. below if you like.
+%\def\What{, Your degrees, etc.} 
+%
+% Set the name of your Department or School here:
+%%%%%%%%%%%%%%%%%%  School or Department %%%%%%%%%%%%%%%
+\def\Where{\textbf{Antônio Sérgio de Sousa Vieira}\\
+                    Federal Institute of Education, Science and Technology} 
+
+%%%%%%%%%%%%  Additional Contact Information %%%%%%%%%%%
+%
+% Set your preferred primary contact address here:
+\def\Address{Av. da Universidade, 102,\\
+Itapipoca, Ceará, Brazil} 
+%
+\def\CityZip{Zip Code: 60440-554} % The tilde inserts a space between the state and zip code. 
+%
+% Set your VT e-mail here:
+\def\Email{sergio.vieira@ifce.edu.br}
+%
+% Set your preferred VT contact number(s) here:
+%\def\TEL{P: 540-231-5555~F: 540-231-5555}
+%
+% Set your department or personal website here:
+%\def\URL{URL: www.vt.edu} 
+%
+%%%%%%%%%%%%%%%%%%%%%  Signature line  %%%%%%%%%%%%%%%%%%%%%
+%
+% Set your signature line below.
+% You can add a signature image in a PDF file using the below code; this requires a file called "signature_block.pdf" to be uploaded to the template in Overleaf.  The vertical spacing (\vspace) and the scaling will have to be adjusted to get things to look correct for your particular signature image. 
+
+%Alternately, comment out the following lines in favor of the one labeled 
+%"[[Alternate]]" if you want to sign a paper copy of the letter.
+
+\signature{  
+%\vspace{-12mm}\includegraphics[scale=0.40]{signature_block.pdf}\\\vspace{-2mm}
+\vspace{-8mm}
+\name \\
+Professor\\
+Federal Institute of Education, Science and Technology}
+
+%\signature{\name}  % [[Alternate]]
+
+% The following block sets up the address on the right-hand side of the header. These lines just compile the information you set up into the LaTex letter variable "address" for later use.
+
+\address{}
+
+\def\newaddress{%
+\Where\\ 
+\Address\\ 
+\CityZip\\ 
+%\TEL\\ 
+\Email\\ 
+%\URL 
+}
+
+%% Adjust the width of the "from" address if the default is too wide/narrow.
+\setlength{\addresswidth}{1.75in}
+
+%
+%%%%%%%%%%%  DATE  %%%%%%%%%%%%%%%%%%%%%%%%%
+% If you want a date different from the current date, comment out the next line in favor of the line labeled "[[Alternate]]". 
+%
+\date{\today}
+%\date{20 September 2020}  %[[Alternate]]
+%
+%%%%%%%%%%% Set the subject here if there is one  %%%%
+\subject{Response to Reviewers} % optional subject line
+\mnumber{175903a8-535d-4ba1-9891-f09c927b3572} %manuscript number
+\begin{document}
+
+%
+%
+%%%%%%%%  The "To" address goes here.
+%
+\begin{letter}{ 
+%                Dr. Mohammed Atiquzzaman\\ 
+			   %Editor-in-Chief, \textit{Vehicular Communications}\\
+               %University of Oklahoma\\ 
+               %Norman, United States
+               }
+
+
+%%%%%%  The "opening" is just the method of address you would like to use at the start of the letter.
+%
+\opening{Dear Editor and Reviewers,}
+
+%%%%%%%%%% Body of letter   %%%%%%%%%%%%%%
+% The "\lipsum[1-10]" command just fills the letter with 10 paragraphs of Latin for the purposes of filler.  Unless you really want to send filler Latin to someone, you will replace this command with actual text.  Do that here:
+%
+
+%\input{content}
+%\input{editor}
+\input{reviewers}
+
+%%%%%%% "closing" sets the sign-off line.
+\vspace{8mm}
+\closing{Yours Sincerely,}
+
+% Comment out/in the lines below as necessary.
+%\encl{If an enclosure is provided, let them know what it is.}
+
+%\ps{A postscript if that is a thing you do.}
+
+%\cc{Someone Who Cares (and is copied).}
+
+\end{letter}
+
+\input{rev1}
+\newpage
+\input{rev2}
+% \newpage
+% \input{rev3}
+% \newpage
+% \input{rev4}
+
+\end{document}

@@ -1,0 +1,130 @@
+\begin{center}
+    \fbox{\textbf{Reviewer \#2}}
+\end{center}
+
+\vspace{0.5cm}
+
+We thank your review work and the opportunity to improve our paper. We have attentively examined all the comments and handled each one of them below.
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.1:} While the manuscript introduces FOFF as a novel energy-efficient task offloading strategy, the justification for choosing Fuzzy TOPSIS over other multi-criteria decision-making (MCDM) techniques could be elaborated further. A brief comparison with alternative approaches such as AHP or PROMETHEE would strengthen the argument.
+\end{mdframed}
+
+\textbf{Authors' Response:} 
+We adopt Fuzzy TOPSIS for offering (i) native handling of data imprecision, (ii) simplicity of implementation and updating in light of new information, and (iii) clear ranked results even under high dynamics—characteristics fundamental in VEC scenarios. In summary, Fuzzy TOPSIS proved to be the most suitable alternative, balancing accuracy in multicriteria decision-making and feasibility in complex, dynamic vehicular environments.
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Pages 2-3, Lines 97-131: \textcolor{blue}{The Fuzzy TOPSIS method was selected due to its stability and lower computational complexity [17] compared to alternative fuzzy ranking techniques, such as Fuzzy AHP (Fuzzy Analytic Hierarchy Process) [18] and Fuzzy PROMETHEE (Fuzzy Preference Ranking Organization Method for Enrichment Evaluations) [17]. This stability in response to the addition or removal of alternatives is crucial in dynamic vehicular systems. As demonstrated by Lima Junior et al. [19], introducing a new alternative significantly altered the rankings produced by Fuzzy AHP, whereas Fuzzy TOPSIS maintained consistent results under identical conditions. Furthermore, Fuzzy AHP incurs substantial computational overhead due to its requirement for multiple pairwise comparisons and weight recalibrations whenever the set of alternatives changes. While Fuzzy PROMETHEE can be effective in static or subjective analysis scenarios, it suffers two critical drawbacks for real-time decision-making: first, it depends on predefined preference functions, i.e., parameters that must be manually tuned for each criterion and cannot autonomously adapt to rapid fluctuations in latency, processing load, or vehicle mobility; second, its often yield partial rankings by grouping indistinguishable alternatives into equivalence levels, forcing the use of additional tie-breaking procedures and adding both latency and complexity. These limitations weaken its flexibility, increase configuration overhead, and compromise both the speed and scalability required in highly dynamic VEC environments. In contrast, Fuzzy TOPSIS provides a complete ranking with computational complexity linear in the number of alternatives, enabling rapid and stable decision-making.}
+    \item Page 4, Table 1: \textcolor{blue}{New entries for the acronyms AHP and PROMETHEE have been added to the table.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.2:} The manuscript lacks a comprehensive comparison with state-of-the-art baselines. While some existing techniques are considered, a broader range of comparisons (e.g., heuristic-based or deep learning-based approaches) would provide better insight into FOFF's effectiveness. Additionally, incorporating statistical significance tests (e.g., Wilcoxon signed-rank test) could enhance the rigor of the results.
+\end{mdframed}
+
+\textbf{Authors' Response:}
+We agree that a broader comparison with state-of-the-art techniques is essential to properly assess the effectiveness of the FOFF strategy. To address this, we have included a new baseline algorithm in the manuscript, named FP-Sched (Fully Partitioned Scheduling) and we included statistical tests in discussion section.
+\vspace{\baselineskip}
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Page 15, Lines 821-831: \textcolor{blue}{The FP-Sched [43] strategy is based on a fully partitioned scheduling mechanism, in which each task must be executed entirely on a single edge device. Devices are evaluated within discrete time slots, and candidate devices are selected based on their ability to complete the task considering transmission time, execution time, and availability during the current slot. The strategy applies a First-Fit Decreasing Utilization (FFDU) policy to assign tasks to the earliest available suitable device, avoiding overload.}
+    \item Page 15, Lines 977-979: \textcolor{blue}{Compared to FP-Sched, which recorded an energy consumption of 277.40 J $\pm$ 158.46, FOFF achieved a reduction of 98.17\%.}
+    \item Page 18, Lines 993-994: \textcolor{blue}{Lastly, compared to FP-Sched, which recorded an energy consumption of 272.74 J $\pm$ 159.76, FOFF achieved a reduction of 98.88\%.}
+    \item Page 19, Table 15: \textcolor{blue}{Wilcoxon signed-rank test between FOFF and baseline methods in challenge scenario with ω=[vl,vh]}
+    \item Pages 19-20, Lines 1061-1114: \textcolor{blue}{In the balanced scenario, FOFF's mean energy usage was substantially lower than that of GTT, HOFF, and ROFF, with Wilcoxon signed-rank tests confirming that these reductions are statistically significant (each comparison yielded $p < 0.01$). FOFF also achieved lower average energy consumption than FP-Sched; however, this particular difference was not statistically significant at the 5\% level, indicating comparable energy efficiency between FOFF and FP-Sched in this case. In terms of task completion time, FOFF completed tasks faster than FP-Sched, HOFF, and ROFF by a wide margin. These pairwise improvements in completion time were all statistically significant as well (Wilcoxon $p < 0.01$ for each). Against GTT, FOFF attained essentially the same task completion time. The slight gap observed was not significant ($p > 0.05$), indicating that FOFF matches GTT's performance. Notably, FOFF manages to equal the fastest baseline (GTT) in completion time while using far less energy. Overall, under balanced conditions FOFF either significantly outperforms or at least matches the best baseline on both metrics, highlighting its robust advantages in efficiency and task completion time. In the more demanding challenging scenario, FOFF maintained its performance edge, underscoring the robustness of its approach under heavier workloads. FOFF continued to consume significantly less energy than GTT, HOFF, and ROFF (Wilcoxon tests, $p < 0.01$ in all comparisons), closely mirroring the improvements seen in the balanced case. When compared to FP-Sched, FOFF again exhibited a much lower mean energy consumption; due to the high variability in FP-Sched's outcomes, however, this difference did not reach statistical significance ($p > 0.05$). This suggests that even in a challenging environment, FOFF is at least as energy-efficient as FP-Sched, and markedly more efficient than the other baselines. FOFF also continued to deliver faster task completion times than nearly all baselines in the challenging scenario. It finished tasks significantly sooner than FP-Sched, HOFF, and ROFF (all $p < 0.01$ in the Wilcoxon signed-rank tests), despite the increased difficulty of this scenario. As in the balanced condition, FOFF's completion time was on par with GTT (no statistically significant difference, $p > 0.05$), meaning FOFF again matches the fastest baseline's performance. The consistency of these results across both scenarios attests to FOFF's robustness: the algorithm sustains its low energy consumption and swift task completion even under challenging conditions, significantly outperforming the baseline approaches in most comparisons.}
+\end{itemize}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.3:} The study should discuss how FOFF scales in highly dynamic vehicular networks with varying traffic densities. Would the proposed method maintain efficiency under real-world vehicular mobility models (e.g., SUMO-based simulations)? An analysis of computational complexity and execution time would further validate its practicality.
+\end{mdframed}
+
+\textbf{Authors' Response:} 
+We acknowledge the importance of vehicular mobility and solution scalability and agree that these aspects warrant future investigation. We will include a paragraph in the manuscript's conclusion emphasizing that the explicit consideration of mobility and large-scale evaluation will be addressed in future work. As justification, we will note that incorporating mobility requires extending the model to track the temporal variation of vehicular connections—possibly integrating predictive mechanisms or proactive offloading decisions before connection loss—which lies beyond the scope of this initial research. The work presented in [17] analyzes the complexity of Fuzzy TOPSIS and thus supports its selection.
+
+\vspace{\baselineskip}
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Page , Lines: \textcolor{blue}{The Fuzzy TOPSIS method was selected due to its stability and lower computational complexity [17] compared to alternative fuzzy ranking techniques, such as Fuzzy AHP (Fuzzy Analytic Hierarchy Process) [18] and Fuzzy PROMETHEE (Fuzzy Preference Ranking Organization Method for Enrichment Evaluations) [17].}
+    \item Page 20, Lines 1136-1141: \textcolor{blue}{Future work will focus on extending the proposed solution to incorporate additional contextual parameters, such as vehicle speed and real-time network fluctuations. Furthermore, we will investigate the performance of our approach in large-scale mobility scenarios.}
+\end{itemize}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.4:} Since FOFF leverages fuzzy logic, a sensitivity analysis on membership function selection and parameter tuning should be included to demonstrate robustness. The manuscript could discuss how different parameter choices affect energy efficiency and decision accuracy.
+\end{mdframed}
+
+\textbf{Authors' Response:} 
+We have extensively addressed this comment by adding a comprehensive sensitivity analysis section that examines how various linguistic weight combinations affect energy efficiency and task completion time. The analysis demonstrates FOFF's robustness across different parameter settings.
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Pages 16, Section 5.1: \textcolor{blue}{This section presents a comprehensive sensitivity analysis of the FOFF with respect to the importance weights assigned to the energy consumption and latency criteria. The analysis examines how different linguistic weight combinations affect the FOFF's performance in terms of energy efficiency and task completion time.}
+    \item Page 16, Subsection 5.1.1: \textcolor{blue}{The sensitivity analysis was conducted using a \textit{Challenging Scenario} involving heterogeneous devices with diverse computational capabilities. We tested different weight configurations, where each weight combination is represented by linguistic terms: very low (vl), low (l), medium low (ml), medium (m), medium high (mh), high (h), and very high (vh). The first weight ($\omega_1$) corresponds to latency importance, while the second weight ($\omega_2$) corresponds to energy consumption importance. For each configuration, we measured performance improvements compared to GTT and ROFF baseline strategies in terms of: Percentage of energy efficiency improvements, percentage of task completion time improvement, and average of energy and latency improvements.}
+    \item Page 16, Subsection 5.1.2: \textcolor{blue}{Figure 6 illustrates the sensitivity of energy efficiency to different weight configurations. The analysis reveals that energy efficiency is highly responsive to weight selection, with improvements ranging from 29.8\% to 67.4\%. The highest energy efficiency improvement (67.4\%) was achieved with the $\omega$=[vl,vh] configuration, which assigns very low importance to latency and very high importance to energy. Other notable configurations include $\omega$=[vl,m] with 54.2\% improvement and $\omega$=[l,h] with 52.6\% improvement. The results demonstrate that prioritizing energy considerations through higher $\omega_2$ values consistently leads to better energy efficiency outcomes. However, this effect is particularly pronounced when combined with lower $\omega_1$ values, indicating that energy-latency trade-offs must be carefully considered.}
+    \item Page 17, Subsection 5.1.3: \textcolor{blue}{As shown in Figure 7, latency performance also exhibits significant sensitivity to weight selection, with improvements ranging from 44.4\% to 55.3\%.  Interestingly, several configurations achieved latency improvements exceeding 50\%, with the highest improvement (55.3\%) observed in the $\omega$=[vh,vh] configuration. Other effective configurations include $\omega$=[vh,m] (54.9\%), $\omega$=[mh,ml] (54.2\%), and $\omega$=[vh,vl] (54.6\%). The results indicate that latency performance benefits from higher $\omega_1$ values, as expected, but it remains relatively robust across various weight combinations. This suggests that FOFF can maintain good latency performance even when energy considerations are prioritized.}
+    \item Page 17, Subsection 5.1.4: \textcolor{blue}{Table 14 presents the energy-latency trade-off for different FOFF weight configurations. The analysis reveals a clear but non-linear relationship between energy efficiency and latency improvements. The $\omega$=[l,h] configuration stands out with 52.6\% energy improvement and 49.8\% latency improvement, offering a balanced performance profile. Other balanced configurations include $\omega$=[ml,mh] (44.2\% energy, 50.1\% latency) and $\omega$=[m,vl] (34.0\% energy, 52.5\% latency). For applications with specific priorities, specialized configurations can be selected: Energy-critical applications: $\omega$=[vl,vh] (67.4\% energy, 45.4\% latency) and Latency-critical applications: $\omega$=[vh,vh] (31.2\% energy, 55.3\% latency).}
+    \item Page 16, Figure 6: \textcolor{blue}{Added a heatmap visualization showing energy efficiency improvements for different weight settings.}
+    \item Page 17, Subsection 5.1.5: \textcolor{blue}{The sensitivity analysis yields several important insights for FOFF implementation: \begin{enumerate}
+        \item Weight selection significantly impacts performance, with potential improvements varying by more than 35\% for energy efficiency and 10\% for latency.
+        \item For general-purpose applications requiring balanced performance, the $\omega$=[l,h] configuration offers the best compromise between energy efficiency and latency.
+        \item In energy-constrained environments (e.g., battery-powered devices), the $\omega$=[vl,vh] configuration provides maximum energy savings while maintaining acceptable latency.
+        \item For delay-sensitive applications (e.g., real-time processing), the $\omega$=[vh,vh] configuration ensures minimum latency while still providing substantial energy savings compared to baseline approaches.
+        \item The robust latency performance across various configurations suggests that FOFF can maintain good responsiveness even when optimizing for energy efficiency.
+    \end{enumerate} This sensitivity analysis demonstrates that FOFF provides a flexible and effective mechanism for adapting the offloading strategy to different operational requirements and constraints. System administrators can select appropriate weight configurations based on their specific performance priorities without requiring modifications to the underlying algorithm.}
+    \item Page 17, Figure 7: \textcolor{blue}{Added a heatmap visualization of task completion time improvements across weight configurations.}
+    \item Page 17, Table 14: \textcolor{blue}{Included a detailed table comparing energy and task completion time improvements for different FOFF weight configurations.}
+\end{itemize}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.5:} The current evaluation appears to assume homogeneous task characteristics. However, in real-world VEC-enabled vehicular networks, tasks vary in terms of computation load, deadline constraints, and dependency. A discussion or an experimental evaluation considering heterogeneous tasks would enhance the generalizability of FOFF.
+\end{mdframed}
+
+\textbf{Authors' Response:}
+We confirm that, in the original manuscript, the considered tasks are already heterogeneous in terms of requirements and characteristics, which will be highlighted more clearly in the revised version. Each vehicle-generated task has distinct parameters, reflecting the diversity of applications in a vehicular environment. The reported results therefore already reflect our method's ability to handle a diverse set of tasks. To avoid any ambiguity, we will add an explicit description of this heterogeneity to the manuscript. In this way, we clarify to the reviewer that our approach considers and accommodates different task profiles, making it applicable to scenarios with heterogeneous vehicular applications.
+\vspace{\baselineskip}
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Page 15, Lines 798-806: \textcolor{blue}{We modeled tasks with varying input data sizes, and CPU cycle requirements for processing. Thus, in our simulations, a vehicle may generate lightweight tasks (with a few million cycles and low latency priority) or heavy, encompassing diverse load heterogeneity scenarios. This variability was incorporated precisely to evaluate the performance of the \emph{FOFF} scheme under realistic conditions where tasks are not identical.}
+\end{itemize}
+
+\vspace{\baselineskip}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.6:} Some figures, especially those depicting performance comparisons, could be enhanced for better readability. Using larger font sizes for axis labels and legends would improve clarity. Additionally, highlighting key insights from figures within the text would help in interpretation.
+\end{mdframed}
+
+\textbf{Authors' Response:} 
+We thank the reviewer for this suggestion. We have increased the font size of axis labels and legends in all performance-comparison figures to improve readability. Additionally, we have enhanced the text with explicit references to key insights from each figure.
+
+\textbf{Additions to the Manuscript:} 
+
+\begin{itemize}
+    \item Pages 16-17: \textcolor{blue}{Improved readability of Figures 6 and 7 (heatmaps) with larger fonts and clearer labels.}
+    \item Page 18: \textcolor{blue}{Enhanced Figures 8, 9, 10, and 11 with larger axis labels and improved legends.}
+    \item Page 17, Lines 903-911: \textcolor{blue}{As shown in Figure 7, latency performance also exhibits significant sensitivity to weight selection, with improvements ranging from 44.4\% to 55.3\%. Interestingly, several configurations achieved latency improvements exceeding 50\%, with the highest improvement (55.3\%) observed in the $\omega$=[vh,vh] configuration. Other effective configurations include $\omega$=[vh,m] (54.9\%), $\omega$=[mh,ml] (54.2\%), and $\omega$=[vh,vl] (54.6\%).} 
+    \item Page 18, Lines 966-973: \textcolor{blue}{Figure 8 (Challenging Scenario) shows that FOFF demonstrated an average energy consumption of 5.07 J $\pm$ 1.67. Compared to GTT, which recorded an energy consumption of 12.06 J $\pm$ 2.98, FOFF achieved a reduction of 57.96\%, highlighting its energy efficiency. In the case of ROFF, which reached 126088.60 J $\pm$ 2731.28, FOFF achieved a 99.99\% reduction.}
+\end{itemize}
+
+\begin{mdframed}[style=review] 
+\textbf{Comment \#2.7:} The related work section should be expanded to include a discussion of the latest research in energy-efficient task offloading in vehicular edge computing, particularly from the last two years such as : Edge Device Selection For Industrial IoT Task Offloading In Mobile Edge Computing, Intelligent Task Offloading in IoT Devices Using Deep Reinforcement Learning Approaches.
+\end{mdframed}
+
+\textbf{Authors' Response:} 
+We appreciate the reviewer's suggestion. As noted in our previous revision, both [31] ('Edge Device Selection for Industrial IoT Task Offloading in Mobile Edge Computing') and [30] ('Intelligent Task Offloading in IoT Devices Using Deep Reinforcement Learning Approaches') have already been incorporated into the Related Work section.
+
+\textbf{References in the Manuscript:}
+\begin{itemize}
+    \item Pages 4-5, Lines 256-270: \textcolor{blue}{The authors in [30] proposed a solution based on Deep Reinforcement Learning, utilizing both off-policy (DQN - Deep Q-Network) and on-policy (A3C - Asynchronous Advantage Actor-Critic) approaches. The DQN method was employed to enable effective learning for task offloading through historical data while A3C was adapted to explore new policies. The objective is to provide a solution that attains an equilibrium between exploration and stability. Through experiments, the authors demonstrated the improvements in the average reward during iterative training. However, the complexity of the model and the need for continuous training may limit its applicability in highly dynamic environments.}
+    
+    \item Page 5, Lines 271-293: \textcolor{blue}{In the study conducted by [31], the authors proposed a two-stage solution for edge server selection in the context of task offloading from mobile devices in industrial IoT networks. In the first stage, the matching feasibility between mobile devices and edge servers is verified using Hall's Marriage Theorem. This step involves constructing a bipartite graph where each mobile device is associated with a list of preferred edge servers. In the second stage, once the matching feasibility is confirmed, a server selection algorithm is employed to assign tasks optimally. This algorithm considers both the computational capacity and the proximity of the edge servers, prioritizing mobile devices based on task-specific parameters such as processing requirements and execution deadlines. Simulation results demonstrate that this dual-stage approach minimizes energy consumption and overall time delay. However, in the first stage, the ranking of preferred servers does not account for high energy consumption, potentially selecting servers with high computational capacity but excessive energy usage.}
+\end{itemize}

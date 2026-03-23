@@ -38,6 +38,7 @@
 \usepackage[T1]{fontenc}                            % Codificação da fonte em 8 bits
 \usepackage{graphicx}                               % Inserir figuras
 \usepackage{amsfonts, amssymb, amsmath}             % Fonte e símbolos matemáticos
+\newcommand{\cmark}{\checkmark}
 \usepackage{booktabs}                               % Comandos para tabelas
 \usepackage{verbatim}                               % Texto é interpretado como escrito no documento
 \usepackage{multirow, array}                        % Múltiplas linhas e colunas em tabelas
@@ -55,6 +56,7 @@
 \usepackage{etoolbox}                               % Usado para alterar a fonte da Section no Sumário
 \usepackage[nogroupskip,nonumberlist,acronym]{glossaries}                % Permite fazer o glossario
 \usepackage{caption}                                % Altera o comportamento da tag caption
+\usepackage{subcaption}                             % Permite o uso de subfiguras
 \usepackage[alf, abnt-emphasize=bf, recuo=0cm, abnt-etal-cite=3, abnt-etal-list=0, abnt-etal-text=it, abnt-thesis-year=both]{abntex2cite}  % Citações padrão ABNT
 %\usepackage[bottom]{footmisc}                      % Mantém as notas de rodapé sempre na mesma posição
 %\usepackage{times}                                 % Usa a fonte Times
@@ -62,8 +64,8 @@
 %\usepackage{lmodern}                               % Usa a fonte Latin Modern
 %\usepackage{subfig}                                % Posicionamento de figuras
 %\usepackage{scalefnt}                              % Permite redimensionar tamanho da fonte
-%\usepackage{color, colortbl}                       % Comandos de cores
-%\usepackage{lscape}                                % Permite páginas em modo "paisagem"
+%\usepackage{colortbl}                              % Cores em tabelas
+\usepackage{pdflscape}                             % Permite páginas em modo "paisagem" (PDF rotacionado)
 %\usepackage{ae, aecompl}                           % Fontes de alta qualidade
 %\usepackage{picinpar}                              % Dispor imagens em parágrafos
 %\usepackage{latexsym}                              % Símbolos matemáticos
@@ -74,7 +76,8 @@
 \usepackage{pdfpages}                               % Incluir pdf no documento
 \usepackage{amsmath}                                % Usar equacoes matematicas
 \usepackage{tikz}                                  % Desenhar graficos
-\usetikzlibrary{shapes.geometric, shapes.symbols, positioning, calc, fit, backgrounds, arrows.meta}
+\usepackage{forest}                                % Desenhar árvores e taxonomias
+\usetikzlibrary{shapes.geometric, shapes.symbols, positioning, calc, fit, backgrounds, arrows.meta, patterns}
 \usepackage{textcase}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
