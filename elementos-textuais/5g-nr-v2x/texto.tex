@@ -142,7 +142,7 @@ Na camada física, a informação digital é mapeada em ondas eletromagnéticas 
 
 % \end{tikzpicture}
 % \Caption{\label{fig:qam} Diagramas de constelação dos esquemas de modulação \gls{QAM} utilizados no \gls{5G} NR. À medida que a ordem da modulação aumenta de (a) para (d), cada símbolo transporta mais bits, elevando a vazão, porém a maior densidade de pontos exige uma \gls{SINR} proporcionalmente superior para manter a taxa de erro aceitável.}
-% \Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
+% \Fonte{Elaborado pelo autor com base em~\cite{cox2025}.}
 % \end{figure}
 
 Para contornar a degradação, a rede emprega o mecanismo de adaptação de enlace (\textit{Link Adaptation}): avalia continuamente a qualidade do canal e regride dinamicamente para esquemas de modulação mais simples (como QPSK) em condições adversas, preservando a confiabilidade da entrega dos pacotes~\cite{cox2025, stallings2021}. É essa dinâmica de seleção do \gls{MCS} que determina a taxa de canal instantânea --- um dos critérios multicritério avaliados pelo \gls{TOPSIS} na seleção do melhor candidato ao descarregamento de tarefas neste trabalho.
@@ -332,7 +332,7 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 
 \end{tikzpicture}
 \Caption{\label{fig:arquitetura_cv2x} Arquitetura das comunicações \gls{5G} \gls{C-V2X}: coexistência da interface celular \gls{Uu} (\gls{V2I}/\gls{V2N}) com a interface direta \gls{PC5} \textit{Sidelink} (\gls{V2V}/\gls{V2P}), integrando o núcleo \gls{5GC}, o servidor \gls{MEC} de borda e os elementos veiculares e pedestres.}
-\Fonte{Elaborado pelo autor com base em \cite{garcia2021, cox2025}.}
+\Fonte{Elaborado pelo autor com base em~\cite{garcia2021, cox2025}.}
 \end{figure}
 
 Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiza a troca de dados em três canais físicos complementares que operam sequencialmente dentro de um mesmo \textit{slot} de transmissão: o \gls{PSCCH}, o \gls{PSSCH}, que transporta efetivamente a carga útil de dados, e o \gls{PSFCH}. A Figura~\ref{fig:slot_sidelink} ilustra a coexistência e a multiplexação temporal desses canais dentro de um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}.
@@ -373,7 +373,7 @@ Para viabilizar essa comunicação direta, a camada física da \gls{PC5} organiz
 \node[rotate=90, font=\tiny] at (11.65, 2) {Guarda};
 
 \end{tikzpicture}
-\caption{Estrutura temporal básica da camada física em um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}, ilustrando a multiplexação dos canais físicos \gls{PSCCH}, \gls{PSSCH} e \gls{PSFCH} \cite{cox2025, garcia2021}.}
+\caption{Estrutura temporal básica da camada física em um \textit{slot} do \gls{5G} \gls{NR} \textit{Sidelink}, ilustrando a multiplexação dos canais físicos \gls{PSCCH}, \gls{PSSCH} e \gls{PSFCH}~\cite{cox2025, garcia2021}.}
 \label{fig:slot_sidelink}
 \end{figure}
 

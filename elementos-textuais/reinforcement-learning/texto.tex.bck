@@ -1,0 +1,577 @@
+Nesta subseção, apresentam-se os conceitos fundamentais sobre aprendizado por reforço (\textit{Reinforcement Learning} – RL), destacando as características que tornam esse paradigma adequado à resolução de problemas com premissas dinâmicas.
+
+Inicialmente, é importante distinguir os conceitos de \textit{algoritmo} e \textit{modelo}. Na computação clássica, um algoritmo consiste em uma sequência finita de instruções lógicas destinadas a converter entradas em uma solução determinada explicitamente. Contudo, no Aprendizado de Máquina (\textit{Machine Learning} - ML), o processo torna-se indutivo, algoritmos são utilizados para processar grandes volumes de dados (\textit{datasets}) e extrair correlações intrínsecas, muitas vezes complexas demais para a análise humana direta. 
+
+O produto desse esforço computacional é o \textit{modelo}, que é     uma representação das relações aprendidas, capaz de generalizar o conhecimento para inferir respostas a partir de novos dados. Com base na natureza dessa interação, as soluções de ML classificam-se em três paradigmas fundamentais: aprendizado supervisionado, não-supervisionado e aprendizado por reforço.
+
+O paradigma supervisionado assemelha-se intuitivamente ao aprendizado guiado por um ``tutor''. Dispõe-se de um conjunto de dados, composto por variáveis preditoras (entradas) e suas respectivas variáveis-alvo (saídas desejadas) fornecidas pela ``tutor'', permitindo que o algoritmo aprenda a relação entre entrada e saída.
+
+O objetivo é criar um modelo que minimize a discrepância (erro) entre a resposta predita e a variável-alvo. A Tabela \ref{tab:exemplo_supervisionado} exemplifica um conjunto de dados composto por múltiplos previsores ($x_1, \dots, x_n$) e uma variável-alvo (rótulo) ($y$).
+
+\begin{table}[htbp]
+    \centering
+    \UECEtab{
+        \caption{Exemplo de conjunto de dados supervisionado com múltiplos previsores e um alvo.}
+        \label{tab:exemplo_supervisionado}
+    }{
+        \begin{tabular*}{0.85\textwidth}{@{\extracolsep{\fill}}cccc}
+            \toprule
+            \textbf{Previsor 1 ($x_1$)} & \textbf{$\dots$} & \textbf{Previsor $n$ ($x_n$)} & \textbf{Alvo ($y$)} \\
+            \midrule
+            1.0 & $\dots$ & 0.5 & 2.2 \\
+            2.0 & $\dots$ & 1.2 & 2.8 \\
+            3.0 & $\dots$ & 1.8 & 4.2 \\
+            $\vdots$ & $\ddots$ & $\vdots$ & $\vdots$ \\
+            5.0 & $\dots$ & 3.1 & 6.1 \\
+            \bottomrule
+        \end{tabular*}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{table}
+
+A relação entre as variáveis preditoras e a variável-alvo pode ser visualizada através da Figura \ref{fig:exemplo_regressao} e nela são exibidos os dados e a reta de regressão ajustada. A linha representa a tendência aprendida que minimiza a distância média para os pontos observados. Vale ressaltar que, para fins de visualização gráfica (Figura \ref{fig:exemplo_regressao}), utilizou-se apenas uma variável preditora.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Regressão linear simples: Dados observados (pontos) e reta de regressão ($y \approx x + 1$) ajustada pelo modelo supervisionado.}
+        \label{fig:exemplo_regressao}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.8\textwidth,
+                height=7cm,
+                xlabel={Previsor ($x$)},
+                ylabel={Alvo ($y$)},
+                grid=major,
+                legend pos=north west,
+                legend style={draw=none},
+                thick
+            ]
+                % Scatter Plot (Dados)
+                \addplot[
+                    only marks,
+                    mark=*,
+                    color=black,
+                    mark size=2.5pt
+                ] coordinates {
+                    (1.0, 2.2)
+                    (2.0, 2.8)
+                    (3.0, 4.2)
+                    (4.0, 4.8)
+                    (5.0, 6.1)
+                };
+                \addlegendentry{Dados Reais}
+
+                % Linha de Regressão
+                \addplot[
+                    color=black!70,
+                    domain=0.5:5.5,
+                    samples=2,
+                    thick
+                ] {1.0*x + 1.0}; % y = x + 1 (Aprox)
+                \addlegendentry{Linha de Regressão}
+                
+                % Ilustração dos resíduos (opcional, para didática)
+                \draw[dashed, gray] (axis cs:3.0, 4.0) -- (axis cs:3.0, 4.2);
+
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+
+No aprendizado não supervisionado, opera-se sobre um conjunto de dados sem rótulos (sem tutor). O objetivo é identificar correlações ou estruturas subjacentes, como o agrupamento de dados semelhantes. Esta abordagem busca descobrir padrões em grandes volumes de dados, como na detecção de anomalias financeiras \cite{deng2009clustering}. Na Figura \ref{fig:exemplo_cluster}, observa-se um conjunto de dados ilustrativo. O objetivo de algoritmos não supervisionados é identificar e delimitar agrupamentos (\textit{clusters}) automaticamente, baseando-se apenas nas características compartilhadas entre as amostras.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Conceito de agrupamento (clustering): identificação de estruturas latentes em dados não rotulados.}
+        \label{fig:exemplo_cluster}
+    }{
+        \begin{tikzpicture}[
+            scale=0.8,
+            point/.style={circle, fill=black!60, inner sep=2pt},
+            centroid/.style={},
+            box/.style={draw=black!30, line width=1.5pt, rectangle}
+        ]
+            % Painel Esquerdo: Unlabelled Data
+            \node[box, minimum width=6cm, minimum height=5cm] (left) at (0,0) {};
+            \node[font=\bfseries, above=0.1cm of left] {Dados não rotulados};
+            
+            % Pontos não rotulados (cinza)
+            \foreach \x/\y in {-1.5/1.0, -1.2/1.5, -1.8/1.3, -1.4/0.8, -1.6/1.7,
+                               1.2/1.2, 1.6/1.5, 1.4/0.9, 1.8/1.3, 1.5/1.6,
+                               -0.2/-0.8, 0.1/-1.0, 0.3/-0.6, -0.1/-1.2, 0.4/-0.9}
+                \fill[black!60] (\x,\y) circle (2.5pt);
+            
+            % Seta K-means
+            \draw[-stealth, line width=1.2pt] (3.0, 0) -- node[above, font=\bfseries] {Algoritmo} (5, 0);
+            
+            % Painel Direito: Labelled Clusters
+            \begin{scope}[shift={(8.5,0)}]
+                \node[box, minimum width=6cm, minimum height=5cm] (right) at (0,0) {};
+                \node[font=\bfseries, above=0.1cm of right] {Agrupamentos Rotulados};
+                
+                % Cluster 1 (Verde - superior esquerdo)
+                \fill[green!20, draw=green!70!black, line width=1.2pt] (-1.5, 1.25) circle (1cm);
+                \foreach \x/\y in {-1.5/1.0, -1.2/1.5, -1.8/1.3, -1.4/0.8, -1.6/1.7}
+                    \fill[green!60!black] (\x,\y) circle (2.5pt);
+                \draw[black, very thick] (-1.65, 1.1) -- (-1.35, 1.4);
+                \draw[black, very thick] (-1.35, 1.1) -- (-1.65, 1.4);
+                
+                % Cluster 2 (Azul - superior direito)  
+                \fill[cyan!20, draw=cyan!70!black, line width=1.2pt] (1.5, 1.25) circle (1cm);
+                \foreach \x/\y in {1.2/1.2, 1.6/1.5, 1.4/0.9, 1.8/1.3, 1.5/1.6}
+                    \fill[cyan!60!black] (\x,\y) circle (2.5pt);
+                \draw[black, very thick] (1.35, 1.1) -- (1.65, 1.4);
+                \draw[black, very thick] (1.65, 1.1) -- (1.35, 1.4);
+                
+                % Cluster 3 (Vermelho - inferior centro)
+                \fill[red!20, draw=red!70!black, line width=1.2pt] (0.1, -0.9) circle (1cm);
+                \foreach \x/\y in {-0.2/-0.8, 0.1/-1.0, 0.3/-0.6, -0.1/-1.2, 0.4/-0.9}
+                    \fill[red!60!black] (\x,\y) circle (2.5pt);
+                \draw[black, very thick] (-0.05, -1.05) -- (0.25, -0.75);
+                \draw[black, very thick] (0.25, -1.05) -- (-0.05, -0.75);
+                
+                % Legenda
+                \draw[black, very thick] (0.85, -2.95) -- (1.15, -2.65);
+                \draw[black, very thick] (1.15, -2.95) -- (0.85, -2.65);
+                \node[anchor=west, font=\small\bfseries] at (1.3, -2.8) {Centróide};
+            \end{scope}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Enquanto os paradigmas supervisionado e não supervisionado focam na análise estática de dados --- seja para predição ou descoberta de padrões ---, o terceiro paradigma aborda o problema da tomada de decisão sequencial.
+
+No aprendizado por reforço clássico, a criação do modelo é realizada de forma diferente, pois não há um \textit{dataset} fixo entregue ao algoritmo. O aprendizado emerge da experiência direta de um \textit{agente} (algoritmo de decisão) com um \textit{ambiente} dinâmico (o mundo e suas regras). Neste ciclo, o agente observa o estado atual do ambiente, decide uma ação com base em sua estratégia (\textit{política}) e recebe uma resposta na forma de recompensa (ou penalidade). O objetivo final não é apenas acertar um rótulo imediato, mas refinar a política para maximizar as recompensas acumuladas ao longo do tempo (Figura \ref{fig:rl_cycle}).
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Ciclo de interação agente-ambiente no aprendizado por reforço: o agente observa o estado do ambiente, seleciona uma ação segundo sua política aprendida, executa a ação e recebe uma recompensa (consequência), iniciando um novo ciclo.}
+        \label{fig:rl_cycle}
+    }{
+        \begin{tikzpicture}[
+            node distance=4cm,
+            >=stealth,
+            box/.style={
+                rectangle, 
+                rounded corners=3mm, 
+                minimum width=3.5cm, 
+                minimum height=2.5cm, 
+                align=center,
+                font=\bfseries,
+                line width=1.2pt
+            },
+            agent/.style={box, draw=blue!60!black, fill=blue!5},
+            env/.style={box, draw=green!60!black, fill=green!5},
+            arrow/.style={->, line width=1.5pt, draw=black!80}
+        ]
+            % Nós
+            \node[agent] (agent) {AGENTE\\[0.5em]\small\normalfont (Tomada de Decisão)};
+            \node[env] (env) [right=of agent] {AMBIENTE\\[0.5em]\small\normalfont (Regras do Mundo)};
+
+            % Setas curvas enfatizando o ciclo
+            
+            % Ação (Agente -> Ambiente)
+            \draw[arrow] (agent.south) .. controls +(down:1.5cm) and +(down:1.5cm) .. (env.south) 
+                node[midway, below=2pt] {\textbf{Ação}};
+
+            % Estado e Recompensa (Ambiente -> Agente)
+            \draw[arrow] (env.north) .. controls +(up:1.5cm) and +(up:1.5cm) .. (agent.north)
+                node[midway, above=2pt] {\textbf{Estado}}
+                node[midway, below=2pt, font=\small] {$\pm$ Recompensa};
+            
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Para fundamentar o funcionamento de decisão no RL, apresenta-se inicialmente o cenário mais elementar: o problema do \textit{k-armed bandit} (k-braços). Neste problema, o agente dispõe de $k$ opções e deve realizar escolhas sequenciais ao longo de um horizonte de tempo finito. Cada opção retorna uma recompensa regida por uma distribuição de probabilidade desconhecida e que não varia ao longo do tempo (\textbf{estacionária}). Neste exemplo, ainda não é necessário utilizar o conceito do estado pois todas as ações são independentes. O importante é que esse problema permite isolar e analisar exclusivamente o dilema fundamental do paradigma: decidir entre explorar (\textit{explore}) novas opções ou explorar intensivamente (\textit{exploit}) uma opção conhecida vantajosa.
+
+Segundo \cite{sutter2022reinforcement}, define-se o valor de uma ação como a recompensa esperada ao escolhê-la. Matematicamente, isso corresponde à esperança condicional da recompensa $R_t$, dado que a ação $a$ foi selecionada na interação $t$ (Equação \ref{eq:action_value}):
+
+\begin{equation}
+    \label{eq:action_value}
+    q_*(a) \doteq \mathbb{E}[R_t | A_t = a]
+\end{equation}
+
+Para ilustrar a incerteza inerente ao processo de decisão, a Figura \ref{fig:k-armed-bandit} apresenta um exemplo visual de um problema de $k$-braços com $k=4$. Cada curva representa a densidade de probabilidade das recompensas associadas a uma ação específica. Observe que, embora a ação $a_3$ possua o maior valor esperado ($q_*(a_3) = 2.5$), sua alta variância ($\sigma=1.5$) implica que, em uma única jogada, ela pode retornar uma recompensa inferior à de uma ação subótima, mas mais estável, como a ação $a_4$. Cabe ao agente, através de repetidas interações, estimar esses valores esperados para convergir à escolha ótima.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Distribuições de probabilidade de recompensa para um problema de 4-braços ($k=4$). Cada curva representa a densidade de probabilidade da recompensa para uma ação específica, ilustrando diferentes médias ($\mu$) e desvios padrão ($\sigma$).}
+        \label{fig:k-armed-bandit}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.7\textwidth,
+                height=7cm,
+                xlabel={Recompensa ($R_t$)},
+                ylabel={Densidade de Probabilidade},
+                domain=-5:8,
+                samples=200,
+                axis lines=left,
+                grid=major,
+                ymax=0.95, % Aumentado para evitar corte dos rótulos
+                enlargelimits=false,
+                % Legenda configurada para ficar abaixo do gráfico, centralizada
+                legend style={
+                    at={(0.5,-0.2)},
+                    anchor=north,
+                    legend columns=2, 
+                    draw=none,
+                    column sep=10pt
+                },
+                thick
+            ]
+                % Ação 1 (Baseline)
+                \addplot [blue] {1/(1*sqrt(2*pi)) * exp(-((x-0)^2)/(2*1^2))};
+                \addlegendentry{Ação 1 ($\mu=0, \sigma=1$)}
+                
+                % Ação 2 (Pior média, menor variância)
+                \addplot [red] {1/(0.5*sqrt(2*pi)) * exp(-((x+1.5)^2)/(2*0.5^2))};
+                \addlegendentry{Ação 2 ($\mu=-1.5, \sigma=0.5$)}
+                
+                % Ação 3 (Melhor média, maior variância)
+                \addplot [green!60!black] {1/(1.5*sqrt(2*pi)) * exp(-((x-2.5)^2)/(2*1.5^2))};
+                \addlegendentry{Ação 3 ($\mu=2.5, \sigma=1.5$)}
+                
+                % Ação 4 (Média boa, variância média)
+                \addplot [orange] {1/(0.8*sqrt(2*pi)) * exp(-((x-1.0)^2)/(2*0.8^2))};
+                \addlegendentry{Ação 4 ($\mu=1.0, \sigma=0.8$)}
+                
+                \node[anchor=south] at (axis cs: 0, 0.40) {$q_*(a_1)$};
+                \node[anchor=south] at (axis cs: -1.5, 0.80) {$q_*(a_2)$};
+                \node[anchor=south] at (axis cs: 2.5, 0.27) {$q_*(a_3)$};
+                \node[anchor=south] at (axis cs: 1.0, 0.50) {$q_*(a_4)$};
+
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Como exemplo, considere a evolução da recompensa acumulada apresentada na Figura \ref{fig:greedy_cumulative}. Esse resultado reflete o comportamento de um agente que, inicialmente desconhecendo as recompensas associadas às ações, experimenta cada opção uma única vez e registra qual delas retornou o maior valor. Suponha que, nessa tentativa preliminar, a ação $a_3$ tenha se mostrado a mais vantajosa (devido à sua alta variância, que permitiu um retorno alto pontual). Adotando uma estratégia gananciosa, o agente passaria a selecionar $a_3$ em todas as interações subsequentes. Com isso, perde-se a oportunidade de explorar outras opções que poderiam se revelar superiores a longo prazo --- como a ação $a_4$, que, apesar de ter retornado menos na primeira tentativa, possui uma média de recompensa robusta e menor variabilidade.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Recompensa acumulada utilizando a estratégia gananciosa (Greedy).}
+        \label{fig:greedy_cumulative}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.7\textwidth, height=5.5cm,
+                xlabel={Interações ($t$)},
+                ylabel={Recompensa Acumulada},
+                grid=major,
+                legend pos=north west
+            ]
+                \addplot[no markers, thick, black] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
+                \addlegendentry{Estratégia Greedy}
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Para lidar com esse dilema, uma estratégia melhor e computacionalmente eficiente, segundo \cite{sutter2022reinforcement}, seria estimar o valor de cada ação na interação $t$ utilizando o Algoritmo \ref{alg:efficient_action_value}. Neste algoritmo, a ação escolhida seria aquela com a melhor média acumulada até o momento. Para garantir a exploração contínua do espaço de ações, o agente escolhe uma ação aleatória com probabilidade $\epsilon$.
+
+\begin{algorithm}[htbp]
+    \caption{Algoritmo $\epsilon$-Greedy para o problema $k$-armed bandit}
+    \label{alg:efficient_action_value}
+    \begin{algorithmic}[1]
+        \REQUIRE Número de ações $k$, valor de exploração $\epsilon$
+        \ENSURE Estimativas de valor $Q(a)$ para cada ação
+        \STATE \textbf{Inicializar}, para $a = 1$ até $k$:
+        \STATE \hspace{\algorithmicindent} $Q(a) \leftarrow 0$
+        \STATE \hspace{\algorithmicindent} $N(a) \leftarrow 0$
+        \STATE
+        \STATE \textbf{Laço}:
+        \STATE \hspace{\algorithmicindent} $A \leftarrow \begin{cases}
+            \arg\max_a Q(a) & \text{com probabilidade } 1-\varepsilon \\
+            \text{uma ação aleatória} & \text{com probabilidade } \varepsilon
+        \end{cases}$
+        \STATE \hspace{\algorithmicindent} $R \leftarrow bandit(A)$
+        \STATE \hspace{\algorithmicindent} $N(A) \leftarrow N(A) + 1$
+        \STATE \hspace{\algorithmicindent} $Q(A) \leftarrow Q(A) + \frac{1}{N(A)} [R - Q(A)]$
+    \end{algorithmic}
+\end{algorithm}
+
+O Algoritmo \ref{alg:efficient_action_value} funciona armazenando o número de vezes que cada ação foi selecionada ($N(a)$) e atualizando a estimativa do valor da ação ($Q(a)$) com base na média incremental das recompensas recebidas. A escolha da ação é feita de forma $\epsilon$-Greedy, com probabilidade $1-\epsilon$. O agente seleciona a ação com o maior valor estimado, enquanto com probabilidade $\epsilon$, ele escolhe uma ação aleatória, promovendo a exploração.
+
+A Figura \ref{fig:average_cumulative} ilustra o desempenho de um agente que adota essa abordagem em comparação com outro que utilizada a estratégia gananciosa. Note que, ao longo do tempo, a recompensa acumulada cresce de forma mais consistente ($\epsilon$-Greedy), refletindo uma estratégia mais robusta.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Comparação de desempenho: Agente Ganancioso (Greedy) vs. Agente $\epsilon$-Ganancioso ($\epsilon$-Greedy).}
+        \label{fig:average_cumulative}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.7\textwidth, height=5.5cm,
+                xlabel={Interações ($t$)},
+                ylabel={Recompensa Acumulada},
+                grid=major,
+                legend pos=north west,
+                legend style={font=\footnotesize}
+            ]
+                % Linha do Greedy (Referência Baseline)
+                \addplot[thick, black, dashed] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
+                \addlegendentry{Greedy ($\epsilon=0$)}
+                
+                % Linha do Epsilon-Greedy (Melhor desempenho esperado)
+                \addplot[thick, orange]        table [x=step, y=epsilon_greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/average_methods_results.csv};
+                \addlegendentry{$\epsilon$-Greedy ($\epsilon=0.1$)}
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Até então não foi necessário lidar com problemas onde as premissas mudam com o tempo, os chamados problemas \textbf{não-estacionários}. Em ambientes reais, contudo, as condições podem variar, exigindo que o agente busque estratégias para tratar essas mudanças de comportamento (regime). No contexto do problema $k$-\textit{armed bandit}, a não-estacionariedade manifesta-se quando cada $k$-braço tem sua distribuição de probabilidade de recompensa modificada ao longo do tempo. A Figura \ref{fig:non_stationary_bandit} ilustra esse cenário, onde as médias das recompensas associadas a cada ação variam temporalmente, evidenciando mudanças de regime que tornam diferentes ações ótimas em diferentes períodos.
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Exemplo de um problema $k$-armed bandit não-estacionário: as médias das recompensas ($q_*(a)$) variam ao longo do tempo, caracterizando diferentes regimes onde ações distintas se tornam ótimas. Note como a Ação 3 (verde) inicia inferior mas torna-se dominante após $t \approx 500$, enquanto a Ação 1 (azul) degrada-se.}
+        \label{fig:non_stationary_bandit}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.85\textwidth,
+                height=8cm,
+                xlabel={Interações ($t$)},
+                ylabel={Valor Verdadeiro da Ação $q_*(a)$},
+                grid=major,
+                thick,
+                domain=0:1000,
+                samples=200,
+                legend pos=north east,
+                legend style={font=\footnotesize},
+                ymin=-1.5,
+                ymax=3.5
+            ]
+                % Ação 1 - Começa bem mas degrada
+                \addplot [blue, thick, smooth] {2.0 - 0.0035*x + 0.3*sin(deg(x/50))};
+                \addlegendentry{Ação 1}
+                
+                % Ação 2 - Oscila em torno de um valor baixo
+                \addplot [red, thick, smooth] {-0.5 + 0.4*sin(deg(x/80)) + 0.0008*x};
+                \addlegendentry{Ação 2}
+                
+                % Ação 3 - Começa ruim mas melhora significativamente
+                \addplot [green!60!black, thick, smooth] {-1.0 + 0.004*x + 0.25*sin(deg(x/60))};
+                \addlegendentry{Ação 3}
+                
+                % Ação 4 - Mantém-se mediano com pequenas variações
+                \addplot [orange, thick, smooth] {0.8 + 0.3*sin(deg(x/100)) - 0.0005*x};
+                \addlegendentry{Ação 4}
+                
+                % Adicionar anotações para destacar mudanças de regime
+                \draw[dashed, gray, line width=0.8pt] (axis cs:500,-1.5) -- (axis cs:500,3.5);
+                \node[font=\scriptsize, align=center] at (axis cs:250, 3.2) {Regime 1\\Ação 1 ótima};
+                \node[font=\scriptsize, align=center] at (axis cs:750, 3.2) {Regime 2\\Ação 3 ótima};
+
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+Isto induz um novo desafio, o agente deve utilizar estratégias onde a recompensa recebida em uma interação recente possui maior importância do que recompensas obtidas anteriormente. Uma forma simples de implementar isso é substituir a média aritmética por uma atualização com taxa de aprendizado constante (Equação \ref{eq:exponential_moving_average}). Nesta formulação, $\alpha \in (0,1]$ é a taxa de aprendizado que determina o peso dado às recompensas recentes. Valores maiores de $\alpha$ fazem o agente reagir mais rapidamente a mudanças, mas aumentam a variabilidade das estimativas.
+
+\begin{equation}
+    \label{eq:exponential_moving_average}
+    Q_{n+1}(A) = Q_n(A) + \alpha [R_n - Q_n(A)]
+\end{equation}
+
+\noindent onde $Q_n(A)$ é a estimativa do valor da ação $A$ após ela ter sido selecionada $n$ vezes, e $R_n$ é a recompensa recebida na $n$-ésima vez que a ação $A$ foi escolhida. O índice $n$ refere-se ao número de vezes que a ação específica $A$ foi selecionada, não ao passo $t$ de tempo global do agente.
+
+O Algoritmo \ref{alg:non_stationary_action_value} apresenta a versão modificada do Algoritmo \ref{alg:efficient_action_value} para lidar com ambientes não-estacionários, utilizando a atualização exponencialmente ponderada da Equação \ref{eq:exponential_moving_average}.
+
+\begin{algorithm}[htbp]
+    \caption{Algoritmo $\epsilon$-Greedy para o problema $k$-armed bandit não-estacionário}
+    \label{alg:non_stationary_action_value}
+    \begin{algorithmic}[1]
+        \REQUIRE Número de ações $k$, valor de exploração $\epsilon$, taxa de aprendizado $\alpha$
+        \ENSURE Estimativas de valor $Q(a)$ para cada ação
+        \STATE \textbf{Inicializar}, para $a = 1$ até $k$:
+        \STATE \hspace{\algorithmicindent} $Q(a) \leftarrow 0$
+        \STATE
+        \STATE \textbf{Laço}:
+        \STATE \hspace{\algorithmicindent} $A \leftarrow \begin{cases}
+            \arg\max_a Q(a) & \text{com probabilidade } 1-\varepsilon\\
+            \text{uma ação aleatória} & \text{com probabilidade } \varepsilon
+        \end{cases}$
+        \STATE \hspace{\algorithmicindent} $R \leftarrow bandit(A)$
+        \STATE \hspace{\algorithmicindent} $Q(A) \leftarrow Q(A) + \alpha [R - Q(A)]$
+    \end{algorithmic}
+\end{algorithm}
+
+A Figura \ref{fig:non_stationary_comparison} ilustra o desempenho comparativo das três estratégias em um ambiente fortemente não-estacionário, onde as médias das recompensas dos braços evoluem continuamente através de um passeio aleatório (\textit{random walk}) aplicado a cada interação, além de mudanças bruscas de regime (\textit{regime shifts}) a cada 1000 interações. Observe que a estratégia com taxa de aprendizado constante ($\alpha=0.1$) demonstra superior capacidade de adaptação às mudanças, alcançando a maior recompensa acumulada final (aproximadamente 21\% superior ao Greedy).
+
+\begin{figure}[htbp]
+    \centering
+    \UECEfig{
+        \caption{Comparação de estratégias em ambiente não-estacionário: Greedy vs. $\epsilon$-Greedy com média amostral vs. $\epsilon$-Greedy com taxa constante ($\alpha=0.1$). A estratégia com taxa constante demonstra melhor adaptação às mudanças dinâmicas.}
+        \label{fig:non_stationary_comparison}
+    }{
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=0.85\textwidth, 
+                height=7cm,
+                xlabel={Interações ($t$)},
+                ylabel={Recompensa Acumulada},
+                grid=major,
+                legend pos=north west,
+                legend style={font=\footnotesize},
+                thick
+            ]
+                % Greedy
+                \addplot[black, dashed, thick] table [x=step, y=greedy_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
+                \addlegendentry{Greedy ($\varepsilon=0$)}
+                
+                % Epsilon-Greedy com sample average
+                \addplot[blue, thick] table [x=step, y=epsilon_sample_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
+                \addlegendentry{$\varepsilon$-Greedy (média amostral, $\varepsilon=0.1$)}
+                
+                % Constant Alpha
+                \addplot[red, thick] table [x=step, y=constant_alpha_reward, col sep=comma] {elementos-textuais/reinforcement-learning/non_stationary_comparison.csv};
+                \addlegendentry{$\varepsilon$-Greedy ($\alpha=0.1$ constante)}
+                
+            \end{axis}
+        \end{tikzpicture}
+    }{
+        \Fonte{Elaborado pelo autor.}
+    }
+\end{figure}
+
+O ambiente não-estacionário é implementado através de dois mecanismos complementares: (i) um \textit{random walk} gaussiano contínuo aplicado a cada interação ($\mu_t \leftarrow \mu_{t-1} + \mathcal{N}(0, 0.1^2)$ para cada braço), e (ii) \textit{regime shifts} periódicos a cada 1000 interações, aplicando perturbações mais bruscas ($\mu_t \leftarrow \mu_{t-1} + \mathcal{N}(0, 2.0^2)$). Os resultados apresentados correspondem à média de 50 execuções independentes com \textit{seeds} distintas (42--91), garantindo robustez estatística dos resultados observados.
+
+% Requer no preâmbulo:
+% \usepackage{tikz}
+% \usetikzlibrary{arrows.meta, positioning, calc}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  >={Stealth[length=2.2mm]},
+  node distance=35mm,
+  font=\small,
+  state/.style={circle, draw, thick, minimum size=14mm, inner sep=0pt},
+  action/.style={rectangle, draw, rounded corners=2mm, thick,
+                 minimum width=12mm, minimum height=7mm, inner sep=2pt},
+  lab/.style={font=\small, fill=white, inner sep=1pt}
+]
+
+% --- Estados ---
+\node[state] (A) {$\alpha$};
+\node[state, right=45mm of A] (B) {$\beta$};
+
+% --- Ações (colocadas diretamente abaixo dos estados para evitar cruzamento) ---
+\node[action, below=18mm of A, xshift=-10mm] (lam) {$\lambda$};
+\node[action, below=18mm of A, xshift=+10mm] (nu)  {$\nu$};
+\node[action, below=18mm of B] (mu) {$\mu$};
+
+% --- Ligações: estado -> ação (decisão) ---
+\draw[->, thick] (A) -- (lam);
+\draw[->, thick] (A) -- (nu);
+\draw[->, thick] (B) -- (mu);
+
+% =========================
+% Transições induzidas por λ
+% =========================
+
+% λ : alpha -> alpha (0.7, 0)  (loop via curva curta)
+\draw[->]
+  (lam.north west) to[bend left=15]
+  node[lab, left] {$0.7,\,0$}
+  (A.south west);
+
+% λ : alpha -> beta (0.3, -1)  (curva por cima, rótulo no meio)
+\draw[->]
+  (lam.north) to[bend left=18]
+  node[lab, above] {$0.3,\,-1$}
+  (B.west);
+
+% =========================
+% Transições induzidas por ν
+% =========================
+
+% ν : alpha -> alpha (1.0, 0) (loop via curva do outro lado)
+\draw[->]
+  (nu.north east) to[bend right=15]
+  node[lab, right] {$1.0,\,0$}
+  (A.south east);
+
+% =========================
+% Transições induzidas por μ
+% =========================
+
+% μ : beta -> beta (0.6, +2) (loop curto à direita)
+\draw[->]
+  (mu.north east) to[bend left=15]
+  node[lab, right] {$0.6,\,+2$}
+  (B.south east);
+
+% μ : beta -> alpha (0.4, +1) (curva por baixo, rótulo embaixo)
+\draw[->]
+  (mu.north) to[bend right=20]
+  node[lab, below] {$0.4,\,+1$}
+  (A.east);
+    
+\end{tikzpicture}
+\caption{MDP didático com dois estados ($\alpha$, $\beta$), ações explícitas ($\lambda$, $\nu$, $\mu$),
+probabilidades de transição e recompensas associadas.}
+\end{figure}
+
+
+
+% Na terminologia de RL, tarefas em que a melhor ação não depende de um estado variante (o ambiente possui um único estado) são denominadas \textbf{não-associativas}, como no caso clássico dos k-bandidos. Em contraste, em tarefas \textbf{associativas}, a ação ótima depende do estado atual do ambiente. Por exemplo, no Xadrez, a melhor jogada é condicionada pela configuração momentânea das peças no tabuleiro.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

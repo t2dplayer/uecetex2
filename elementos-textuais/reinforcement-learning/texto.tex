@@ -1,8 +1,8 @@
 \section*{Fundamentos}
 
-O \gls{RL} é um paradigma de \gls{ML} onde o treinamento dos modelos se dá com a interação direta com o ambiente através de ações e a observação da recompensa ou penalização por tal ato \cite{sutton2018}. Nela, o agente (aquele que procura aprender as relações intrínsecas do problema que se busca resolver) não tem acesso a nenhum supervisor que indique qual a melhor ação a ser tomada, e nem mesmo a um conjunto de dados de partida rotulados para que ele possa analisar e buscar reconhecer padrões \cite{hu2024, sutton2018}.
+O \gls{RL} é um paradigma de \gls{ML} onde o treinamento dos modelos se dá com a interação direta com o ambiente através de ações e a observação da recompensa ou penalização por tal ato~\cite{sutton2018}. Nela, o agente (aquele que procura aprender as relações intrínsecas do problema que se busca resolver) não tem acesso a nenhum supervisor que indique qual a melhor ação a ser tomada, e nem mesmo a um conjunto de dados de partida rotulados para que ele possa analisar e buscar reconhecer padrões~\cite{hu2024, sutton2018}.
 
-De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um ciclo de interação contínua entre o agente e o ambiente, dinâmica que pode ser observada na Figura \ref{fig:rl_loop} \cite{hu2024, sutton2018}. Embora esse mecanismo iterativo de tentativa e erro seja conceitualmente simples, ele serve de base para o desenvolvimento de modelos de \gls{IA} capazes de resolver problemas complexos de tomada de decisão em áreas desafiadoras, como robótica, condução autônoma e jogos de alto desempenho \cite{hu2024}. Além disso, essa mesma interação tem sido fundamental para auxiliar no treinamento e alinhamento de \glspl{LLM}, empregando algoritmos de otimização de políticas aliados ao \gls{RLHF} para refinar e instruir sistemas avançados, a exemplo do InstructGPT e do ChatGPT \cite{ouyang2022, hu2024}.
+De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um ciclo de interação contínua entre o agente e o ambiente, dinâmica que pode ser observada na Figura \ref{fig:rl_loop}~\cite{hu2024, sutton2018}. Embora esse mecanismo iterativo de tentativa e erro seja conceitualmente simples, ele serve de base para o desenvolvimento de modelos de \gls{IA} capazes de resolver problemas complexos de tomada de decisão em áreas desafiadoras, como robótica, condução autônoma e jogos de alto desempenho~\cite{hu2024}. Além disso, essa mesma interação tem sido fundamental para auxiliar no treinamento e alinhamento de \glspl{LLM}, empregando algoritmos de otimização de políticas aliados ao \gls{RLHF} para refinar e instruir sistemas avançados, a exemplo do InstructGPT e do ChatGPT~\cite{ouyang2022, hu2024}.
 
 \begin{figure}[ht!]
 \centering
@@ -33,14 +33,14 @@ De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um c
 \end{tikzpicture}
 \caption{Ciclo básico de interação Agente-Ambiente no \gls{RL}. A cada passo, o agente observa o estado atual, escolhe uma ação, e o ambiente responde com uma recompensa e um novo estado.}
 \label{fig:rl_loop}
-\Fonte{Elaborado pelo autor com base em \cite{hu2024, sutton2018}.}
+\Fonte{Elaborado pelo autor com base em~\cite{hu2024, sutton2018}.}
 \end{figure}
 
 \section*{Processos de Decisão de Markov (\gls{MDP}) e seus Componentes}
 
-Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente \cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição \cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$ \cite{hu2024}. 
+Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente~\cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição~\cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$~\cite{hu2024}. 
 
-O parâmetro $\gamma \in [0, 1]$ atua como um fator de desconto, controlando o peso que o agente dará às recompensas futuras em comparação às imediatas \cite{sutton2018}. Além disso, o agente pode seguir uma estratégia para mapear estados e tomar suas ações, mecanismo este conhecido como política ($\pi$) \cite{hu2024}. A dinâmica desse sistema atende rigorosamente à Propriedade de Markov, a qual postula que o futuro independe do passado dado o estado e a ação presentes \cite{sutton2018}. Por fim, em cenários onde o agente não observa o estado real, mas recebe apenas uma observação corrompida ou baseada em probabilidades, o modelo é generalizado para os \glspl{POMDP} \cite{sutton2018, hu2024}.
+O parâmetro $\gamma \in [0, 1]$ atua como um fator de desconto, controlando o peso que o agente dará às recompensas futuras em comparação às imediatas~\cite{sutton2018}. Além disso, o agente pode seguir uma estratégia para mapear estados e tomar suas ações, mecanismo este conhecido como política ($\pi$)~\cite{hu2024}. A dinâmica desse sistema atende rigorosamente à Propriedade de Markov, a qual postula que o futuro independe do passado dado o estado e a ação presentes~\cite{sutton2018}. Por fim, em cenários onde o agente não observa o estado real, mas recebe apenas uma observação corrompida ou baseada em probabilidades, o modelo é generalizado para os \glspl{POMDP}~\cite{sutton2018, hu2024}.
 
 \begin{figure}[ht!]
 \centering
@@ -114,34 +114,34 @@ O parâmetro $\gamma \in [0, 1]$ atua como um fator de desconto, controlando o p
 
 \end{tikzpicture}
 \caption{Sequência de interação em um \gls{MDP}.}
-\Fonte{Elaborado pelo autor com base em \cite{sutton2018}.}
+\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.}
 \end{figure}
 
 \section*{Retorno Esperado, Fator de Desconto e Horizontes}
 
-O \gls{MDP} é capaz de modelar problemas que possuem um final natural bem definido, conhecidos na literatura como tarefas episódicas (Horizonte Finito), como uma partida de xadrez, ou problemas em que o agente continua interagindo com o ambiente perpetuamente, chamados de tarefas contínuas (Horizonte Infinito) \cite{sutton2018, hu2024}. Em tarefas episódicas, que finalizam em um passo de tempo terminal $T$, o agente busca maximizar o retorno cumulativo simples, dado pela soma $G_t = R_{t+1} + R_{t+2} + \dots + R_T$ \cite{sutton2018}. 
+O \gls{MDP} é capaz de modelar problemas que possuem um final natural bem definido, conhecidos na literatura como tarefas episódicas (Horizonte Finito), como uma partida de xadrez, ou problemas em que o agente continua interagindo com o ambiente perpetuamente, chamados de tarefas contínuas (Horizonte Infinito)~\cite{sutton2018, hu2024}. Em tarefas episódicas, que finalizam em um passo de tempo terminal $T$, o agente busca maximizar o retorno cumulativo simples, dado pela soma $G_t = R_{t+1} + R_{t+2} + \dots + R_T$~\cite{sutton2018}. 
 
-No entanto, para tarefas contínuas (Horizonte Infinito), a simples soma das recompensas ao longo do tempo poderia divergir e tender ao infinito \cite{hu2024, sutton2018}. Para solucionar esse problema, aplica-se o Fator de Desconto $\gamma \in [0,1)$ \cite{sutton2018, zhao2024}. O Retorno Descontado $G_t$, iniciado no passo $t$, é calculado como a soma infinita das recompensas futuras, onde cada recompensa é penalizada exponencialmente pelo quão distante no futuro ela for recebida \cite{sutton2018}:
+No entanto, para tarefas contínuas (Horizonte Infinito), a simples soma das recompensas ao longo do tempo poderia divergir e tender ao infinito~\cite{hu2024, sutton2018}. Para solucionar esse problema, aplica-se o Fator de Desconto $\gamma \in [0,1)$~\cite{sutton2018, zhao2024}. O Retorno Descontado $G_t$, iniciado no passo $t$, é calculado como a soma infinita das recompensas futuras, onde cada recompensa é penalizada exponencialmente pelo quão distante no futuro ela for recebida~\cite{sutton2018}:
 
 \begin{equation}
     G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
     \label{eq:retorno_descontado_infinito}
 \end{equation}
 
-Para garantir matematicamente que o valor desse retorno descontado seja finito, utiliza-se a convergência das séries geométricas \cite{sutton2018, zhao2024}. Caso a recompensa máxima possível do ambiente seja um valor constante $R$ não nulo (por exemplo, se o agente receber $+1$ a cada passo), a soma infinita converge limitando o retorno a $G_t = \sum_{k=0}^{\infty} \gamma^k R = \frac{R}{1-\gamma}$ \cite{sutton2018, zhao2024}. 
+Para garantir matematicamente que o valor desse retorno descontado seja finito, utiliza-se a convergência das séries geométricas~\cite{sutton2018, zhao2024}. Caso a recompensa máxima possível do ambiente seja um valor constante $R$ não nulo (por exemplo, se o agente receber $+1$ a cada passo), a soma infinita converge limitando o retorno a $G_t = \sum_{k=0}^{\infty} \gamma^k R = \frac{R}{1-\gamma}$~\cite{sutton2018, zhao2024}. 
 
-Além disso, uma propriedade algébrica fundamental do retorno em \gls{RL} é que a Equação \ref{eq:retorno_descontado_infinito} pode ser reescrita de forma exata como uma relação recursiva \cite{hu2024, sutton2018}. Ela separa a recompensa imediatamente recebida do retorno descontado do próximo passo de tempo \cite{sutton2018, hu2024}.
+Além disso, uma propriedade algébrica fundamental do retorno em \gls{RL} é que a Equação \ref{eq:retorno_descontado_infinito} pode ser reescrita de forma exata como uma relação recursiva~\cite{hu2024, sutton2018}. Ela separa a recompensa imediatamente recebida do retorno descontado do próximo passo de tempo~\cite{sutton2018, hu2024}.
 
 \begin{equation}
     G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots = R_{t+1} + \gamma G_{t+1}
     \label{eq:retorno_recursivo}
 \end{equation}
 
-Esta decomposição recursiva forma a base matemática que torna possíveis as Equações de Bellman e a atualização iterativa das estimativas das funções de valor nos algoritmos de aprendizado \cite{hu2024, sutton2018}. Em última análise, o objetivo central do agente é maximizar o retorno esperado $\mathbb{E}[G_t]$, ponderando tanto a dinâmica estocástica do ambiente quanto as ações definidas pela sua política, que pode ser determinística ($a = \pi(s)$) ou estocástica ($\pi(a|s) = P(A_t = a | S_t = s)$) \cite{sutton2018, hu2024}.
+Esta decomposição recursiva forma a base matemática que torna possíveis as Equações de Bellman e a atualização iterativa das estimativas das funções de valor nos algoritmos de aprendizado~\cite{hu2024, sutton2018}. Em última análise, o objetivo central do agente é maximizar o retorno esperado $\mathbb{E}[G_t]$, ponderando tanto a dinâmica estocástica do ambiente quanto as ações definidas pela sua política, que pode ser determinística ($a = \pi(s)$) ou estocástica ($\pi(a|s) = P(A_t = a | S_t = s)$)~\cite{sutton2018, hu2024}.
 
 \section*{Funções de Valor e Equações de Bellman}
 
-Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao seguir uma determinada política por meio da estimativa do retorno esperado a longo prazo \cite{sutton2018}. Para quantificar formalmente esse desempenho, a literatura estabelece duas abordagens principais: estimar o valor de estar no estado atual ($s$), ou estimar o valor de selecionar uma ação específica ($a$) a partir desse estado ($s$) \cite{hu2024, sutton2018}. A primeira estimativa é calculada utilizando a Função de Valor de Estado ($V^\pi$), enquanto a segunda é obtida por meio da Função de Valor de Ação ($Q^\pi$) \cite{hu2024, sutton2018}. Ambas as funções fundamentam-se em uma propriedade de consistência recursiva, expressas matematicamente pelas Equações de Expectativa de Bellman \cite{sutton2018}:
+Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao seguir uma determinada política por meio da estimativa do retorno esperado a longo prazo~\cite{sutton2018}. Para quantificar formalmente esse desempenho, a literatura estabelece duas abordagens principais: estimar o valor de estar no estado atual ($s$), ou estimar o valor de selecionar uma ação específica ($a$) a partir desse estado ($s$)~\cite{hu2024, sutton2018}. A primeira estimativa é calculada utilizando a Função de Valor de Estado ($V^\pi$), enquanto a segunda é obtida por meio da Função de Valor de Ação ($Q^\pi$)~\cite{hu2024, sutton2018}. Ambas as funções fundamentam-se em uma propriedade de consistência recursiva, expressas matematicamente pelas Equações de Expectativa de Bellman~\cite{sutton2018}:
 
 \begin{align}
     V^\pi(s) &= \sum_{a} \pi(a|s) \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^\pi(s') \right] \\
@@ -153,7 +153,7 @@ Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao 
 %     Q^*(s,a) = \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right]
 % \end{equation}
 
-Também é possível definir a Função de Vantagem (\textit{Advantage}), que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado \cite{wang2016dueling}:
+Também é possível definir a Função de Vantagem (\textit{Advantage}), que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado~\cite{wang2016dueling}:
 \begin{equation}
     A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)
 \end{equation}
@@ -161,42 +161,42 @@ Também é possível definir a Função de Vantagem (\textit{Advantage}), que me
 \section*{Métodos de Aprendizado e Diferença Temporal}
 
 % O \gls{RL} requer balanço com o \textbf{Dilema Exploração-Explotação}. 
-De forma geral, durante o ciclo de interação, o agente enfrenta o \textbf{Dilema Exploração-Explotação} (\textit{Exploration-Exploitation Dilemma}), precisando decidir continuamente entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa \cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é fundamental para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões \cite{hu2024}.
+De forma geral, durante o ciclo de interação, o agente enfrenta o \textbf{Dilema Exploração-Explotação} (\textit{Exploration-Exploitation Dilemma}), precisando decidir continuamente entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa~\cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é fundamental para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões~\cite{hu2024}.
 
-Quanto ao conhecimento prévio sobre as dinâmicas do ambiente (as regras de transição e recompensa), a literatura divide os métodos em duas categorias principais \cite{sutton2018, moerland2023}. Em abordagens \textit{Model-Based} (Baseadas em Modelo), o agente possui ou aprende um modelo matemático do ambiente, permitindo o uso de técnicas de planejamento como a Programação Dinâmica para simular trajetórias e antecipar ações \cite{sutton2018, hu2024}. Por outro lado, nas abordagens \textit{Model-Free} (Livres de Modelo), o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente \cite{hu2024, sutton2018}.
+Quanto ao conhecimento prévio sobre as dinâmicas do ambiente (as regras de transição e recompensa), a literatura divide os métodos em duas categorias principais~\cite{sutton2018, moerland2023}. Em abordagens \textit{Model-Based} (Baseadas em Modelo), o agente possui ou aprende um modelo matemático do ambiente, permitindo o uso de técnicas de planejamento como a Programação Dinâmica para simular trajetórias e antecipar ações~\cite{sutton2018, hu2024}. Por outro lado, nas abordagens \textit{Model-Free} (Livres de Modelo), o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente~\cite{hu2024, sutton2018}.
 
-Para resolver problemas \textit{Model-Free}, destacam-se duas estratégias: os \textit{Métodos de Monte Carlo}, que atualizam as estimativas de valor apenas ao final de um episódio, utilizando o retorno total e real acumulado \cite{sutton2018, hu2024} e através da \textit{Aprendizagem por Diferença Temporal (TD Learning)}, que atualiza suas estimativas a cada passo, utilizando o retrocesso (\textit{bootstrapping}) embasado na estimativa de valor do próximo estado e na recompensa imediata \cite{sutton2018}. 
+Para resolver problemas \textit{Model-Free}, destacam-se duas estratégias: os \textit{Métodos de Monte Carlo}, que atualizam as estimativas de valor apenas ao final de um episódio, utilizando o retorno total e real acumulado~\cite{sutton2018, hu2024} e através da \textit{Aprendizagem por Diferença Temporal (TD Learning)}, que atualiza suas estimativas a cada passo, utilizando o retrocesso (\textit{bootstrapping}) embasado na estimativa de valor do próximo estado e na recompensa imediata~\cite{sutton2018}. 
 
-% A unificação formal entre essas suas técnicas se dá por meio dos \textit{Traços de Elegibilidade (TD($\lambda$))}, onde a taxa de decaimento $\lambda$ atua como uma ponte contínua entre o passo único e o episódio completo \cite{sutton2018, zhao2024}.
+% A unificação formal entre essas suas técnicas se dá por meio dos \textit{Traços de Elegibilidade (TD($\lambda$))}, onde a taxa de decaimento $\lambda$ atua como uma ponte contínua entre o passo único e o episódio completo~\cite{sutton2018, zhao2024}.
 
-% Dentro do TD Learning voltado para controle, existem dois algoritmos clássicos \cite{sutton2018} [20, 21]. O \textbf{SARSA} realiza um aprendizado \textbf{On-policy}, onde o agente estima o valor e otimiza a exata mesma política exploratória que utiliza para interagir com o ambiente \cite{hu2024, sutton2018} [22-24]:
+% Dentro do TD Learning voltado para controle, existem dois algoritmos clássicos~\cite{sutton2018} [20, 21]. O \textbf{SARSA} realiza um aprendizado \textbf{On-policy}, onde o agente estima o valor e otimiza a exata mesma política exploratória que utiliza para interagir com o ambiente~\cite{hu2024, sutton2018} [22-24]:
 % \begin{equation}
 %     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
 % \end{equation}
-% E o clássico \textbf{Q-Learning} \cite{watkins1992}, que opera de forma \textbf{Off-policy}, aproximando a função de valor da política ótima independentemente da política comportamental utilizada para explorar o ambiente \cite{sutton2018, hu2024} [21, 25, 26]:
+% E o clássico \textbf{Q-Learning}~\cite{watkins1992}, que opera de forma \textbf{Off-policy}, aproximando a função de valor da política ótima independentemente da política comportamental utilizada para explorar o ambiente~\cite{sutton2018, hu2024} [21, 25, 26]:
 % \begin{equation}
 %     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
 % \end{equation}
-% Por fim, para evitar o viés de superestimação matemática causado pela operação do máximo no Q-Learning clássico, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção da melhor ação da avaliação do seu valor real, usando duas tabelas ou funções independentes \cite{hasselt2010double, hu2024} [27-30].
+% Por fim, para evitar o viés de superestimação matemática causado pela operação do máximo no Q-Learning clássico, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção da melhor ação da avaliação do seu valor real, usando duas tabelas ou funções independentes~\cite{hasselt2010double, hu2024} [27-30].
 
 \section*{Aprendizagem por Reforço Profundo (\gls{DRL})}
 
-A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (\gls{DQN})} \cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
+A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (\gls{DQN})}~\cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
 \begin{equation}
     L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right]
 \end{equation}
 
-Evoluções incluem a \textbf{Repetição de Experiência Priorizada (PER)}, que amostra transições com base na magnitude do erro TD em vez de uniforme \cite{schaul2016per}, a já citada \textbf{Double DQN}, e a \textbf{Dueling DQN} que ramifica a rede neural final estimando separadamente valor ($V$) e vantagem ($A$) \cite{wang2016dueling}.
+Evoluções incluem a \textbf{Repetição de Experiência Priorizada (PER)}, que amostra transições com base na magnitude do erro TD em vez de uniforme~\cite{schaul2016per}, a já citada \textbf{Double DQN}, e a \textbf{Dueling DQN} que ramifica a rede neural final estimando separadamente valor ($V$) e vantagem ($A$)~\cite{wang2016dueling}.
 
 \subsection{Policy Gradients e REINFORCE}
-Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair política; otimizamos diretamente uma política parametrizada $\pi_\theta$. O \textbf{Teorema do Gradiente de Política} embasa essas atualizações estocásticas. Utiliza-se o \textbf{Truque da Razão de Verossimilhança} $\nabla_\theta P = P \nabla_\theta \log P$ para derivar a expectativa \cite{sutton2018}:
+Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair política; otimizamos diretamente uma política parametrizada $\pi_\theta$. O \textbf{Teorema do Gradiente de Política} embasa essas atualizações estocásticas. Utiliza-se o \textbf{Truque da Razão de Verossimilhança} $\nabla_\theta P = P \nabla_\theta \log P$ para derivar a expectativa~\cite{sutton2018}:
 \begin{equation}
     \nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \nabla_\theta \log \pi_\theta(A_t|S_t) Q^\pi(S_t, A_t) \right]
 \end{equation}
-A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$ \cite{williams1992}.
+A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$~\cite{williams1992}.
 
 \subsection{Actor-Critic, \gls{PPO}, TRPO e \gls{SAC}}
-Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico} \cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como \textit{baseline} para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
+Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico}~\cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como \textit{baseline} para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
 
 \begin{figure}[ht!]
 \centering
@@ -217,19 +217,19 @@ Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquite
     \draw[arrow, dashed, red] (critic.90) -- node[left] {Erro TD ($\delta$)} (actor.270);
 \end{tikzpicture}
 \caption{Dinâmica Ator-Crítico.}
-\Fonte{Elaborado pelo autor com base em \cite{sutton2018}.}
+\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.}
 \end{figure}
 
 Para mitigar o colapso por passos muito largos nas atualizações de gradiente contínuo:
 \begin{itemize}
-    \item \textbf{TRPO:} Impõe uma restrição (Trust Region) usando Divergência KL para travar passos agressivos \cite{schulman2015trpo}.
-    \item \textbf{PPO:} Muito mais simples que TRPO, ele "corta" (clip) a função objetivo de modo a desincentivar uma política nova de se afastar demais da antiga \cite{schulman2017ppo}:
+    \item \textbf{TRPO:} Impõe uma restrição (Trust Region) usando Divergência KL para travar passos agressivos~\cite{schulman2015trpo}.
+    \item \textbf{PPO:} Muito mais simples que TRPO, ele "corta" (clip) a função objetivo de modo a desincentivar uma política nova de se afastar demais da antiga~\cite{schulman2017ppo}:
     \begin{equation}
         L^{CLIP}(\theta) = \mathbb{E}\left[ \min(r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t) \right]
     \end{equation}
     onde $r_t(\theta) = \frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$.
-    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do \gls{DQN} \cite{sutton2018}.
-    \item \textbf{SAC:} Abordagem focada em regularização de entropia; o agente tenta escalar recompensas ao máximo mas preservando a máxima entropia (agindo aleatoriamente onde possível) \cite{haarnoja2018sac}.
+    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do \gls{DQN}~\cite{sutton2018}.
+    \item \textbf{SAC:} Abordagem focada em regularização de entropia; o agente tenta escalar recompensas ao máximo mas preservando a máxima entropia (agindo aleatoriamente onde possível)~\cite{haarnoja2018sac}.
 \end{itemize}
 
 \subsection{Avanços e Extensões}
