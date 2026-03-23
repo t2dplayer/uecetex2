@@ -806,3 +806,88 @@ A superioridade do SAC-TOPSIS não decorre de nenhum componente isolado, mas da 
 \end{enumerate}
 
 Em contraste, o PPO-TOPSIS sofre das três falhas simétricas: aprende uma pergunta que o TOPSIS já responde (redundância), colapsa para uma estratégia degenerada com entropia insuficiente para resistir ao sinal TOPSIS (colapso), e sobreajusta ao único cenário de treino sem o mecanismo de reciclagem do replay buffer (ineficiência amostral). O experimento controlado confirma inequivocamente este diagnóstico: ao trocar \emph{apenas} o algoritmo --- mantendo estado 6D, ação binária e recompensa idênticos --- o SAC-TOPSIS atinge $45{,}3\%$ enquanto o PPO-TOPSIS obtém $18{,}4\%$, um déficit de $26{,}9$ pontos percentuais atribuível exclusivamente à natureza on-policy do \gls{PPO} e à sua baixa temperatura entrópica. O TOPSIS, portanto, não é neutro quando mal integrado: \emph{amplifica} as fraquezas do algoritmo hospedeiro.
+
+% ──────────────────────────────────────────────────────────────────────────────
+\section{Avaliação Comparativa de Políticas}
+\label{sec:ranking-completo}
+
+As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são: taxa de deadline (\%), SWQ ($= \hat{\tau}\cdot\overline{(D_j - \text{JCT}_j)/D_j}_{\text{sucesso}}$), JCT médio em segundos, energia média por tarefa em joules e o objetivo $J(\pi) = 0{,}60\cdot\hat{\tau} - 0{,}40\cdot\overline{(0{,}35\,\text{JCT} + 0{,}35\,E)/(D + 0{,}35\,E_{\max})}$ com $E_{\max} = 432{,}6\,\text{J}$ (percentil 99 global).
+
+\begin{landscape}
+\begin{table}[htbp]
+\centering
+\caption{Ranking completo das 25 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa TOPSIS.}
+\label{tab:ranking-completo}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{clrrrrrrrrr}
+\toprule
+\textbf{\#} & \textbf{Política} & \textbf{Cn} & \textbf{Taxa\%} & \textbf{SWQ} & \textbf{JCT (s)} & \textbf{E (J)} & \textbf{J($\pi$)} & \textbf{\%Loc} & \textbf{\%V2V} & \textbf{Categoria} \\
+\midrule
+ 1 & \textbf{sac-topsis} $\star$       & 658 & \textbf{45,21} & \textbf{0,1484} &  6,547 & 25,828 & \textbf{0,2454} & 74,1 & 25,9 & RL+TOPSIS \\
+ 2 & ppo-topsis $\star$                & 658 & 42,66 & 0,1426 &  5,895 & 21,333 & 0,2344 & 98,7 &  1,3 & RL+TOPSIS \\
+ 3 & ppo-base                    & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & RL-Base \\
+ 4 & ppo-topsis-compact $\star$        & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & RL+TOPSIS \\
+ 5 & td3-base                    & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & RL-Base \\
+ 6 & a2c-topsis $\star$                & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & RL+TOPSIS \\
+ 7 & td3-topsis $\star$                & 658 & 43,91 & 0,1388 &  \textbf{3,703} & 22,995 & 0,2424 & 76,5 & 23,5 & RL+TOPSIS \\
+ 8 & sac-topsis-9d $\star$             & 658 & 42,82 & 0,1386 &  5,886 & \textbf{20,985} & 0,2348 & 94,7 &  5,3 & RL+TOPSIS \\
+ 9 & sac-topsis-manhattan $\star$      & 658 & 41,66 & 0,1385 & 11,831 & 23,656 & 0,2211 & 51,1 & 48,9 & RL+TOPSIS \\
+10 & sac-t1 $\star$                    & 658 & 32,96 & 0,1270 & 11,487 & 26,126 & 0,1658 & 22,6 & 77,4 & RL+TOPSIS \\
+11 & greedy-unfair               & 658 & 41,29 & 0,1262 &  5,613 &  7,396 & 0,2370 & 67,3 & 32,7 & Heurística \\
+12 & sac-a1                      & 658 & 39,11 & 0,1256 & 13,722 & 21,118 & 0,2064 & 82,9 & 17,1 & RL-Base \\
+13 & sac-r1                      & 658 & 38,26 & 0,1223 & 13,353 & 31,425 & 0,1914 & 58,8 & 41,2 & RL-Base \\
+14 & sac-s1                      & 658 & 28,69 & 0,1122 & 39,298 & 20,305 & 0,1210 & 38,2 & 61,8 & RL-Base \\
+15 & gini                        & 658 & 35,24 & 0,1057 &  3,456 & 39,395 & 0,1790 & 61,7 & 38,3 & Heurística \\
+16 & dqn-topsis $\star$                & 658 & 25,90 & 0,0997 & 21,722 & 23,979 & 0,1161 & 20,0 & 80,0 & RL+TOPSIS \\
+17 & jain                        & 658 & 32,54 & 0,0973 &  3,628 & 39,280 & 0,1627 & 58,6 & 41,4 & Heurística \\
+18 & random                      & 658 & 30,02 & 0,0950 & 17,853 & 27,330 & 0,1427 & 40,7 & 59,3 & Heurística \\
+19 & roundrobin                  & 658 & 28,50 & 0,0905 & 17,900 & 31,080 & 0,1315 & 34,9 & 65,1 & Heurística \\
+20 & greedy                      & 658 & 29,03 & 0,0823 & 29,265 &  6,168 & 0,1429 & 42,5 & 57,5 & Heurística \\
+21 & a2c-base                    & 658 & 21,74 & 0,0772 & 13,653 & 48,862 & 0,0785 & 20,3 & 79,7 & RL-Base \\
+22 & dqn-base                    & 658 & 22,10 & 0,0686 & 13,599 & 44,445 & 0,0839 & 21,5 & 78,5 & RL-Base \\
+23 & greedy-fair                 & 658 & 20,61 & 0,0528 & 40,754 &  \textbf{5,634} & 0,0823 & 27,9 & 72,1 & Heurística \\
+24 & sac-base                    & 658 &  4,52 & 0,0119 & 57,075 & 24,230 & $-$0,042 &  5,1 & 94,9 & RL-Base \\
+25 & rsu                         & 658 &  1,86 & 0,0030 & 144,191 & 4,843 & $-$0,123 &  1,2 & 98,8 & Heurística \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+\end{landscape}
+
+A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmos, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
+
+\begin{table}[htbp]
+\centering
+\caption{Ganho do TOPSIS por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
+\label{tab:ganho-topsis}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrr}
+\toprule
+\multirow{2}{*}{\textbf{Algoritmo}} & \multirow{2}{*}{\textbf{Versão}} & \multicolumn{2}{c}{\textbf{Taxa\%}} & \multicolumn{2}{c}{\textbf{SWQ}} & \multicolumn{2}{c}{\textbf{J($\pi$)}} & \multirow{2}{*}{\textbf{Destaques}} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+ & & Base & TOPSIS & Base & TOPSIS & Base & TOPSIS & \\
+\midrule
+\multirow{2}{*}{SAC}
+ & base   & 4,52  & ---    & 0,0119 & ---    & $-$0,042 & --- & colapso total (94,9\% V2V) \\
+ & topsis & ---   & \textbf{45,21} & ---    & \textbf{0,1484} & --- & \textbf{0,2454} & \textbf{$+$40,7 pp / $+$1147\% SWQ} \\
+\midrule
+\multirow{2}{*}{PPO}
+ & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
+ & topsis & ---   & 42,66  & ---    & 0,1426 & --- & 0,2344 & $+$0,3 pp / $+$0,6\% SWQ \\
+\midrule
+\multirow{2}{*}{TD3}
+ & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
+ & topsis & ---   & 43,91  & ---    & 0,1388 & --- & 0,2424 & $+$1,6 pp taxa; JCT $-44{,}5\%$ \\
+\midrule
+\multirow{2}{*}{DQN}
+ & base   & 22,10 & ---    & 0,0686 & ---    & 0,0839 & --- & 78,5\% V2V sem critério \\
+ & topsis & ---   & 25,90  & ---    & 0,0997 & --- & 0,1161 & $+$3,8 pp / $+$45\% SWQ \\
+\midrule
+\multirow{2}{*}{A2C}
+ & base   & 21,74 & ---    & 0,0772 & ---    & 0,0785 & --- & 79,7\% V2V, energia alta \\
+ & topsis & ---   & 42,32  & ---    & 0,1418 & --- & 0,2295 & \textbf{$+$20,6 pp / $+$84\% SWQ} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
