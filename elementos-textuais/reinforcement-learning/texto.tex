@@ -36,7 +36,7 @@ De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um c
 \Fonte{Elaborado pelo autor com base em \cite{hu2024, sutton2018}.}
 \end{figure}
 
-\section*{Processos de Decisão de Markov (MDP) e seus Componentes}
+\section*{Processos de Decisão de Markov (\gls{MDP}) e seus Componentes}
 
 Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente \cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição \cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$ \cite{hu2024}. 
 
@@ -160,7 +160,7 @@ Também é possível definir a Função de Vantagem (\textit{Advantage}), que me
 
 \section*{Métodos de Aprendizado e Diferença Temporal}
 
-% O RL requer balanço com o \textbf{Dilema Exploração-Explotação}. 
+% O \gls{RL} requer balanço com o \textbf{Dilema Exploração-Explotação}. 
 De forma geral, durante o ciclo de interação, o agente enfrenta o \textbf{Dilema Exploração-Explotação} (\textit{Exploration-Exploitation Dilemma}), precisando decidir continuamente entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa \cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é fundamental para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões \cite{hu2024}.
 
 Quanto ao conhecimento prévio sobre as dinâmicas do ambiente (as regras de transição e recompensa), a literatura divide os métodos em duas categorias principais \cite{sutton2018, moerland2023}. Em abordagens \textit{Model-Based} (Baseadas em Modelo), o agente possui ou aprende um modelo matemático do ambiente, permitindo o uso de técnicas de planejamento como a Programação Dinâmica para simular trajetórias e antecipar ações \cite{sutton2018, hu2024}. Por outro lado, nas abordagens \textit{Model-Free} (Livres de Modelo), o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente \cite{hu2024, sutton2018}.
@@ -179,9 +179,9 @@ Para resolver problemas \textit{Model-Free}, destacam-se duas estratégias: os \
 % \end{equation}
 % Por fim, para evitar o viés de superestimação matemática causado pela operação do máximo no Q-Learning clássico, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção da melhor ação da avaliação do seu valor real, usando duas tabelas ou funções independentes \cite{hasselt2010double, hu2024} [27-30].
 
-\section*{Aprendizagem por Reforço Profundo (DRL)}
+\section*{Aprendizagem por Reforço Profundo (\gls{DRL})}
 
-A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (DQN)} \cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
+A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (\gls{DQN})} \cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
 \begin{equation}
     L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right]
 \end{equation}
@@ -195,8 +195,8 @@ Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair polí
 \end{equation}
 A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$ \cite{williams1992}.
 
-\subsection{Actor-Critic, PPO, TRPO e SAC}
-Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico} \cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como baseline para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
+\subsection{Actor-Critic, \gls{PPO}, TRPO e SAC}
+Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico} \cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como \textit{baseline} para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
 
 \begin{figure}[ht!]
 \centering
@@ -228,9 +228,9 @@ Para mitigar o colapso por passos muito largos nas atualizações de gradiente c
         L^{CLIP}(\theta) = \mathbb{E}\left[ \min(r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t) \right]
     \end{equation}
     onde $r_t(\theta) = \frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$.
-    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do DQN \cite{sutton2018}.
+    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do \gls{DQN} \cite{sutton2018}.
     \item \textbf{SAC:} Abordagem focada em regularização de entropia; o agente tenta escalar recompensas ao máximo mas preservando a máxima entropia (agindo aleatoriamente onde possível) \cite{haarnoja2018sac}.
 \end{itemize}
 
 \subsection{Avanços e Extensões}
-Dentre outras áreas sofisticadas constam o \textbf{Aprendizado por Reforço Multi-Agente (MARL)}, onde agentes interagem no mesmo ambiente. O \textbf{Independent Q-Learning} treina agentes individuais tratando os outros como parte estacionária do ambiente, o que na prática gera um POMDP instável. O \textbf{Curriculum Learning} ataca a \textbf{Lida com Recompensas Esparsas} submetendo o agente a tarefas crescentemente difíceis. \textbf{Aprendizado por Reforço Inverso (IRL)} decodifica a função de recompensa baseando-se num especialista humano, enquanto o \textbf{Aprendizado por Reforço Offline} procura aprender comportamentos unicamente consumindo um dataset preexistente gigante, sem tocar ou explorar ativamente o simulador ao vivo.
+Dentre outras áreas sofisticadas constam o \textbf{Aprendizado por Reforço Multi-Agente (MARL)}, onde agentes interagem no mesmo ambiente. O \textbf{Independent Q-Learning} treina agentes individuais tratando os outros como parte estacionária do ambiente, o que na prática gera um \gls{POMDP} instável. O \textbf{Curriculum Learning} ataca a \textbf{Lida com Recompensas Esparsas} submetendo o agente a tarefas crescentemente difíceis. \textbf{Aprendizado por Reforço Inverso (IRL)} decodifica a função de recompensa baseando-se num especialista humano, enquanto o \textbf{Aprendizado por Reforço Offline} procura aprender comportamentos unicamente consumindo um dataset preexistente gigante, sem tocar ou explorar ativamente o simulador ao vivo.

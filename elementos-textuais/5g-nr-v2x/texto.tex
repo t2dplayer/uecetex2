@@ -1,6 +1,6 @@
 % \input{elementos-textuais/5g-nr-v2x/stallings-5g}
 
-\section{Arquitetura e Modelagem 5G V2I e C-V2X}
+\section{Arquitetura e Modelagem 5G \gls{V2I} e C-V2X}
 \label{sec:comunicacao-5g-e-sidelink}
 
 Nesta seção, analisam-se as arquiteturas \gls{5G} \gls{NR} e \gls{5G} \gls{NR} \gls{V2X}, fundamentadas nas especificações do Release 16 do \gls{3GPP}~\cite{3gpp38901}. 
@@ -84,7 +84,7 @@ Nas especificações do \gls{3GPP} foram definidas nomenclaturas, ou pontos de r
     \item \textbf{N6:} Interface que conecta a \gls{UPF} diretamente às \gls{DN} externas, como a Internet pública ou intranets de clientes. 
 \end{itemize}
 
-A arquitetura do \gls{5GC}, por conta de sua modularidade, viabiliza o conceito de \gls{NS}. Tal conceito possibilita a criação de redes virtuais independentes, isoladas e que operam em paralelo sobre uma infraestrutura física compartilhada \cite{stallings2021}. Graças à abstração de hardware permitida pelas tecnologias de \gls{SDN} e \gls{NFV}, cada rede virtual individual (\textit{slice}) adquire um conjunto dedicado de recursos físicos e funções de rede \cite{stallings2021}. Dessa forma, cada \textit{slice} (Figura~\ref{fig:slicing_short}) pode ser parametrizado em termos de latência, largura de banda, mobilidade e segurança, oferecendo atributos específicos e blindando o desempenho de um cenário de uso contra congestionamentos em serviços paralelos, viabilizando o diversificado ecossistema digital do \gls{5G} \cite{stallings2021}.
+A arquitetura do \gls{5GC}, por conta de sua modularidade, viabiliza o conceito de \gls{NS}. Tal conceito possibilita a criação de redes virtuais independentes, isoladas e que operam em paralelo sobre uma infraestrutura física compartilhada \cite{stallings2021}. Graças à abstração de \textit{hardware} permitida pelas tecnologias de \gls{SDN} e \gls{NFV}, cada rede virtual individual (\textit{slice}) adquire um conjunto dedicado de recursos físicos e funções de rede \cite{stallings2021}. Dessa forma, cada \textit{slice} (Figura~\ref{fig:slicing_short}) pode ser parametrizado em termos de latência, largura de banda, mobilidade e segurança, oferecendo atributos específicos e blindando o desempenho de um cenário de uso contra congestionamentos em serviços paralelos, viabilizando o diversificado ecossistema digital do \gls{5G} \cite{stallings2021}.
 
 \begin{figure}[ht!]
 \centering
@@ -136,7 +136,7 @@ A arquitetura do \gls{5GC}, por conta de sua modularidade, viabiliza o conceito 
 \Fonte{Elaborado pelo autor.}
 \end{figure}
 
-Enquanto a tecnologia \gls{NFV} abstrai as capacidades de computação, armazenamento e funções de rede via software, dispensando hardwares físicos proprietários, a \gls{SDN} isola o plano de dados do plano de controle nos dispositivos de rede, consolidando as rotas a partir de um controlador centralizado e programável \cite{stallings2021}.
+Enquanto a tecnologia \gls{NFV} abstrai as capacidades de computação, armazenamento e funções de rede via \textit{software}, dispensando hardwares físicos proprietários, a \gls{SDN} isola o plano de dados do plano de controle nos dispositivos de rede, consolidando as rotas a partir de um controlador centralizado e programável \cite{stallings2021}.
 
 Para garantir baixas latências, foi necessário distribuir as funções de processamento e armazenamento da nuvem para dispositivos mais próximos do cliente do serviço. Na prática, isto significou que as aplicações não precisariam mais enviar seus dados para \textit{datacenters} distantes, sendo penalizadas com latências elevadas. Essa solução foi materializada com a integração do \gls{MEC} à rede móvel \gls{5G}, onde a \gls{UPF} é distribuída localmente para rotear os dados diretamente aos servidores periféricos, possibilitando a resposta em tempo real. A Figura~\ref{fig:arquitetura_mec_5g} ilustra a arquitetura do \gls{5GC} com a integração do \gls{MEC}.
 
@@ -184,9 +184,8 @@ Para garantir baixas latências, foi necessário distribuir as funções de proc
   \draw[<->, thick] (upfc) -- node[above] {N6} (cloud);
 
 \end{tikzpicture}
-\caption{\label{fig:arquitetura_mec_5g} Integração do \gls{MEC} à rede \gls{5G} distribuindo a função \gls{UPF} localmente visando reduzir a latência de tráfego sensível.}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:arquitetura_mec_5g} Integração do \gls{MEC} à rede \gls{5G} distribuindo a função \gls{UPF} localmente visando reduzir a latência de tráfego sensível.}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 Na rede de acesso \gls{5G}, a \gls{gNB} atua como a \gls{RBS} responsável por fornecer a interface aérea, gerenciando a transmissão e a recepção de dados entre o \gls{UE} e a rede núcleo \cite{fowdur2025, cox2025}. Quanto à sua infraestrutura, a \gls{gNB} evoluiu em relação ao \gls{eNodeB} (rede de acesso do \gls{4GLTE}) adotando uma arquitetura modular. Essa nova estrutura separa suas funções base em duas unidades (divisão funcional): a \gls{CU} e as \glspl{DU}.
@@ -229,9 +228,8 @@ A \gls{CU} é responsável pelo processamento de serviços em tempo não real e 
   \draw[<->, very thick] (du.east) -- ++(1.8cm,0) node[right, font=\bfseries, align=center] {Interface\\Aérea (Uu)};
 
 \end{tikzpicture}
-\caption{\label{fig:gnb_split} Divisão funcional arquitetural da estação base \gls{gNB} nas unidades \gls{CU} e \gls{DU}, mostrando a alocação dos protocolos de rádio.}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:gnb_split} Divisão funcional arquitetural da estação base \gls{gNB} nas unidades \gls{CU} e \gls{DU}, mostrando a alocação dos protocolos de rádio.}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 Estas mudanças na arquitetura da rede forçaram as operadoras a elaborar um plano estratégico para migrar do \gls{4GLTE} para o \gls{5G}, formalmente designado como Opção 3. Inicialmente, a ideia foi aproveitar a infraestrutura existente do \gls{4GLTE} como base, adotando o modelo de implantação \gls{NSA}. O modelo \gls{NSA} mantém o uso do núcleo de pacotes do \gls{4GLTE}, conhecido como \gls{EPC}, e fornece \gls{EN-DC} ao usuário. Nesse arranjo, a estação base \gls{LTE} (\gls{eNodeB}) atua como nó mestre, utilizando o \gls{UPF} do \gls{EPC} para gerenciar a sinalização (como autenticação, mobilidade e estabelecimento da conexão). Simultaneamente, a estação \gls{5G} (\gls{en-gNB}) atua como nó secundário dedicado ao Plano de Usuário, fornecendo a interface de rádio de alta capacidade para reforçar o fluxo de dados brutos da internet (Figura~\ref{fig:migracao_nsa}). A Figura~\ref{fig:migracao_nsa} ilustra essa migração.
@@ -273,9 +271,8 @@ Estas mudanças na arquitetura da rede forçaram as operadoras a elaborar um pla
   \draw[<->, thick, blue] (gnb.south) -- node[right, align=center, text=blue] {Dados\\ (NR-Uu)} (gnb.south |- ue.north);
 
 \end{tikzpicture}
-\caption{\label{fig:migracao_nsa} Estrutura de implantação Não-Autônoma (\gls{NSA}) baseada no núcleo legado \gls{EPC}, separando a controladora rádio \gls{4GLTE} do nó secundário \gls{en-gNB} (dividido em \gls{CU} e \gls{DU}).}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:migracao_nsa} Estrutura de implantação Não-Autônoma (\gls{NSA}) baseada no núcleo legado \gls{EPC}, separando a controladora rádio \gls{4GLTE} do nó secundário \gls{en-gNB} (dividido em \gls{CU} e \gls{DU}).}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 Ainda na Figura \ref{fig:migracao_nsa}, as interfaces lógicas S1 (\gls{S1-C} e \gls{S1-U}) ligam a rede de acesso ao núcleo \gls{EPC}. A \gls{S1-C} transporta o tráfego do plano de controle (sinalização), enquanto a \gls{S1-U} transporta pacotes de dados do usuário. Já a interface \gls{X2} conecta diretamente o \gls{eNodeB} e o \gls{en-gNB}, permitindo que o \gls{MN} coordene o \gls{SN}, gerencie a mobilidade e divida o fluxo de dados do usuário entre as duas torres. As interfaces \gls{LTE-Uu} e \gls{NR-Uu} são as interfaces aéreas de conexão de rádio que conectam o \gls{UE} às torres \gls{4G} e \gls{5G}, respectivamente.
@@ -308,9 +305,8 @@ O segundo passo em direção ao uso pleno do \gls{5G} é a migração para o mod
   \draw[<->, thick, blue] (gnb.south) -- node[right, align=center, text=blue] {Conexão Direta\\(NR-Uu)} (ue.north);
 
 \end{tikzpicture}
-\caption{\label{fig:migracao_sa} Estrutura de implantação Autônoma (\gls{SA}) ou Opção 2. O núcleo \gls{5GC} conecta-se diretamente à estação base \gls{gNB} via interface \gls{NG}.}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:migracao_sa} Estrutura de implantação Autônoma (\gls{SA}) ou Opção 2. O núcleo \gls{5GC} conecta-se diretamente à estação base \gls{gNB} via interface \gls{NG}.}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 No modelo \gls{SA}, as conexões sem fio com o usuário final operam através de uma interface aérea, conhecida como \gls{5G} \gls{NR}. Nela, o espectro de radiofrequência suporta maiores larguras de banda. Para tanto, as operações foram divididas em duas faixas de frequência: (i) a \gls{FR1} e (ii) a \gls{FR2}.
@@ -350,9 +346,8 @@ O intervalo de radiofrequência \gls{FR1} abrange o espectro da faixa sub-6~GHz,
   \node[font=\small, align=center, text=magenta!60!black, anchor=south] at (9.25, 1.6) {Alta Capacidade\\e Banda Ultra-larga};
 
 \end{tikzpicture}
-\caption{\label{fig:nr_spectrum} Divisão conceitual do espectro de radiofrequência \gls{5G} \gls{NR} nas faixas \gls{FR1} (Sub-6 GHz) e \gls{FR2} (mmWave).}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:nr_spectrum} Divisão conceitual do espectro de radiofrequência \gls{5G} \gls{NR} nas faixas \gls{FR1} (Sub-6 GHz) e \gls{FR2} (mmWave).}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 No \gls{4G} tradicional, eram utilizadas antenas \gls{MIMO} com até 8 elementos, mas tal configuração revelou-se inadequada para as operações em faixas de frequência milimétricas. Portanto, no \gls{5G}, aproveitando-se do diminuto comprimento de onda dessas frequências, foi possível aumentar o número de elementos de antena consideravelmente, integrando dezenas ou centenas de elementos (como 64, 128 ou 256) em um único painel. Essa configuração é conhecida como \textit{Massive} \gls{MIMO}. Ela é altamente densa e atua em conjunto para gerar ganhos consideráveis, compensando a atenuação natural do sinal nas faixas do \gls{FR2}.
@@ -440,8 +435,7 @@ A eficácia do \textit{Massive} \gls{MIMO} depende de uma técnica de filtragem 
     \end{scope}
 
 \end{tikzpicture}
-\caption{Comparativo ilustrativo entre a arquitetura \gls{4G} tradicional e o \gls{5G} \textit{Massive} \gls{MIMO}. À esquerda, nota-se a limitação dos painéis com poucos elementos e o desperdício de potência. À direita, aproveitando o diminuto comprimento de onda no \gls{FR2}, o adensamento massivo de antenas gera uma altíssima resolução espacial, permitindo a conformação de feixes (\textit{Beamforming}) eficientes e a multiplexação \gls{MU-MIMO}.}
-\label{fig:massive_mimo_beamforming}
+\Caption{\label{fig:massive_mimo_beamforming} Comparativo ilustrativo entre a arquitetura \gls{4G} tradicional e o \gls{5G} \textit{Massive} \gls{MIMO}. À esquerda, nota-se a limitação dos painéis com poucos elementos e o desperdício de potência. À direita, aproveitando o diminuto comprimento de onda no \gls{FR2}, o adensamento massivo de antenas gera uma altíssima resolução espacial, permitindo a conformação de feixes (\textit{Beamforming}) eficientes e a multiplexação \gls{MU-MIMO}.}
 \end{figure}
 
 Os sinais e dados enviados ao \gls{UE} a partir da \gls{RBS} utilizam o esquema de acesso múltiplo \gls{OFDMA}. O \gls{OFDMA} divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados pela estação base como uma matriz bidimensional de tempo e frequência e agrupados em \gls{RB}, em que cada bloco contém 12 subportadoras. Dessa forma, a rede entrega diferentes fatias do espectro a diferentes usuários de forma simultânea, o que aumenta a eficiência espectral da transmissão e a qualidade da experiência do usuário. A Figura \ref{fig:ofdma} ilustra o funcionamento do \gls{OFDMA} onde são alocados \gls{RB} para quatro \gls{UE} diferentes.
@@ -508,10 +502,8 @@ Os sinais e dados enviados ao \gls{UE} a partir da \gls{RBS} utilizam o esquema 
     }
 
 \end{tikzpicture}
-\caption{Representação do \gls{OFDMA} no \gls{5G}: à esquerda, a estação base (\gls{gNB}) distribui feixes dedicados a cada usuário; à direita, a grade bidimensional de tempo e frequência exibe como os Blocos de Recursos (\gls{RB}) são alocados simultaneamente a diferentes \gls{UE}.}
-\label{fig:ofdma}
-\vspace{0.2cm}
-\small{\textbf{Fonte:} Elaborado pelo autor.}
+\Caption{\label{fig:ofdma} Representação do \gls{OFDMA} no \gls{5G}: à esquerda, a estação base (\gls{gNB}) distribui feixes dedicados a cada usuário; à direita, a grade bidimensional de tempo e frequência exibe como os Blocos de Recursos (\gls{RB}) são alocados simultaneamente a diferentes \gls{UE}.}
+\Fonte{Elaborado pelo autor.}
 \end{figure}
 
 Diferente do \gls{LTE}, que limitava o \gls{SCS} ao valor fixo de 15~kHz, o \gls{5G} \gls{NR} utiliza um mecanismo capaz de flexibilizar o espaçamento de subportadoras \cite{stallings2021}. Através da numerologia escalável $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, é possível obter diferentes valores de \gls{SCS} (Equação~\ref{eq:numerologia_escalavel}), viabilizando a adaptação da rede a diferentes faixas de frequência e cenários de uso \cite{asplund2025, cox2025}.
@@ -806,7 +798,7 @@ Para mitigar a \gls{ISI}, a porção final do símbolo \gls{OFDM} é copiada e i
   \draw[thick] (9.0, -0.9) -- (9.0, -0.7);
 
 \end{tikzpicture}
-\Caption{\label{fig:multipercurso_isi} Efeito do multipercurso e da \gls{ISI} em comunicações V2X. (a)~Cenário urbano: o sinal da gNB chega ao veículo receptor pelo caminho direto (LOS, instante $t_1$) e por dois percursos refletidos (no prédio em $t_2$ e no solo em $t_3$), gerando um espalhamento de atraso $\tau_{DS} = t_3 - t_1$. (b)~Domínio do tempo: o eco atrasado do Símbolo~$n$ invade a janela do Símbolo~$n\!+\!1$, causando a zona hachurada de \gls{ISI}.}
+\Caption{\label{fig:multipercurso_isi} Efeito do multipercurso e da \gls{ISI} em comunicações \gls{V2X}. (a)~Cenário urbano: o sinal da gNB chega ao veículo receptor pelo caminho direto (LOS, instante $t_1$) e por dois percursos refletidos (no prédio em $t_2$ e no solo em $t_3$), gerando um espalhamento de atraso $\tau_{DS} = t_3 - t_1$. (b)~Domínio do tempo: o eco atrasado do Símbolo~$n$ invade a janela do Símbolo~$n\!+\!1$, causando a zona hachurada de \gls{ISI}.}
 \Fonte{Elaborado pelo autor com base em \cite{stallings2021}.}
 \end{figure}
 
@@ -922,7 +914,7 @@ Para contornar esse problema de degradação, a rede utiliza o mecanismo de Adap
 \Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
 \end{figure}
 
-% Início V2X
+% Início \gls{V2X}
 
 O próximo passo natural, depois dessa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \gls{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração trouxe avanços significativos, consolidando o paradigma \textbf{C-V2X (\textit{Cellular Vehicle-to-Everything})} \cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.
 
@@ -1037,7 +1029,7 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 \node[font=\footnotesize\bfseries, text=green!55!black, fill=white, inner sep=1.5pt, rounded corners=2pt, opacity=0.85, text opacity=1] at (3.55, -0.65) {Veículo 2};
 
 % ==============================
-% PEDESTRE (V2P) — na calçada inferior
+% PEDESTRE (\gls{V2P}) — na calçada inferior
 % ==============================
 % Cabeça
 \fill[orange!65!black] (6.65, -1.4) circle (0.22);
@@ -1114,20 +1106,20 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 \draw[<->, thick, dashed, orange!65!black] (mec.south east) -- node[above, font=\scriptsize, text=orange!65!black, sloped, fill=white, inner sep=1pt] {N6 local} ([yshift=0.5cm, xshift=-0.3cm]gnb_top);
 
 % ==============================
-% ENLACES V2I / V2N (Interface Uu) — Azul
+% ENLACES \gls{V2I} / \gls{V2N} (Interface Uu) — Azul
 % ==============================
 \draw[<->, line width=1.8pt, blue!60!black] (v1_ant) -- node[left, font=\scriptsize\bfseries, align=center, xshift=-0.2cm, text=blue!60!black, fill=white, inner sep=1.5pt, rounded corners=1pt, opacity=0.9, text opacity=1] {V2I / V2N\\(Interface Uu)} (-0.45, 5.1);
 \draw[<->, line width=1.8pt, blue!60!black] (v2_ant) -- node[right, font=\scriptsize\bfseries, align=center, xshift=0.2cm, text=blue!60!black, fill=white, inner sep=1.5pt, rounded corners=1pt, opacity=0.9, text opacity=1] {V2I / V2N\\(Interface Uu)} (0.45, 5.1);
 
 % ==============================
-% ENLACE V2V (Interface PC5 Sidelink) — Roxo
+% ENLACE \gls{V2V} (Interface PC5 Sidelink) — Roxo
 % ==============================
 % Linha curva para não se sobrepor a estrada
 \draw[<->, line width=2pt, purple!75!black] (v1_ant) .. controls (-1, 3.0) and (1, 3.0) .. (v2_ant);
 \node[font=\scriptsize\bfseries, text=purple!75!black, fill=white, inner sep=2pt, rounded corners=2pt] at (0, 3.2) {V2V Direto (PC5 Sidelink)};
 
 % ==============================
-% ENLACE V2P (Interface PC5 Sidelink) — Laranja
+% ENLACE \gls{V2P} (Interface PC5 Sidelink) — Laranja
 % ==============================
 \draw[<->, line width=1.4pt, orange!75!black, densely dashed] (v2_ant) .. controls (5.5, -0.3) and (6.8, -0.5) .. (ped);
 \node[font=\scriptsize\bfseries, text=orange!75!black, fill=white, inner sep=1.5pt, rounded corners=1pt] at (5.8, -0.6) {V2P (PC5)};
@@ -1137,9 +1129,9 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 % ==============================
 \node[draw=gray!45, fill=white, thick, rounded corners=5pt, inner sep=6pt, anchor=north west, font=\scriptsize] at (-7.5, -3.3) {
 \begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
-    \textcolor{blue!60!black}{\rule[0.3ex]{1.0cm}{1.8pt}} & Interface Uu (V2I / V2N) \\[3pt]
-    \textcolor{purple!75!black}{\rule[0.3ex]{1.0cm}{2.0pt}} & Interface PC5 --- V2V \\[3pt]
-    \textcolor{orange!75!black}{\rule[0.3ex]{0.4cm}{1.2pt}\hspace{2pt}\rule[0.3ex]{0.4cm}{1.2pt}} & Interface PC5 --- V2P \\[3pt]
+    \textcolor{blue!60!black}{\rule[0.3ex]{1.0cm}{1.8pt}} & Interface Uu (\gls{V2I} / \gls{V2N}) \\[3pt]
+    \textcolor{purple!75!black}{\rule[0.3ex]{1.0cm}{2.0pt}} & Interface PC5 --- \gls{V2V} \\[3pt]
+    \textcolor{orange!75!black}{\rule[0.3ex]{0.4cm}{1.2pt}\hspace{2pt}\rule[0.3ex]{0.4cm}{1.2pt}} & Interface PC5 --- \gls{V2P} \\[3pt]
     \textcolor{gray!55}{\rule[0.3ex]{0.4cm}{0.8pt}\hspace{2pt}\rule[0.3ex]{0.4cm}{0.8pt}} & Infraestrutura (NG / N6) \\
 \end{tabular}
 };

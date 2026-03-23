@@ -7,7 +7,7 @@
 % \section{Técnicas de Offloading em Ambientes Veiculares}
 % \label{sec:tecnicas-de-offloading-em-ambientes-veiculares}
 
-% \section{Modelos Híbridos Fuzzy e Aprendizado por Reforço}
+% \section{Modelos Híbridos \textit{Fuzzy} e Aprendizado por Reforço}
 % \label{sec:modelos-hibridos-fuzzy-e-aprendizado-por-reforco}
 
 % \section{Problemas e Desafios Atuais}
@@ -79,7 +79,7 @@ Para classificar e relacionar o estado da arte das soluções de descarregamento
           [{$\triangleright$ Pesos Dinâmicos\\$\triangleright$ Penalização Severa\\$\triangleright$ Recompensa Global\\$\triangleright$ Estágios Sequenciais\\$\triangleright$ Drift-plus-penalty}]
         ]
         [Modelos
-          [{$\triangleright$ DQN, D3QN, P-DQN\\$\triangleright$ SAC, DDPG, QDPG\\$\triangleright$ L-MADDPG, SIDDPG\\$\triangleright$ Fusões: FL, DT, GNN}]
+          [{$\triangleright$ \gls{DQN}, D3QN, P-DQN\\$\triangleright$ \gls{SAC}, DDPG, QDPG\\$\triangleright$ L-MADDPG, SIDDPG\\$\triangleright$ Fusões: FL, DT, GNN}]
         ]
       ]
       [Ambiente\\Simulado
@@ -89,7 +89,7 @@ Para classificar e relacionar o estado da arte das soluções de descarregamento
   ]
 \end{forest}
 }
-\Caption{\label{fig:taxonomia_adaptada} Taxonomia adaptada para classificação dos trabalhos relacionados em descarregamento computacional veicular, com ênfase na modelagem de Aprendizado por Reforço Profundo (DRL) e ambiente de simulação.}
+\Caption{\label{fig:taxonomia_adaptada} Taxonomia adaptada para classificação dos trabalhos relacionados em descarregamento computacional veicular, com ênfase na modelagem de Aprendizado por Reforço Profundo (\gls{DRL}) e ambiente de simulação.}
 \Fonte{Adaptado de~\citeonline{de2020computation}.}
 \end{figure}
 
@@ -99,7 +99,7 @@ No descarregamento de tarefas, o cenário de comunicação celular vem ganhando 
 \subsection{Tecnologia}
 A evolução das tecnologias de comunicação veicular destaca a transição de padrões tradicionais, como o \gls{DSRC} e o IEEE 802.11bd, para a comunicação celular aliada à \gls{IA}. Essa mudança visa, sobretudo, possibilitar baixas latências e alta vazão de dados em cenários de alta mobilidade, contribuindo para resolver o problema de descarregamento de tarefas. Nesse contexto, diversos trabalhos, como os de~\cite{Moghaddasi2023, sidwini, li2025, meghamala2025}, utilizam interfaces \gls{C-V2X} e arquiteturas de borda para o compartilhamento de informações em aplicações veiculares avançadas. 
 
-O estudo de~\cite{Moghaddasi2023} propõe um algoritmo de \gls{DRL}, especificamente o \gls{DDQN}, em redes \gls{5G} para solucionar o problema de descarregamento de tarefas utilizando a comunicação \gls{V2I} para alcançar eficiência energética e a diminuição da latência. O trabalho de~\cite{sidwini} explora o uso de algoritmos avançados de \gls{DRL}, como o \gls{SAC}, para otimizar o descarregamento dinâmico entre dispositivos locais, servidores de borda e a nuvem, equilibrando o consumo de energia e o atraso na execução. Em um cenário direcionado aos sistemas \gls{6G},~\cite{li2025} introduz um esquema inteligente baseado em \gls{DQN} em redes \gls{V2X} assistidas por \gls{MEC} para otimizar conjuntamente a associação aos servidores, a taxa de descarregamento de tarefas e a aceleração dos veículos. Essa abordagem visa minimizar o atraso do sistema e evitar colisões de trânsito, utilizando uma função de recompensa segmentada que respeita restrições de atraso, energia e segurança. Por fim,~\cite{meghamala2025} propõe um framework de \gls{MARL} para redes \gls{5G} que combina o algoritmo \gls{SAC} com arquiteturas hierárquicas (\gls{MATD3} e \gls{TD2PG}). Essa solução visa a alocação dinâmica de subcanais, potência de transmissão e recursos computacionais em servidores \gls{MEC}, levando em consideração a mobilidade dos usuários e o isolamento das fatias de rede (\textit{network slicing}).
+O estudo de~\cite{Moghaddasi2023} propõe um algoritmo de \gls{DRL}, especificamente o \gls{DDQN}, em redes \gls{5G} para solucionar o problema de descarregamento de tarefas utilizando a comunicação \gls{V2I} para alcançar eficiência energética e a diminuição da latência. O trabalho de~\cite{sidwini} explora o uso de algoritmos avançados de \gls{DRL}, como o \gls{SAC}, para otimizar o descarregamento dinâmico entre dispositivos locais, servidores de borda e a nuvem, equilibrando o consumo de energia e o atraso na execução. Em um cenário direcionado aos sistemas \gls{6G},~\cite{li2025} introduz um esquema inteligente baseado em \gls{DQN} em redes \gls{V2X} assistidas por \gls{MEC} para otimizar conjuntamente a associação aos servidores, a taxa de descarregamento de tarefas e a aceleração dos veículos. Essa abordagem visa minimizar o atraso do sistema e evitar colisões de trânsito, utilizando uma função de recompensa segmentada que respeita restrições de atraso, energia e segurança. Por fim,~\cite{meghamala2025} propõe um \textit{framework} de \gls{MARL} para redes \gls{5G} que combina o algoritmo \gls{SAC} com arquiteturas hierárquicas (\gls{MATD3} e \gls{TD2PG}). Essa solução visa a alocação dinâmica de subcanais, potência de transmissão e recursos computacionais em servidores \gls{MEC}, levando em consideração a mobilidade dos usuários e o isolamento das fatias de rede (\textit{network slicing}).
 
 \subsection{Servidor}
 Quando há necessidade de transferência de responsabilidade de processamento de tarefas, existem três opções viáveis: processar as tarefas em (i) um dispositivo de infraestrutura de borda, (ii) recursos ociosos das unidades processadoras dos veículos vizinhos, ou (iii) uma robusta infraestrutura de nuvem, que apresenta maior capacidade, mas latência consideravelmente superior. A seguir, é descrito como as principais opções locais foram modeladas.
@@ -107,7 +107,7 @@ Quando há necessidade de transferência de responsabilidade de processamento de
 \subsection*{\textbf{MEC}}
 Servidores \gls{MEC} contribuem significativamente para atender exigências de \gls{URLLC} em \gls{5G} \gls{NR}. Eles ficam localizados na borda da rede e podem ser constituídos de equipamentos robustos, capazes de auxiliar no processamento pesado de tarefas delegadas por outros dispositivos com recursos limitados.
 
-Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e estações base para oferecer suporte computacional de baixa latência aos veículos. Aproveitando essa infraestrutura de borda, o estudo de~\cite{zhao2025} propõe o esquema \gls{PDQKM} para otimizar o descarregamento de múltiplas tarefas, permitindo reduzir a latência total do sistema. Por outro lado, o trabalho de~\cite{wu2025} utiliza \gls{GAN} para expandir amostras de tarefas evitando o desequilíbrio de dados, criando um modelo de \gls{FL} para realizar o descarregamento de tarefas de forma energeticamente eficiente em servidores \gls{MEC}. O estudo de~\cite{mohammad2025} apresenta o framework EMEC-IoVTOF, que integra \gls{DRL} com a técnica de \gls{PSO} para otimizar a alocação de recursos em sistemas \gls{IoV}. A solução calcula custos de descarregamento para evitar a convergência para ótimos locais, conseguindo reduções significativas de latência e consumo de energia, além de contornar restrições de largura de banda em cenários veiculares dinâmicos. Por sua vez, o estudo de~\cite{liu2025} utiliza o método de aproximação de Bernstein para converter restrições probabilísticas de interferência em formato tratável, minimizando uma função de utilidade que equilibra atrasos na transmissão e na computação para o \gls{C-MEC}.
+Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e estações base para oferecer suporte computacional de baixa latência aos veículos. Aproveitando essa infraestrutura de borda, o estudo de~\cite{zhao2025} propõe o esquema \gls{PDQKM} para otimizar o descarregamento de múltiplas tarefas, permitindo reduzir a latência total do sistema. Por outro lado, o trabalho de~\cite{wu2025} utiliza \gls{GAN} para expandir amostras de tarefas evitando o desequilíbrio de dados, criando um modelo de \gls{FL} para realizar o descarregamento de tarefas de forma energeticamente eficiente em servidores \gls{MEC}. O estudo de~\cite{mohammad2025} apresenta o \textit{framework} EMEC-IoVTOF, que integra \gls{DRL} com a técnica de \gls{PSO} para otimizar a alocação de recursos em sistemas \gls{IoV}. A solução calcula custos de descarregamento para evitar a convergência para ótimos locais, conseguindo reduções significativas de latência e consumo de energia, além de contornar restrições de largura de banda em cenários veiculares dinâmicos. Por sua vez, o estudo de~\cite{liu2025} utiliza o método de aproximação de Bernstein para converter restrições probabilísticas de interferência em formato tratável, minimizando uma função de utilidade que equilibra atrasos na transmissão e na computação para o \gls{C-MEC}.
 
 \subsection*{\textbf{VEC}}
 
@@ -116,8 +116,7 @@ Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e 
 \subsection*{\textbf{Discussão}}
 \begin{table}[h]
     \centering
-    \caption{Resumo dos aspectos de Padrão de Comunicação, Servidor e Condições de Ambiente dos trabalhos relacionados}
-    \label{tab:padrao_comunicacao}
+    \Caption{\label{tab:padrao_comunicacao}Resumo dos aspectos de Padrão de Comunicação, Servidor e Condições de Ambiente dos trabalhos relacionados}
     \renewcommand{\arraystretch}{1.2}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
@@ -138,9 +137,10 @@ Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e 
        ~\cite{abbas2025}           & \checkmark & & & \checkmark & & & \checkmark & \\ \hline
     \end{tabular}
     }
+    \Fonte{Elaborado pelo autor}
 \end{table}
 
-Analisando a Tabela \ref{tab:padrao_comunicacao}, constata-se forte tendência de padronização de tecnologias celulares avançadas para comunicação veicular. Grande parte dos trabalhos recentes analisados concentra-se na utilização de conectividade \gls{V2I} via redes \gls{5G} e \gls{6G}. Em relação à comunicação entre os nós, embora o padrão \gls{C-V2X} englobe diferentes interfaces, diversos trabalhos referem-se estritamente à utilização das interfaces \textit{sidelink} destas comunicações para troca direta de dados (\gls{V2V}). Já em relação à infraestrutura, a adoção de servidores \gls{MEC} centralizados em unidades \gls{RSU} ainda é predominante, mas observa-se tendência crescente de pesquisas que exploram \gls{VEC}, tratando os próprios veículos como provedores de recursos. Trabalhos como os de~\cite{liu2025} e~\cite{long2025} adotam arquiteturas colaborativas integrando \gls{MEC} com nuvem e \gls{VEC} com nuvem, respectivamente.
+Analisando a Tabela \ref{tab:padrao_comunicacao}, constata-se forte tendência de padronização de tecnologias celulares avançadas para comunicação veicular. Grande parte dos trabalhos recentes analisados concentra-se na utilização de conectividade \gls{V2I} via redes \gls{5G} e \gls{6G}. Em relação à comunicação entre os nós, embora o padrão \gls{C-V2X} englobe diferentes interfaces, diversos trabalhos referem-se estritamente à utilização das interfaces \textit{Sidelink} destas comunicações para troca direta de dados (\gls{V2V}). Já em relação à infraestrutura, a adoção de servidores \gls{MEC} centralizados em unidades \gls{RSU} ainda é predominante, mas observa-se tendência crescente de pesquisas que exploram \gls{VEC}, tratando os próprios veículos como provedores de recursos. Trabalhos como os de~\cite{liu2025} e~\cite{long2025} adotam arquiteturas colaborativas integrando \gls{MEC} com nuvem e \gls{VEC} com nuvem, respectivamente.
 
 Outro aspecto identificado foi a ausência de tratamento para a observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Todos os trabalhos identificados na tabela modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de CPU dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
 
@@ -149,14 +149,14 @@ Outra limitação identificada diz respeito à modelagem de cargas de trabalho. 
 Nesse contexto, o modelo proposto neste trabalho visa endereçar essas lacunas ao modelar, desde a concepção do ambiente, tais dificuldades e estocasticidades inerentes a redes veiculares reais, conforme a adoção das tecnologias supramencionadas.
 
 \section{Problema}
-Com a infraestrutura de comunicação estabilizada, a escolha de abordagens apropriadas constitui um passo crítico para a garantia dos requisitos no ambiente veicular. A formulação de soluções para o descarregamento de tarefas dinâmico e em tempo real apresenta elevada complexidade. Para contornar essa dificuldade, diversos trabalhos na literatura optam por simplificar o escopo, desenvolvendo abordagens focadas em uma única métrica, como a minimização exclusiva da latência ou do consumo de energia~\cite{feng2017ave, hou2016vehicular, ren2018latency, ren2019collaborative, zhang2019delay}. No entanto, o estudo de~\cite{qin2020} enfatiza que otimizar um único objetivo isoladamente não reflete a realidade das redes, enquanto~\cite{zhang2024} reitera que a busca por um compromisso dinâmico entre tempo de resposta e consumo energético transforma a alocação em um problema incerto de otimização multiobjetivo NP-difícil. Diante dessa constatação, observa-se a necessidade do desenvolvimento de políticas que considerem múltiplos critérios simultaneamente, com o intuito de projetar propostas robustas e capazes de atender às demandas operacionais e funcionais de longo prazo.
+Com a infraestrutura de comunicação estabilizada, a escolha de abordagens apropriadas constituem um passo crítico para a garantia dos requisitos no ambiente veicular. A formulação de soluções para o descarregamento de tarefas dinâmico e em tempo real apresenta elevada complexidade. Para contornar essa dificuldade, diversos trabalhos na literatura optam por simplificar o escopo, desenvolvendo abordagens focadas em uma única métrica, como a minimização exclusiva da latência ou do consumo de energia~\cite{feng2017ave, hou2016vehicular, ren2018latency, ren2019collaborative, zhang2019delay}. No entanto, o estudo de~\cite{qin2020} enfatiza que otimizar um único objetivo isoladamente não reflete a realidade das redes, enquanto~\cite{zhang2024} reitera que a busca por um compromisso dinâmico entre tempo de resposta e consumo energético transforma a alocação em um problema incerto de otimização multiobjetivo NP-difícil. Diante dessa constatação, observa-se a necessidade do desenvolvimento de políticas que considerem múltiplos critérios simultaneamente, com o intuito de projetar propostas robustas e capazes de atender às demandas operacionais e funcionais de longo prazo.
 
-A modelagem de um cenário realista precisa lidar fundamentalmente com incertezas espaciais da rede. A alta velocidade dos veículos altera significativamente a infraestrutura veicular, mascarando os estados reais e comprometendo a acurácia dos dados divulgados pelos nós de computação~\cite{liu2025}. A somatória entre a imprevisibilidade de processos no interior da borda~\cite{abbas2025} e o natural decréscimo de precisão proveniente do atraso por telemetria exige uma abordagem maleável. Decisões sustentadas integralmente por lógicas determinísticas tornam-se insatisfatórias, contribuindo que os modelos não atendam adequadamente os requisitos de qualidade no descarregamento de tarfas~\cite{kandali2025, zhao2025}.
+A modelagem de um cenário realista precisa lidar fundamentalmente com incertezas espaciais da rede. A alta velocidade dos veículos altera significativamente a infraestrutura veicular, mascarando os estados reais e comprometendo a acurácia dos dados divulgados pelos nós de computação~\cite{liu2025}. A somatória entre a imprevisibilidade de processos no interior da borda~\cite{abbas2025} e o natural decréscimo de precisão proveniente do atraso por telemetria exige uma abordagem maleável. Decisões sustentadas integralmente por lógicas determinísticas tornam-se insatisfatórias, contribuindo para que os modelos não atendam adequadamente os requisitos de qualidade no descarregamento de tarefas~\cite{kandali2025, zhao2025}.
 
 \subsection{Estratégia}
-Para contornar grande parte dos vieses supracitados, a literatura contemporânea aponta uma considerável substituição do uso de heurísticas e meta-heurísticas por soluções mais sofisticados e adaptativos. A respeito desta transformação, destaca-se a utilização de \gls{DRL}, por conta de sua capacidade de aprimorar sequências de ações de longo prazo extraídas através de intensas interações com ambiente simulado.
+Para contornar grande parte dos vieses supracitados, a literatura contemporânea aponta uma considerável substituição do uso de heurísticas e meta-heurísticas por soluções mais sofisticadas e adaptativas. A respeito desta transformação, destaca-se a utilização de \gls{DRL}, por conta de sua capacidade de aprimorar sequências de ações de longo prazo extraídas através de intensas interações com ambiente simulado.
 
-De fato, o escopo científico atual tem explorado ativamente o uso de diversas estatégias  integradas ao \gls{DRL}. Uma delas é a integração com aprendizado \gls{FL}, que permite o treinamento colaborativo de modelos \gls{DRL} entre múltiplos agentes, preservando a privacidade dos dados locais~\cite{chen2025}. Outra frente mescla esquemas \gls{DRL} com tecnologia \gls{DT}, possibilitando que soluções sejam testadas e simuladas virtualmente antes da execução no ambiente físico~\cite{wei2024}. Para lidar com o vasto espaço de estados e com cenários altamente variáveis, pesquisas recentes fundem arquiteturas \gls{DRL} com redes \gls{GNN} para capturar de forma eficiente as relações e as dependências espaciais entre os nós veiculares~\cite{wang2024, tang2024}. Adicionalmente, métodos \gls{TL} têm sido utilizados para acelerar a adaptação de veículos recém-conectados em infraestruturas baseadas em \gls{SDN}, onde a separação entre os planos de controle e de dados facilita a gerência global~\cite{baker2024}. Por fim, destaca-se a incorporação da teoria de otimização de Lyapunov acoplada a métodos \gls{DRL} para garantir matematicamente a estabilidade contínua das filas de tarefas a longo prazo~\cite{kumar2023}.
+De fato, o escopo científico atual tem explorado ativamente o uso de diversas estratégias  integradas ao \gls{DRL}. Uma delas é a integração com aprendizado \gls{FL}, que permite o treinamento colaborativo de modelos \gls{DRL} entre múltiplos agentes, preservando a privacidade dos dados locais~\cite{chen2025}. Outra frente mescla esquemas \gls{DRL} com tecnologia \gls{DT}, possibilitando que soluções sejam testadas e simuladas virtualmente antes da execução no ambiente físico~\cite{wei2024}. Para lidar com o vasto espaço de estados e com cenários altamente variáveis, pesquisas recentes fundem arquiteturas \gls{DRL} com redes \gls{GNN} para capturar de forma eficiente as relações e as dependências espaciais entre os nós veiculares~\cite{wang2024, tang2024}. Adicionalmente, métodos \gls{TL} têm sido utilizados para acelerar a adaptação de veículos recém-conectados em infraestruturas baseadas em \gls{SDN}, onde a separação entre os planos de controle e de dados facilita a gerência global~\cite{baker2024}. Por fim, destaca-se a incorporação da teoria de otimização de Lyapunov acoplada a métodos \gls{DRL} para garantir matematicamente a estabilidade contínua das filas de tarefas a longo prazo~\cite{kumar2023}.
 
 \subsection*{\textbf{Função Objetivo}}
 Além do compromisso entre a minimização da latência de processamento e a redução do consumo de energia, a literatura recente incorpora a otimização de custos operacionais e financeiros da rede~\cite{ma2025}. A estabilidade das filas de tarefas (\textit{queue stability}) a longo prazo também é um objetivo considerado, frequentemente abordado por meio da otimização de Lyapunov acoplada a técnicas de aprendizado~\cite{kumar2023}. Outros estudos buscam maximizar a taxa de sucesso das tarefas sob restrições de prioridade e da capacidade dos nós de computação~\cite{kumari2025}. Adicionalmente, o gerenciamento de confiança (\textit{trust management}) dos nós de borda desponta como um objetivo crítico em infraestruturas \gls{SDN} para evitar descarregamentos falhos ou maliciosos~\cite{baker2024}.
@@ -171,23 +171,23 @@ No que tange aos modelos, existem diversos trabalhos focados em otimizar a forma
 
 \begin{table}[ht!]
     \centering
-    \caption{Classificação dos algoritmos clássicos de DRL quanto à adequação ao espaço de ação}
-    \label{tab:drl_action_spaces}
+    \Caption{\label{tab:drl_action_spaces}Classificação dos algoritmos clássicos de \gls{DRL} quanto à adequação ao espaço de ação}
     \renewcommand{\arraystretch}{1.3}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|l|c|l|}
         \hline
         \textbf{Algoritmo DRL} & \textbf{Espaço de Ação} & \textbf{Referência Base} \\ \hline
-        DQN (\textit{Deep Q-Network}) & Discreto &~\cite{uddin2025, farimani2024} \\ \hline
-        Double DQN & Discreto &~\cite{uddin2025} \\ \hline
-        Dueling DQN & Discreto &~\cite{uddin2025} \\ \hline
+        \gls{DQN} (\textit{Deep Q-Network}) & Discreto &~\cite{uddin2025, farimani2024} \\ \hline
+        Double \gls{DQN} & Discreto &~\cite{uddin2025} \\ \hline
+        Dueling \gls{DQN} & Discreto &~\cite{uddin2025} \\ \hline
         DDPG (\textit{Deep Deterministic Policy Gradient}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
-        TD3 (\textit{Twin Delayed DDPG}) & Contínuo &~\cite{uddin2025} \\ \hline
-        PPO (\textit{Proximal Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
+        \gls{TD3} (\textit{Twin Delayed DDPG}) & Contínuo &~\cite{uddin2025} \\ \hline
+        \gls{PPO} (\textit{Proximal Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
         TRPO (\textit{Trust Region Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
-        SAC (\textit{Soft Actor-Critic}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
+        \gls{SAC} (\textit{Soft Actor-Critic}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
     \end{tabular}
     }
+    \Fonte{Elaborado pelo autor}
 \end{table}
 
 \subsection*{\textbf{Ambiente Simulado}}
@@ -195,7 +195,7 @@ O treinamento e a validação de algoritmos de aprendizado \gls{DRL} voltados pa
 
 Para modelar a mobilidade com precisão, simuladores de tráfego microscópico, como o \textit{SUMO} (Simulation of Urban MObility)~\cite{lopez2018microscopic} e o \textit{PTV Vissim}~\cite{ptv2020vissim}, são amplamente adotados na literatura~\cite{souza2021, kumar2023}. Ferramentas desse tipo permitem a criação de malhas rodoviárias e urbanas e simulam o comportamento dinâmico dos veículos por meio de modelos matemáticos, capturando variações de velocidade, aceleração e respostas a semáforos~\cite{li2025}. Em paralelo, a dinâmica das comunicações --- que inclui o desvanecimento do canal, perdas de propagação e bloqueios físicos (condições de visada \textit{LoS/NLoS}) --- é frequentemente emulada por simuladores de rede de eventos discretos, destacando-se o ns-3, o qual costuma ser integrado ao SUMO para formar plataformas de co-simulação~\cite{souza2021, uddin2025}.
 
-Em relação ao treinamento do modelo de inteligência artificial, o ambiente de simulação é abstraído matematicamente para que o agente observe os estados e tome decisões. Para viabilizar esse treinamento, trabalhos recentes constroem ambientes customizados baseados em padrões como o \textit{OpenAI Gym}~\cite{brockman2016openai}, que gerenciam o ciclo de observação do estado, execução da ação e recebimento da recompensa~\cite{uddin2025} para treinar e otimizar os pesos das redes neurais~\cite{moghaddasi2024, kumar2023, wu2025}.
+Em relação ao treinamento do modelo de inteligência artificial, o ambiente de simulação é abstraído matematicamente para que o agente observe os estados e tome decisões. Para viabilizar esse treinamento, trabalhos recentes constroem ambientes customizados baseados em padrões como o \textit{OpenAI Gym} (recentemente sucedido pelo \textit{Gymnasium})~\cite{brockman2016openai}, que gerenciam o ciclo de observação do estado, execução da ação e recebimento da recompensa~\cite{uddin2025} para treinar e otimizar os pesos das redes neurais~\cite{moghaddasi2024, kumar2023, wu2025}.
 
 Por fim, para evitar que o treinamento ocorra de forma puramente teórica, a literatura atual enfatiza o uso de dados do mundo real (\textit{real-world traces}) dentro do ambiente de simulação~\cite{farimani2024}. Algumas abordagens incorporam trajetórias extraídas de frotas reais ou bases de dados de servidores comerciais --- como o \textit{Google Cluster Dataset} --- para emular as flutuações estocásticas na geração de tarefas e a exigência de recursos de CPU, Memória e Largura de Banda~\cite{long2025}. Essa imersão de dados reais no ambiente simulado garante que as políticas de descarregamento aprendidas pelo agente \gls{DRL} sejam aplicáveis e estáveis diante das dinâmicas de arquiteturas \gls{VEC} no mundo físico.
 
@@ -203,8 +203,7 @@ Por fim, para evitar que o treinamento ocorra de forma puramente teórica, a lit
 \begin{landscape}
 \begin{table}[p]
     \centering
-    \caption{Análise comparativa dos trabalhos relacionados por Função Objetivo, Estado, Recompensa e Ambiente Simulado}
-    \label{tab:estrategia_checkmark}
+    \Caption{\label{tab:estrategia_checkmark}Análise comparativa dos trabalhos relacionados por Função Objetivo, Estado, Recompensa e Ambiente Simulado}
     \setlength{\arrayrulewidth}{0.6pt}
     \renewcommand{\arraystretch}{1.35}
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -252,16 +251,17 @@ Por fim, para evitar que o treinamento ocorra de forma puramente teórica, a lit
        ~\cite{farimani2024}& \checkmark & \checkmark & \checkmark &            &            &            & \checkmark &            &            &            &            & \checkmark &            &            &            & \checkmark &            \\ \hline
        ~\cite{shi2023}     & \checkmark & \checkmark &            &            &            &            &            &            &            &            & \checkmark &            &            &            &            & \checkmark &            \\ \hline
     \end{tabular}
+    \Fonte{Elaborado pelo autor}
 \end{table}
 \end{landscape}
 
-Segundo \cite{miriyala2025}, apesar dos notáveis avanços proporcionados pela integração do \gls{DRL} no descarregamento de tarefas, a literatura recente aponta limitações que dificultam que os modelos teóricos sejam utilizados no mundo real. Uma análise rigorosa conduzida por~\cite{miriyala2025} revela que a maioria das abordagens atuais sofre de simplificações excessivas na modelagem do ambiente. Frequentemente, os trabalhos utilizam representações de estado baseadas em vetores planos (\textit{flat vectors}), o que ignora as complexas relações estruturais e topológicas entre os veículos e a infraestrutura. Essa lacuna evidencia a necessidade de incorporar arquiteturas diferentes, como as \gls{GNN} para extrair representações topológicas antes da tomada de decisão. Além disso, os ambientes simulados costumam assumir canais de comunicação idealizados e conectividade persistente, negligenciando falhas físicas comuns nas redes veiculares, como quedas intermitentes de conexão (\textit{dropouts})~\cite{miriyala2025}.
+Segundo \cite{miriyala2026}, apesar dos notáveis avanços proporcionados pela integração do \gls{DRL} no descarregamento de tarefas, a literatura recente aponta limitações que dificultam que os modelos teóricos sejam utilizados no mundo real. Uma análise rigorosa conduzida por~\cite{miriyala2026} revela que a maioria das abordagens atuais sofre de simplificações excessivas na modelagem do ambiente. Frequentemente, os trabalhos utilizam representações de estado baseadas em vetores planos (\textit{flat vectors}), o que ignora as complexas relações estruturais e topológicas entre os veículos e a infraestrutura. Essa lacuna evidencia a necessidade de incorporar arquiteturas diferentes, como as \gls{GNN} para extrair representações topológicas antes da tomada de decisão. Além disso, os ambientes simulados costumam assumir canais de comunicação idealizados e conectividade persistente, negligenciando falhas físicas comuns nas redes veiculares, como quedas intermitentes de conexão (\textit{dropouts})~\cite{miriyala2026}.
 
-Outra lacuna está relacionada a carga computacional imposta pelos próprios modelos de aprendizado de máquina. Grande parte das pesquisas assume que os servidores de borda possuem recursos substanciais de hardware, deixando um vácuo no estudo onde dispositivos possuem severas restrições energéticas, de memória e de processamento (teto operacional de \textit{FLOPS}). Para contornar esse obstáculo e viabilizar a implantação,~\cite{miriyala2025} destacam que pesquisas futuras devem focar no desenvolvimento de arquiteturas e representações mais leves, aplicando técnicas de compressão de modelos. 
+Outra lacuna está relacionada a carga computacional imposta pelos próprios modelos de aprendizado de máquina. Grande parte das pesquisas assume que os servidores de borda possuem recursos substanciais de \textit{hardware}, deixando um vácuo no estudo onde dispositivos possuem severas restrições energéticas, de memória e de processamento (teto operacional de \textit{FLOPS}). Para contornar esse obstáculo e viabilizar a implantação,~\cite{miriyala2026} destacam que pesquisas futuras devem focar no desenvolvimento de arquiteturas e representações mais leves, aplicando técnicas de compressão de modelos. 
 
-No que tange à adaptabilidade dos algoritmos, observa-se que as políticas \gls{DRL} são tradicionalmente treinadas e permanecem imutáveis durante a implantação em produção. Contudo, em cenários veiculares não estacionários, onde o ambiente sofre alterações constantes devido a mudanças de distribuição das cargas (\textit{distribution shifts}), tais políticas estáticas divergem e rapidamente se tornam obsoletas e ineficientes~\cite{miriyala2025}. Identifica-se que há espaço na exploração de mecanismos de adaptação \textit{online} de modo a evoluir a política computada pelo modelo.
+No que tange à adaptabilidade dos algoritmos, observa-se que as políticas \gls{DRL} são tradicionalmente treinadas e permanecem imutáveis durante a implantação em produção. Contudo, em cenários veiculares não estacionários, onde o ambiente sofre alterações constantes devido a mudanças de distribuição das cargas (\textit{distribution shifts}), tais políticas estáticas divergem e rapidamente se tornam obsoletas e ineficientes~\cite{miriyala2026}. Identifica-se que há espaço na exploração de mecanismos de adaptação \textit{online} de modo a evoluir a política computada pelo modelo.
 
-Por fim, a transição destas propostas para sistemas reais esbarra na falta de avaliação comparativa confiável (\textit{benchmarking}). A disparidade entre os estudos dificulta extrapolações e comparações parciais justas sobre as potenciais eficiências obtidas.~\cite{miriyala2025} criticam o fato de que a literatura tende a se atentar demasiadamente com as constatações de performance baseadas no treinamento ideal dos agentes.
+Por fim, a transição destas propostas para sistemas reais esbarra na falta de avaliação comparativa confiável (\textit{benchmarking}). A disparidade entre os estudos dificulta extrapolações e comparações parciais justas sobre as potenciais eficiências obtidas.~\cite{miriyala2026} criticam o fato de que a literatura tende a se atentar demasiadamente com as constatações de performance baseadas no treinamento ideal dos agentes.
 
 \section{Considerações Finais}
 Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL} têm se solidificado como a direção mais promissora para o gerenciamento de recursos em arquiteturas de borda veicular. A integração com técnicas emergentes demonstra que há flexibilidade suficiente para abarcar os altos desafios impostos pelos cenários veiculares práticos. No entanto, as lacunas destacadas --- como a predominância de simulações com observabilidade perfeita e cenários determinísticos --- salientam a necessidade crítica de propostas que incorporem incerteza, variação de rajadas e carga de trabalho. Este alinhamento direciona o desenvolvimento da solução apresentada nos capítulos seguintes, projetada com vistas a preencher estas falhas e entregar maior robustez.
@@ -271,9 +271,9 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 %     \begin{tabular}{|l|l|l|l|c|} 
 %         \hline \textbf{Artigo} & \textbf{Tecnologia} & \textbf{Servidor} & \textbf{Principal Inovação} & \textbf{Latência} \\ 
 %         \hline 
-%        ~\cite{Moghaddasi2023} & 5G / V2I & BS / Edge & Data Offloading via DDQN & Melhoria de 9,8\% \\ 
-%         \hline~\cite{sidwini} & Edge / Cloud & Edge / Cloud & Descarregamento de tarefas Otimizado via SAC & Var. \\ 
-%         \hline~\cite{li2025} & 6G / V2X & MEC (RSU/BS) & Offloading e Associação via DQN & Redução de 16,4\% \\ 
+%        ~\cite{Moghaddasi2023} & 5G / \gls{V2I} & BS / Edge & Data Offloading via DDQN & Melhoria de 9,8\% \\ 
+%         \hline~\cite{sidwini} & Edge / Cloud & Edge / Cloud & Descarregamento de tarefas Otimizado via \gls{SAC} & Var. \\ 
+%         \hline~\cite{li2025} & 6G / \gls{V2X} & MEC (RSU/BS) & Offloading e Associação via \gls{DQN} & Redução de 16,4\% \\ 
 %         \hline~\cite{meghamala2025} & 5G / MEC & gNodeB & Alocação de Recursos via MARL & Otimizada \\ 
 %         \hline 
 %     \end{tabular} 
@@ -281,10 +281,10 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 
 % O estudo de~\cite{mondal2025} aborda o desafio de utilizar Aprendizado por Reforço Profundo (\gls{DRL}), especificamente um controlador DDQN, para orquestrar de forma inteligente o \textit{handover} e a seleção entre as interfaces \gls{Uu} (celular) e \gls{PC5} (sidelink). 
 
-% Por sua vez,~\cite{heo2026} foca no \textit{streaming} de vídeo interveicular, propondo um framework híbrido que utiliza a via \gls{V2V} como primária e a via \gls{V2N2V} (apoiada por \gls{MEC}) para retransmissões seletivas, garantindo uma latência sob o limite crítico de 50 ms. 
+% Por sua vez,~\cite{heo2026} foca no \textit{streaming} de vídeo interveicular, propondo um \textit{framework} híbrido que utiliza a via \gls{V2V} como primária e a via \gls{V2N2V} (apoiada por \gls{MEC}) para retransmissões seletivas, garantindo uma latência sob o limite crítico de 50 ms. 
 
 
-% apresenta o framework \gls{3M}, que integra o Gerenciamento de Mobilidade, tecnologia Multi-RAT e Aprendizado de Máquina (\gls{ML}), buscando garantir um suporte hiper-rápido e ultraconfiável para redes veiculares \gls{6G}, com a projeção de latências que podem chegar a $< 1$ ms para comunicações críticas.
+% apresenta o \textit{framework} \gls{3M}, que integra o Gerenciamento de Mobilidade, tecnologia Multi-RAT e Aprendizado de Máquina (\gls{ML}), buscando garantir um suporte hiper-rápido e ultraconfiável para redes veiculares \gls{6G}, com a projeção de latências que podem chegar a $< 1$ ms para comunicações críticas.
 % \begin{table}[h]
 % \centering
 % \caption{Comparativa das Abordagens de \textit{Task Offloading} Assistidas por MEC}
@@ -298,7 +298,7 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 
 % Wu et al.~\cite{wu2025} & \gls{MEC} (5G/6G) & \gls{GAN} + Aprendizado Federado (\gls{FL}) & Foca em implantação leve e eficiência energética. Usa o \gls{MEC} para gerenciar \gls{FL} e \gls{GAN} na expansão de amostras, resolvendo o desequilíbrio de dados sem sobrecarregar a rede. \\ \hline
 
-% Mohammad et al.~\cite{mohammad2025} & EMEC (\gls{MEC} para \gls{IoV}) & \gls{DRL} + \gls{PSO} & Apresenta framework EMEC-IoVTOF que delega tarefas para a borda visando reduzir latência e energia. O uso do \gls{PSO} ajuda as decisões de \gls{DRL} a fugirem de armadilhas de ótimos locais. \\ \hline
+% Mohammad et al.~\cite{mohammad2025} & EMEC (\gls{MEC} para \gls{IoV}) & \gls{DRL} + \gls{PSO} & Apresenta \textit{framework} EMEC-IoVTOF que delega tarefas para a borda visando reduzir latência e energia. O uso do \gls{PSO} ajuda as decisões de \gls{DRL} a fugirem de armadilhas de ótimos locais. \\ \hline
 
 % Liu et al.~\cite{liu2025} & \gls{C-MEC} (Colaboração Nuvem-Borda) & Aproximação de Bernstein + SCA & Divide o esforço: tarefas sensíveis a atraso vão para \gls{MEC}, e tarefas tolerantes vão para nuvem. Lida com incertezas de canal (mobilidade) e restrições de interferência de forma probabilística. \\ \hline
 % \end{tabular}
@@ -335,21 +335,21 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 %         \multirow{2}{*}{\textbf{Referência}} & \multicolumn{4}{c|}{\textbf{Estratégia}} & \multirow{2}{*}{\textbf{Ambiente}} \\ \cline{2-5}
 %         & \textbf{Objetivo} & \textbf{Eng. de Estado} & \textbf{Eng. de Recompensa} & \textbf{Modelos} & \\ \hline
         
-%        ~\cite{baker2024} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $+$ Utilidade do Sistema & Latência, Buffer, CPU & Latência, Energia & DQN + \textit{Transfer Learning} & Estocástico, Carga de Trabalho \\ \hline
+%        ~\cite{baker2024} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $+$ Utilidade do Sistema & Latência, Buffer, CPU & Latência, Energia & \gls{DQN} + \textit{Transfer Learning} & Estocástico, Carga de Trabalho \\ \hline
         
 %        ~\cite{wei2024} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $-$ Sobrecarga & Canal, Latência, CPU & Função Custo & QDPG (DDPG + D3QN) & Estocástico, Carga de Trabalho \\ \hline
         
-%        ~\cite{chen2025} & $-$ Tempo de Resposta & Canal, Buffer, CPU & Latência & DQN Federado & Estocástico, Carga de Trabalho \\ \hline
+%        ~\cite{chen2025} & $-$ Tempo de Resposta & Canal, Buffer, CPU & Latência & \gls{DQN} Federado & Estocástico, Carga de Trabalho \\ \hline
         
 %        ~\cite{ma2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético & Canal, Buffer, CPU & Função Custo & P-DQN & Estocástico \\ \hline
         
 %        ~\cite{kumar2023} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $-$ Sobrecarga & Canal, Latência, Buffer, CPU & Função Custo & L-MADDPG (Ator-Crítico) & Estocástico, Incerteza, Carga de Trabalho \\ \hline
         
-%        ~\cite{kumari2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $+$ Utilidade do Sistema & Canal, Latência, Buffer, CPU & Função Custo & DQN & Estocástico \\ \hline
+%        ~\cite{kumari2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético \newline $+$ Utilidade do Sistema & Canal, Latência, Buffer, CPU & Função Custo & \gls{DQN} & Estocástico \\ \hline
         
 %        ~\cite{tian2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético & Canal, Buffer, CPU & Latência, Energia & SIDDPG (Ator-Crítico) & Estocástico, Carga de Trabalho \\ \hline
         
-%        ~\cite{bao2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético & Canal, Latência, Buffer, CPU & Função Custo & SAC & Estocástico, Incerteza \\ \hline
+%        ~\cite{bao2025} & $-$ Tempo de Resposta \newline $-$ Cons. Energético & Canal, Latência, Buffer, CPU & Função Custo & \gls{SAC} & Estocástico, Incerteza \\ \hline
         
 %     \end{tabular}
 %     }

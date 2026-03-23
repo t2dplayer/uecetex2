@@ -1,7 +1,7 @@
 \section{A Internet de Veículos (IoV) e as Redes Veiculares}
 \label{sec:internet-de-veiculos}
 
-A evolução das Redes de Comunicação Veicular nas últimas décadas é marcada por uma transição clara entre paradigmas tecnológicos. Inicialmente, o foco concentrava-se nas Redes Ad Hoc Veiculares (VANETs, \textit{Vehicular Ad hoc NETworks}), priorizando a conectividade direta entre os veículos. Com o amadurecimento da Internet das Coisas (IoT, \textit{Internet of Things}), iniciou-se um processo de convergência que resultou no atual ecossistema da Internet dos Veículos (IoV, \textit{Internet of Vehicles}) \cite{salcedo2025_evolution, abd2024comparative}. Enquanto o estágio inicial das VANETs visava a comunicação básica, a IoV contemporânea integra sensores embarcados, Inteligência Artificial (IA) e Redes Definidas por Software (SDN) para viabilizar Sistemas de Transporte Inteligentes (ITS) verdadeiramente autônomos e conectados.
+A evolução das Redes de Comunicação Veicular nas últimas décadas é marcada por uma transição clara entre paradigmas tecnológicos. Inicialmente, o foco concentrava-se nas Redes Ad Hoc Veiculares (VANETs, \textit{Vehicular Ad hoc NETworks}), priorizando a conectividade direta entre os veículos. Com o amadurecimento da Internet das Coisas (IoT, \textit{Internet of Things}), iniciou-se um processo de convergência que resultou no atual ecossistema da Internet dos Veículos (IoV, \textit{Internet of Vehicles}) \cite{salcedo2025_evolution, abd2024comparative}. Enquanto o estágio inicial das VANETs visava a comunicação básica, a IoV contemporânea integra sensores embarcados, Inteligência Artificial (IA) e Redes Definidas por Software (\gls{SDN}) para viabilizar Sistemas de Transporte Inteligentes (ITS) verdadeiramente autônomos e conectados.
 
 As VANETs emergiram como uma evolução das redes móveis ad hoc (MANETs, \textit{Mobile Ad hoc NETworks}). No entanto, seu grande diferencial é a alta mobilidade dos nós, o que impõe desafios rigorosos em termos de conectividade e latência. Diferente das MANETs, os enlaces nas redes veiculares surgem e desaparecem rapidamente. Para aplicações de segurança crítica, como alertas de colisão, atrasos na comunicação são intoleráveis. Consequentemente, novas tecnologias de comunicação foram desenvolvidas para atender às exigências das VANETs e da futura IoV, destacando-se o DSRC (\textit{Dedicated Short-Range Communications}) e o C-V2X (\textit{Cellular Vehicle-to-Everything}).
 
@@ -9,7 +9,7 @@ As VANETs emergiram como uma evolução das redes móveis ad hoc (MANETs, \texti
 
 \begin{figure}[ht!]
 \centering
-\Caption{\label{fig:v2x-overview} Abstração do Ecossistema IoV: V2V, V2I, V2N e V2P em Cruzamento}
+\Caption{\label{fig:v2x-overview} Abstração do Ecossistema IoV: \gls{V2V}, \gls{V2I}, \gls{V2N} e \gls{V2P} em Cruzamento}
 \vspace{0.2cm}
 \begin{tikzpicture}[
     font=\sffamily,
@@ -98,32 +98,32 @@ As VANETs emergiram como uma evolução das redes móveis ad hoc (MANETs, \texti
     \pic at (6.75, 1.5) {car top up};
     \node[font=\scriptsize\bfseries] at (8.0, 1.5) {Veículo B};
 
-    % V2I RSU (Traffic light / Edge node at intersection corner)
+    % \gls{V2I} \gls{RSU} (Traffic light / Edge node at intersection corner)
     \filldraw[fill=gray!80, draw=black, thick] (4.0, 7.0) rectangle (4.4, 7.4);
     \filldraw[fill=green!40, draw=black, thick] (4.1, 7.1) rectangle (4.3, 7.3);
     \node[fill=white, inner sep=2pt, font=\scriptsize\bfseries, rounded corners] at (3.1, 6.8) {Edge RSU};
 
-    % V2N Tower & Cloud (Top Right)
+    % \gls{V2N} Tower & Cloud (Top Right)
     \node[draw=black, fill=red!10, thick, rounded corners, align=center, font=\scriptsize\bfseries] (Tower) at (10.5, 5.5) {Torre\\(5G gNB)};
     \node[cloud, cloud puffs=12, cloud puff arc=120, aspect=2, draw=black, fill=gray!10, thick, font=\scriptsize\bfseries] (Cloud) at (10.5, 8.0) {Core 5G / ITS};
     \draw[thick] (Tower) -- (Cloud);
 
-    % V2P Pedestrian (Crossing top crosswalk)
+    % \gls{V2P} Pedestrian (Crossing top crosswalk)
     \filldraw[fill=blue] (6.0, 6.95) circle (0.15); 
     \filldraw[fill=white!80!pink] (6.0, 6.95) circle (0.08); 
     \node[fill=white, inner sep=2pt, font=\scriptsize\bfseries, rounded corners] at (6.4, 7.5) {Pedestre};
 
     % Communication Links
-    % V2V (Car 1 <-> Car 2)
+    % \gls{V2V} (Car 1 <-> Car 2)
     \draw[<->, dashed, line width=1.5pt, blue] (3.8, 4.0) -- (6.5, 2.2) node[midway, sloped, above=1pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2V};
     
-    % V2I (Car 1 <-> RSU)
+    % \gls{V2I} (Car 1 <-> \gls{RSU})
     \draw[<->, dashed, line width=1.5pt, green!50!black] (3.2, 4.8) -- (4.2, 7.0) node[midway, left=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2I};
     
-    % V2N (Car 2 <-> Tower)
+    % \gls{V2N} (Car 2 <-> Tower)
     \draw[<->, dashed, line width=1.5pt, purple] (7.2, 2.0) -- (9.8, 4.9) node[midway, below=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2N};
     
-    % V2P (Car 1 <-> Pedestrian)
+    % \gls{V2P} (Car 1 <-> Pedestrian)
     \draw[<->, dashed, line width=1.5pt, orange] (3.8, 4.6) -- (5.8, 6.8) node[midway, sloped, above=2pt, fill=white, inner sep=1pt, rounded corners, font=\bfseries\small] {V2P};
 
     % Border 
@@ -134,9 +134,9 @@ As VANETs emergiram como uma evolução das redes móveis ad hoc (MANETs, \texti
 \end{figure} 
 
 
-O ecossistema IoV, referenciado como \textit{Vehicle-to-Everything} (V2X), é estruturado por quatro interfaces de comunicação que determinam a topologia e o alcance da troca de dados. A interface \textbf{Vehicle-to-Vehicle (V2V)} viabiliza a comunicação direta entre veículos, configurando-se como um requisito crítico para sistemas de segurança ativa e alertas de colisão iminente. A comunicação \textbf{Vehicle-to-Infrastructure (V2I)} conecta o veículo aos equipamentos da infraestrutura viária (RSUs, \textit{Road Side Units}), provendo tanto dados locais de tráfego quanto o acesso a recursos de computação robustos com baixa latência. Para cenários que demandam coordenação global ou acesso a um poder de armazenamento e processamento massivo, a interface \textbf{Vehicle-to-Network (V2N)} estabelece o enlace celular com a rede núcleo da operadora, encaminhando o tráfego para a nuvem em detrimento do aumento da latência. Por fim, a interface \textbf{Vehicle-to-Pedestrian (V2P)} integra pedestres à rede por meio de dispositivos móveis, ampliando a consciência situacional do sistema de transporte.
+O ecossistema IoV, referenciado como \textit{Vehicle-to-Everything} (\gls{V2X}), é estruturado por quatro interfaces de comunicação que determinam a topologia e o alcance da troca de dados. A interface \textbf{Vehicle-to-Vehicle (\gls{V2V})} viabiliza a comunicação direta entre veículos, configurando-se como um requisito crítico para sistemas de segurança ativa e alertas de colisão iminente. A comunicação \textbf{Vehicle-to-Infrastructure (\gls{V2I})} conecta o veículo aos equipamentos da infraestrutura viária (RSUs, \textit{Road Side Units}), provendo tanto dados locais de tráfego quanto o acesso a recursos de computação robustos com baixa latência. Para cenários que demandam coordenação global ou acesso a um poder de armazenamento e processamento massivo, a interface \textbf{Vehicle-to-Network (\gls{V2N})} estabelece o enlace celular com a rede núcleo da operadora, encaminhando o tráfego para a nuvem em detrimento do aumento da latência. Por fim, a interface \textbf{Vehicle-to-Pedestrian (\gls{V2P})} integra pedestres à rede por meio de dispositivos móveis, ampliando a consciência situacional do sistema de transporte.
 
-Neste cenário, a viabilização da IoV é intrinsecamente dependente da maturidade de tecnologias de rádio robustas. Historicamente, o marco inicial no desenvolvimento de sistemas de comunicação de baixa latência ocorreu no final da década de 1990, com a alocação de 75MHz do espectro na banda 5.9GHz para sistemas de transporte inteligente \cite{zheng2015}. A motivação na época, residia na incapacidade das redes celulares em atender aos requisitos de segurança viária (latências proibitivas e instabilidade de conexão), somada às limitações de interferência das bandas não licenciadas \textit{Industrial, Scientific, and Medical} (ISM). Sob uma perspectiva técnica, o DSRC consolidou-se não como um protocolo isolado, mas como um arcabouço regulatório e tecnológico que, ao integrar a camada física IEEE 802.11p à arquitetura \textit{Wireless Access in Vehicular Environments} (WAVE) --- responsável por definir como as mensagens de segurança são estruturadas, criptografadas e um conjunto de padrões de interface de comunicação V2V e V2I --- definiu os parâmetros fundamentais para aplicações de segurança ativa e sistemas de tarifação eletrônica (Figura \ref{fig:arquitetura-dsrc-wave}).
+Neste cenário, a viabilização da IoV é intrinsecamente dependente da maturidade de tecnologias de rádio robustas. Historicamente, o marco inicial no desenvolvimento de sistemas de comunicação de baixa latência ocorreu no final da década de 1990, com a alocação de 75MHz do espectro na banda 5.9GHz para sistemas de transporte inteligente \cite{zheng2015}. A motivação na época, residia na incapacidade das redes celulares em atender aos requisitos de segurança viária (latências proibitivas e instabilidade de conexão), somada às limitações de interferência das bandas não licenciadas \textit{Industrial, Scientific, and Medical} (ISM). Sob uma perspectiva técnica, o DSRC consolidou-se não como um protocolo isolado, mas como um arcabouço regulatório e tecnológico que, ao integrar a camada física IEEE 802.11p à arquitetura \textit{Wireless Access in Vehicular Environments} (WAVE) --- responsável por definir como as mensagens de segurança são estruturadas, criptografadas e um conjunto de padrões de interface de comunicação \gls{V2V} e \gls{V2I} --- definiu os parâmetros fundamentais para aplicações de segurança ativa e sistemas de tarifação eletrônica (Figura \ref{fig:arquitetura-dsrc-wave}).
 
 \begin{figure}[ht!]
 \centering
@@ -185,7 +185,7 @@ O segundo eixo representa uma mudança de paradigma com o surgimento do \textbf{
 
 \begin{table}[ht!]
     \centering
-    \Caption{\label{tab:radio-tech-comparison} Comparativo técnico da evolução V2X: do DSRC ao 6G}
+    \Caption{\label{tab:radio-tech-comparison} Comparativo técnico da evolução \gls{V2X}: do DSRC ao 6G}
     \UECEtab{}{
         \begin{tabular}{lp{1.8cm}p{1.8cm}p{2.2cm}p{2.5cm}}
             \toprule

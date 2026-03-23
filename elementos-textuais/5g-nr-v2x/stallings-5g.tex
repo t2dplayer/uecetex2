@@ -60,11 +60,11 @@ Valendo-se do Fatiamento de Rede, cada rede virtual individual (slice) pode ser 
 \Fonte{Elaborado pelo autor.}
 \end{figure}
 
-Essa grande flexibilidade operacional da rede e do núcleo é primariamente garantida pelas abordagens fundamentais em Redes Definidas por Software (SDN) e Virtualização de Funções de Rede (NFV) [20, 21].
+Essa grande flexibilidade operacional da rede e do núcleo é primariamente garantida pelas abordagens fundamentais em Redes Definidas por Software (\gls{SDN}) e Virtualização de Funções de Rede (\gls{NFV}) [20, 21].
 
-A tecnologia NFV tem o papel revolucionário de abstrair as capacidades de computação e armazenamento da rede, implementando-as em software de forma ágil dentro de máquinas virtuais comerciais, dispensando a necessidade de grandes hardwares físicos proprietários [20, 22].
+A tecnologia \gls{NFV} tem o papel revolucionário de abstrair as capacidades de computação e armazenamento da rede, implementando-as em \textit{software} de forma ágil dentro de máquinas virtuais comerciais, dispensando a necessidade de grandes hardwares físicos proprietários [20, 22].
 
-Em consonância, a diretriz do SDN isola a camada de dados da camada de decisões nos roteadores corporativos, consolidando de maneira eficiente as rotas a partir de um controlador unificado programável em servidor central [17, 20].
+Em consonância, a diretriz do \gls{SDN} isola a camada de dados da camada de decisões nos roteadores corporativos, consolidando de maneira eficiente as rotas a partir de um controlador unificado programável em servidor central [17, 20].
 
 Ainda para viabilizar as baixas latências ditadas pelo URLLC, as funções e conteúdos de aplicações foram deslocados das nuvens centrais tradicionais para as extremidades locais, formando a chamada Computação de Borda de Múltiplo Acesso (MEC) [20, 23].
 
@@ -122,10 +122,10 @@ Combinando-se com os módulos FEC (Forward Error Correction) e LDPC, atua em par
   \node[draw, rectangle, rounded corners, fill=yellow!20, minimum width=2.5cm, minimum height=1.2cm, right of=car2, node distance=4cm] (rsu) {RSU (Infraestrutura)};
 
   % Edges
-  \draw[<->, thick, red] (car1) -- node[above] {PC5 (Sidelink V2V)} (car2);
-  \draw[<->, thick, blue] (car1) -- node[above, sloped] {Uu (V2N)} (gnb);
-  \draw[<->, thick, blue] (car2) -- node[above, sloped] {Uu (V2N)} (gnb);
-  \draw[<->, thick, red] (car2) -- node[above] {PC5 (V2I)} (rsu);
+  \draw[<->, thick, red] (car1) -- node[above] {PC5 (Sidelink \gls{V2V})} (car2);
+  \draw[<->, thick, blue] (car1) -- node[above, sloped] {Uu (\gls{V2N})} (gnb);
+  \draw[<->, thick, blue] (car2) -- node[above, sloped] {Uu (\gls{V2N})} (gnb);
+  \draw[<->, thick, red] (car2) -- node[above] {PC5 (\gls{V2I})} (rsu);
 \end{tikzpicture}
 \Caption{\label{fig:cv2x_short} Conceito 5G C-V2X abrangendo comunicações Uu (Celular) e PC5 (Sidelink direto).}
 \Fonte{Elaborado pelo autor.}
@@ -133,15 +133,15 @@ Combinando-se com os módulos FEC (Forward Error Correction) e LDPC, atua em par
 
 Desfrutando inteiramente dessa nova realidade construída com baixas latências de borda, surgem as aplicações da arquitetura C-V2X (Cellular Vehicle-to-Everything), engenhadas especificamente para orquestrar o trânsito moderno inteligente [3, 49].
 
-As premissas baseadas em V2X no 5G impulsionam a permuta instantânea de posições geográficas entre veículos em alta velocidade, assim como entre redes veiculares cruzando sinalizações semafóricas dotadas de sensores independentes da malha civil [49, 50].
+As premissas baseadas em \gls{V2X} no 5G impulsionam a permuta instantânea de posições geográficas entre veículos em alta velocidade, assim como entre redes veiculares cruzando sinalizações semafóricas dotadas de sensores independentes da malha civil [49, 50].
 
 O avanço na maturação do padrão do 5G NR nas gerações pós-Release 16 impulsionou não apenas rastreamentos de frota, mas as exigentes tecnologias de "platooning" veicular avançado de automação veicular compartilhada sem intervenções do controle rodoviário humano [50, 51].
 
 Dentro dos blocos lógicos desse segmento automotivo formidável, a pedra fundamental reside na estipulação rádio referenciada por Interface PC5, amplamente batizada na indústria pelas alcunhas de "Sidelink" [50, 52].
 
-A capacidade "Sidelink" do 5G engendra autênticas comunicações radiais ponto a ponto orientadas de dispositivos para dispositivos (D2D) sem depender da coordenação em nuvens ou em trânsitos centrais via gNB para que os pacotes troquem de rotas cruciais [49, 50].
+A capacidade "Sidelink" do 5G engendra autênticas comunicações radiais ponto a ponto orientadas de dispositivos para dispositivos (\gls{D2D}) sem depender da coordenação em nuvens ou em trânsitos centrais via gNB para que os pacotes troquem de rotas cruciais [49, 50].
 
-Ao harmonizar formidavelmente a capacidade multimegabit do feixe mmWave, o isolamento lógico das fatias NFV e as topologias diretas distribuídas em Sidelink e MEC, a quinta geração sela a base imutável para consolidar o avanço sem limites das sociedades veiculares urbanas nos anos seguintes [10, 51, 53].
+Ao harmonizar formidavelmente a capacidade multimegabit do feixe mmWave, o isolamento lógico das fatias \gls{NFV} e as topologias diretas distribuídas em Sidelink e MEC, a quinta geração sela a base imutável para consolidar o avanço sem limites das sociedades veiculares urbanas nos anos seguintes [10, 51, 53].
 
 Este capítulo aborda os princípios do processamento digital de sinais na interface aérea do 5G. Existem três tópicos principais. O primeiro abrange as técnicas subjacentes para transmissão e recepção que o 5G herdou dos sistemas 2G e 3G, como por exemplo, modulação, demodulação e estimativa de canal. O segundo abrange a multiplexação por divisão de frequências ortogonais (\gls{OFDMA}), uma técnica herdada do LTE através da qual a estação base pode se comunicar com diferentes dispositivos móveis simultaneamente. O terceiro abrange o gerenciamento de erros no fluxo de dados recebido por meio de correção antecipada de erro e retransmissão. Também serão discutidos uma série de problemas inerentes às elevadas frequências de rádio e que são especialmente relevantes ao 5G.
 
