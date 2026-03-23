@@ -7,7 +7,7 @@ A quinta geração de comunicações móveis celulares, o \gls{5G}, representou 
 
 O \gls{5G} foi idealizado para operar em três grandes cenários de uso. O primeiro, \gls{eMBB}, atende serviços que exigem altas taxas de transferência de dados, suportando picos de até 20~Gbps no \textit{downlink}~\cite{stallings2021}. O segundo, \gls{mMTC}, foi formulado para interconectar eficientemente o ecossistema da \gls{IoT}, suportando um grande número de dispositivos com baixo consumo energético~\cite{morais2025, raghavan2025}. O terceiro, \gls{URLLC}, é essencial para aplicações que demandam atrasos na casa de frações de milissegundos e taxas de erro de $10^{-5}$, como controle robótico e \gls{ITS}, incluindo casos de uso avançados como o \textit{platooning}\footnote{Refere-se à aplicação de \gls{ITS} que vincula eletronicamente dois ou mais veículos para que trafeguem de forma coordenada, mantendo uma distância mínima e constante entre si.} e a direção autônoma de Nível 4 e 5~\cite{sae2021j3016, raghavan2025, sheikh2026}.
 
-Para suportar tais exigências, a arquitetura do \gls{5G} foi subdividida em dois grandes blocos: (i) a \gls{NG-RAN}, responsável pelo acesso de rádio, e (ii) o \gls{5GC}, que implementa o núcleo da rede por meio do modelo de \gls{SBA}~\cite{stallings2021}, conforme ilustrado na Figura~\ref{fig:arquitetura_5g_macro}. No núcleo, as funções \gls{AMF} e \gls{SMF} gerenciam mobilidade, sessões e sinalização, enquanto a \gls{UPF} é responsável pelo roteamento efetivo dos pacotes de dados.
+Para suportar tais exigências, a arquitetura do \gls{5G} foi subdividida em dois grandes blocos: (i) a \gls{NG-RAN}, responsável pelo acesso de rádio, e (ii) o \gls{5GC}, que implementa o núcleo da rede por meio do modelo de \gls{SBA}~\cite{stallings2021}, conforme ilustrado na Figura~\ref{fig:arquitetura_5g_macro}. No núcleo, as \gls{AMF} e \gls{SMF} gerenciam mobilidade, sessões e sinalização, enquanto a \gls{UPF} é responsável pelo roteamento efetivo dos pacotes de dados.
 
 \begin{figure}[ht!]
 \centering
@@ -82,79 +82,79 @@ Na rede de acesso \gls{5G}, a estação base \gls{gNB} adotou uma arquitetura mo
 \subsection{Interface Aérea 5G NR: OFDMA e Adaptação de Enlace}
 \label{subsec:interface-aerea-5g}
 
-Os sinais transmitidos pela interface aérea do \gls{5G} \gls{NR} utilizam o esquema de acesso múltiplo \gls{OFDMA}. Esse esquema divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados como uma matriz bidimensional de tempo e frequência, agrupados em \glspl{RB} com 12 subportadoras cada, permitindo que diferentes fatias do espectro sejam alocadas simultaneamente a diferentes usuários~\cite{stallings2021, asplund2025}. O \gls{5G} \gls{NR} introduziu ainda uma numerologia escalável, com espaçamento de subportadoras $\Delta f = 15 \times 2^{\mu}$~kHz para $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, permitindo adaptar a latência e a capacidade de acordo com a faixa de frequência e o cenário de uso~\cite{cox2025}. O espectro suportado abrange a faixa \gls{FR1} (sub-6~GHz, até 100~MHz de largura de banda) e a faixa \gls{FR2} ou \gls{mmWave} (24,25~GHz a 71~GHz, até 400~MHz), com o emprego de \textit{Massive} \gls{MIMO} e \textit{beamforming} para compensar a atenuação nas frequências milimétricas~\cite{stallings2021, asplund2025}.
+Os sinais transmitidos pela interface aérea do \gls{5G} \gls{NR} utilizam o esquema de \gls{OFDMA}. Esse esquema divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados como uma matriz bidimensional de tempo e frequência, agrupados em \glspl{RB} com 12 subportadoras cada, permitindo que diferentes fatias do espectro sejam alocadas simultaneamente a diferentes usuários~\cite{stallings2021, asplund2025}. O \gls{5G} \gls{NR} introduziu ainda uma numerologia escalável, com espaçamento de subportadoras $\Delta f = 15 \times 2^{\mu}$~kHz para $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, permitindo adaptar a latência e a capacidade de acordo com a faixa de frequência e o cenário de uso~\cite{cox2025}. O espectro suportado abrange a faixa \gls{FR1} (sub-6~GHz, até 100~MHz de largura de banda) e a faixa \gls{FR2} ou \gls{mmWave} (24,25~GHz a 71~GHz, até 400~MHz), com o emprego de \textit{Massive} \gls{MIMO} e \textit{beamforming} para compensar a atenuação nas frequências milimétricas~\cite{stallings2021, asplund2025}.
 
-Na camada física, a informação digital é mapeada em ondas eletromagnéticas por meio de esquemas de \gls{QAM}. O \gls{3GPP} especifica tabelas de \gls{MCS} que associam um índice a um esquema de modulação específico (QPSK, 16-QAM, 64-QAM ou 256-QAM) e à sua respectiva taxa de codificação. Cada esquema empacota uma quantidade crescente de bits por símbolo transmitido --- de 2 bits no QPSK a 8 bits no 256-QAM ---, elevando diretamente a vazão de dados~\cite{cox2025}. Conforme a ordem de modulação aumenta, os pontos no diagrama de constelação tornam-se mais densos (Figura~\ref{fig:qam}), exigindo uma \gls{SINR} proporcionalmente superior para manter a \gls{BER} aceitável.
+Na camada física, a informação digital é mapeada em ondas eletromagnéticas por meio de esquemas de \gls{QAM}. O \gls{3GPP} especifica tabelas de \gls{MCS} que associam um índice a um esquema de modulação específico (QPSK, 16-QAM, 64-QAM ou 256-QAM) e à sua respectiva taxa de codificação. Cada esquema empacota uma quantidade crescente de bits por símbolo transmitido --- de 2 bits no QPSK a 8 bits no 256-QAM ---, elevando diretamente a vazão de dados~\cite{cox2025}. Conforme a ordem de modulação aumenta, os pontos no diagrama de constelação tornam-se mais densos, exigindo uma \gls{SINR} proporcionalmente superior para manter a \gls{BER} aceitável.
 
-\begin{figure}[htpb]
-\centering
-\begin{tikzpicture}[scale=0.95]
+% \begin{figure}[htpb]
+% \centering
+% \begin{tikzpicture}[scale=0.95]
 
-% ===== QPSK (superior esquerdo) =====
-\begin{scope}[xshift=0cm, yshift=0cm]
-  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
-  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
-  \draw[gray!30, thin] (0,0) circle (1.414cm);
-  \foreach \x/\y in {1/1, -1/1, -1/-1, 1/-1}
-    \filldraw[blue!80!black] (\x,\y) circle (3pt);
-  \node[font=\small, blue!80!black, anchor=south west] at (1.05,1.05) {\texttt{00}};
-  \node[font=\small, blue!80!black, anchor=south east] at (-1.05,1.05) {\texttt{01}};
-  \node[font=\small, blue!80!black, anchor=north east] at (-1.05,-1.05) {\texttt{11}};
-  \node[font=\small, blue!80!black, anchor=north west] at (1.05,-1.05) {\texttt{10}};
-  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(a) QPSK --- 2 bits/símbolo};
-\end{scope}
+% % ===== QPSK (superior esquerdo) =====
+% \begin{scope}[xshift=0cm, yshift=0cm]
+%   \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+%   \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+%   \draw[gray!30, thin] (0,0) circle (1.414cm);
+%   \foreach \x/\y in {1/1, -1/1, -1/-1, 1/-1}
+%     \filldraw[blue!80!black] (\x,\y) circle (3pt);
+%   \node[font=\small, blue!80!black, anchor=south west] at (1.05,1.05) {\texttt{00}};
+%   \node[font=\small, blue!80!black, anchor=south east] at (-1.05,1.05) {\texttt{01}};
+%   \node[font=\small, blue!80!black, anchor=north east] at (-1.05,-1.05) {\texttt{11}};
+%   \node[font=\small, blue!80!black, anchor=north west] at (1.05,-1.05) {\texttt{10}};
+%   \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(a) QPSK --- 2 bits/símbolo};
+% \end{scope}
 
-% ===== 16-QAM (superior direito) =====
-\begin{scope}[xshift=6cm, yshift=0cm]
-  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
-  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
-  \foreach \x in {-1.5, -0.5, 0.5, 1.5}
-    \foreach \y in {-1.5, -0.5, 0.5, 1.5}
-      \filldraw[red!80!black] (\x,\y) circle (2.5pt);
-  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(b) 16-QAM --- 4 bits/símbolo};
-\end{scope}
+% % ===== 16-QAM (superior direito) =====
+% \begin{scope}[xshift=6cm, yshift=0cm]
+%   \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+%   \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+%   \foreach \x in {-1.5, -0.5, 0.5, 1.5}
+%     \foreach \y in {-1.5, -0.5, 0.5, 1.5}
+%       \filldraw[red!80!black] (\x,\y) circle (2.5pt);
+%   \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(b) 16-QAM --- 4 bits/símbolo};
+% \end{scope}
 
-% ===== 64-QAM (inferior esquerdo) =====
-\begin{scope}[xshift=0cm, yshift=-6cm]
-  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
-  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
-  \foreach \i in {0,...,7}
-    \foreach \j in {0,...,7} {
-      \pgfmathsetmacro{\px}{-1.75 + \i * 0.5}
-      \pgfmathsetmacro{\py}{-1.75 + \j * 0.5}
-      \filldraw[green!50!black] (\px,\py) circle (1.8pt);
-    }
-  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(c) 64-QAM --- 6 bits/símbolo};
-\end{scope}
+% % ===== 64-QAM (inferior esquerdo) =====
+% \begin{scope}[xshift=0cm, yshift=-6cm]
+%   \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+%   \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+%   \foreach \i in {0,...,7}
+%     \foreach \j in {0,...,7} {
+%       \pgfmathsetmacro{\px}{-1.75 + \i * 0.5}
+%       \pgfmathsetmacro{\py}{-1.75 + \j * 0.5}
+%       \filldraw[green!50!black] (\px,\py) circle (1.8pt);
+%     }
+%   \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(c) 64-QAM --- 6 bits/símbolo};
+% \end{scope}
 
-% ===== 256-QAM (inferior direito) =====
-\begin{scope}[xshift=6cm, yshift=-6cm]
-  \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
-  \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
-  \foreach \i in {0,...,15}
-    \foreach \j in {0,...,15} {
-      \pgfmathsetmacro{\px}{-1.875 + \i * 0.25}
-      \pgfmathsetmacro{\py}{-1.875 + \j * 0.25}
-      \filldraw[purple!70!black] (\px,\py) circle (1.0pt);
-    }
-  \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(d) 256-QAM --- 8 bits/símbolo};
-\end{scope}
+% % ===== 256-QAM (inferior direito) =====
+% \begin{scope}[xshift=6cm, yshift=-6cm]
+%   \draw[->, gray!60] (-2.2,0) -- (2.2,0) node[right, font=\small] {I};
+%   \draw[->, gray!60] (0,-2.2) -- (0,2.2) node[above, font=\small] {Q};
+%   \foreach \i in {0,...,15}
+%     \foreach \j in {0,...,15} {
+%       \pgfmathsetmacro{\px}{-1.875 + \i * 0.25}
+%       \pgfmathsetmacro{\py}{-1.875 + \j * 0.25}
+%       \filldraw[purple!70!black] (\px,\py) circle (1.0pt);
+%     }
+%   \node[font=\small\bfseries, anchor=north] at (0,-2.5) {(d) 256-QAM --- 8 bits/símbolo};
+% \end{scope}
 
-\end{tikzpicture}
-\Caption{\label{fig:qam} Diagramas de constelação dos esquemas de modulação \gls{QAM} utilizados no \gls{5G} NR. À medida que a ordem da modulação aumenta de (a) para (d), cada símbolo transporta mais bits, elevando a vazão, porém a maior densidade de pontos exige uma \gls{SINR} proporcionalmente superior para manter a taxa de erro aceitável.}
-\Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
-\end{figure}
+% \end{tikzpicture}
+% \Caption{\label{fig:qam} Diagramas de constelação dos esquemas de modulação \gls{QAM} utilizados no \gls{5G} NR. À medida que a ordem da modulação aumenta de (a) para (d), cada símbolo transporta mais bits, elevando a vazão, porém a maior densidade de pontos exige uma \gls{SINR} proporcionalmente superior para manter a taxa de erro aceitável.}
+% \Fonte{Elaborado pelo autor com base em \cite{cox2025}.}
+% \end{figure}
 
 Para contornar a degradação, a rede emprega o mecanismo de adaptação de enlace (\textit{Link Adaptation}): avalia continuamente a qualidade do canal e regride dinamicamente para esquemas de modulação mais simples (como QPSK) em condições adversas, preservando a confiabilidade da entrega dos pacotes~\cite{cox2025, stallings2021}. É essa dinâmica de seleção do \gls{MCS} que determina a taxa de canal instantânea --- um dos critérios multicritério avaliados pelo \gls{TOPSIS} na seleção do melhor candidato ao descarregamento de tarefas neste trabalho.
 
 \subsection{Comunicação Veicular C-V2X e Interface \textit{Sidelink} PC5}
 \label{subsec:cv2x-sidelink}
 
-O próximo passo natural, após essa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \glspl{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração consolidou o paradigma \textbf{C-V2X (\textit{Cellular Vehicle-to-Everything})}~\cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.
+O próximo passo natural, após essa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \glspl{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração consolidou o paradigma \gls{C-V2X}~\cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.
 
-O \gls{C-V2X} opera fundamentalmente sobre duas interfaces: (i) a \textbf{Uu}, conectando o veículo à infraestrutura da rede celular (\gls{V2I}/\gls{V2N}), e (ii) a \textbf{PC5 (\textit{Sidelink})}, que estabelece um enlace direto veículo-veículo (\gls{V2V}) e veículo-pedestre (\gls{V2P}) sem que os dados precisem transitar pelas antenas ou pelo núcleo da rede \gls{5GC}. No \textit{Release} 16 do \gls{3GPP}, o \textit{Sidelink} do \gls{5G} \gls{NR} foi aprimorado para suportar não apenas transmissões abertas (\textit{broadcast}), mas também comunicações \textit{unicast} e \textit{groupcast}, garantindo maior controle de \gls{QoS} em manobras cooperativas, como a formação de pelotões (\textit{platooning}).
+O \gls{C-V2X} opera fundamentalmente sobre duas interfaces: (i) a \gls{Uu}, conectando o veículo à infraestrutura da rede celular (\gls{V2I}/\gls{V2N}), e (ii) a PC5 (\textit{Sidelink}), que estabelece um enlace direto veículo-veículo (\gls{V2V}) e veículo-pedestre (\gls{V2P}) sem que os dados precisem transitar pelas antenas ou pelo núcleo da rede \gls{5GC}. No \textit{Release} 16 do \gls{3GPP}, o \textit{Sidelink} do \gls{5G} \gls{NR} foi aprimorado para suportar não apenas transmissões abertas (\textit{broadcast}), mas também comunicações \textit{unicast} e \textit{groupcast}, garantindo maior controle de \gls{QoS} em manobras cooperativas, como a formação de pelotões (\textit{platooning}).
 
-O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5} \textit{Sidelink} operam sob dois modos distintos. No \textbf{Modo 1}, a alocação de recursos é centralizada: a \gls{gNB} agenda os recursos para os veículos através da interface celular (\gls{Uu}), garantindo baixa ocorrência de colisões, mas exigindo que os veículos estejam sob cobertura celular ininterrupta. No \textbf{Modo 2}, os próprios veículos gerenciam os recursos de rádio de forma autônoma por meio de sensoriamento prévio do canal (\textit{Channel Sensing}), sendo a base para a cooperação distribuída em zonas sem cobertura celular. A Figura~\ref{fig:arquitetura_cv2x} apresenta essas conexões.
+O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5} \textit{Sidelink} operam sob dois modos distintos. No Modo 1, a alocação de recursos é centralizada: a \gls{gNB} agenda os recursos para os veículos através da \gls{Uu}, garantindo baixa ocorrência de colisões, mas exigindo que os veículos estejam sob cobertura celular ininterrupta. No \textbf{Modo 2}, os próprios veículos gerenciam os recursos de rádio de forma autônoma por meio de sensoriamento prévio do canal (\textit{Channel Sensing}), sendo a base para a cooperação distribuída em zonas sem cobertura celular. A Figura~\ref{fig:arquitetura_cv2x} apresenta essas conexões.
 
 \begin{figure}[htpb]
 \centering
@@ -217,24 +217,28 @@ O gerenciamento do acesso ao meio e a reserva de recursos de rádio no \gls{PC5}
 % ==============================
 % VEÍCULO 2 — Faixa inferior (indo para a esquerda ←)
 % ==============================
-\fill[black, opacity=0.06, rounded corners=3pt] (1.95, -1.12) rectangle (5.15, -0.22);
+\fill[black, opacity=0.06, rounded corners=3pt] (1.95, -1.12) rectangle (5.15, 0.42);
 \fill[green!15, rounded corners=4pt] (2.0, -1.05) rectangle (5.1, -0.25);
 \draw[green!55!black, thick, rounded corners=4pt] (2.0, -1.05) rectangle (5.1, -0.25);
-\fill[green!8, rounded corners=3pt] (2.65, -1.05) rectangle (4.45, -1.65);
-\draw[green!55!black, thick, rounded corners=3pt] (2.65, -1.05) rectangle (4.45, -1.65);
-\fill[cyan!18] (2.8, -1.57) rectangle (3.5, -1.18);
-\draw[cyan!45, thin] (2.8, -1.57) rectangle (3.5, -1.18);
-\fill[cyan!18] (3.6, -1.57) rectangle (4.3, -1.18);
-\draw[cyan!45, thin] (3.6, -1.57) rectangle (4.3, -1.18);
+% Cabine / Teto (acima do corpo, em direção à faixa central)
+\fill[green!8, rounded corners=3pt] (2.65, -0.25) rectangle (4.45, 0.35);
+\draw[green!55!black, thick, rounded corners=3pt] (2.65, -0.25) rectangle (4.45, 0.35);
+% Janela traseira
+\fill[cyan!18] (2.8, -0.17) rectangle (3.5, 0.22);
+\draw[cyan!45, thin] (2.8, -0.17) rectangle (3.5, 0.22);
+% Janela dianteira
+\fill[cyan!18] (3.6, -0.17) rectangle (4.3, 0.22);
+\draw[cyan!45, thin] (3.6, -0.17) rectangle (4.3, 0.22);
 \fill[red!50] (5.1, -0.9) rectangle (4.95, -0.65);
 \fill[yellow!60] (2.15, -0.9) rectangle (2.0, -0.65);
 \fill[black!80] (4.45, -1.05) circle (0.22);
 \fill[gray!50] (4.45, -1.05) circle (0.10);
 \fill[black!80] (2.65, -1.05) circle (0.22);
 \fill[gray!50] (2.65, -1.05) circle (0.10);
-\draw[green!55!black, thick] (3.55, -1.65) -- (3.55, -2.05);
-\fill[green!55!black] (3.55, -2.05) circle (0.06);
-\node (v2_ant) at (3.55, -2.05) {};
+% Antena veicular (do topo da cabine)
+\draw[green!55!black, thick] (3.55, 0.35) -- (3.55, 0.75);
+\fill[green!55!black] (3.55, 0.75) circle (0.06);
+\node (v2_ant) at (3.55, 0.75) {};
 \node[font=\footnotesize\bfseries, text=green!55!black, fill=white, inner sep=1.5pt, rounded corners=2pt, opacity=0.85, text opacity=1] at (3.55, -0.65) {Veículo 2};
 
 % ==============================
