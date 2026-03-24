@@ -1,0 +1,13 @@
+\section{Descarregamento de Tarefas em VEC}
+\label{sec:task-offloading-vec}
+
+O descarregamento de tarefas (\textit{task offloading}) em ambientes de Computação de Borda Veicular (\gls{VEC}) é um processo crítico para estender as capacidades computacionais de veículos com recursos limitados. Este processo envolve a decisão de executar uma tarefa localmente no veículo ou descarregá-la para um servidor de borda (\gls{RSU}/MEC) ou para veículos vizinhos (\gls{V2V}) por meio de interfaces de comunicação como 5G NR e Sidelink \cite{wang2022}.
+
+As estratégias de descarregamento podem ser classificadas em:
+\begin{itemize}
+    \item \textbf{Total (\textit{Full Offloading}):} A tarefa inteira é enviada para um recurso externo;
+    \item \textbf{Parcial (\textit{Partial Offloading}):} A tarefa é dividida, com partes executadas localmente e outras remotamente;
+    \item \textbf{Adaptativo (\textit{Adaptive Offloading}):} A decisão é tomada dinamicamente com base nas condições da rede e requisitos da aplicação.
+\end{itemize}
+
+O principal objetivo do descarregamento é otimizar métricas como latência de ponta a ponta e consumo de energia, garantindo que os prazos (\textit{deadlines}) das tarefas sejam cumpridos em cenários de alta mobilidade e volatilidade de canais \cite{liu2021}.
