@@ -180,32 +180,38 @@ Neste cenário, a viabilização da \gls{IoV} é intrinsecamente dependente da m
 
 A partir do legado do \gls{DSRC}, a evolução tecnológica da comunicação veicular ramificou-se em dois eixos técnicos distintos. O primeiro, o padrão \textbf{IEEE 802.11bd} (\textit{Next Generation V2X} - NGV), surge como uma melhoria incremental do IEEE 802.11p. Conforme~\cite{naik2019}, a demanda por maior vazão de dados (\textit{throughput}) e a necessidade de robustez contra o desvanecimento rápido em cenários de alta mobilidade foram os principais motivadores desta evolução, integrando técnicas para suporte a velocidades de até 250~km/h.
 
-O segundo eixo representa uma mudança de paradigma com o surgimento do \gls{C-V2X} e sua posterior transição para o \gls{5G} \gls{NR}-\gls{V2X} e o horizonte do \gls{6G}~\cite{rodriguez2025_6genabled}. As limitações do \gls{DSRC} em termos de escalabilidade e custo de implantação impulsionaram o desenvolvimento do \gls{C-V2X} pelo \gls{3GPP}~\cite{chen2017}. Sob uma perspectiva regulatória atual, a disputa tecnológica foi amplamente resolvida em mercados-chave; nos Estados Unidos, a \gls{FCC} estabeleceu o \gls{C-V2X} como padrão obrigatório para segurança \gls{ITS} com descontinuação oficial do \gls{DSRC} em dezembro de 2026~\cite{fcc2024_59ghz}, enquanto no Brasil a ANATEL, através da Resolução nº 772/2025~\cite{anatel2025_res772}, harmonizou os requisitos técnicos nacionais com os padrões globais celular e radar automotivo~\cite{anatel2025_ato14158}. A Tabela \ref{tab:radio-tech-comparison} sintetiza a evolução e as divergências técnicas entre essas abordagens.
+O segundo eixo representa uma mudança de paradigma com o surgimento do \gls{C-V2X} e sua posterior transição para o \gls{5G} \gls{NR}-\gls{V2X} e o horizonte do \gls{6G}~\cite{rodriguez2025_6genabled}. As limitações do \gls{DSRC} em termos de escalabilidade e custo de implantação impulsionaram o desenvolvimento do \gls{C-V2X} pelo \gls{3GPP}~\cite{chen2017}. Sob uma perspectiva regulatória atual, a disputa tecnológica foi amplamente resolvida em mercados-chave; nos Estados Unidos, a \gls{FCC} estabeleceu o \gls{C-V2X} como padrão obrigatório para segurança \gls{ITS} com descontinuação oficial do \gls{DSRC} em dezembro de 2026~\cite{fcc2024_59ghz}, enquanto no Brasil a \gls{ANATEL}, através da Resolução nº 772/2025, harmonizou os requisitos técnicos nacionais com os padrões globais celular e radar automotivo. 
+
+% A Tabela \ref{tab:radio-tech-comparison} sintetiza a evolução e as divergências técnicas entre essas abordagens.
+
+% ~\cite{anatel2025_res772}
+% ~\cite{anatel2025_ato14158}
+
+% \begin{table}[ht!]
+%     \centering
+%     \Caption{\label{tab:radio-tech-comparison} Comparativo técnico da evolução \gls{V2X}: do \gls{DSRC} ao \gls{6G}}
+%     \UECEtab{}{
+%         \begin{tabular}{lp{1.8cm}p{1.8cm}p{2.2cm}p{2.5cm}}
+%             \toprule
+%             \textbf{Atributo} & \textbf{\gls{DSRC} (11p)} & \textbf{NGV (11bd)} & \textbf{\gls{C-V2X} (\gls{5G} \gls{NR})} & \textbf{\gls{6G}-V2X (Exp.)} \\
+%             \midrule \midrule
+%             Acesso \gls{MAC} & CSMA/CA & CSMA/CA+ & CP-OFDM & Holístico/Cognit. \\
+%             Código Canal & BCC & LDPC & LDPC & Polar / AI-based \\
+%             Latência & $\sim$100~ms & $<$~50~ms & 3--10~ms & $<$~1~ms \\
+%             Taxa Dados & 6--27~Mbps & Até 90~Mbps & Mbps a Gbps & $>$~1~Tbps \\
+%             Transmissão & Broadcast & Broadcast & Uni/Groupcast & Semântica / ISAC \\
+%             Conectividade & Ad-hoc & Ad-hoc & Nativa Sidelink & Integrada (Sat.) \\
+%             Robustez Doppler& Moderada & Alta & Muito Alta & Extrema \\
+%             Sincronização & Não exigida & Não exigida & Exigida (GNSS) & Pevasiva (AI) \\
+%             \bottomrule
+%         \end{tabular}
+%     }{
+%         \Fonte{Elaborado pelo autor com base em~\cite{naik2019evolution, abd2024comparative, sanchez2025evolution}}
+%         \Nota{BC: \textit{Broadcast}; CP-OFDM: \textit{Cyclic Prefix Orthogonal Frequency Division Multiplexing}; GNSS: \textit{Global Navigation Satellite System}; ISAC: \textit{Integrated Sensing and Communication}; LDPC: \textit{Low-Density Parity-Check}; NGV: \textit{Next Generation V2X}.}
+%     }
+% \end{table}
 
 
-\begin{table}[ht!]
-    \centering
-    \Caption{\label{tab:radio-tech-comparison} Comparativo técnico da evolução \gls{V2X}: do \gls{DSRC} ao \gls{6G}}
-    \UECEtab{}{
-        \begin{tabular}{lp{1.8cm}p{1.8cm}p{2.2cm}p{2.5cm}}
-            \toprule
-            \textbf{Atributo} & \textbf{\gls{DSRC} (11p)} & \textbf{NGV (11bd)} & \textbf{\gls{C-V2X} (\gls{5G} \gls{NR})} & \textbf{\gls{6G}-V2X (Exp.)} \\
-            \midrule \midrule
-            Acesso \gls{MAC} & CSMA/CA & CSMA/CA+ & CP-OFDM & Holístico/Cognit. \\
-            Código Canal & BCC & LDPC & LDPC & Polar / AI-based \\
-            Latência & $\sim$100~ms & $<$~50~ms & 3--10~ms & $<$~1~ms \\
-            Taxa Dados & 6--27~Mbps & Até 90~Mbps & Mbps a Gbps & $>$~1~Tbps \\
-            Transmissão & Broadcast & Broadcast & Uni/Groupcast & Semântica / ISAC \\
-            Conectividade & Ad-hoc & Ad-hoc & Nativa Sidelink & Integrada (Sat.) \\
-            Robustez Doppler& Moderada & Alta & Muito Alta & Extrema \\
-            Sincronização & Não exigida & Não exigida & Exigida (GNSS) & Pevasiva (AI) \\
-            \bottomrule
-        \end{tabular}
-    }{
-        \Fonte{Elaborado pelo autor com base em~\cite{naik2019evolution, abd2024comparative, sanchez2025evolution}}
-        \Nota{BC: \textit{Broadcast}; CP-OFDM: \textit{Cyclic Prefix Orthogonal Frequency Division Multiplexing}; GNSS: \textit{Global Navigation Satellite System}; ISAC: \textit{Integrated Sensing and Communication}; LDPC: \textit{Low-Density Parity-Check}; NGV: \textit{Next Generation V2X}.}
-    }
-\end{table}
+As redes veiculares evoluíram com a integração à \gls{IoV}, transitando da incerteza tecnológica para uma realidade onde a superioridade do \gls{C-V2X} é um fato regulatório consolidado~\cite{ansari2020v2x}. Embora o \gls{DSRC} possua validação extensiva em segurança básica, a indústria convergiu para o ecossistema celular em função de sua projeção escalonável em direção ao \gls{5G} \gls{NR} em frequências milimétricas (\gls{mmWave}, \gls{FR2}) e aos futuros padrões \gls{6G} operando em faixas Terahertz (THz)~\cite{naik2019evolution}. 
 
-
-As redes veiculares evoluíram com a integração à \gls{IoV}, transitando da incerteza tecnológica para uma realidade onde a superioridade do \gls{C-V2X} é um fato regulatório consolidado~\cite{ansari2020v2x}. Embora o \gls{DSRC} possua validação extensiva em segurança básica, a indústria convergiu para o ecossistema celular em função de sua projeção escalonável em direção ao \gls{5G} \gls{NR} em frequências milimétricas (\gls{mmWave}, \gls{FR2}) e aos futuros padrões \gls{6G} operando em faixas Terahertz (THz)~\cite{naik2019evolution}. Entretanto, o transplante das arquiteturas de rádio para bandas de frequência tão elevadas introduz barreiras operacionais agressivas, como deficiências estruturais de difração, elevada taxa de absorção atmosférica e severas falhas (\textit{outage}) originadas pelo bloqueio dinâmico gerado pelo próprio tráfego (veículos de grande porte e pedestres), demandando arranjos de antenas estritamente direcionais e complexas matrizes estocásticas e de teoria de filas para modelar matematicamente sua real confiabilidade~\cite{moltchanov2022tutorial}. Consequentemente, a pesquisa atual concentra-se em preencher os hiatos dos mecanismos de serviço (\textit{service-level performance}) propondo sub-rogação de tráfego, reservas de banda vitais, sistemas híbridos de predição e gestão inteligente de espectro — como Redes de Atenção para Grafos (GAT) e Aprendizado por Reforço Multiagente (\gls{MARL}) — com a finalidade de otimizar a coexistência multitecnologia e manter a operação em tempo real irrestrita~\cite{turcanu2016}.
+% Entretanto, mudar para bandas de frequência tão elevadas introduz barreiras operacionais, como deficiências estruturais de difração, elevada taxa de absorção atmosférica e severas falhas (\textit{outage}) originadas pelo bloqueio dinâmico gerado pelo próprio tráfego (veículos de grande porte e pedestres), demandando arranjos de antenas estritamente direcionais e complexas matrizes estocásticas e de teoria de filas para modelar matematicamente sua real confiabilidade~\cite{moltchanov2022tutorial}. Consequentemente, a pesquisa atual concentra-se em preencher os hiatos dos mecanismos de serviço (\textit{service-level performance}) propondo sub-rogação de tráfego, reservas de banda vitais, sistemas híbridos de predição e gestão inteligente de espectro — como Redes de Atenção para Grafos (GAT) e Aprendizado por Reforço Multiagente (\gls{MARL}) — com a finalidade de otimizar a coexistência multitecnologia e manter a operação em tempo real irrestrita~\cite{turcanu2016}.
