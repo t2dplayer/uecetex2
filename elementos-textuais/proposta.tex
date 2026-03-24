@@ -230,7 +230,7 @@ $Q_{\max}$            & Capacidade máxima das filas               & $100$ taref
 
 \subsection{Protocolo de Treinamento e Hiperparâmetros}
 
-O treinamento de cada política \gls{DRL} é conduzido em modo \textbf{offline}, interagindo exclusivamente com o simulador, sem nenhum acesso ao ambiente real. O protocolo é o seguinte:
+O treinamento de cada política \gls{DRL} é conduzido em modo \textbf{\textit{offline}}, interagindo exclusivamente com o simulador, sem nenhum acesso ao ambiente real. O protocolo é o seguinte:
 
 \begin{enumerate}
     \item \textbf{Cenário de treino:} Um único cenário de 100 tarefas a 10 tps (\texttt{cenario\_v2x\_10tps\_w01}) é utilizado durante todo o treinamento. A generalização para outros volumes e taxas é avaliada nas 661 instâncias de teste (\textit{zero-shot}).
@@ -278,8 +278,8 @@ onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a primazia da taxa de sucesso sobre 
 
 Para resolver esse problema, a arquitetura proposta é dividida em duas fases:
 \begin{itemize}
-    \item \textbf{Fase de Treinamento (Offline):} O algoritmo \gls{SAC} (\textit{Soft Actor-Critic}) interage com um simulador estocástico para otimizar os pesos de uma rede neural Perceptron Multicamadas (\gls{MLP}). O ambiente simula a heterogeneidade dos servidores, a dinâmica autorregressiva (AR-1) das filas e as perdas de percurso realistas baseadas nos padrões \gls{3GPP} TR 38.901.
-    \item \textbf{Fase de Implantação (Online):} Em tempo real, o módulo \gls{TOPSIS} ranqueia os $N$ candidatos disponíveis (servidores \gls{RSU} ou veículos vizinhos \gls{V2V}), convertendo-os em um vetor de estado compacto de 6 dimensões $\mathbf{S}_t \in \mathbb{R}^6$. A \gls{MLP} treinada recebe esse vetor e emite a decisão binária $a_t \in \{0, 1\}$ (executar localmente ou descarregar para o candidato de maior escore).
+    \item \textbf{Fase de Treinamento (\textit{Offline}):} O algoritmo \gls{SAC} (\textit{Soft Actor-Critic}) interage com um simulador estocástico para otimizar os pesos de uma rede neural Perceptron Multicamadas (\gls{MLP}). O ambiente simula a heterogeneidade dos servidores, a dinâmica autorregressiva (AR-1) das filas e as perdas de percurso realistas baseadas nos padrões \gls{3GPP} TR 38.901.
+    \item \textbf{Fase de Implantação (\textit{Online}):} Em tempo real, o módulo \gls{TOPSIS} ranqueia os $N$ candidatos disponíveis (servidores \gls{RSU} ou veículos vizinhos \gls{V2V}), convertendo-os em um vetor de estado compacto de 6 dimensões $\mathbf{S}_t \in \mathbb{R}^6$. A \gls{MLP} treinada recebe esse vetor e emite a decisão binária $a_t \in \{0, 1\}$ (executar localmente ou descarregar para o candidato de maior escore).
 \end{itemize}
 
 A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arquitetura SAC-TOPSIS em tempo de inferência.

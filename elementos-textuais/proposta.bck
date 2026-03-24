@@ -1,0 +1,1546 @@
+\chapter{Proposta}
+\label{chap:proposta}
+
+Este capítulo apresenta em detalhes a abordagem proposta para o descarregamento de tarefas em redes de \gls{VEC}: um agente de \gls{DRL} baseado no algoritmo \gls{PPO} cujo espaço de observação é construído pelo método \gls{TOPSIS}. A exposição está organizada de forma autossuficiente — todos os conceitos matemáticos necessários são introduzidos e derivados a partir do zero, de modo que o leitor familiarizado com os fundamentos de \gls{RL} e probabilidade básica possa acompanhar o raciocínio sem recorrer a fontes externas.
+
+% ============================================================
+\section{Visão Geral da Arquitetura}
+\label{sec:visao-geral}
+% ============================================================
+
+A solução proposta é estruturada em duas fases distintas: uma \textbf{fase de treinamento} (offline) e uma \textbf{fase de implantação} (online).
+
+Na \textbf{fase de treinamento}, o algoritmo \gls{PPO} interage com um simulador do ambiente \gls{VEC} para otimizar os pesos $\theta$ de uma \textbf{rede neural} (MLP com duas camadas de 256 neurônios) — a política $\pi_\theta$. O \gls{PPO} é, portanto, o \emph{algoritmo de treinamento}; a MLP resultante é o \emph{componente de decisão}. Ao final do treinamento, apenas a MLP é necessária para operação.
+
+Na \textbf{fase de implantação}, o sistema opera em tempo real: para cada tarefa gerada pelo veículo, o \gls{TOPSIS} avalia todos os $N$ candidatos disponíveis — que podem ser \glspl{RSU}, servidores \gls{MEC} ou veículos vizinhos dentro do alcance de comunicação — e constrói a matriz de decisão $\mathbf{X} \in \mathbb{R}^{N \times 4}$, cujas colunas representam os quatro critérios: latência estimada, ocupação de fila, taxa de canal e energia de transmissão. A partir de $\mathbf{X}$, o módulo gera o vetor de estado fixo $\mathbf{S}_t \in [0,1]^{15}$ que é entregue à MLP, a qual emite a ação binária $a_t \in \{0, 1\}$ em microssegundos.
+
+A Figura~\ref{fig:arquitetura} ilustra o fluxo completo de informação entre os componentes.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    % ── Blocos principais ─────────────────────────────────────────────
+    envblock/.style={rectangle, draw, rounded corners=4pt,
+                     minimum width=2.6cm, minimum height=1.4cm,
+                     align=center, font=\small,
+                     fill=blue!7, draw=blue!55, line width=0.9pt},
+    topblock/.style={rectangle, draw, rounded corners=4pt,
+                     minimum width=2.9cm, minimum height=1.4cm,
+                     align=center, font=\small,
+                     fill=teal!8, draw=teal!55, line width=0.9pt},
+    ppoblock/.style={rectangle, draw, rounded corners=4pt,
+                     minimum width=2.8cm, minimum height=1.4cm,
+                     align=center, font=\small,
+                     fill=purple!7, draw=purple!50, line width=0.9pt},
+    actblock/.style={rectangle, draw, rounded corners=4pt,
+                     minimum width=2.4cm, minimum height=1.4cm,
+                     align=center, font=\small,
+                     fill=orange!7, draw=orange!55, line width=0.9pt},
+    % ── Sub-blocos do triplete ────────────────────────────────────────
+    triplet/.style={rectangle, draw, rounded corners=3pt,
+                    minimum width=2.1cm, minimum height=1.0cm,
+                    align=center, font=\scriptsize,
+                    fill=teal!4, draw=teal!40, line width=0.6pt},
+    % ── Setas ─────────────────────────────────────────────────────────
+    arrow/.style={->, >=stealth, thick, draw=black!70},
+    darrow/.style={->, >=stealth, thick, dashed, draw=black!55},
+    tinyarrow/.style={->, >=stealth, draw=gray!60},
+    lbl/.style={font=\scriptsize, text=black!65},
+    tlbl/.style={font=\scriptsize, text=teal!70!black},
+]
+
+% ── Fluxo principal ──────────────────────────────────────────────────
+\node[envblock] (env)
+    {\textbf{Ambiente VEC}\\$N$ candidatos\\(RSUs, MEC, veículos)};
+
+\node[topblock, right=1.6cm of env] (top)
+    {\textbf{Módulo TOPSIS}\\$\mathbf{X}\!\in\!\mathbb{R}^{N\times4}$\\
+     $\downarrow\;\mathbf{S}_t\!\in\![0,1]^{15}$};
+
+\node[ppoblock, right=1.6cm of top] (ppo)
+    {\textbf{Política $\pi_\theta$}\\MLP $[256,\!256]$\\
+     \textit{\scriptsize (treinada pelo PPO)}};
+
+\node[actblock, right=1.5cm of ppo] (act)
+    {\textbf{Decisão}\\$a_t\!=\!0$\,(LOCAL)\\$a_t\!=\!1$\,(OFFLOAD)};
+
+% Setas principais
+\draw[arrow] (env.east)
+    -- node[above, lbl]{$\mathbf{X}\!\in\!\mathbb{R}^{N\times4}$} (top.west);
+\draw[arrow] (top.east)
+    -- node[above, lbl]{$\mathbf{S}_t\!\in\![0,1]^{15}$} (ppo.west);
+\draw[arrow] (ppo.east)
+    -- node[above, lbl]{$a_t$} (act.west);
+
+% Loop de recompensa
+\draw[darrow] (act.south) -- ++(0,-3.2)
+    -| (env.south);
+\node[lbl, below=0.15cm of act] {recompensa $r_t$\;\textit{(treinamento)}};
+
+% ── Expansão do triplete ─────────────────────────────────────────────
+\node[triplet, below=1.9cm of top, xshift=-2.2cm] (sbest)
+    {$\mathbf{s}_\textup{best}$\\
+     $[C^*,\hat\tau,\hat{Q},\hat{C},\hat{E}]$};
+
+\node[triplet, below=1.9cm of top] (sagent)
+    {$\mathbf{s}_\textup{agent}$\\
+     $[C^*,\hat\tau,\hat{Q},\hat{C},\hat{E}]$};
+
+\node[triplet, below=1.9cm of top, xshift=+2.2cm] (sworst)
+    {$\mathbf{s}_\textup{worst}$\\
+     $[C^*,\hat\tau,\hat{Q},\hat{C},\hat{E}]$};
+
+% Conectores TOPSIS → triplete
+\draw[tinyarrow] (top.south) -- ++(0,-0.3) -| (sbest.north);
+\draw[tinyarrow] (top.south) -- (sagent.north);
+\draw[tinyarrow] (top.south) -- ++(0,-0.3) -| (sworst.north);
+
+% Rótulos
+\node[tlbl, above=0.04cm of sbest]  {melhor ($\uparrow C^*$)};
+\node[tlbl, above=0.04cm of sagent] {agente (alvo)};
+\node[tlbl, above=0.04cm of sworst] {pior ($\downarrow C^*$)};
+
+% Equação de composição
+\node[font=\small, text=black!55, below=0.3cm of sagent]
+    {$\mathbf{S}_t =
+      \bigl[\;\underbrace{\mathbf{s}_\textup{best}}_{5}
+            \;\|\;
+            \underbrace{\mathbf{s}_\textup{agent}}_{5}
+            \;\|\;
+            \underbrace{\mathbf{s}_\textup{worst}}_{5}\;\bigr]
+      \in[0,1]^{15}$};
+
+\end{tikzpicture}%
+}% end resizebox
+\caption{Arquitetura da solução proposta. O Ambiente \gls{VEC} expõe uma matriz de decisão $\mathbf{X}\!\in\!\mathbb{R}^{N\times4}$ com $N$ candidatos variável (RSUs, servidores MEC ou veículos vizinhos); as 4 colunas correspondem a latência estimada, ocupação de fila, taxa de canal e energia de transmissão. O Módulo \gls{TOPSIS} reduz essa entrada a um vetor fixo $\mathbf{S}_t\!\in\![0,1]^{15}$ via triplete \{melhor, agente, pior\}, cada nó com cinco atributos normalizados $(C^*, \hat\tau, \hat{Q}, \hat{C}, \hat{E})$. A Política $\pi_\theta$ — uma MLP $[256{\times}256]$ \emph{treinada} pelo algoritmo \gls{PPO} — recebe $\mathbf{S}_t$ e emite a ação binária $a_t$ em tempo real. Durante o treinamento (linha tracejada), a ação retroalimenta o simulador com a recompensa $r_t$; em implantação, apenas a MLP opera.}
+\label{fig:arquitetura}
+\end{figure}
+
+% ============================================================
+\section{Formulação Formal do Problema}
+\label{sec:formulacao-formal}
+% ============================================================
+
+Seja um veículo agente operando em uma área de cobertura com $N_s$ nós de infraestrutura heterogêneos (e.g., \glspl{RSU}, servidores \gls{MEC}, \glspl{gNB} \gls{5G}) e $N_v - 1$ veículos vizinhos dentro do alcance de comunicação. A cada instante $t$, o veículo agente gera uma tarefa com tamanho $b_t$ (em bytes), densidade computacional $\rho_t$ (ciclos/byte) e prazo $D_t$ (em segundos). O veículo deve decidir se executa a tarefa \emph{localmente} (no próprio veículo), ou se a \emph{descarrega} para um dos $N = N_s + (N_v - 1)$ candidatos disponíveis, que incluem tanto servidores de infraestrutura (V2I) quanto veículos vizinhos (V2V). O objetivo central é:
+
+\begin{equation}
+    \max_{\pi} \;\mathbb{E}_\pi\!\left[\sum_{t=0}^{T} \mathbf{1}\!\left[\tau_t \leq D_t\right]\right]
+    \quad \text{s.a.} \quad \mathbb{E}_\pi\!\left[E_t\right] \leq E_{\max},
+    \label{eq:objetivo-global}
+\end{equation}
+
+\noindent onde $\tau_t$ é a latência total da execução da tarefa $t$, $D_t$ é o prazo específico da tarefa e $E_t$ é a energia consumida. O problema é formulado rigorosamente como um \textbf{\gls{POMDP}}, definido pela sétupla $(\mathcal{S}, \mathcal{A}, \Omega, \mathcal{P}, \mathcal{O}, \mathcal{R}, \gamma)$:
+
+\begin{itemize}
+    \item \textbf{Espaço de estados latentes}: $\mathcal{S}$, que contém o estado completo e não observável da rede — taxas de canal instantâneas de todos os nós, estados internos das filas de todos os nós (servidores e veículos) e posições exatas dos veículos. O agente \textbf{nunca observa} $\mathbf{s}_t \in \mathcal{S}$ diretamente.
+
+    \item \textbf{Espaço de ações}: $\mathcal{A} = \{0, 1\}$, onde $a_t = 0$ indica execução local (\texttt{LOCAL}) e $a_t = 1$ indica descarregamento (\texttt{OFFLOAD}) para o nó — servidor de infraestrutura ou veículo vizinho — de maior $C^*$ no ranqueamento \gls{TOPSIS}.
+
+    \item \textbf{Espaço de observações}: $\Omega \subseteq [0,1]^{15}$. O agente recebe a observação $o_t \in \Omega$, que é o vetor de estado fixo $\mathbf{S}_t$ construído pelo módulo \gls{TOPSIS} (Seções~\ref{sec:topsis} e~\ref{sec:estado-fixo}).
+
+    \item \textbf{Função de transição}: $\mathcal{P}(s_{t+1} \mid s_t, a_t)$, não-estacionária devido à mobilidade dos veículos, às flutuações de canal e à cadeia de Markov de regimes de tráfego (Seção~\ref{sec:modelo-ambiente}).
+
+    \item \textbf{Função de observação}: $\mathcal{O}(o_t \mid s_t, a_{t-1})$, que mapeia o estado latente $s_t$ e a ação anterior $a_{t-1}$ para a observação $o_t \in \Omega$. O módulo \gls{TOPSIS} implementa esta função: a partir das medições ruidosas disponíveis (estimativas de canal e fila), produz a observação $\mathbf{S}_t \in [0,1]^{15}$.
+
+    \item \textbf{Função de recompensa}: $\mathcal{R}(s_t, a_t) = r_t$, definida em detalhes na Seção~\ref{sec:recompensa}.
+
+    \item \textbf{Fator de desconto}: $\gamma = 0{,}99$, discutido na Seção~\ref{sec:recompensa}.
+\end{itemize}
+
+\subsection{Justificativa do \glsentryshort{POMDP}}
+\label{subsec:pomdp-justificativa}
+
+O estado latente $s_t \in \mathcal{S}$ é inacessível por três razões estruturais. Primeiro, taxas de canal \gls{V2I} são estocásticas e variam com a posição do veículo — o agente observa apenas estimativas obtidas com atraso de um passo de tempo, sujeitas a ruído de sondagem. Segundo, o estado interno das filas dos servidores remotos é observado indiretamente, via telemetria com latência de propagação. Terceiro, posições dos veículos evoluem continuamente segundo um processo estocástico, introduzindo incerteza nas estimativas de distância e, portanto, de latência e energia \cite{uddin2025, farimani2024}. O módulo \gls{TOPSIS} implementa a função de observação $\mathcal{O}$: transforma as medições parciais disponíveis em $o_t = \mathbf{S}_t \in [0,1]^{15}$, resumindo o estado latente em uma representação de dimensão fixa que captura a melhor opção de offload, o custo local e a dispersão do campo de candidatos.
+
+% ============================================================
+\section{Modelagem do Ambiente de Simulação}
+\label{sec:modelo-ambiente}
+% ============================================================
+
+O ambiente de simulação foi implementado como um ambiente \textit{gymnasium} customizado, seguindo a interface padrão de \gls{RL}. Esta seção detalha cada componente do modelo.
+
+% ------------------------------------------------------------
+\subsection{Topologia e Mobilidade}
+\label{subsec:topologia}
+% ------------------------------------------------------------
+
+Considera-se uma área quadrada de dimensão $A \times A$ metros, com $N_v$ veículos e $N_s$ servidores de borda posicionados no interior da área. Os veículos se movem com velocidade aleatória uniforme, refletindo nas bordas da área (modelo de reflexão), de forma a modelar um cenário urbano com tráfego persistente.
+
+A capacidade de processamento local do veículo segue um \textbf{processo \gls{AR}(1)} (autorregressivo de primeira ordem), que modela a autocorrelação temporal da disponibilidade de \gls{CPU}:
+
+\begin{equation}
+    f_t = f_\mu + \rho\,(f_{t-1} - f_\mu) + \sigma_\varepsilon\,\varepsilon_t, \quad \varepsilon_t \sim \mathcal{N}(0,1),
+    \label{eq:ar1-cpu}
+\end{equation}
+
+\noindent com parâmetros $f_\mu = 1{,}5$ GHz (média de longo prazo), $\rho = 0{,}95$ (coeficiente de autocorrelação), $\sigma_\varepsilon = 0{,}2$ GHz (desvio padrão do ruído), e $f_t$ limitado ao intervalo $[0{,}5;\;4{,}0]$ GHz. A interpretação do \gls{AR}(1) é direta: o parâmetro $\rho$ próximo de 1 garante persistência temporal — uma \gls{CPU} congestionada no instante $t$ tende a permanecer congestionada em $t+1$, o que é consistente com a realidade de processos de sistema operacional que acumulam carga e a liberam gradualmente. O ruído $\varepsilon_t$ introduz variabilidade para evitar trajetórias perfeitamente determinísticas.
+
+% ------------------------------------------------------------
+\subsection{Heterogeneidade dos Servidores}
+\label{subsec:servidores}
+% ------------------------------------------------------------
+
+Os $N_s$ servidores de borda possuem capacidades de processamento heterogêneas, ciclando pelo conjunto $\{1{,}0;\;2{,}0;\;4{,}0\}$ GHz de forma a cobrir toda a faixa de variação para qualquer valor de $N_s$. Para $N_s = 3$, tem-se exatamente um servidor lento ($1{,}0$ GHz), um servidor médio ($2{,}0$ GHz) e um servidor rápido ($4{,}0$ GHz), representando a heterogeneidade típica de \glspl{RSU} urbanas com diferentes gerações de hardware implantadas.
+
+A heterogeneidade é uma característica de projeto deliberada e essencial. Em um cenário homogêneo (todos os servidores equivalentes), qualquer política de descarregamento que selecione um servidor arbitrário é ótima em termos de capacidade de processamento, tornando o problema trivial. A introdução de servidores com capacidades distintas, combinada com ocupações de fila diferentes e distâncias variáveis, cria um problema de seleção genuinamente não trivial em que a escolha do servidor errado pode resultar em violação de prazo, mesmo quando a decisão de descarregar é correta \cite{moghaddasi2024}.
+
+% ------------------------------------------------------------
+\subsection{Modelo de Filas}
+\label{subsec:filas}
+% ------------------------------------------------------------
+
+Cada nó $i$ (veículo ou servidor) mantém uma fila discreta $Q_i \in \{0, 1, \ldots, Q_{\max}\}$, com $Q_{\max} = 8$. A dinâmica da fila segue o modelo:
+
+\begin{equation}
+    Q_i(t+1) = \min\!\bigl(Q_i(t) + \mathbf{1}[\text{nó $i$ selecionado em $t$}],\; Q_{\max}\bigr),
+    \label{eq:fila-incremento}
+\end{equation}
+
+\noindent e, a cada passo de tempo, a fila drena com probabilidade $p_{\text{drain},i}$:
+
+\begin{equation}
+    Q_i(t+1) \leftarrow \max\!\bigl(Q_i(t+1) - 1,\; 0\bigr) \quad \text{com prob. } p_{\text{drain},i}.
+    \label{eq:fila-dreno}
+\end{equation}
+
+A probabilidade de dreno é proporcional à capacidade de processamento do nó. Para servidores:
+\begin{equation}
+    p_{\text{drain},i}^{\text{server}} = 0{,}25 + 0{,}15 \cdot \frac{f_i}{4\;\text{GHz}},
+    \label{eq:pdrain-server}
+\end{equation}
+
+\noindent resultando em $p_{\text{drain}} \in [0{,}25;\;0{,}40]$ (0,25 para servidor de 1 GHz, 0,40 para servidor de 4 GHz). Para o veículo local: $p_{\text{drain}}^{\text{vehicle}} = 0{,}20$. Este modelo aproxima o comportamento de uma fila M/M/1, onde o tempo médio de serviço é inversamente proporcional à capacidade de processamento, justificando a dependência linear entre $p_{\text{drain}}$ e $f_i$.
+
+A carga efetiva do nó é calculada como:
+\begin{equation}
+    \rho_i = \frac{Q_i}{Q_{\max}}.
+    \label{eq:carga-efetiva}
+\end{equation}
+
+% ------------------------------------------------------------
+\subsection{Perfis de Tarefas e Regimes de Tráfego}
+\label{subsec:regimes}
+% ------------------------------------------------------------
+
+O ambiente define três \textbf{regimes de tráfego}, cada um com características distintas de tamanho, complexidade e prazo de tarefa:
+
+\begin{table}[htbp]
+\centering
+\caption{Parâmetros dos regimes de tráfego por tipo de tarefa.}
+\label{tab:regimes-trafego}
+\begin{tabular}{lccc}
+\hline
+\textbf{Regime} & \textbf{Tamanho} $b$ (KB) & \textbf{Densidade} $\rho$ (ciclos/byte) & \textbf{Prazo} $D$ (ms) \\
+\hline
+Leve (\textit{light})       & $\mathcal{U}[5,\;15]$   & 7\,000  & $\mathcal{U}[80,\;150]$  \\
+Crítico (\textit{critical})  & $\mathcal{U}[10,\;20]$  & 9\,000  & $\mathcal{U}[50,\;100]$  \\
+Pesado (\textit{heavy})      & $\mathcal{U}[50,\;80]$  & 11\,000 & $\mathcal{U}[250,\;500]$ \\
+\hline
+\end{tabular}
+\end{table}
+
+A transição entre regimes segue uma \textbf{cadeia de Markov} com matriz de transição:
+
+\begin{equation}
+    \mathbf{\Pi} =
+    \begin{pmatrix}
+        0{,}70 & 0{,}20 & 0{,}10 \\
+        0{,}20 & 0{,}60 & 0{,}20 \\
+        0{,}10 & 0{,}20 & 0{,}70
+    \end{pmatrix},
+    \label{eq:matriz-transicao}
+\end{equation}
+
+\noindent onde as linhas e colunas correspondem, respectivamente, aos estados \textit{light}, \textit{critical} e \textit{heavy}. A diagonal dominante (0,70 e 0,60) reflete a \textbf{persistência temporal} dos regimes: uma vez no regime leve, a rede permanece nele com probabilidade 0,70, o que cria não-estacionariedade temporal. O agente deve aprender políticas robustas que funcionem bem em todos os três regimes, sem identificação explícita do regime corrente.
+
+% ------------------------------------------------------------
+\subsection{Modelos de Canal}
+\label{subsec:canal}
+% ------------------------------------------------------------
+
+O cálculo da taxa de dados segue um pipeline de três etapas para ambos os tipos de enlace: (i)~perda de percurso, (ii)~SNR e (iii)~capacidade de Shannon com fator de eficiência espectral.
+
+\paragraph{Canal \gls{V2I} (3GPP TR 38.901 UMi Street Canyon).}
+A perda de percurso entre o veículo e um nó de infraestrutura distingue condições de visada direta (\gls{LOS}) e sem visada (\gls{NLOS}). A probabilidade de \gls{LOS} a distância $d$ é dada pela Tabela~B.1.2.1-1 do TR 38.901:
+
+\begin{equation}
+    p_{\mathrm{LOS}}(d) = \min\!\left(\frac{18}{d},\,1\right)\!\left(1 - e^{-d/36}\right) + e^{-d/36}.
+    \label{eq:plos}
+\end{equation}
+
+As perdas de percurso para cada condição são, com $f_c = 3{,}5$ GHz:
+
+\begin{align}
+    \mathrm{PL}^{\mathrm{LOS}}(d)  &= 32{,}4 + 21\log_{10}(d) + 20\log_{10}(f_c/10^9)\;\text{[dB]},
+    \label{eq:pl-los} \\
+    \mathrm{PL}^{\mathrm{NLOS}}(d) &= \max\!\Bigl(35{,}3\log_{10}(d) + 22{,}4 + 21{,}3\log_{10}(f_c/10^9),\;
+                                       \mathrm{PL}^{\mathrm{LOS}}(d)\Bigr)\;\text{[dB]}.
+    \label{eq:pl-nlos}
+\end{align}
+
+A perda efetiva é a média ponderada pela probabilidade de \gls{LOS}:
+
+\begin{equation}
+    \mathrm{PL}_{V2I}(d) = p_{\mathrm{LOS}}(d)\cdot\mathrm{PL}^{\mathrm{LOS}}(d)
+                         + \bigl(1 - p_{\mathrm{LOS}}(d)\bigr)\cdot\mathrm{PL}^{\mathrm{NLOS}}(d).
+    \label{eq:pathloss-v2i}
+\end{equation}
+
+O piso de ruído térmico é calculado explicitamente a partir da largura de banda $B = 40$ MHz e da figura de ruído do receptor $NF = 7$ dB:
+
+\begin{equation}
+    N_0 = -174\;\text{dBm/Hz} + 10\log_{10}(B) + NF = {-91}\;\text{dBm}.
+    \label{eq:noise-floor}
+\end{equation}
+
+A \gls{SNR} recebida e a taxa de dados resultante são:
+
+\begin{align}
+    \mathrm{SNR}_{V2I}(d) &= P_{tx} - \mathrm{PL}_{V2I}(d) - N_0,
+    \label{eq:snr-v2i} \\
+    C_{V2I}(d) &= \eta \cdot B \cdot \log_2\!\left(1 + 10^{\,\mathrm{SNR}_{V2I}(d)/10}\right),
+    \label{eq:capacidade-v2i}
+\end{align}
+
+\noindent com potência de transmissão $P_{tx} = 23$ dBm e fator de eficiência espectral $\eta = 0{,}6$, que modela o overhead de protocolos, retransmissões \gls{HARQ} e bits de controle. Como referência: a 50~m, $\mathrm{SNR} \approx +27{,}8$ dB e $C \approx 222$ Mbps; a 200~m, $\mathrm{SNR} \approx +1{,}0$ dB e $C \approx 28$ Mbps.
+
+\paragraph{Canal \gls{V2V} (3GPP TR 37.885 C-V2X Sidelink).}
+Para comunicação entre veículos, o TR 37.885 especifica um modelo de caminho único sem distinção LOS/NLOS, com $f_c = 5{,}9$ GHz:
+
+\begin{equation}
+    \mathrm{PL}_{V2V}(d) = 38{,}77 + 16{,}7\log_{10}(d) + 18{,}2\log_{10}(f_c/10^9)\;\text{[dB]}.
+    \label{eq:pathloss-v2v}
+\end{equation}
+
+Com $B = 20$ MHz, $NF = 9$ dB e $P_{tx} = 23$ dBm, o piso de ruído é $N_0 = {-92}$ dBm, e a taxa de dados segue a mesma expressão de Shannon (Equação~\eqref{eq:capacidade-v2i}) com os parâmetros V2V. Como referência: a 30~m, $C \approx 150$ Mbps; a 100~m, $C \approx 115$ Mbps — a variação é menor que no V2I pois o expoente de distância (16,7 vs 21–35,3) é mais baixo, refletindo a geometria de propagação lateral típica do enlace veicular.
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Latência}
+\label{subsec:latencia}
+% ------------------------------------------------------------
+
+\paragraph{Descarregamento (OFFLOAD).} Dado que o nó selecionado (servidor de infraestrutura ou veículo vizinho) possui frequência $f_s$ e carga $\rho_s = Q_s/Q_{\max}$, a latência total de descarregamento é:
+
+\begin{align}
+    \tau_{tx}      &= \frac{b \cdot 8}{C(d_s)}, \label{eq:tau-tx} \\
+    \tau_{proc}    &= \frac{b \cdot \rho_{\text{dens}}}{f_s}, \label{eq:tau-proc} \\
+    \tau_{queue}   &= \frac{\rho_s}{1 - \rho_s + \varepsilon} \cdot \tau_{proc}, \label{eq:tau-queue} \\
+    \tau_{offload} &= \tau_{tx} + \tau_{proc} + \tau_{queue}, \label{eq:tau-offload}
+\end{align}
+
+\noindent onde $b$ é o tamanho da tarefa em bytes, $\rho_{\text{dens}}$ é a densidade computacional em ciclos/byte, $C(d_s)$ é a capacidade do canal ao nó escolhido (V2I para servidores, V2V para veículos vizinhos), e $\varepsilon = 10^{-6}$ previne divisão por zero quando $\rho_s \to 1$.
+
+\paragraph{Execução local (LOCAL).} Para execução no próprio veículo com frequência $f_v$ e carga $\rho_v$:
+
+\begin{equation}
+    \tau_{local} = \left(\frac{\rho_v}{1 - \rho_v + \varepsilon} + 1\right) \cdot \frac{b \cdot \rho_{\text{dens}}}{f_v}.
+    \label{eq:tau-local}
+\end{equation}
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Energia}
+\label{subsec:energia}
+% ------------------------------------------------------------
+
+\paragraph{Energia de transmissão (OFFLOAD).} Assumindo potência de transmissão constante $P_{tx}^{(W)} = 0{,}1$ W:
+
+\begin{equation}
+    E_{tx} = P_{tx}^{(W)} \cdot \tau_{tx}.
+    \label{eq:energia-tx}
+\end{equation}
+
+\paragraph{Energia de processamento local (LOCAL).} O modelo cúbico de energia dinâmica de \gls{CPU} é amplamente adotado na literatura \cite{chen2025}:
+
+\begin{equation}
+    E_{local} = \kappa \cdot f_v^2 \cdot (b \cdot \rho_{\text{dens}}),
+    \label{eq:energia-local}
+\end{equation}
+
+\noindent onde $\kappa = 10^{-28}$ é o coeficiente de capacitância efetiva. O fator $f_v^2$ (quadrático na frequência) captura o custo energético da tensão de operação, enquanto o fator $b \cdot \rho_{\text{dens}}$ representa o total de ciclos de \gls{CPU} necessários.
+
+% ============================================================
+\section{Tomada de Decisão Multicritério: TOPSIS}
+\label{sec:topsis}
+% ============================================================
+
+% ------------------------------------------------------------
+\subsection{Motivação para o Uso do TOPSIS na Construção do Estado}
+\label{subsec:topsis-motivacao}
+% ------------------------------------------------------------
+
+O descarregamento de tarefas em ambientes \gls{VEC} é intrinsecamente um problema de \textbf{\gls{MCDM}}: existem múltiplos critérios conflitantes — latência de transmissão, ocupação de fila, taxa de dados e consumo de energia — para os quais não existe uma solução única ótima em todos simultaneamente \cite{miriyala2025}. Minimizar a latência pode exigir o servidor mais próximo, que frequentemente é o mais congestionado; maximizar a taxa de dados pode requerer maior potência de transmissão, elevando o consumo energético. A ausência de uma solução Pareto-dominante universal justifica o emprego de um método \gls{MCDM} capaz de agregar os critérios em um escore composto.
+
+A escolha do \gls{TOPSIS} é motivada por três propriedades que o tornam particularmente adequado como pré-processador de estado para redes neurais:
+
+\begin{enumerate}
+    \item \textbf{Escore naturalmente normalizado.} O coeficiente de proximidade $C^*_i \in [0,1]$ é produzido diretamente pelo algoritmo, sem necessidade de pré-processamento adicional antes da entrada na rede neural. A normalização decorre da própria definição de $C^*_i$ como razão de distâncias (Equação~\eqref{eq:closeness}).
+
+    \item \textbf{Estatística suficiente de ordem relativa.} O escore $C^*_i$ captura toda a informação de ranqueamento dos $N$ candidatos em uma única dimensão interpretável, sem expor à rede neural a dimensionalidade bruta $N \times 4$ da matriz de decisão. Formalmente, $C^*_i$ é uma função suficiente para a ordenação dos candidatos em relação aos quatro critérios ponderados: qualquer política ótima que dependa apenas da ordenação dos candidatos pode ser expressa como função de $\{C^*_i\}_{i=1}^N$.
+
+    \item \textbf{Complexidade favorável e independência de $N$.} O \gls{TOPSIS} opera em $O(N \log N)$, dominado pela ordenação dos escores. Métodos baseados em grafos (\glspl{GNN}) têm complexidade $O(N^2 \cdot D_{\text{GNN}})$ por camada de passagem de mensagem, crescendo quadraticamente com o número de candidatos e exigindo retreinamento completo para cada novo valor de $N$. O \gls{TOPSIS}, combinado com a representação triplet (Seção~\ref{sec:estado-fixo}), produz um estado de dimensão fixa $[0,1]^{15}$ independente de $N$ — propriedade fundamental para a generalização zero-shot da política (Seção~\ref{subsec:zeroshot}).
+\end{enumerate}
+
+Alternativas como a soma ponderada simples (\textit{weighted sum}) perdem a informação de dominância de Pareto: uma alternativa que domina todas as outras em três dos quatro critérios, mas é levemente inferior no quarto, pode receber escore agregado inferior a uma alternativa mediocre em todos os critérios. O \gls{TOPSIS} preserva esta estrutura ao considerar simultaneamente a proximidade à solução ideal positiva e a distância à solução ideal negativa.
+
+\paragraph{Justificativa dos pesos $\mathbf{w} = [0{,}35;\;0{,}25;\;0{,}25;\;0{,}15]$.}
+
+A distribuição de pesos é motivada pela hierarquia de requisitos \gls{URLLC} estabelecida pelo 3GPP: latência é o critério primário de qualidade de serviço em sistemas de comunicação ultrafidedigna, com requisitos tipicamente inferiores a 1--10 ms para aplicações críticas \cite{uddin2025}. A justificativa para cada peso é:
+
+\begin{itemize}
+    \item $w_\tau = 0{,}35$ (latência): peso majoritário, refletindo a primazia da latência em cenários \gls{URLLC}. A latência de transmissão e processamento determina diretamente o cumprimento ou violação do prazo $D_t$.
+    \item $w_\rho = 0{,}25$ (ocupação de fila): peso equivalente à taxa de dados, pois a ocupação de fila determina a latência de espera $\tau_{queue}$ (Equação~\eqref{eq:tau-queue}), que é um componente direto da latência total — tornando-a funcionalmente equivalente em importância à latência de transmissão.
+    \item $w_C = 0{,}25$ (taxa de dados): a taxa de canal determina $\tau_{tx}$ diretamente (Equação~\eqref{eq:tau-tx}). A equivalência funcional entre $w_\rho$ e $w_C$ reflete o fato de que ambos os critérios contribuem de forma comparável para a latência total em cenários \gls{VEC} com distâncias típicas de 50--200 m.
+    \item $w_E = 0{,}15$ (energia): peso minoritário, pois a energia afeta a vida da bateria do veículo, mas não compromete imediatamente o cumprimento de prazo — constituindo um objetivo secundário no contexto \gls{URLLC}.
+\end{itemize}
+
+\paragraph{Justificativa da norma $L_2$ (Euclidiana) no Passo 4.}
+
+A norma $L_2$ é a métrica original do \gls{TOPSIS}, introduzida por \citeonline{hwang1981} e mantida como padrão na literatura de \gls{MCDM} \cite{miriyala2025}. A propriedade fundamental que justifica esta escolha no presente contexto é que a norma $L_2$ penaliza candidatos que se desviam simultaneamente em vários critérios do ideal de forma mais severa do que a norma $L_1$: ao elevar os desvios ao quadrado antes de somá-los, ela atribui custo superlinear a afastamentos múltiplos e simultâneos. Esta propriedade é adequada para o problema de descarregamento, onde um candidato com latência alta \textit{e} fila cheia \textit{e} baixa taxa de dados deve receber uma penalidade mais severa do que um candidato com um único critério ruim — comportamento que a $L_2$ captura naturalmente após a normalização vetorial do Passo 1.
+
+% ============================================================
+\section{Representação de Estado Invariante à Escala}
+\label{sec:estado-fixo}
+% ============================================================
+
+Um desafio central em \gls{RL} para redes \gls{VEC} é a \textbf{variabilidade do número de candidatos}: conforme veículos e servidores entram e saem da área de cobertura, $N$ pode variar de 1 a dezenas. Arquiteturas como \glspl{GNN} lidam com topologias variáveis ao custo de elevada complexidade computacional e dificuldade de generalização \cite{miriyala2025}. A abordagem proposta resolve este problema por meio de uma representação de estado de dimensão fixa, construída pelo \gls{TOPSIS} e independente de $N$.
+
+% ------------------------------------------------------------
+\subsection{Características por Nó}
+\label{subsec:features-por-no}
+% ------------------------------------------------------------
+
+Após a execução do \gls{TOPSIS}, cada candidato $i$ é representado por um vetor de características de 5 dimensões, todas normalizadas para o intervalo $[0,1]$:
+
+\begin{equation}
+    \mathbf{s}_i = \left[C^*_i,\;\frac{\tau_i}{\tau_{\max}},\;\frac{Q_i}{Q_{\max}},\;\frac{C_i}{C_{\max}},\;\frac{E_i}{E_{\max}}\right],
+    \label{eq:feature-vector}
+\end{equation}
+
+\noindent onde cada componente cumpre um papel informacional específico e insubstituível para a política do agente:
+
+\begin{itemize}
+    \item $C^*_i \in [0,1]$: escore \gls{TOPSIS} composto — sumariza os quatro critérios em uma única dimensão interpretável pela rede neural como ``quão boa é esta opção em termos relativos ao conjunto de candidatos disponíveis''. A justificativa para incluir $C^*_i$ como feature explícita, e não apenas como critério de seleção, é que ele fornece ao crítico uma representação comprimida da posição relativa do candidato, facilitando a aprendizagem da função de valor $V^\phi(\mathbf{S}_t)$.
+
+    \item $\tau_i / \tau_{\max}$: a latência absoluta normalizada informa a viabilidade do prazo em escala absoluta. O escore $C^*_i$ é uma medida relativa — o melhor dos $N$ candidatos terá $C^*_i \to 1$ mesmo que todos os candidatos sejam objetivamente ruins. A latência normalizada $\tau_i/\tau_{\max}$ fornece o sinal de escala absoluta necessário para que o agente distinga um ambiente favorável (onde todos os candidatos têm baixa latência) de um ambiente desfavorável (onde todos os candidatos violam o prazo) — informação que $C^*_i$ sozinho não pode fornecer.
+
+    \item $Q_i / Q_{\max}$: prediz o custo futuro de offloading para o nó $i$. Uma fila alta no instante $t$ sinaliza que offloads futuros para este nó serão penalizados pela componente $\tau_{queue}$ (Equação~\eqref{eq:tau-queue}). A propriedade AR(1) das filas ($\rho = 0{,}95$) garante persistência temporal: o nível de fila atual é um preditor relevante do nível futuro, tornando $Q_i/Q_{\max}$ uma feature de valor para o crítico ao estimar retornos de longo prazo $V^\phi(\mathbf{S}_t)$.
+
+    \item $C_i / C_{\max}$: a taxa de dados determina $\tau_{tx}$ diretamente (Equação~\eqref{eq:tau-tx}), sendo necessária para o crítico prever como quedas de canal em futuros passos afetarão as recompensas. Flutuações de canal em ambientes \gls{V2I} são autocorrelacionadas com a posição do veículo — incluir $C_i/C_{\max}$ permite ao crítico antecipar degradação de canal e ajustar as estimativas de valor correspondentemente.
+
+    \item $E_i / E_{\max}$: a energia normalizada aparece explicitamente na função de recompensa $r_t$ (via $J_t$, Equação~\eqref{eq:custo-conjunto}). A sua inclusão no vetor de estado é necessária para que o crítico aprenda $V^\phi(\mathbf{S}_t)$ com precisão: sem $E_i/E_{\max}$, o crítico não teria acesso direto à componente de energia da recompensa, forçando-o a inferi-la indiretamente a partir de $C_i/C_{\max}$ e $\tau_i/\tau_{\max}$ — o que introduziria viés nas estimativas de vantagem $\hat{A}_t^{\text{GAE}}$.
+\end{itemize}
+
+\paragraph{Suficiência da representação: por que $[C^*_i,\,\hat\tau_i]$ não basta.}
+\label{par:suficiencia}
+Uma pergunta natural é se uma representação mínima $\mathbf{s}_i = [C^*_i,\,\hat\tau_i]$ — apenas o escore relativo e a latência absoluta — seria suficiente para um bom aprendizado e generalização. A resposta é negativa, e o argumento é estrutural.
+
+Para a \textbf{decisão instantânea} em $t$, $[C^*, \hat\tau]$ é razoavelmente informativo: $C^*_i$ já agrega os quatro critérios, e $\hat\tau_i$ ancora a escala absoluta. O problema não está na decisão em $t$, mas na \textbf{estimação do valor pelo crítico} $V^\phi(\mathbf{S}_t) = \mathbb{E}\!\left[\sum_{k \geq 0} \gamma^k r_{t+k}\right]$.
+
+Considere dois candidatos com $C^* = 0{,}70$ e $\hat\tau = 0{,}15$ — estados idênticos em $[C^*, \hat\tau]$, mas opostos em dinâmica futura:
+
+\begin{center}
+\small
+\begin{tabular}{lccl}
+\toprule
+Candidato & $\hat{Q}$ & Trajetória futura & Ação ótima \\
+\midrule
+Servidor rápido, fila crescendo & 0,80 & $\tau_{t+1}$ duplica (fila AR(1)) & LOCAL \\
+Servidor médio, fila drenando   & 0,20 & $\tau_{t+1}$ cai                   & OFFLOAD \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Sem $\hat{Q}_i$, esses dois estados são \textbf{indistinguíveis} para o crítico, que produzirá a mesma estimativa de valor para situações com retornos futuros opostos — introduzindo variância sistemática nas estimativas de vantagem $\hat{A}_t^{\text{GAE}}$ e degradando a convergência do PPO.
+
+Analogamente, sem $\hat{E}_i$, o componente energético da recompensa $r_t = -[0{,}7\,\hat\tau + 0{,}3\,\hat{E}]$ torna-se \textbf{invisível para o crítico}: $30\%$ do sinal de recompensa contínua não é observado, introduzindo viés nas estimativas de $V^\phi$. Sem $\hat{C}_i$, o crítico não consegue antecipar degradação de canal entre passos consecutivos — especialmente crítico no regime heavy, quando o veículo se afasta da RSU e o canal deteriora rapidamente.
+
+Em síntese: $[C^*, \hat\tau]$ seria suficiente apenas em um ambiente \textbf{estacionário e sem filas}, onde a decisão é um problema de seleção \textit{one-shot} sem dinâmica temporal. No ambiente \gls{VEC} com AR(1), cadeia de Markov de regimes e filas acopladas, os três features adicionais $[\hat{Q}, \hat{C}, \hat{E}]$ são necessários para que o crítico estime $V^\phi(\mathbf{S}_t)$ com precisão suficiente para que o PPO convirja de forma confiável. A Tabela~\ref{tab:suficiencia} sumariza esta análise.
+
+\begin{table}[htbp]
+\centering
+\caption{Análise de suficiência das representações de estado. A coluna ``Decisão'' avalia a qualidade da ação em $t$; ``Aprendizado'' avalia a precisão do crítico ao longo do treinamento.}
+\label{tab:suficiencia}
+\small
+\begin{tabular}{p{3.8cm} p{2.6cm} p{2.6cm} p{4.2cm}}
+\toprule
+\textbf{Representação} & \textbf{Decisão em $t$} & \textbf{Aprendizado} & \textbf{Limitação principal} \\
+\midrule
+$[C^*_i,\,\hat\tau_i]$ — 6D
+  & Razoável
+  & Comprometido
+  & Crítico cego à dinâmica de fila/canal/energia; alta variância em $\hat{A}_t$ \\
+\addlinespace
+$[C^*_i,\,\hat\tau_i,\,\hat{Q}_i]$ — 9D
+  & Boa
+  & Melhorado
+  & Sem sinal de energia (30\% da recompensa invisível) \\
+\addlinespace
+$[C^*_i,\,\hat\tau_i,\,\hat{Q}_i,\,\hat{C}_i,\,\hat{E}_i]$ — 15D
+  & Ótima
+  & Estável
+  & Representação minimal completa \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para o veículo local (agente), o vetor $\mathbf{s}_{\text{agent}}$ é calculado de forma análoga, com a latência local estimada pela Equação~\eqref{eq:tau-local}, a ocupação de fila local, taxa de dados de uplink nula ($C_i = 0$ pois não há transmissão no modo local) e energia pelo modelo cúbico (Equação~\eqref{eq:energia-local}).
+
+% ------------------------------------------------------------
+\subsection{Construção do Estado Fixo $[\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$}
+\label{subsec:estado-triplet}
+% ------------------------------------------------------------
+
+Dados $N \geq 1$ candidatos ranqueados pelo \gls{TOPSIS} em ordem decrescente de $C^*$, o estado fixo de 15 dimensões é:
+
+\begin{equation}
+    \mathbf{S}_t = \left[\mathbf{s}_{\text{rank}_1} \;\middle|\; \mathbf{s}_{\text{agent}} \;\middle|\; \mathbf{s}_{\text{rank}_N}\right] \in [0,1]^{15},
+    \label{eq:estado-fixo}
+\end{equation}
+
+\noindent onde $\mathbf{s}_{\text{rank}_1}$ é o vetor do candidato de maior $C^*$ (melhor opção de descarregamento) e $\mathbf{s}_{\text{rank}_N}$ é o vetor do candidato de menor $C^*$ (pior opção disponível). O estado $\mathbf{S}_t$ possui \textbf{sempre 15 dimensões}, independentemente do valor de $N$.
+
+A escolha do triplet $[\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$ é motivada pela \textbf{teoria da informação de decisão}: o estado ótimo minimal para uma decisão binária (offload vs local) deve responder a três perguntas fundamentais:
+
+\begin{enumerate}
+    \item \textit{Qual a melhor opção de offload disponível?} — respondida por $\mathbf{s}_{\text{best}}$ (rank 1).
+    \item \textit{Qual o custo da alternativa local (não fazer offload)?} — respondida por $\mathbf{s}_{\text{agent}}$.
+    \item \textit{Qual a dispersão do conjunto de candidatos?} — respondida por $\mathbf{s}_{\text{worst}}$ (rank $N$).
+\end{enumerate}
+
+Os três componentes cumprem papéis complementares e insubstituíveis:
+
+\begin{enumerate}
+    \item \textbf{$\mathbf{s}_{\text{best}}$ (rank 1):} Informa o agente sobre a melhor opção de offload disponível em $t$. A sua presença é condição necessária para que o agente avalie se descarregar é vantajoso em termos absolutos. Sem $\mathbf{s}_{\text{best}}$, o agente não tem acesso à melhor alternativa de offload disponível.
+
+    \item \textbf{$\mathbf{s}_{\text{agent}}$:} Representa o estado local do veículo — latência esperada de execução local, ocupação atual da fila local e custo energético local. A sua presença é condição necessária para que o agente compare o custo do offload com o custo da execução local. Sem $\mathbf{s}_{\text{agent}}$, o agente seria incapaz de realizar a comparação offload-vs-local: equivaleria a tomar uma decisão de compra sem conhecer o preço da alternativa.
+
+    \item \textbf{$\mathbf{s}_{\text{worst}}$ (rank $N$):} Serve como referência de dispersão do campo de candidatos. A quantidade $C^*_{\text{best}} - C^*_{\text{worst}}$ grande indica \textbf{heterogeneidade alta} — há candidatos muito bons e muito ruins, e a escolha do servidor importa mais do que a decisão offload/local. Um valor pequeno indica \textbf{homogeneidade} — a decisão offload/local domina sobre a escolha do servidor. Sem $\mathbf{s}_{\text{worst}}$, o agente perde este sinal de dispersão e não consegue distinguir ambientes heterogêneos (onde a seleção do servidor é crítica) de ambientes homogêneos (onde qualquer servidor é equivalente).
+\end{enumerate}
+
+A Tabela~\ref{tab:ablacao-informacional} sistematiza o conteúdo informacional de cada variante do estado, identificando qual pergunta de decisão cada uma deixa sem resposta.
+
+\begin{table}[htbp]
+\centering
+\caption{Análise de conteúdo informacional das variantes do estado. Cada linha indica quais perguntas de decisão a variante é capaz de responder ($\checkmark$) ou não ($\times$).}
+\label{tab:ablacao-informacional}
+\begin{tabular}{lccc}
+\hline
+\textbf{Variante} & \textbf{Melhor offload?} & \textbf{Custo local?} & \textbf{Dispersão?} \\
+\hline
+\texttt{best|agent|worst} (proposta)                          & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\texttt{top3}: $[\mathbf{s}_1 | \mathbf{s}_2 | \mathbf{s}_3]$  & $\checkmark$ & $\times$     & $\checkmark$ \\
+\texttt{top2\_agent}: $[\mathbf{s}_1 | \mathbf{s}_2 | \mathbf{s}_{\text{agent}}]$ & $\checkmark$ & $\checkmark$ & $\times$ \\
+\texttt{agent\_only}: $[\mathbf{s}_{\text{agent}} | \mathbf{0} | \mathbf{0}]$      & $\times$     & $\checkmark$ & $\times$ \\
+\hline
+\end{tabular}
+\end{table}
+
+A variante \texttt{top3} omite o custo local: o agente não possui referência para comparar offload com execução local, sendo forçado a inferir o custo local indiretamente — o que introduz ambiguidade na aprendizagem da fronteira de decisão. A variante \texttt{top2\_agent} omite a dispersão: o agente não consegue distinguir um campo heterogêneo (onde selecionar o melhor servidor é crítico) de um campo homogêneo (onde a decisão offload/local domina). A variante \texttt{agent\_only} omite completamente a informação de offload, tornando impossível a comparação direta entre as alternativas. Apenas o triplet proposto responde às três perguntas simultaneamente.
+
+\paragraph{Invariância dimensional.} Para qualquer $N \in \{1, 2, \ldots, \infty\}$, o \gls{TOPSIS} computa os escores $C^*_i$ para todos os $N$ candidatos em $O(N \log N)$, e então seleciona três entradas representativas. A operação de seleção é $O(N)$ (min e max do vetor de escores), mas a saída é sempre $\mathbb{R}^{15}$. Portanto, \textbf{um modelo treinado com $N = 3$ pode ser avaliado em cenários com $N$ muito maior sem qualquer modificação na arquitetura da rede neural}, pois o espaço de observação é fixo em $\dim = 15$ e o mapeamento $N \to 15$ é definido pela regra de seleção do \gls{TOPSIS}. Esta propriedade é fundamental para a viabilidade prática da abordagem em redes dinâmicas.
+
+% ------------------------------------------------------------
+\subsection{Justificativa por Análise de Conteúdo Informacional}
+\label{subsec:ablativo}
+% ------------------------------------------------------------
+
+A escolha do triplet $[\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$ é validada teoricamente pela análise de conteúdo informacional de cada variante alternativa, conforme sintetizado na Tabela~\ref{tab:ablacao-informacional}. A justificativa é estrutural: cada um dos três componentes responde a uma pergunta de decisão irredutível, e a ausência de qualquer um deles implica em informação insuficiente para a tomada de decisão ótima \cite{baker2024}.
+
+A propriedade de suficiência informacional do triplet pode ser enunciada formalmente: para uma decisão binária $a_t \in \{0,1\}$ com custo dependente simultaneamente do melhor offload disponível, do custo local e da dispersão dos candidatos, o estado $\mathbf{S}_t = [\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$ é uma \textbf{representação suficiente} no sentido de que nenhuma das três perguntas de decisão fica sem resposta — condição que nenhuma das variantes alternativas satisfaz completamente.
+
+% ------------------------------------------------------------
+\subsection{Generalização Zero-Shot por Transferência Estrutural}
+\label{subsec:zeroshot}
+% ------------------------------------------------------------
+
+A representação de estado de dimensão fixa viabiliza uma propriedade notável: a política treinada com $N = 3$ candidatos deverá generalizar para cenários com $N$ arbitrariamente maior \textbf{sem nenhum retreinamento}. A justificativa desta capacidade de \textbf{generalização zero-shot} é de natureza matemática, decorrente da estrutura do mapeamento \gls{TOPSIS}.
+
+\paragraph{Argumento matemático.} O mapeamento $f: \mathbb{R}^{N \times 4} \to [0,1]^{15}$ é contínuo e surjetivo sobre $[0,1]^{15}$ para qualquer $N \geq 1$: para qualquer ponto $\mathbf{s} \in [0,1]^{15}$, existe uma configuração de candidatos que produz exatamente $\mathbf{s}$ como saída. Em consequência, o espaço de estados $[0,1]^{15}$ é o mesmo para qualquer valor de $N$ — não há extrapolação fora do domínio de treinamento quando $N$ aumenta.
+
+Formalmente: se a política $\pi_\theta$ foi treinada sobre a distribuição $P_{N=3}(\mathbf{S}_t)$ dos estados produzidos com três candidatos, e se $P_{N=k}(\mathbf{S}_t) \subset [0,1]^{15}$ para todo $k \geq 1$, então $\pi_\theta$ pode generalizar para $k > 3$ sem modificação — o grau de generalização depende da sobreposição entre $P_{N=3}$ e $P_{N=k}$.
+
+Com $N$ maior, a distribuição de $C^*_{\text{best}}$ desloca-se para regiões superiores de $[0,1]$. Formalmente, assumindo que os escores individuais $C^*_i$ são variáveis aleatórias i.i.d. com função de distribuição acumulada $F(c)$ no suporte $[0,1]$, a distribuição da estatística de ordem máxima $C^*_{\text{best}} = \max_{i=1}^N C^*_i$ é:
+\begin{equation}
+    P\!\left(C^*_{\text{best}} \leq c\right) = \bigl[F(c)\bigr]^N.
+    \label{eq:order-stat}
+\end{equation}
+Para qualquer $c < 1$, tem-se $[F(c)]^N \to 0$ exponencialmente quando $N \to \infty$: a massa de probabilidade colapsa na extremidade superior do intervalo. Em termos do espaço de estados $[0,1]^{15}$, isso significa que o vetor $\mathbf{s}_{\text{best}}$ se desloca continuamente em direção à região $C^*_{\text{best}} \to 1$ — região que é analiticamente possível para qualquer $N$ e, portanto, sobre a qual a rede neural já aprendeu uma representação durante o treinamento com $N = 3$. Como o domínio $[0,1]^{15}$ é estritamente preservado para qualquer $N$, a rede \textbf{interpola} sobre sub-regiões já cobertas por sua topologia interna — não extrapola para fora do domínio de treinamento. Este argumento fundamenta analiticamente a generalização zero-shot sem retreinamento.
+
+A estrutura triplet garante que o agente recebe sempre a mesma forma de informação independentemente de $N$: a melhor opção disponível, o custo local e a dispersão do campo. Com mais candidatos, a melhor opção torna-se objetivamente melhor (maior $C^*_{\text{best}}$), e a política aprende a explorar corretamente esta melhoria porque o sinal de qualidade está contido na mesma dimensão do espaço de estados.
+
+\paragraph{Comparação com abordagens baseadas em grafos.} Métodos baseados em \glspl{GNN} requerem retreinamento completo para cada novo valor de $N$, pois a estrutura do grafo de mensagens possui dimensionalidade $O(N^2 \cdot D_{\text{GNN}})$ por passo de passagem de mensagem — crescendo quadraticamente com o número de nós. A abordagem \gls{TOPSIS} + estado fixo elimina esta dependência estrutural: o custo de inferência cresce apenas como $O(N \log N)$, e nenhum retreinamento é necessário para novos valores de $N$.
+
+% ------------------------------------------------------------
+\subsection{Generalização por Regime Operacional}
+\label{subsec:generaliz-regime}
+% ------------------------------------------------------------
+
+A subseção anterior demonstrou a generalização zero-shot em relação ao número de candidatos $N$. Uma questão independente — e igualmente relevante para o deploy em campo — é: a política $\pi_\theta$ generaliza para regimes operacionais \emph{diferentes} dos vistos no treinamento, tais como novas configurações de hardware, diferentes perfis de carga ou topologias de rede distintas?
+
+A resposta exige distinguir dois mecanismos presentes na representação de estado.
+
+\paragraph{Mecanismo 1 — $C^*$ como estatística de ordem relativa (invariante de escala).}
+O coeficiente de proximidade $C^*_i \in [0,1]$ produzido pelo \gls{TOPSIS} compara os candidatos \emph{entre si}, não contra um valor absoluto externo. Formalmente, $C^*_i$ é uma função da geometria interna da matriz $\mathbf{X}$:
+
+\begin{equation}
+    C^*_i = \frac{d_i^-}{d_i^+ + d_i^-},
+    \label{eq:cstar-regime}
+\end{equation}
+
+\noindent onde $d_i^+$ e $d_i^-$ são as distâncias do candidato $i$ à solução ideal positiva e negativa \emph{do conjunto atual}. Consequência direta: se todos os servidores do novo cenário forem uniformemente mais rápidos (e.g., 8 GHz ao invés de 1–4 GHz), a escala absoluta das latências decresce, mas a estrutura de $C^*$ é preservada — o melhor candidato ainda recebe $C^*_\text{best} \approx 1$ e o pior recebe $C^*_\text{worst} \approx 0$. A política aprendeu a interpretar \emph{o nível} de $C^*_\text{best}$ como sinal de qualidade da melhor opção disponível; esse sinal permanece semanticamente correto em qualquer cenário.
+
+\paragraph{Mecanismo 2 — Features absolutas e a envoltória de normalização.}
+Os demais quatro atributos do vetor de estado são normalizados por constantes físicas fixas:
+
+\begin{equation}
+    \hat\tau_i = \frac{\tau_i}{\tau_{\max}}, \quad
+    \hat{C}_i  = \frac{C_i}{C_{\max}},    \quad
+    \hat{E}_i  = \frac{E_i}{E_{\max}},
+    \label{eq:norm-absoluta}
+\end{equation}
+
+\noindent com $\tau_{\max} = 2{,}0$ s, $C_{\max} = 400$ Mbps e $E_{\max} = 0{,}5$ J, escolhidos para cobrir a faixa operacional de redes \gls{VEC}/V2X conforme os modelos de canal \gls{3GPP}. Estas constantes definem uma \textbf{envoltória de normalização}: um novo regime operacional $\mathcal{R}'$ produz estados em $[0,1]^{15}$ — e, portanto, dentro do domínio de treinamento — se e somente se os valores físicos de $\mathcal{R}'$ satisfazem $\tau_i \leq \tau_{\max}$, $C_i \leq C_{\max}$ e $E_i \leq E_{\max}$.
+
+\paragraph{Condição formal de generalização.}
+Seja $P_{\mathcal{R}'}(\mathbf{S}_t)$ a distribuição de estados induzida pelo regime $\mathcal{R}'$. A política $\pi_\theta$ generaliza para $\mathcal{R}'$ sem retreinamento se:
+
+\begin{equation}
+    P_{\mathcal{R}'}(\mathbf{S}_t) \;\subset\; [0,1]^{15},
+    \label{eq:cond-generaliz}
+\end{equation}
+
+\noindent condição que é suficiente pelo mesmo argumento de interpolação da Seção~\ref{subsec:zeroshot}: o domínio $[0,1]^{15}$ é denso por construção, e a rede neural não extrapola fora dele. A Tabela~\ref{tab:generaliz-regime} classifica cenários típicos segundo este critério.
+
+\begin{table}[htbp]
+\centering
+\caption{Generalização da política $\pi_\theta$ para diferentes regimes operacionais.}
+\label{tab:generaliz-regime}
+\small
+\begin{tabular}{p{4.2cm} p{3.5cm} p{2.2cm} p{3.5cm}}
+\toprule
+\textbf{Mudança de regime} & \textbf{Efeito nas features} & \textbf{Generaliza?} & \textbf{Justificativa} \\
+\midrule
+Maior $N$ (mais candidatos)
+  & $C^*_\text{best}\!\uparrow$, features em $(0,1)$
+  & Sim (zero-shot)
+  & Sec.~\ref{subsec:zeroshot} \\
+\addlinespace
+Servidores mais rápidos (ex.: 8 GHz)
+  & $\hat\tau\!\downarrow$, $C^*\!\uparrow$; valores dentro de $[0,1]$
+  & Sim
+  & Interpolação; regime light já cobre $\hat\tau \to 0$ \\
+\addlinespace
+Carga pesada dentro do envelope ($\tau < 2$ s)
+  & $\hat\tau\!\uparrow$; ainda em $(0,1)$
+  & Sim
+  & Regime heavy cobre $\hat\tau \to 1$ \\
+\addlinespace
+Carga extrema fora do envelope ($\tau > 2$ s)
+  & $\hat\tau = 1$ (saturação por clip)
+  & Parcial
+  & Perde discriminação absoluta; $C^*$ ainda ranqueia corretamente \\
+\addlinespace
+Canais de alta capacidade ($C > 400$ Mbps, ex.: mmWave)
+  & $\hat{C} = 1$ (saturação por clip)
+  & Parcial
+  & $C^*$ reflete ganho relativo; sinal absoluto saturado \\
+\addlinespace
+Novos tipos de nó (topologia diferente)
+  & Idem ao caso de maior $N$
+  & Sim
+  & $N = N_s + N_v$ é indiferente para o estado 15D \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Regimes de carga já cobertos pelo treinamento.}
+Os três regimes da cadeia de Markov — \textit{light}, \textit{critical} e \textit{heavy} — são \textbf{latentes}: o agente nunca observa o regime diretamente. Em vez disso, a cadeia de Markov força a política a aprender comportamentos robustos que funcionam bem em todos os regimes simultaneamente, pois cada episódio de treinamento percorre múltiplos regimes. A política não precisa identificar o regime corrente; o estado $\mathbf{S}_t$ já codifica o \emph{efeito} do regime sobre os candidatos disponíveis — filas altas, latências elevadas e baixos $C^*$ no regime heavy; o oposto no regime light.
+
+A Figura~\ref{fig:invariancia-escala} ilustra este princípio com três candidatos avaliados em quatro cenários de escala absolutamente distintos: o \emph{ranking} de $C^*$ é idêntico em todos os casos, mesmo quando a latência absoluta varia de 5 ms (hardware futuro) a 2,8 s (carga extrema que satura $\hat\tau = 1$). A Figura~\ref{fig:envoltoria} complementa esta análise mostrando a distribuição dos pares $(\hat\tau, C^*_\text{best})$ para amostras dos três regimes de treinamento e de dois cenários inéditos: o hardware futuro (servidores de $\sim$10× maior velocidade) projeta-se na região inferior de $[0,1]^2$, dentro do domínio coberto pelo regime \textit{light}; a carga extrema ($\tau > \tau_{\max}$) satura em $\hat\tau = 1$, mas $C^*$ continua a ranquear corretamente os candidatos.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{fig_invariancia_escala.pdf}
+    \caption{Invariância de escala do $C^*$: três candidatos (A, B, C) avaliados em quatro regimes com latências absolutas de 5 ms a 2,8 s. O ranking $A > B > C$ é preservado em todos os cenários, evidenciando que $C^*$ é uma estatística de ordem relativa, independente da escala absoluta dos recursos.}
+    \label{fig:invariancia-escala}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.88\linewidth]{fig_envoltoria_normalizacao.pdf}
+    \caption{Envoltória de normalização: distribuição de $(\hat\tau, C^*_\text{best})$ para 600 amostras de cada regime operacional. Os três regimes de treinamento cobrem densamente $[0,1]^2$. O cenário de \emph{hardware futuro} (servidores $\sim$10$\times$ mais rápidos) interpola na região inferior-esquerda — já coberta pelo regime \textit{light}. O cenário de \emph{carga extrema} ($\tau > \tau_{\max}$) satura em $\hat\tau = 1$, mantendo $C^*$ funcional como critério de ranqueamento.}
+    \label{fig:envoltoria}
+\end{figure}
+
+\paragraph{Implicação prática.}
+A arquitetura proposta generaliza por regime operacional dentro da envoltória de normalização definida pelos modelos \gls{3GPP} para redes \gls{VEC}, sem nenhuma modificação estrutural. Para cenários fora dessa envoltória (e.g., redes industriais com latências na ordem de microssegundos, ou canais mmWave de múltiplos gigabits), bastaria reajustar as constantes $\tau_{\max}$, $C_{\max}$ e $E_{\max}$ — sem necessidade de redesenhar a arquitetura ou retreinar com um novo algoritmo.
+
+% ============================================================
+\section{Função de Recompensa}
+\label{sec:recompensa}
+% ============================================================
+
+A função de recompensa deve capturar dois objetivos distintos: (i) minimizar o custo conjunto de latência e energia no regime contínuo, e (ii) garantir o cumprimento de prazos como uma restrição quase-rígida. A recompensa no passo $t$ é definida como:
+
+\begin{equation}
+    r_t = -J_t + \Omega_t,
+    \label{eq:recompensa}
+\end{equation}
+
+\noindent onde o \textbf{custo de desempenho conjunto} é:
+
+\begin{equation}
+    J_t = w_1 \cdot \ell_{t,\text{norm}} + w_2 \cdot e_{t,\text{norm}},
+    \label{eq:custo-conjunto}
+\end{equation}
+
+\noindent com $w_1 = 0{,}7$ e $w_2 = 0{,}3$, e:
+
+\begin{align}
+    \ell_{t,\text{norm}} &= \min\!\left(\frac{\tau_t}{\tau_{\max}},\;1{,}0\right), \label{eq:lat-norm} \\
+    e_{t,\text{norm}}    &= \min\!\left(\frac{E_t}{E_{\max}},\;1{,}0\right). \label{eq:energy-norm}
+\end{align}
+
+A \textbf{penalidade de prazo} é:
+
+\begin{equation}
+    \Omega_t = -10 \cdot \mathbf{1}\!\left[\tau_t > D_t\right],
+    \label{eq:penalidade-deadline}
+\end{equation}
+
+\noindent onde $\mathbf{1}[\cdot]$ é a função indicadora e $D_t$ é o prazo específico da tarefa (dependente do regime corrente, conforme Tabela~\ref{tab:regimes-trafego}).
+
+\paragraph{Justificativa da ponderação $w_1 = 0{,}7$, $w_2 = 0{,}3$.} A ponderação 70/30 é motivada pela literatura \gls{URLLC}: em sistemas de comunicação ultrafidedigna, a latência é o critério primário de qualidade de serviço \cite{uddin2025}. A energia afeta a vida da bateria do veículo, mas tem custo de penalidade menor no curto prazo — ela é um objetivo secundário que guia a otimização fina dentro do conjunto de ações que respeitam os prazos. A normalização pelos respectivos máximos ($\tau_{\max} = 5$ s, $E_{\max} = 1$ J) garante $J_t \in [0,1]$ em toda trajetória possível, assegurando que a hierarquia de sinal entre $J_t$ e $\Omega_t$ seja preservada.
+
+\paragraph{Justificativa da magnitude $|\Omega| = 10$.} A hierarquia de sinal é estabelecida por princípio de projeto: a penalidade deve dominar o custo $J \in [0,1]$ por uma ordem de magnitude, para que a rede neural trate o prazo como uma restrição quase-rígida, e não como mais um critério de otimização. A propriedade é verificável formalmente: para qualquer $J_t \in [0,1]$, tem-se
+
+\begin{equation}
+    -J_t + \Omega_t = -J_t - 10 \leq -10 < -1 \leq -J_t \quad (\text{quando } \tau_t \leq D_t).
+\end{equation}
+
+Portanto, qualquer trajetória que viole o prazo recebe recompensa estritamente menor que qualquer trajetória que o respeite, independentemente dos valores de latência e energia envolvidos. A hierarquia é preservada para toda trajetória possível \cite{baker2024, farimani2024}.
+
+\paragraph{Justificativa de $\gamma = 0{,}99$.} O fator de desconto deve refletir o horizonte temporal relevante para as dependências entre decisões. No modelo de filas proposto, as filas persistem entre passos com coeficiente $\rho = 0{,}95$ no processo AR(1): um offload ao servidor $i$ no instante $t$ incrementa $Q_i$, impactando $\tau_{queue}$ nos próximos 10--20 passos, até que a drenagem reduza a fila ao nível de equilíbrio. Com $\gamma = 0{,}99$, a recompensa no passo $t + k$ recebe peso $\gamma^k = 0{,}99^k$; para $k = 100$ passos futuros, este peso é $0{,}99^{100} \approx 0{,}366$ — suficiente para capturar o horizonte de drenagem de fila e motivar o agente a evitar congestionamento de longo prazo. Um $\gamma$ menor (e.g., 0,95) atribuiria peso $0{,}95^{100} \approx 0{,}006$ ao passo $t+100$, tornando o agente míope frente ao efeito de acumulação de filas.
+
+O \textbf{retorno acumulado esperado} com desconto $\gamma = 0{,}99$ é:
+
+\begin{equation}
+    G_t = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k}.
+    \label{eq:retorno-acumulado}
+\end{equation}
+
+% ============================================================
+\section{Algoritmo de Treinamento: PPO}
+\label{sec:ppo}
+% ============================================================
+
+O agente é treinado com o algoritmo \textbf{\gls{PPO}} (\textit{Proximal Policy Optimization}), um algoritmo Ator-Crítico \textit{on-policy} da família de métodos de gradiente de política. Esta seção apresenta a formulação matemática completa do \gls{PPO} e justifica sua escolha frente às alternativas.
+
+% ------------------------------------------------------------
+\subsection{Estrutura Ator-Crítico}
+\label{subsec:ator-critico}
+% ------------------------------------------------------------
+
+O \gls{PPO} mantém duas redes neurais com parâmetros independentes:
+
+\begin{itemize}
+    \item \textbf{Ator (rede de política):} $\pi_\theta: \mathcal{S} \to \Delta(\mathcal{A})$, mapeia o estado $\mathbf{S}_t \in \mathbb{R}^{15}$ para uma distribuição de probabilidade sobre as ações $\mathcal{A} = \{0, 1\}$. O ator é implementado como um Perceptron Multicamadas (MLP) com arquitetura $[15 \to 256 \to 256 \to 2]$ (duas camadas ocultas de 256 neurônios com ativação ReLU, camada de saída com \textit{softmax}).
+
+    \item \textbf{Crítico (rede de valor):} $V_\phi: \mathcal{S} \to \mathbb{R}$, estima o retorno esperado $V^\pi(\mathbf{S}_t) = \mathbb{E}_\pi[G_t \mid \mathbf{S}_t]$. O crítico possui arquitetura idêntica ao ator, exceto na camada de saída: $[15 \to 256 \to 256 \to 1]$.
+\end{itemize}
+
+A escolha da arquitetura MLP $[256,256]$ é fundamentada pelo \textbf{Teorema da Aproximação Universal} \cite{hornik1989}: toda função mensurável de Borel $g: [0,1]^{15} \to \mathbb{R}$ pode ser aproximada com precisão arbitrária por uma rede neural de uma única camada oculta de largura suficiente e ativações não-polinomiais. Uma MLP com \textit{duas} camadas ocultas aumenta a profundidade e reduz a largura necessária para representar funções com descontinuidades — como a fronteira induzida pela penalidade de prazo $\Omega_t = -10 \cdot \mathbf{1}[\tau_t > D_t]$, que introduz uma superfície de decisão abrupta no espaço compacto $[0,1]^{15}$.
+
+A largura de 256 neurônios é motivada pela restrição operacional de inferência em tempo real: a complexidade de inferência do MLP é $O(H \cdot D)$, onde $H = 256$ e $D = 15$, garantindo tempo de resposta $O(1)$ compatível com os requisitos de latência \gls{URLLC}. O número total de parâmetros, $\approx 270{.}000$, limita a dimensão do espaço de parâmetros e satisfaz a condição de complexidade de Vapnik-Chervonenkis (VC) suficiente para a aprendizagem de fronteiras de decisão no domínio $[0,1]^{15}$ com garantias de generalização.
+
+Ambas as redes são implementadas com a biblioteca \textit{stable-baselines3}, utilizando a política \texttt{MlpPolicy} com \texttt{net\_arch=[256, 256]} para ator e crítico.
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Vantagem com GAE}
+\label{subsec:gae}
+% ------------------------------------------------------------
+
+A \textbf{função de vantagem} $A_t = Q(s_t, a_t) - V(s_t)$ mede o quanto a ação $a_t$ é melhor (ou pior) do que a ação média sob a política $\pi$. Estimativas de vantagem com baixa variância são críticas para o aprendizado estável em ambientes com penalidades esparsas e grandes como a presente proposta.
+
+O \textbf{GAE} (\textit{Generalized Advantage Estimation}) computa uma estimativa suavizada da vantagem:
+
+\begin{equation}
+    \hat{A}_t^{\text{GAE}} = \sum_{l=0}^{\infty} (\gamma \lambda)^l \cdot \delta_{t+l},
+    \label{eq:gae}
+\end{equation}
+
+\noindent onde $\delta_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$ é o \textbf{erro de diferença temporal} (TD error) e $\lambda = 0{,}95$ controla o \textit{trade-off} viés-variância: $\lambda \to 0$ reduz variância ao custo de maior viés (equivale ao TD(0)); $\lambda \to 1$ elimina o viés ao custo de maior variância (equivale ao retorno de Monte Carlo).
+
+% ------------------------------------------------------------
+\subsection{Objetivo Proximal (CLIP)}
+\label{subsec:clip}
+% ------------------------------------------------------------
+
+O \gls{PPO} otimiza um objetivo substituto (\textit{surrogate objective}) que limita o tamanho da atualização da política. Define-se a razão de probabilidade:
+
+\begin{equation}
+    r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)},
+    \label{eq:prob-ratio}
+\end{equation}
+
+\noindent e o objetivo CLIP é:
+
+\begin{equation}
+    L^{\text{CLIP}}(\theta) = \mathbb{E}_t\!\left[\min\!\left(r_t(\theta)\,\hat{A}_t^{\text{GAE}},\;\mathrm{clip}\!\left(r_t(\theta),\;1-\varepsilon,\;1+\varepsilon\right)\hat{A}_t^{\text{GAE}}\right)\right],
+    \label{eq:ppo-clip}
+\end{equation}
+
+\noindent com $\varepsilon = 0{,}2$. O parâmetro $\varepsilon$ define a \textbf{região de confiança} dentro da qual a aproximação linear da função de vantagem $\hat{A}_t^{\text{GAE}}$ permanece válida: ao restringir $r_t(\theta) \in [1-\varepsilon,\, 1+\varepsilon]$, o mecanismo CLIP garante que a atualização da política permaneça na vizinhança local onde a estimativa de vantagem é confiável. Analiticamente, \citeonline{schulman2017ppo} demonstra que o objetivo CLIP é um limite inferior (\textit{surrogate lower bound}) do retorno esperado $J(\theta)$: maximizá-lo garante melhoria monotônica de $J(\theta)$ a cada iteração, evitando o colapso da política diante das penalidades esparsas de $\Omega = -10$, que introduzem descontinuidades severas na superfície de recompensa. O valor $\varepsilon = 0{,}2$ é o padrão da literatura \cite{schulman2017ppo}, oferecendo equilíbrio entre estabilidade (restrição da região de confiança) e velocidade de convergência (tamanho do passo de atualização). O objetivo completo do \gls{PPO} incorpora também a perda do crítico e o bônus de entropia:
+
+\begin{equation}
+    L(\theta, \phi) = L^{\text{CLIP}}(\theta) - c_1 \cdot L^{\text{VF}}(\phi) + c_2 \cdot \mathcal{H}[\pi_\theta(\cdot \mid s_t)],
+    \label{eq:ppo-objetivo-completo}
+\end{equation}
+
+\noindent onde $L^{\text{VF}}(\phi) = \mathbb{E}_t[(V_\phi(s_t) - G_t)^2]$ é o erro quadrático médio do crítico, $\mathcal{H}[\pi_\theta(\cdot \mid s_t)] = -\sum_{a} \pi_\theta(a \mid s_t) \log \pi_\theta(a \mid s_t)$ é a entropia da política, e $c_2 = 0{,}01$ é o coeficiente de entropia (\texttt{ent\_coef}).
+
+Cada componente do objetivo cumpre uma função específica:
+
+\begin{itemize}
+    \item \textbf{CLIP:} Quando $r_t(\theta) > 1 + \varepsilon$ (a ação tornou-se mais provável sob a nova política), o gradiente é zerado, impedindo atualizações excessivas que poderiam desestabilizar a política — em particular, evita o colapso da política ao explorar a penalidade de $-10$ de forma gulosa e prematura.
+
+    \item \textbf{Perda do Crítico $L^{\text{VF}}$:} Treina o crítico para predizer com precisão os retornos esperados, fornecendo estimativas de vantagem mais precisas para o ator.
+
+    \item \textbf{Bônus de Entropia $\mathcal{H}$:} Penaliza políticas determinísticas, incentivando a exploração nas fases iniciais do treinamento, quando o agente ainda não mapeou bem o espaço de estados.
+\end{itemize}
+
+Os hiperparâmetros de treinamento são: $n_{\text{steps}} = 2048$, $\text{batch\_size} = 64$, $\gamma = 0{,}99$, $\lambda_{\text{GAE}} = 0{,}95$, $\varepsilon_{\text{clip}} = 0{,}2$, $\alpha = 3 \times 10^{-4}$ (\textit{learning rate}).
+
+% ------------------------------------------------------------
+\subsection{Justificativa da Escolha do PPO}
+\label{subsec:ppo-justificativa}
+% ------------------------------------------------------------
+
+A escolha do \gls{PPO} frente às principais alternativas — \gls{DQN}, \gls{SAC} e DDPG — é motivada por três fatores estruturais do problema:
+
+\begin{enumerate}
+    \item \textbf{Penalidades esparsas e grandes:} A penalidade de $\Omega = -10$ na violação de prazo cria uma superfície de recompensa altamente não-suave. Métodos baseados em valor como o \gls{DQN} podem sofrer de superestimação catastrófica da função de valor próximo a estados de penalidade \cite{miriyala2025}. O mecanismo CLIP do \gls{PPO} limita a magnitude do gradiente, prevenindo divergência.
+
+    \item \textbf{Ambiente não-estacionário:} A cadeia de Markov de regimes causa \textit{distribution shift} contínuo durante o treinamento. O \gls{PPO} é \textit{on-policy}: cada atualização usa exclusivamente dados gerados pela política corrente, evitando os artefatos de dados obsoletos (\textit{stale data}) que afetam métodos \textit{off-policy} como o \gls{SAC} e o DDPG, cujo \textit{experience replay} pode conter transições de regimes já superados.
+
+    \item \textbf{Espaço de ação discreto e binário:} A ação $\{0, 1\}$ é naturalmente representada por uma distribuição categórica com saída \textit{softmax}, sem necessidade de aproximações de ação contínua como as requeridas pelo DDPG. O \gls{PPO} com ações discretas é matematicamente direto e não requer truques adicionais de exploração \cite{uddin2025, wei2024}.
+\end{enumerate}
+
+% ============================================================
+\section{Complexidade Computacional}
+\label{sec:complexidade}
+% ============================================================
+
+A viabilidade da abordagem para operação em tempo real em redes \gls{VEC} depende da eficiência computacional por passo de decisão. A Tabela~\ref{tab:complexidade} sumariza a complexidade assintótica de cada componente.
+
+\begin{table}[htbp]
+\centering
+\caption{Complexidade computacional por passo de decisão ($N$: número de candidatos; $D = 15$: dimensão do estado; $H = 256$: neurônios por camada oculta).}
+\label{tab:complexidade}
+\begin{tabular}{lll}
+\hline
+\textbf{Componente} & \textbf{Complexidade} & \textbf{Observação} \\
+\hline
+Normalização TOPSIS        & $O(N \cdot n)$   & $n = 4$ fixo \\
+Distâncias TOPSIS          & $O(N \cdot n)$   & \\
+Ordenação TOPSIS           & $O(N \log N)$    & dominante \\
+Inferência PPO (MLP)       & $O(H \cdot D)$   & $O(1)$ \\
+\hline
+\textbf{Total por passo}   & $O(N \log N)$    & dominado pelo TOPSIS \\
+\hline
+\end{tabular}
+\end{table}
+
+Para $N \leq 20$ candidatos, típico em cenários \gls{VEC} urbanos, a complexidade é equivalente a ordenar 20 números — operação da ordem de microssegundos em hardware moderno, plenamente compatível com os requisitos de tempo real (decisão $< 1$ ms).
+
+\paragraph{Complexidade espacial.} A rede \gls{PPO} com arquitetura $[15 \to 256 \to 256 \to 2]$ para o ator e $[15 \to 256 \to 256 \to 1]$ para o crítico totaliza $2 \times (15 \times 256 + 256^2 + 256 \times 2) \approx 270{.}000$ parâmetros $\approx 1{,}0$ MB. O sistema completo cabe confortavelmente na memória de qualquer \gls{RSU} ou \gls{gNB} contemporâneo.
+
+\paragraph{Comparação com alternativas.} Uma abordagem baseada em \gls{GNN} para lidar com a topologia variável exigiria, em contraste, computação de mensagens entre $O(N^2)$ pares de nós por camada, resultando em complexidade $O(N^2 \cdot D_{\text{GNN}})$ por passo — quadrática em $N$ e potencialmente proibitiva para $N$ grande ou em hardware embarcado \cite{miriyala2025}. A abordagem \gls{TOPSIS} + estado fixo reduz esta dependência para $O(N \log N)$, sem perda de expressividade na representação do estado, e elimina a necessidade de retreinamento para novos valores de $N$ (Seção~\ref{subsec:zeroshot}).
+
+
+
+###############################333
+
+\chapter{Proposta}
+\label{chap:proposta}
+
+Este capítulo apresenta em detalhes a abordagem proposta para o descarregamento de tarefas em redes de \gls{VEC}: um agente de \gls{DRL} baseado no algoritmo \gls{PPO} cujo espaço de observação é construído pelo método \gls{TOPSIS}. A exposição está organizada de forma autossuficiente — todos os conceitos matemáticos necessários são introduzidos e derivados a partir do zero, de modo que o leitor familiarizado com os fundamentos de \gls{RL} e probabilidade básica possa acompanhar o raciocínio sem recorrer a fontes externas.
+
+% ============================================================
+\section{Visão Geral da Arquitetura}
+\label{sec:visao-geral}
+% ============================================================
+
+A solução proposta é estruturada em duas fases distintas: uma \textbf{fase de treinamento} (offline) e uma \textbf{fase de implantação} (online). Na fase de treinamento, o agente \gls{PPO} interage com um simulador do ambiente \gls{VEC}, aprendendo uma política $\pi_\theta$ que mapeia estados de 15 dimensões em decisões binárias (executar localmente ou descarregar). Na fase de implantação, o sistema opera em tempo real: para cada tarefa gerada pelo veículo, o \gls{TOPSIS} processa a matriz de decisão dos $N$ candidatos disponíveis, gerando o vetor de estado fixo de 15 dimensões que é entregue ao agente, o qual emite a ação binária em microssegundos.
+
+A Figura~\ref{fig:arquitetura} ilustra o fluxo completo de informação entre os componentes.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.4cm and 2.0cm,
+    block/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm,
+                  minimum height=1.0cm, align=center, font=\small,
+                  fill=blue!8, draw=blue!40},
+    gblock/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm,
+                   minimum height=1.0cm, align=center, font=\small,
+                   fill=green!8, draw=green!50!black},
+    oblock/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm,
+                   minimum height=1.0cm, align=center, font=\small,
+                   fill=orange!10, draw=orange!60},
+    rblock/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm,
+                   minimum height=1.0cm, align=center, font=\small,
+                   fill=red!8, draw=red!40},
+    pblock/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm,
+                   minimum height=1.0cm, align=center, font=\small,
+                   fill=purple!8, draw=purple!40},
+    arrow/.style={->, >=stealth, thick},
+    darrow/.style={->, >=stealth, thick, dashed},
+]
+
+% Nodes
+\node[block] (env)     {\textbf{Ambiente VEC}\\$N$ candidatos\\(servidores / RSUs)};
+\node[gblock, right=2.2cm of env] (topsis) {\textbf{Módulo TOPSIS}\\$\mathbf{X} \in \mathbb{R}^{N \times 4}$\\$\rightarrow \mathbf{S}_t \in \mathbb{R}^{15}$};
+\node[pblock, right=2.2cm of topsis] (ppo)   {\textbf{Agente PPO}\\MLP $[256,256]$\\$\pi_\theta: \mathbb{R}^{15}\!\to\!\{0,1\}$};
+\node[rblock, right=2.2cm of ppo]   (action) {\textbf{Ação}\\LOCAL ($a{=}0$) ou\\OFFLOAD ($a{=}1$)};
+
+% Main flow arrows
+\draw[arrow] (env.east)    -- node[above,font=\scriptsize]{matriz $\mathbf{X}$} (topsis.west);
+\draw[arrow] (topsis.east) -- node[above,font=\scriptsize]{$\mathbf{S}_t \in [0,1]^{15}$} (ppo.west);
+\draw[arrow] (ppo.east)    -- node[above,font=\scriptsize]{$a_t$} (action.west);
+
+% Reward feedback from action to env
+\draw[darrow] (action.south) -- ++(0,-1.2) -| node[below,font=\scriptsize]{$r_t$, nova tarefa} (env.south);
+
+\end{tikzpicture}
+\caption{Arquitetura da solução proposta. O Ambiente \gls{VEC} fornece $N$ candidatos; o Módulo \gls{TOPSIS} constrói a matriz de decisão $\mathbf{X} \in \mathbb{R}^{N \times 4}$ e gera o estado fixo $\mathbf{S}_t \in \mathbb{R}^{15}$; o Agente \gls{PPO} (MLP $256{\times}256$) recebe $\mathbf{S}_t$ e emite a ação binária $a_t$; a ação resultante ($\mathrm{LOCAL}$ ou $\mathrm{OFFLOAD}$) retroalimenta o ambiente com a recompensa $r_t$.}
+\label{fig:arquitetura}
+\end{figure}
+
+% ============================================================
+\section{Formulação Formal do Problema}
+\label{sec:formulacao-formal}
+% ============================================================
+
+Seja um veículo gerador de tarefas operando em uma área de cobertura com $N_s$ servidores de borda heterogêneos (e.g., \glspl{RSU}, \glspl{gNB} \gls{5G}). A cada instante $t$, o veículo gera uma tarefa com tamanho $b_t$ (em bytes), densidade computacional $\rho_t$ (ciclos/byte) e prazo $D_t$ (em segundos). O veículo deve decidir se executa a tarefa localmente ou a descarrega para um dos servidores disponíveis. O objetivo central é:
+
+\begin{equation}
+    \max_{\pi} \;\mathbb{E}_\pi\!\left[\sum_{t=0}^{T} \mathbf{1}\!\left[\tau_t \leq D_t\right]\right]
+    \quad \text{s.a.} \quad \mathbb{E}_\pi\!\left[E_t\right] \leq E_{\max},
+    \label{eq:objetivo-global}
+\end{equation}
+
+\noindent onde $\tau_t$ é a latência total da execução da tarefa $t$, $D_t$ é o prazo específico da tarefa e $E_t$ é a energia consumida. O problema é formulado como um \textbf{\gls{MDP}} (e, mais precisamente, como um \textbf{\gls{POMDP}}) definido pela tupla $(\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma)$:
+
+\begin{itemize}
+    \item \textbf{Espaço de estados}: $\mathcal{S} \subseteq [0,1]^{15}$. O estado $\mathbf{S}_t \in \mathbb{R}^{15}$ é um vetor de dimensão fixa construído pelo \gls{TOPSIS} (detalhado nas Seções~\ref{sec:topsis} e~\ref{sec:estado-fixo}).
+
+    \item \textbf{Espaço de ações}: $\mathcal{A} = \{0, 1\}$, onde $a_t = 0$ indica execução local (\texttt{LOCAL}) e $a_t = 1$ indica descarregamento (\texttt{OFFLOAD}) para o candidato de melhor ranqueamento pelo \gls{TOPSIS}.
+
+    \item \textbf{Função de transição}: $\mathcal{P}(s_{t+1} \mid s_t, a_t)$, que é não-estacionária devido à mobilidade dos veículos, às flutuações de canal e à cadeia de Markov de regimes de tráfego (Seção~\ref{sec:modelo-ambiente}).
+
+    \item \textbf{Função de recompensa}: $\mathcal{R}(s_t, a_t) = r_t$, definida em detalhes na Seção~\ref{sec:recompensa}.
+
+    \item \textbf{Fator de desconto}: $\gamma = 0{,}99$, próximo de 1 para valorizar recompensas futuras e penalizar estratégias que reduzem latência imediata às custas de congestionamento futuro nas filas.
+\end{itemize}
+
+\subsection{Justificativa do \glsentryshort{POMDP}}
+\label{subsec:pomdp-justificativa}
+
+O problema se enquadra formalmente como um \gls{POMDP} por três razões fundamentais. Primeiro, a qualidade do canal de comunicação \gls{V2I} é estocástica e varia rapidamente com a posição do veículo — o agente observa apenas uma estimativa ruidosa da taxa de dados, não o estado real do canal. Segundo, o estado das filas nos servidores remotos é apenas parcialmente observável: o veículo pode estimar a ocupação da fila com base em medições passadas, mas não tem acesso direto ao estado interno dos nós remotos. Terceiro, as posições dos veículos evoluem continuamente de acordo com um processo estocástico, alterando as distâncias e, consequentemente, as estimativas de latência e energia \cite{uddin2025, farimani2024}. A representação de estado proposta (Seção~\ref{sec:estado-fixo}) mitiga parcialmente a observabilidade incompleta ao resumir as informações disponíveis em um vetor compacto que captura o melhor, o pior e o estado local, sem exigir o conhecimento do estado completo da rede.
+
+% ============================================================
+\section{Modelagem do Ambiente de Simulação}
+\label{sec:modelo-ambiente}
+% ============================================================
+
+O ambiente de simulação foi implementado como um ambiente \textit{gymnasium} customizado, seguindo a interface padrão de \gls{RL}. Esta seção detalha cada componente do modelo.
+
+% ------------------------------------------------------------
+\subsection{Topologia e Mobilidade}
+\label{subsec:topologia}
+% ------------------------------------------------------------
+
+Considera-se uma área quadrada de dimensão $A \times A$ metros, com $N_v$ veículos e $N_s$ servidores de borda posicionados no interior da área. Os veículos se movem com velocidade aleatória uniforme, refletindo nas bordas da área (modelo de reflexão), de forma a modelar um cenário urbano com tráfego persistente.
+
+A capacidade de processamento local do veículo segue um \textbf{processo \gls{AR}(1)} (autorregressivo de primeira ordem), que modela a autocorrelação temporal da disponibilidade de \gls{CPU}:
+
+\begin{equation}
+    f_t = f_\mu + \rho\,(f_{t-1} - f_\mu) + \sigma_\varepsilon\,\varepsilon_t, \quad \varepsilon_t \sim \mathcal{N}(0,1),
+    \label{eq:ar1-cpu}
+\end{equation}
+
+\noindent com parâmetros $f_\mu = 1{,}5$ GHz (média de longo prazo), $\rho = 0{,}95$ (coeficiente de autocorrelação), $\sigma_\varepsilon = 0{,}2$ GHz (desvio padrão do ruído), e $f_t$ limitado ao intervalo $[0{,}5;\;4{,}0]$ GHz. A interpretação do \gls{AR}(1) é direta: o parâmetro $\rho$ próximo de 1 garante persistência temporal — uma \gls{CPU} congestionada no instante $t$ tende a permanecer congestionada em $t+1$, o que é consistente com a realidade de processos de sistema operacional que acumulam carga e a liberam gradualmente. O ruído $\varepsilon_t$ introduz variabilidade para evitar trajetórias perfeitamente determinísticas.
+
+% ------------------------------------------------------------
+\subsection{Heterogeneidade dos Servidores}
+\label{subsec:servidores}
+% ------------------------------------------------------------
+
+Os $N_s$ servidores de borda possuem capacidades de processamento heterogêneas, ciclando pelo conjunto $\{1{,}0;\;2{,}0;\;4{,}0\}$ GHz de forma a cobrir toda a faixa de variação para qualquer valor de $N_s$. Para $N_s = 3$, tem-se exatamente um servidor lento ($1{,}0$ GHz), um servidor médio ($2{,}0$ GHz) e um servidor rápido ($4{,}0$ GHz), representando a heterogeneidade típica de \glspl{RSU} urbanas com diferentes gerações de hardware implantadas.
+
+A heterogeneidade é uma característica de projeto deliberada e essencial. Em um cenário homogêneo (todos os servidores equivalentes), qualquer política de descarregamento que selecione um servidor arbitrário é ótima em termos de capacidade de processamento, tornando o problema trivial. A introdução de servidores com capacidades distintas, combinada com ocupações de fila diferentes e distâncias variáveis, cria um problema de seleção genuinamente não trivial em que a escolha do servidor errado pode resultar em violação de prazo, mesmo quando a decisão de descarregar é correta \cite{moghaddasi2024}.
+
+% ------------------------------------------------------------
+\subsection{Modelo de Filas}
+\label{subsec:filas}
+% ------------------------------------------------------------
+
+Cada nó $i$ (veículo ou servidor) mantém uma fila discreta $Q_i \in \{0, 1, \ldots, Q_{\max}\}$, com $Q_{\max} = 8$. A dinâmica da fila segue o modelo:
+
+\begin{equation}
+    Q_i(t+1) = \min\!\bigl(Q_i(t) + \mathbf{1}[\text{nó $i$ selecionado em $t$}],\; Q_{\max}\bigr),
+    \label{eq:fila-incremento}
+\end{equation}
+
+\noindent e, a cada passo de tempo, a fila drena com probabilidade $p_{\text{drain},i}$:
+
+\begin{equation}
+    Q_i(t+1) \leftarrow \max\!\bigl(Q_i(t+1) - 1,\; 0\bigr) \quad \text{com prob. } p_{\text{drain},i}.
+    \label{eq:fila-dreno}
+\end{equation}
+
+A probabilidade de dreno é proporcional à capacidade de processamento do nó. Para servidores:
+\begin{equation}
+    p_{\text{drain},i}^{\text{server}} = 0{,}25 + 0{,}15 \cdot \frac{f_i}{4\;\text{GHz}},
+    \label{eq:pdrain-server}
+\end{equation}
+
+\noindent resultando em $p_{\text{drain}} \in [0{,}25;\;0{,}40]$ (0,25 para servidor de 1 GHz, 0,40 para servidor de 4 GHz). Para o veículo local: $p_{\text{drain}}^{\text{vehicle}} = 0{,}20$. Este modelo aproxima o comportamento de uma fila M/M/1, onde o tempo médio de serviço é inversamente proporcional à capacidade de processamento, justificando a dependência linear entre $p_{\text{drain}}$ e $f_i$.
+
+A carga efetiva do nó é calculada como:
+\begin{equation}
+    \rho_i = \frac{Q_i}{Q_{\max}}.
+    \label{eq:carga-efetiva}
+\end{equation}
+
+% ------------------------------------------------------------
+\subsection{Perfis de Tarefas e Regimes de Tráfego}
+\label{subsec:regimes}
+% ------------------------------------------------------------
+
+O ambiente define três \textbf{regimes de tráfego}, cada um com características distintas de tamanho, complexidade e prazo de tarefa:
+
+\begin{table}[htbp]
+\centering
+\caption{Parâmetros dos regimes de tráfego por tipo de tarefa.}
+\label{tab:regimes-trafego}
+\begin{tabular}{lccc}
+\hline
+\textbf{Regime} & \textbf{Tamanho} $b$ (KB) & \textbf{Densidade} $\rho$ (ciclos/byte) & \textbf{Prazo} $D$ (ms) \\
+\hline
+Leve (\textit{light})       & $\mathcal{U}[5,\;15]$   & 7\,000  & $\mathcal{U}[80,\;150]$  \\
+Crítico (\textit{critical})  & $\mathcal{U}[10,\;20]$  & 9\,000  & $\mathcal{U}[50,\;100]$  \\
+Pesado (\textit{heavy})      & $\mathcal{U}[50,\;80]$  & 11\,000 & $\mathcal{U}[250,\;500]$ \\
+\hline
+\end{tabular}
+\end{table}
+
+A transição entre regimes segue uma \textbf{cadeia de Markov} com matriz de transição:
+
+\begin{equation}
+    \mathbf{\Pi} =
+    \begin{pmatrix}
+        0{,}70 & 0{,}20 & 0{,}10 \\
+        0{,}20 & 0{,}60 & 0{,}20 \\
+        0{,}10 & 0{,}20 & 0{,}70
+    \end{pmatrix},
+    \label{eq:matriz-transicao}
+\end{equation}
+
+\noindent onde as linhas e colunas correspondem, respectivamente, aos estados \textit{light}, \textit{critical} e \textit{heavy}. A diagonal dominante (0,70 e 0,60) reflete a \textbf{persistência temporal} dos regimes: uma vez no regime leve, a rede permanece nele com probabilidade 0,70, o que cria não-estacionariedade temporal. O agente deve aprender políticas robustas que funcionem bem em todos os três regimes, sem identificação explícita do regime corrente.
+
+% ------------------------------------------------------------
+\subsection{Modelos de Canal}
+\label{subsec:canal}
+% ------------------------------------------------------------
+
+\paragraph{Canal \gls{V2I} (3GPP TR 38.901 UMi).} A perda de percurso entre o veículo e um servidor de infraestrutura é modelada segundo o padrão \gls{3GPP} TR 38.901 para cenário \textit{Urban Micro} (UMi):
+
+\begin{equation}
+    \mathrm{PL}_{V2I}(d) = 32{,}4 + 21\log_{10}(d) + 20\log_{10}(f_c)\;\text{[dB]},
+    \label{eq:pathloss-v2i}
+\end{equation}
+
+\noindent com $f_c = 3{,}5$ GHz, largura de banda $B = 40$ MHz, potência de transmissão $P_{tx} = 23$ dBm e potência de ruído $N_0 = -95$ dBm. A relação sinal-ruído recebida é:
+
+\begin{equation}
+    \mathrm{SNR}(d) = P_{tx}\,[\text{dBm}] - \mathrm{PL}(d)\,[\text{dB}] - N_0\,[\text{dBm}],
+    \label{eq:snr}
+\end{equation}
+
+\noindent e a capacidade de Shannon fornece a taxa de dados:
+
+\begin{equation}
+    C(d) = B \cdot \log_2\!\left(1 + 10^{\,\mathrm{SNR}(d)/10}\right).
+    \label{eq:capacidade-shannon}
+\end{equation}
+
+Como referência numérica: a 50 m, $C \approx 222$ Mbps; a 200 m, $C \approx 28$ Mbps, ilustrando a forte dependência com a distância.
+
+\paragraph{Canal \gls{V2V} (3GPP TR 37.885).} Para comunicação entre veículos, a perda de percurso segue:
+
+\begin{equation}
+    \mathrm{PL}_{V2V}(d) = 38{,}77 + 16{,}7\log_{10}(d) + 18{,}2\log_{10}(f_c)\;\text{[dB]},
+    \label{eq:pathloss-v2v}
+\end{equation}
+
+\noindent com $f_c = 5{,}9$ GHz e $B = 20$ MHz, parâmetros típicos do padrão \gls{3GPP} para comunicações \gls{V2V} em frequências dedicadas à segurança veicular.
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Latência}
+\label{subsec:latencia}
+% ------------------------------------------------------------
+
+\paragraph{Descarregamento (OFFLOAD).} Dado que o servidor selecionado possui frequência $f_s$ e carga $\rho_s = Q_s/Q_{\max}$, a latência total de descarregamento é:
+
+\begin{align}
+    \tau_{tx}      &= \frac{b \cdot 8}{C(d_s)}, \label{eq:tau-tx} \\
+    \tau_{proc}    &= \frac{b \cdot \rho_{\text{dens}}}{f_s}, \label{eq:tau-proc} \\
+    \tau_{queue}   &= \frac{\rho_s}{1 - \rho_s + \varepsilon} \cdot \tau_{proc}, \label{eq:tau-queue} \\
+    \tau_{offload} &= \tau_{tx} + \tau_{proc} + \tau_{queue}, \label{eq:tau-offload}
+\end{align}
+
+\noindent onde $b$ é o tamanho da tarefa em bytes, $\rho_{\text{dens}}$ é a densidade computacional em ciclos/byte, $C(d_s)$ é a capacidade do canal ao servidor escolhido, e $\varepsilon = 10^{-6}$ previne divisão por zero quando $\rho_s \to 1$.
+
+\paragraph{Execução local (LOCAL).} Para execução no próprio veículo com frequência $f_v$ e carga $\rho_v$:
+
+\begin{equation}
+    \tau_{local} = \left(\frac{\rho_v}{1 - \rho_v + \varepsilon} + 1\right) \cdot \frac{b \cdot \rho_{\text{dens}}}{f_v}.
+    \label{eq:tau-local}
+\end{equation}
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Energia}
+\label{subsec:energia}
+% ------------------------------------------------------------
+
+\paragraph{Energia de transmissão (OFFLOAD).} Assumindo potência de transmissão constante $P_{tx}^{(W)} = 0{,}1$ W:
+
+\begin{equation}
+    E_{tx} = P_{tx}^{(W)} \cdot \tau_{tx}.
+    \label{eq:energia-tx}
+\end{equation}
+
+\paragraph{Energia de processamento local (LOCAL).} O modelo cúbico de energia dinâmica de \gls{CPU} é amplamente adotado na literatura \cite{chen2025}:
+
+\begin{equation}
+    E_{local} = \kappa \cdot f_v^2 \cdot (b \cdot \rho_{\text{dens}}),
+    \label{eq:energia-local}
+\end{equation}
+
+\noindent onde $\kappa = 10^{-28}$ é o coeficiente de capacitância efetiva. O fator $f_v^2$ (quadrático na frequência) captura o custo energético da tensão de operação, enquanto o fator $b \cdot \rho_{\text{dens}}$ representa o total de ciclos de \gls{CPU} necessários.
+
+% ============================================================
+\section{Tomada de Decisão Multicritério: TOPSIS}
+\label{sec:topsis}
+% ============================================================
+
+O descarregamento de tarefas envolve critérios múltiplos e conflitantes: minimizar latência pode exigir o servidor mais próximo, mas esse servidor pode estar sobrecarregado (alta ocupação de fila), aumentando a latência de fila; maximizar a taxa de dados pode requerer alta potência de transmissão, elevando o consumo energético. Este é o domínio da \textbf{\gls{MCDM}}: problemas em que existem $m$ alternativas avaliadas por $n$ critérios conflitantes, sem solução única que seja ótima para todos os critérios simultaneamente \cite{miriyala2025}.
+
+% ------------------------------------------------------------
+\subsection{O Algoritmo TOPSIS}
+\label{subsec:topsis-algoritmo}
+% ------------------------------------------------------------
+
+O \textbf{\gls{TOPSIS}} (\textit{Technique for Order of Preference by Similarity to Ideal Solution}) é um método \gls{MCDM} que ranqueia alternativas pela proximidade relativa à \textbf{Solução Ideal Positiva} (PIS — melhor valor possível em cada critério) e pela distância à \textbf{Solução Ideal Negativa} (NIS — pior valor possível). Uma alternativa é preferível se estiver simultaneamente próxima da PIS e distante da NIS.
+
+Seja $\mathbf{X} \in \mathbb{R}^{m \times n}$ a matriz de decisão com $m$ candidatos e $n = 4$ critérios: latência $(\tau)$, carga de \gls{CPU} $(\rho_{cpu})$, taxa de dados $(C)$ e energia $(E)$. O procedimento se desenvolve em cinco passos.
+
+\paragraph{Passo 1 — Normalização vetorial.} Normaliza cada coluna para remover efeitos de escala:
+
+\begin{equation}
+    r_{ij} = \frac{x_{ij}}{\sqrt{\displaystyle\sum_{k=1}^{m} x_{kj}^2}}.
+    \label{eq:normalizacao-topsis}
+\end{equation}
+
+\paragraph{Passo 2 — Matriz normalizada ponderada.} Aplica os pesos $\mathbf{w} = [w_1, w_2, w_3, w_4]^T$ com $\sum_j w_j = 1$:
+
+\begin{equation}
+    v_{ij} = w_j \cdot r_{ij}.
+    \label{eq:ponderacao-topsis}
+\end{equation}
+
+Os pesos adotados são $\mathbf{w} = [0{,}35;\;0{,}25;\;0{,}25;\;0{,}15]$ para $[\tau,\;\rho_{cpu},\;C,\;E]$, respectivamente, refletindo a prioridade de latência em cenários \gls{URLLC} \cite{uddin2025}.
+
+\paragraph{Passo 3 — Soluções ideais positiva e negativa.} Os critérios são classificados em \textit{custo} (minimizar: latência, carga, energia) e \textit{benefício} (maximizar: taxa de dados):
+
+\begin{align}
+    A^+_j &= \begin{cases} \min_i v_{ij} & \text{se critério $j$ é custo} \\ \max_i v_{ij} & \text{se critério $j$ é benefício} \end{cases}, \label{eq:pis} \\[6pt]
+    A^-_j &= \begin{cases} \max_i v_{ij} & \text{se critério $j$ é custo} \\ \min_i v_{ij} & \text{se critério $j$ é benefício} \end{cases}. \label{eq:nis}
+\end{align}
+
+\paragraph{Passo 4 — Distâncias à PIS e NIS.} A distância de cada candidato $i$ às soluções ideais é calculada pela \textbf{norma $L_2$ Euclidiana}:
+
+\begin{align}
+    d^+_i &= \sqrt{\sum_{j=1}^{n} \left(v_{ij} - A^+_j\right)^2}, \label{eq:dist-pis} \\
+    d^-_i &= \sqrt{\sum_{j=1}^{n} \left(v_{ij} - A^-_j\right)^2}. \label{eq:dist-nis}
+\end{align}
+
+A norma $L_2$ é a métrica padrão do \gls{TOPSIS} clássico \cite{miriyala2025} e foi adotada neste trabalho por produzir escores $C^*_i$ com maior poder discriminativo entre candidatos em ambientes \gls{VEC}. Ao elevar os desvios ao quadrado, ela penaliza mais candidatos que se afastam simultaneamente de vários critérios do ideal — o que é desejável quando todos os critérios (latência, fila, taxa de dados, energia) são relevantes e as escalas foram normalizadas pelo Passo~1. Em cenários com poucos candidatos ($N = 3$), a $L_2$ oferece maior separação entre os escores $C^*_i$ do que a $L_1$, facilitando a aprendizagem da política pelo agente \gls{PPO}.
+
+\paragraph{Passo 5 — Coeficiente de proximidade.} O escore final de cada candidato é:
+
+\begin{equation}
+    C^*_i = \frac{d^-_i}{d^+_i + d^-_i} \in [0, 1].
+    \label{eq:closeness}
+\end{equation}
+
+O coeficiente $C^*_i \to 1$ indica que o candidato $i$ está próximo da solução ideal e distante da anti-ideal (preferível); $C^*_i \to 0$ indica o oposto. O ranqueamento final dos candidatos é determinado por $C^*_i$ em ordem decrescente.
+
+% ------------------------------------------------------------
+\subsection{Extensão Fuzzy do TOPSIS}
+\label{subsec:fuzzy-topsis}
+% ------------------------------------------------------------
+
+Em ambientes com incerteza de medição — onde estimativas de latência chegam com atraso de telemetria e ocupações de fila são observadas com ruído — cada valor $x_{ij}$ pode ser modelado como um \textbf{Número Fuzzy Triangular} (\textit{Triangular Fuzzy Number}, TFN): $\tilde{x}_{ij} = (L_{ij},\;M_{ij},\;U_{ij})$, onde $L_{ij}$ é o limite inferior, $M_{ij}$ é o valor modal e $U_{ij}$ é o limite superior do intervalo de confiança.
+
+A \textbf{fuzzificação} é realizada a partir da estatística da coluna $j$:
+
+\begin{align}
+    L_{ij} &= x_{ij} - \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-lower} \\
+    M_{ij} &= x_{ij}, \label{eq:fuzz-modal} \\
+    U_{ij} &= x_{ij} + \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-upper}
+\end{align}
+
+\noindent onde $\hat{\sigma}_j$ é o desvio padrão empírico da coluna $j$ e $\sigma_{\text{frac}} \in [0, 1]$ é um hiperparâmetro de fuzzificação. A \textbf{defuzzificação} pelo centroide recupera um valor escalar:
+
+\begin{equation}
+    \bar{x}_{ij} = \frac{L_{ij} + M_{ij} + U_{ij}}{3} = x_{ij},
+    \label{eq:defuzz-centroid}
+\end{equation}
+
+\noindent que neste caso resulta exatamente no valor original (pois o TFN é simétrico em torno de $M_{ij}$), porém a estrutura fuzzy influencia os cálculos intermediários de PIS e NIS ao considerar os extremos do intervalo.
+
+Quando $\sigma_{\text{frac}} = 0$: $L_{ij} = M_{ij} = U_{ij} = x_{ij}$, e o método reduz-se exatamente ao \gls{TOPSIS} padrão. Esta parametrização unificada permite que o mesmo código opere tanto no modo padrão quanto no modo fuzzy, com a transição controlada por um único hiperparâmetro. \textbf{Na presente implementação, adota-se $\sigma_{\text{frac}} = 0{,}0$}, correspondendo ao \gls{TOPSIS} determinístico padrão. A extensão fuzzy é apresentada como uma generalização natural do método para documentar a capacidade do sistema de absorver incerteza de medição sem alterações estruturais, caso o ambiente operacional demande tal tratamento.
+
+A justificativa para a extensão é direta: em cenários \gls{VEC}, estimativas de qualidade de canal e ocupação de fila chegam com atraso de um passo de tempo. Intervalos fuzzy modelam o intervalo de confiança em torno de cada medição, prevenindo inversões de ranqueamento instáveis quando dois candidatos possuem escores $C^*$ muito próximos — situação em que qualquer perturbação de medição poderia trocar a ordem e gerar inconsistência na política do agente \cite{farimani2024}.
+
+% ============================================================
+\section{Representação de Estado Invariante à Escala}
+\label{sec:estado-fixo}
+% ============================================================
+
+Um desafio central em \gls{RL} para redes \gls{VEC} é a \textbf{variabilidade do número de candidatos}: conforme veículos e servidores entram e saem da área de cobertura, $N$ pode variar de 1 a dezenas. Arquiteturas como \glspl{GNN} lidam com topologias variáveis ao custo de elevada complexidade computacional e dificuldade de generalização \cite{miriyala2025}. A abordagem proposta resolve este problema por meio de uma representação de estado de dimensão fixa, construída pelo \gls{TOPSIS} e independente de $N$.
+
+% ------------------------------------------------------------
+\subsection{Características por Nó}
+\label{subsec:features-por-no}
+% ------------------------------------------------------------
+
+Após a execução do \gls{TOPSIS}, cada candidato $i$ é representado por um vetor de características de 5 dimensões, todas normalizadas para o intervalo $[0,1]$:
+
+\begin{equation}
+    \mathbf{s}_i = \left[C^*_i,\;\frac{\tau_i}{\tau_{\max}},\;\frac{Q_i}{Q_{\max}},\;\frac{C_i}{C_{\max}},\;\frac{E_i}{E_{\max}}\right],
+    \label{eq:feature-vector}
+\end{equation}
+
+\noindent onde:
+\begin{itemize}
+    \item $C^*_i \in [0,1]$: coeficiente de proximidade do \gls{TOPSIS} — escore composto de qualidade do candidato;
+    \item $\tau_i / \tau_{\max}$: latência estimada normalizada ($\tau_{\max} = 5$ s);
+    \item $Q_i / Q_{\max}$: razão de ocupação da fila ($Q_{\max} = 8$);
+    \item $C_i / C_{\max}$: taxa de dados normalizada ($C_{\max} = 300$ Mbps);
+    \item $E_i / E_{\max}$: energia normalizada ($E_{\max} = 1$ J).
+\end{itemize}
+
+Para o veículo local (agente), o vetor $\mathbf{s}_{\text{agent}}$ é calculado de forma análoga, com a latência local estimada pela Equação~\eqref{eq:tau-local}, a ocupação de fila local, taxa de dados de uplink nula ($C_i = 0$ pois não há transmissão no modo local) e energia pelo modelo cúbico (Equação~\eqref{eq:energia-local}).
+
+% ------------------------------------------------------------
+\subsection{Construção do Estado Fixo $[\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$}
+\label{subsec:estado-triplet}
+% ------------------------------------------------------------
+
+Dados $N \geq 1$ candidatos ranqueados pelo \gls{TOPSIS} em ordem decrescente de $C^*$, o estado fixo de 15 dimensões é:
+
+\begin{equation}
+    \mathbf{S}_t = \left[\mathbf{s}_{\text{rank}_1} \;\middle|\; \mathbf{s}_{\text{agent}} \;\middle|\; \mathbf{s}_{\text{rank}_N}\right] \in [0,1]^{15},
+    \label{eq:estado-fixo}
+\end{equation}
+
+\noindent onde $\mathbf{s}_{\text{rank}_1}$ é o vetor do candidato de maior $C^*$ (melhor opção de descarregamento) e $\mathbf{s}_{\text{rank}_N}$ é o vetor do candidato de menor $C^*$ (pior opção disponível). O estado $\mathbf{S}_t$ possui \textbf{sempre 15 dimensões}, independentemente do valor de $N$.
+
+Os três componentes cumprem papéis complementares e insubstituíveis na tomada de decisão:
+
+\begin{enumerate}
+    \item \textbf{$\mathbf{s}_{\text{best}}$ (rank 1):} Informa o agente sobre a melhor opção de descarregamento disponível no instante $t$. Permite que o agente avalie se descarregar \textit{vale a pena} em termos absolutos.
+
+    \item \textbf{$\mathbf{s}_{\text{agent}}$:} Representa o estado local do veículo — latência esperada de execução local, ocupação atual da fila do veículo e custo energético local. Permite que o agente compare diretamente a execução local com o descarregamento, sem precisar inferir o custo local a partir de observações indiretas.
+
+    \item \textbf{$\mathbf{s}_{\text{worst}}$ (rank $N$):} Encapsula a dispersão de qualidade do conjunto de candidatos. Uma grande diferença entre $C^*_{\text{best}}$ e $C^*_{\text{worst}}$ sinaliza uma vizinhança heterogênea, onde a \textit{seleção} do servidor é crítica — há candidatos muito bons e muito ruins. Uma diferença pequena indica candidatos homogêneos, onde a decisão de descarregar ou não é mais importante do que qual servidor escolher. Sem $\mathbf{s}_{\text{worst}}$, o agente não tem acesso a essa informação de dispersão.
+\end{enumerate}
+
+\paragraph{Invariância dimensional.} Para qualquer $N \in \{1, 2, \ldots, \infty\}$, o \gls{TOPSIS} computa os escores $C^*_i$ para todos os $N$ candidatos em $O(N \log N)$, e então seleciona três entradas representativas. A operação de seleção é $O(N)$ (min e max do vetor de escores), mas a saída é sempre $\mathbb{R}^{15}$. Portanto, \textbf{um modelo treinado com $N = 3$ pode ser avaliado em cenários com $N = 20$ sem qualquer modificação na arquitetura da rede neural}, pois o espaço de observação é fixo em $\dim = 15$ e o mapeamento $N \to 15$ é definido pela regra de seleção do \gls{TOPSIS}. Esta propriedade é fundamental para a viabilidade prática da abordagem em redes dinâmicas.
+
+% ------------------------------------------------------------
+\subsection{Justificativa por Estudos Ablativos}
+\label{subsec:ablativo}
+% ------------------------------------------------------------
+
+A escolha do triplet $[\mathbf{s}_{\text{best}} \mid \mathbf{s}_{\text{agent}} \mid \mathbf{s}_{\text{worst}}]$ não é arbitrária — ela é validada empiricamente em comparação com alternativas plausíveis:
+
+\begin{itemize}
+    \item \texttt{top3}: $[\mathbf{s}_{\text{rank}_1} \mid \mathbf{s}_{\text{rank}_2} \mid \mathbf{s}_{\text{rank}_3}]$ — sem auto-conhecimento (o agente não sabe seu próprio custo local);
+    \item \texttt{top2\_agent}: $[\mathbf{s}_{\text{rank}_1} \mid \mathbf{s}_{\text{rank}_2} \mid \mathbf{s}_{\text{agent}}]$ — sem referência ao pior caso;
+    \item \texttt{agent\_only}: $[\mathbf{s}_{\text{agent}} \mid \mathbf{0} \mid \mathbf{0}]$ — sem qualquer informação do \gls{TOPSIS}.
+\end{itemize}
+
+Os estudos ablativos (descritos no Capítulo de Experimentos) demonstram que o triplet proposto alcança a melhor Área Sob a Curva (AUC) de desempenho e a convergência mais rápida em relação à política gulosa de referência (\textit{greedy baseline}), confirmando que tanto o auto-conhecimento ($\mathbf{s}_{\text{agent}}$) quanto a referência ao pior caso ($\mathbf{s}_{\text{worst}}$) contribuem de forma mensurável para a qualidade do aprendizado \cite{baker2024}.
+
+% ------------------------------------------------------------
+\subsection{Generalização Zero-Shot por Transferência Estrutural}
+\label{subsec:zeroshot}
+% ------------------------------------------------------------
+
+A representação de estado de dimensão fixa viabiliza uma propriedade notável: o agente treinado com $N = 3$ candidatos generaliza para cenários com $N$ muito maior \textbf{sem nenhum retreinamento}. Esta capacidade de \textbf{generalização zero-shot} decorre da estrutura matemática do mapeamento \gls{TOPSIS}.
+
+\paragraph{Argumento matemático.} O mapeamento $f: \mathbb{R}^{N \times 4} \to [0,1]^{15}$ produz sempre uma saída de 15 dimensões, independentemente de $N$. Um modelo treinado com $N = 3$ observa estados em que $C^*_{\text{best}} \in [0{,}4;\;0{,}7]$ tipicamente — pois com apenas três candidatos a probabilidade de encontrar um candidato excelente é limitada. Com $N = 20$, a maior quantidade de candidatos aumenta a probabilidade de que ao menos um seja excelente, elevando $C^*_{\text{best}}$ para regiões superiores do intervalo $[0,1]$. Este deslocamento, porém, constitui uma \textbf{extrapolação natural dentro do domínio} $[0,1]^{15}$ que a rede neural já aprendeu a tratar — não uma descontinuidade estrutural.
+
+A intuição fundamental é que a operação de ranqueamento do \gls{TOPSIS} é uma \textbf{estatística suficiente} para a decisão: ela resume os $N$ candidatos em uma representação de tamanho fixo que captura exatamente o que o agente precisa saber — a qualidade da melhor opção disponível ($C^*_{\text{best}}$), o custo de execução local ($\mathbf{s}_{\text{agent}}$) e a dispersão de qualidade do conjunto ($C^*_{\text{worst}}$). Adicionar mais candidatos apenas melhora a qualidade do melhor candidato, efeito que o agente aprende corretamente a explorar.
+
+\paragraph{Evidência empírica.} Os resultados experimentais confirmam este comportamento de forma consistente e monotônica em todas as variantes avaliadas:
+
+\begin{itemize}
+    \item \textbf{DRL-Best3} (triplet proposto): treinado com $N = 3$ (taxa de cumprimento de prazo: 59,1\%), testado zero-shot com $N = 20$: 78,1\% (+18,9 p.p.);
+    \item \textbf{DRL-Top3}: $59{,}4\% \to 77{,}3\%$ (+17,9 p.p.);
+    \item \textbf{DRL-Top2}: $59{,}6\% \to 79{,}6\%$ (+20,0 p.p.);
+    \item \textbf{DRL-AgentOnly}: $55{,}4\% \to 77{,}8\%$ (+22,4 p.p.).
+\end{itemize}
+
+O crescimento monotônico com $N$ — sem nenhuma degradação intermediária — confirma que o agente não está simplesmente memorizando padrões de $N = 3$, mas aprendendo a explorar corretamente a estrutura do espaço de estados normalizado.
+
+\paragraph{Comparação com abordagens baseadas em grafos.} Métodos baseados em \glspl{GNN} requerem retreinamento completo para cada novo valor de $N$, pois a estrutura do grafo de mensagens possui dimensionalidade $O(N^2 \cdot D_{\text{GNN}})$ por passo de passagem de mensagem — crescendo quadraticamente com o número de nós. A abordagem \gls{TOPSIS} + estado fixo elimina esta dependência estrutural: o custo de inferência cresce apenas como $O(N \log N)$, e nenhum retreinamento é necessário para novos valores de $N$.
+
+% ============================================================
+\section{Função de Recompensa}
+\label{sec:recompensa}
+% ============================================================
+
+A função de recompensa deve capturar dois objetivos distintos: (i) minimizar o custo conjunto de latência e energia no regime contínuo, e (ii) garantir o cumprimento de prazos como uma restrição quase-rígida. A recompensa no passo $t$ é definida como:
+
+\begin{equation}
+    r_t = -J_t + \Omega_t,
+    \label{eq:recompensa}
+\end{equation}
+
+\noindent onde o \textbf{custo de desempenho conjunto} é:
+
+\begin{equation}
+    J_t = w_1 \cdot \ell_{t,\text{norm}} + w_2 \cdot e_{t,\text{norm}},
+    \label{eq:custo-conjunto}
+\end{equation}
+
+\noindent com $w_1 = 0{,}7$ e $w_2 = 0{,}3$ (latência prioritária, consistente com requisitos \gls{URLLC}), e:
+
+\begin{align}
+    \ell_{t,\text{norm}} &= \min\!\left(\frac{\tau_t}{\tau_{\max}},\;1{,}0\right), \label{eq:lat-norm} \\
+    e_{t,\text{norm}}    &= \min\!\left(\frac{E_t}{E_{\max}},\;1{,}0\right). \label{eq:energy-norm}
+\end{align}
+
+A \textbf{penalidade de prazo} é:
+
+\begin{equation}
+    \Omega_t = -10 \cdot \mathbf{1}\!\left[\tau_t > D_t\right],
+    \label{eq:penalidade-deadline}
+\end{equation}
+
+\noindent onde $\mathbf{1}[\cdot]$ é a função indicadora e $D_t$ é o prazo específico da tarefa (dependente do regime corrente, conforme Tabela~\ref{tab:regimes-trafego}).
+
+\paragraph{Justificativa da magnitude $|\Omega| = 10$.} A hierarquia de sinal é intencional: $J_t \in [0,1]$ pelo limite imposto pelas normalizações, enquanto $|\Omega| = 10$ é uma ordem de magnitude maior. Isso garante que \textit{qualquer} violação de prazo seja sempre pior do que \textit{qualquer} combinação possível de latência e energia dentro dos limites normais — o cumprimento de prazo é tratado como restrição prioritária, e a minimização de $J_t$ guia a otimização fina dentro do conjunto de ações que cumprem os prazos \cite{baker2024, farimani2024}.
+
+O \textbf{retorno acumulado esperado} com desconto $\gamma = 0{,}99$ é:
+
+\begin{equation}
+    G_t = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k}.
+    \label{eq:retorno-acumulado}
+\end{equation}
+
+O valor $\gamma = 0{,}99$ atribui peso significativo às recompensas futuras, motivando o agente a evitar estratégias que minimizam a latência imediata ao custo de acumular tarefas nas filas — o que causaria congestionamento e violações de prazo nos passos subsequentes.
+
+% ============================================================
+\section{Algoritmo de Treinamento: PPO}
+\label{sec:ppo}
+% ============================================================
+
+O agente é treinado com o algoritmo \textbf{\gls{PPO}} (\textit{Proximal Policy Optimization}), um algoritmo Ator-Crítico \textit{on-policy} da família de métodos de gradiente de política. Esta seção apresenta a formulação matemática completa do \gls{PPO} e justifica sua escolha frente às alternativas.
+
+% ------------------------------------------------------------
+\subsection{Estrutura Ator-Crítico}
+\label{subsec:ator-critico}
+% ------------------------------------------------------------
+
+O \gls{PPO} mantém duas redes neurais com parâmetros independentes:
+
+\begin{itemize}
+    \item \textbf{Ator (rede de política):} $\pi_\theta: \mathcal{S} \to \Delta(\mathcal{A})$, mapeia o estado $\mathbf{S}_t \in \mathbb{R}^{15}$ para uma distribuição de probabilidade sobre as ações $\mathcal{A} = \{0, 1\}$. O ator é implementado como um Perceptron Multicamadas (MLP) com arquitetura $[15 \to 256 \to 256 \to 2]$ (duas camadas ocultas de 256 neurônios com ativação ReLU, camada de saída com \textit{softmax}).
+
+    \item \textbf{Crítico (rede de valor):} $V_\phi: \mathcal{S} \to \mathbb{R}$, estima o retorno esperado $V^\pi(\mathbf{S}_t) = \mathbb{E}_\pi[G_t \mid \mathbf{S}_t]$. O crítico possui arquitetura idêntica ao ator, exceto na camada de saída: $[15 \to 256 \to 256 \to 1]$.
+\end{itemize}
+
+Ambas as redes são implementadas com a biblioteca \textit{stable-baselines3}, utilizando a política \texttt{MlpPolicy} com \texttt{net\_arch=[256, 256]} para ator e crítico.
+
+% ------------------------------------------------------------
+\subsection{Estimativa de Vantagem com GAE}
+\label{subsec:gae}
+% ------------------------------------------------------------
+
+A \textbf{função de vantagem} $A_t = Q(s_t, a_t) - V(s_t)$ mede o quanto a ação $a_t$ é melhor (ou pior) do que a ação média sob a política $\pi$. Estimativas de vantagem com baixa variância são críticas para o aprendizado estável em ambientes com penalidades esparsas e grandes como a presente proposta.
+
+O \textbf{GAE} (\textit{Generalized Advantage Estimation}) computa uma estimativa suavizada da vantagem:
+
+\begin{equation}
+    \hat{A}_t^{\text{GAE}} = \sum_{l=0}^{\infty} (\gamma \lambda)^l \cdot \delta_{t+l},
+    \label{eq:gae}
+\end{equation}
+
+\noindent onde $\delta_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$ é o \textbf{erro de diferença temporal} (TD error) e $\lambda = 0{,}95$ controla o \textit{trade-off} viés-variância: $\lambda \to 0$ reduz variância ao custo de maior viés (equivale ao TD(0)); $\lambda \to 1$ elimina o viés ao custo de maior variância (equivale ao retorno de Monte Carlo).
+
+% ------------------------------------------------------------
+\subsection{Objetivo Proximal (CLIP)}
+\label{subsec:clip}
+% ------------------------------------------------------------
+
+O \gls{PPO} otimiza um objetivo substituto (\textit{surrogate objective}) que limita o tamanho da atualização da política. Define-se a razão de probabilidade:
+
+\begin{equation}
+    r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)},
+    \label{eq:prob-ratio}
+\end{equation}
+
+\noindent e o objetivo CLIP é:
+
+\begin{equation}
+    L^{\text{CLIP}}(\theta) = \mathbb{E}_t\!\left[\min\!\left(r_t(\theta)\,\hat{A}_t^{\text{GAE}},\;\mathrm{clip}\!\left(r_t(\theta),\;1-\varepsilon,\;1+\varepsilon\right)\hat{A}_t^{\text{GAE}}\right)\right],
+    \label{eq:ppo-clip}
+\end{equation}
+
+\noindent com $\varepsilon = 0{,}2$ (intervalo de \textit{clipping}). O objetivo completo do \gls{PPO} incorpora também a perda do crítico e o bônus de entropia:
+
+\begin{equation}
+    L(\theta, \phi) = L^{\text{CLIP}}(\theta) - c_1 \cdot L^{\text{VF}}(\phi) + c_2 \cdot \mathcal{H}[\pi_\theta(\cdot \mid s_t)],
+    \label{eq:ppo-objetivo-completo}
+\end{equation}
+
+\noindent onde $L^{\text{VF}}(\phi) = \mathbb{E}_t[(V_\phi(s_t) - G_t)^2]$ é o erro quadrático médio do crítico, $\mathcal{H}[\pi_\theta(\cdot \mid s_t)] = -\sum_{a} \pi_\theta(a \mid s_t) \log \pi_\theta(a \mid s_t)$ é a entropia da política, e $c_2 = 0{,}01$ é o coeficiente de entropia (\texttt{ent\_coef}).
+
+Cada componente do objetivo cumpre uma função específica:
+
+\begin{itemize}
+    \item \textbf{CLIP:} Quando $r_t(\theta) > 1 + \varepsilon$ (a ação tornou-se mais provável sob a nova política), o gradiente é zerado, impedindo atualizações excessivas que poderiam desestabilizar a política — em particular, evita o colapso da política ao explorar a penalidade de $-10$ de forma gulosa e prematura.
+
+    \item \textbf{Perda do Crítico $L^{\text{VF}}$:} Treina o crítico para predizer com precisão os retornos esperados, fornecendo estimativas de vantagem mais precisas para o ator.
+
+    \item \textbf{Bônus de Entropia $\mathcal{H}$:} Penaliza políticas determinísticas, incentivando a exploração nas fases iniciais do treinamento, quando o agente ainda não mapeou bem o espaço de estados.
+\end{itemize}
+
+Os hiperparâmetros de treinamento são: $n_{\text{steps}} = 2048$, $\text{batch\_size} = 64$, $\gamma = 0{,}99$, $\lambda_{\text{GAE}} = 0{,}95$, $\varepsilon_{\text{clip}} = 0{,}2$, $\alpha = 3 \times 10^{-4}$ (\textit{learning rate}).
+
+% ------------------------------------------------------------
+\subsection{Justificativa da Escolha do PPO}
+\label{subsec:ppo-justificativa}
+% ------------------------------------------------------------
+
+A escolha do \gls{PPO} frente às principais alternativas — \gls{DQN}, \gls{SAC} e DDPG — é motivada por três fatores estruturais do problema:
+
+\begin{enumerate}
+    \item \textbf{Penalidades esparsas e grandes:} A penalidade de $\Omega = -10$ na violação de prazo cria uma superfície de recompensa altamente não-suave. Métodos baseados em valor como o \gls{DQN} podem sofrer de superestimação catastrófica da função de valor próximo a estados de penalidade \cite{miriyala2025}. O mecanismo CLIP do \gls{PPO} limita a magnitude do gradiente, prevenindo divergência.
+
+    \item \textbf{Ambiente não-estacionário:} A cadeia de Markov de regimes causa \textit{distribution shift} contínuo durante o treinamento. O \gls{PPO} é \textit{on-policy}: cada atualização usa exclusivamente dados gerados pela política corrente, evitando os artefatos de dados obsoletos (\textit{stale data}) que afetam métodos \textit{off-policy} como o \gls{SAC} e o DDPG, cujo \textit{experience replay} pode conter transições de regimes já superados.
+
+    \item \textbf{Espaço de ação discreto e binário:} A ação $\{0, 1\}$ é naturalmente representada por uma distribuição categórica com saída \textit{softmax}, sem necessidade de aproximações de ação contínua como as requeridas pelo DDPG. O \gls{PPO} com ações discretas é matematicamente direto e não requer truques adicionais de exploração \cite{uddin2025, wei2024}.
+\end{enumerate}
+
+% ============================================================
+\section{Complexidade Computacional}
+\label{sec:complexidade}
+% ============================================================
+
+A viabilidade da abordagem para operação em tempo real em redes \gls{VEC} depende da eficiência computacional por passo de decisão. A Tabela~\ref{tab:complexidade} sumariza a complexidade assintótica de cada componente.
+
+\begin{table}[htbp]
+\centering
+\caption{Complexidade computacional por passo de decisão ($N$: número de candidatos; $D = 15$: dimensão do estado; $H = 256$: neurônios por camada oculta).}
+\label{tab:complexidade}
+\begin{tabular}{lll}
+\hline
+\textbf{Componente} & \textbf{Complexidade} & \textbf{Observação} \\
+\hline
+Normalização TOPSIS        & $O(N \cdot n)$   & $n = 4$ fixo \\
+Distâncias TOPSIS          & $O(N \cdot n)$   & \\
+Ordenação TOPSIS           & $O(N \log N)$    & dominante \\
+Inferência PPO (MLP)       & $O(H \cdot D)$   & $O(1)$ \\
+\hline
+\textbf{Total por passo}   & $O(N \log N)$    & dominado pelo TOPSIS \\
+\hline
+\end{tabular}
+\end{table}
+
+Para $N \leq 20$ candidatos, típico em cenários \gls{VEC} urbanos, a complexidade é equivalente a ordenar 20 números — operação da ordem de microssegundos em hardware moderno, plenamente compatível com os requisitos de tempo real (decisão $< 1$ ms).
+
+\paragraph{Complexidade espacial.} A rede \gls{PPO} com arquitetura $[15 \to 256 \to 256 \to 2]$ para o ator e $[15 \to 256 \to 256 \to 1]$ para o crítico totaliza $2 \times (15 \times 256 + 256^2 + 256 \times 2) \approx 270{.}000$ parâmetros $\approx 1{,}0$ MB. O sistema completo cabe confortavelmente na memória de qualquer \gls{RSU} ou \gls{gNB} contemporâneo.
+
+\paragraph{Comparação com alternativas.} Uma abordagem baseada em \gls{GNN} para lidar com a topologia variável exigiria, em contraste, computação de mensagens entre $O(N^2)$ pares de nós por camada, resultando em complexidade $O(N^2 \cdot D_{\text{GNN}})$ por passo — quadrática em $N$ e potencialmente proibitiva para $N$ grande ou em hardware embarcado \cite{miriyala2025}. A abordagem \gls{TOPSIS} + estado fixo reduz esta dependência para $O(N \log N)$, sem perda de expressividade na representação do estado, e elimina a necessidade de retreinamento para novos valores de $N$ (Seção~\ref{subsec:zeroshot}).
+
+####################################3
+
+\chapter{Proposta de Solução: Agente DRL Híbrido com Precondicionamento MCDM}
+\label{chap:proposta}
+
+\subsection{O Problema e o Ambiente}
+O descarregamento computacional em sistemas de Computação de Borda Veicular (\gls{VEC}) é um problema inerentemente complexo, frequentemente caracterizado como NP-difícil, devido à natureza altamente não estacionária e volátil das redes veiculares. O ambiente operacional é marcado pela alta mobilidade dos nós, o que provoca constantes quebras de conexão, flutuações severas na largura de banda e atrasos inevitáveis na telemetria. Consequentemente, o sistema sofre de observabilidade estritamente parcial (\gls{POMDP}), cenário no qual os agentes precisam tomar decisões críticas de roteamento e alocação de recursos baseando-se em informações de estado que podem estar incompletas ou desatualizadas \cite{uddin2025, farimani2024}.
+
+\subsection{Resolução da Incerteza com \textit{Fuzzy}-\gls{TOPSIS}}
+Para lidar com a imprecisão e a incerteza intrínsecas às métricas coletadas no ambiente veicular (como estimativas de latência, carga de CPU e qualidade do canal), esta proposta adota a lógica \textit{Fuzzy} integrada ao método \gls{TOPSIS} (\textit{Technique for Order of Preference by Similarity to Ideal Solution}). A lógica \textit{Fuzzy} atua na fuzzificação dos dados brutos do ambiente, modelando a imprecisão dos sensores e da rede por meio de graus de pertinência, eliminando ruídos e flutuações abruptas. Em seguida, o operador \gls{TOPSIS} avalia essas representações difusas calculando a distância relativa de cada nó candidato (servidores de borda ou veículos vizinhos) em relação a uma solução ideal positiva (nó perfeito) e a uma solução ideal negativa (nó sobrecarregado ou distante). O resultado é um escore de proximidade relativa $C^* \in [0, 1]$, que quantifica de forma robusta e resistente à incerteza o quão adequado é cada nó para receber a tarefa.
+
+\subsection{Engenharia de Estado Fixo e Conexão com \gls{RNN}}
+Um dos maiores desafios na modelagem de Aprendizado por Reforço Profundo (\gls{DRL}) em redes \gls{VEC} é a variação dinâmica na quantidade de nós. Conforme veículos entram e saem da área de cobertura, o tamanho do vetor de observação muda. Trabalhos recentes costumam empregar Redes Neurais em Grafos (\gls{GNN}) para lidar com essa topologia variável, o que adiciona uma carga computacional massiva e inviabiliza decisões em milissegundos \cite{miriyala2025}.
+
+Para solucionar esse problema sem onerar o processamento, propõe-se o uso do \textit{Fuzzy}-\gls{TOPSIS} como um filtro de extração de características capaz de fixar a quantidade de parâmetros do espaço de estados. Em vez de observar toda a rede, o algoritmo ranqueia os nós disponíveis baseando-se no escore $C^*$. O estado $s_t$ repassado ao agente é, então, construído exclusivamente pelas características de três entidades fundamentais:
+\begin{enumerate}
+    \item O nó com o \textbf{primeiro lugar no ranqueamento} (o melhor candidato disponível);
+    \item O \textbf{próprio agente} (estado local do veículo gerador da tarefa);
+    \item O nó com o \textbf{último lugar no ranqueamento} (o pior cenário possível, agindo como uma âncora inferior que delimita o gradiente de utilidade do espaço de ação).
+\end{enumerate}
+
+A inclusão de $s_{worst}$ não é arbitrária: ao expor o agente simultaneamente ao melhor e ao pior cenário disponível, o estado compactado codifica implicitamente a dispersão de qualidade da vizinhança, informação que de outro modo exigiria a exposição de todos os $N$ nós. A validade dessa compressão será verificada empiricamente por meio de experimentos ablativos comparando o triplet $[s_{best}, s_{agent}, s_{worst}]$ com representações de top-$k$ nós ($k = 2, 3$), permitindo quantificar o trade-off entre eficiência computacional e qualidade de decisão.
+
+Dessa forma, independentemente de haver $5$ ou $500$ veículos no raio de comunicação, o vetor de estado possui uma dimensionalidade estrita e constante definida por $S_t = [s_{best}, s_{agent}, s_{worst}]$. Esse estado compactado é então acoplado a uma Rede Neural Recorrente (\gls{RNN}), especificamente a uma camada \gls{LSTM} (\textit{Long Short-Term Memory}). A \gls{RNN} processa essa sequência fixa, capturando as dependências temporais do ambiente e mitigando o problema da observabilidade parcial. Para o treinamento, adota-se o algoritmo de Otimização de Política Proximal (\gls{PPO}), pertencente à família Ator-Crítico. A escolha é motivada por dois fatores: (i) o \gls{PPO} restringe a atualização da política por meio de \textit{surrogate objective clipping}, prevenindo colapsos de gradiente quando o ambiente sofre transições bruscas de regime — característica crítica em redes veiculares não estacionárias; e (ii) sua formulação \textit{on-policy} se adapta naturalmente ao cenário com penalidades esparsas e severas que surgem da violação de \textit{deadlines} operacionais \cite{moghaddasi2024}. O modelo prescinde de \gls{GNN}s e não exige retreinamento quando a densidade veicular muda.
+
+\subsection{Adaptação Instantânea a Regimes Discretos de Tráfego via Métricas Dinâmicas}
+Para que o modelo opere em regimes de tráfego distintos sem a necessidade de retreinamento, propõe-se um mecanismo de seleção dinâmica de métricas de distância cujo mapeamento cluster→métrica é determinado de forma \textbf{orientada a dados}, utilizando a própria função de valor do agente \gls{PPO} como oráculo de qualidade. O procedimento é dividido em duas fases.
+
+\textbf{Fase de Pós-Treinamento — Calibração dos Regimes:}
+Após a convergência do agente \gls{PPO} com a métrica $L_2$ como configuração-base, coletam-se todas as observações $\{s_t\}$ armazenadas durante o treinamento. Essas amostras são agrupadas por um Modelo de Mistura de Gaussianas (\textit{Gaussian Mixture Model}, \gls{GMM}) em $K$ \textit{clusters} $\mathcal{C} = \{C_1, \ldots, C_K\}$, onde $K$ é selecionado via Critério de Informação Bayesiano (\textit{BIC}) para minimizar a suposição de clusters esféricos que limitaria o \textit{K-Means}. Cada cluster $C_k$ emergente representa um regime operacional distinto da rede (e.g., tráfego livre, congestionamento parcial, área de sombra de cobertura).
+
+Em seguida, para cada cluster $C_k$ e para cada métrica candidata $m \in \mathcal{M} = \{L_1, L_2, L_\infty\}$, calcula-se um \textbf{escore de alinhamento} $Q(m, C_k)$ que mede o quanto o ranqueamento produzido pelo \textit{Fuzzy}-\gls{TOPSIS} sob a métrica $m$ concorda com a preferência implícita da política ótima aprendida:
+
+\begin{equation}
+    Q(m, C_k) = \frac{1}{|C_k|} \sum_{s_t \in C_k} \tau_K\!\left(R_m(s_t),\; R^*(s_t)\right)
+    \label{eq:alignment-score}
+\end{equation}
+
+\noindent onde $R_m(s_t)$ é o vetor de ranqueamento dos nós candidatos produzido pelo \textit{Fuzzy}-\gls{TOPSIS} com a métrica $m$; $R^*(s_t)$ é o ranqueamento de referência (\textit{oráculo}), obtido ordenando os nós pelo valor estimado pela rede Crítica do \gls{PPO} $V_{\pi^*}(s_t, n_i)$; e $\tau_K$ é o coeficiente de correlação de postos de Kendall, que quantifica a concordância ordinal entre os dois ranqueamentos no intervalo $[-1, 1]$.
+
+A métrica atribuída a cada cluster é, portanto, aquela que maximiza esse alinhamento:
+\begin{equation}
+    m^*(C_k) = \underset{m \in \mathcal{M}}{\arg\max}\; Q(m, C_k)
+    \label{eq:metric-assignment}
+\end{equation}
+
+\noindent Esta derivação garante que a associação cluster→métrica não é arbitrária nem baseada em intuição geométrica, mas sim extraída diretamente da política ótima aprendida. A intuição de fundo é coerente com as propriedades das normas: $L_2$ tende a dominar em regimes estáveis com variação isotrópica; $L_1$ em cenários com gargalos axiais isolados; $L_\infty$ quando um único recurso critico determina a viabilidade do offloading. Contudo, a Equação~\ref{eq:metric-assignment} decide empiricamente, sem assumir essas propriedades a priori.
+
+\textbf{Fase de Execução (\textit{Deployment}) — Comutação Instantânea:}
+Ao receber uma nova observação $s_t$, o sistema computa a probabilidade de pertinência a cada cluster via \gls{GMM}: $p_k = P(C_k \mid s_t)$. O cluster ativo é determinado por $k^* = \arg\max_k\, p_k$, e a métrica $m^*(C_{k^*})$ é imediatamente ativada no operador \textit{Fuzzy}-\gls{TOPSIS}. Essa comutação ocorre exclusivamente na camada de pré-processamento, sem qualquer alteração nos pesos do agente.
+
+Para estados fora do domínio de treinamento, a distância de Mahalanobis ao centroide mais próximo $d_M(s_t, \mu_{k^*})$ serve como sinal de confiança: se $d_M$ exceder um limiar $\delta$ calibrado no conjunto de validação, o sistema recua para a métrica $L_2$ como configuração segura e emite um alerta de regime inédito, sinalizando a necessidade de retreinamento incremental. Essa separação entre o componente adaptativo (regimes conhecidos) e o componente de detecção de anomalia (\textit{out-of-distribution}) delimita com precisão o escopo de garantias da abordagem \cite{miriyala2025, uddin2025}.
+
+
+% \section{Modelo Híbrido Fuzzy-TOPSIS e Aprendizado por Reforço}
+% \label{sec:modelo-hibrido-fuzzy-topsis-e-aprendizado-por-reforco}
+
+% A complexidade inerente à otimização multiobjetivo no descarregamento de tarefas em redes veiculares exige abordagens que transcendam o processamento direto de métricas brutas. Para mitigar a maldição da dimensionalidade e acelerar a convergência do modelo de Aprendizado por Reforço Profundo (\gls{DRL}), este trabalho propõe o precondicionamento do espaço de estados ($s_t$) por meio de um operador \gls{MCDM} acoplado, especificamente uma formulação Global do \textit{Technique for Order of Preference by Similarity to Ideal Solution} (TOPSIS). Diferente das abordagens de normalização convencionais do tipo \textit{min-max}, que frequentemente sofrem com a flutuação das fronteiras do ambiente dinâmico (causando instabilidade no \textit{target} da rede), o TOPSIS Global adota pontos ideais positivos e negativos estáticos ($A^+_{global}$ e $A^-_{global}$) baseados nos limites físicos absolutos do hardware e do canal \gls{V2X}. Essa ancoragem permite o cálculo de um escore de proximidade relativa $C^*$, que, ao compor o estado da rede neural, atua matematicamente como um guia de densidade de valor, orientando o agente \gls{DRL} de forma geometricamente correlacionada e evitando colapsos de representação (\textit{embedding collapse}) diante das severas incertezas da observabilidade parcial do meio veicular \cite{uddin2025, de2020computation}.
+
+% No que concerne à engenharia da função de recompensa (\textit{Reward Shaping}), o modelo afasta-se da clássica atribuição empírica ou estática de hiperparâmetros, uma limitação frequentemente criticada na literatura por causar desequilíbrio na otimização conjunta de objetivos concorrentes, como latência e energia \cite{uddin2025}. Para contornar essa sub-otimização, a recompensa de otimização contínua é modelada como a minimização da função $J = w_1 L_{norm} + w_2 E_{norm}$, cujos pesos escalares $w_i$ são extraídos analiticamente a partir da Taxa Marginal de Substituição correspondente ao \textit{Knee Point} (ponto de joelho) de uma Fronteira de Pareto previamente mapeada. Além do componente contínuo, uma função de barreira estrita é implementada: o agente recebe uma forte penalidade esparsa ($\Omega = -10$) caso a ação viole limites toleráveis críticos de operação (\textit{deadlines} operacionais) \cite{baker2024, farimani2024, chen2025}. A equação final da recompensa, definida por $r_t = -J + \mathbb{I}(falha) \cdot \Omega$, garante a busca por alocações Pareto-ótimas e assegura os requisitos fundamentais de confiabilidade de serviços veiculares sensíveis ao tempo.
+
+% Por fim, o emprego de uma penalidade abrupta da magnitude de $\Omega$ introduz desafios algorítmicos substanciais, notadamente o surgimento de picos no Erro de Diferença Temporal (\textit{TD Error}) que podem levar à divergência catastrófica em arquiteturas baseadas puramente em valor, como o algoritmo \gls{DQN} \cite{miriyala2025, uddin2025}. Para estabilizar o treinamento em face dessa descontinuidade espacial da recompensa, justifica-se a escolha mandatória do algoritmo de Otimização de Política Proximal (\gls{PPO}). Pertencente à família Ator-Crítico e classificado como \textit{on-policy}, o \gls{PPO} resolve a instabilidade restringindo a atualização da política (\textit{surrogate objective clipping}) para evitar saltos destrutivos nos gradientes, o que previne o colapso da política quando as estatísticas do ambiente sofrem transições bruscas \cite{uddin2025, miriyala2025}. Para conter a magnitude do gradiente na rede Crítica que avalia o \textit{TD Error} induzido pelo abismo de $-10$, a formulação também exige estratégias de \textit{Gradient Clipping} acopladas a funções de ativação restritas (ex: \texttt{Tanh}), garantindo que o agente convirja de modo robusto num espaço de ação contínuo e de alta variância, características típicas da orquestração de recursos no \textit{Edge Computing} \gls{6G} \cite{uddin2025, wei2024}.
