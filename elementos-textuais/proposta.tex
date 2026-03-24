@@ -286,7 +286,8 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
 
 \begin{figure}[htb]
 \centering
-\resizebox{\textwidth}{!}{%
+\makebox[\linewidth][c]{%
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
     font=\sffamily\normalsize,
     >=Stealth,
@@ -376,7 +377,7 @@ A Figura~\ref{fig:sac-topsis-arch} ilustra o fluxo completo de decisão da arqui
     node[rot, pos=0.2, right]{recompensa $r_t$ (treino \textit{offline})} (mlp.east);
 
 \end{tikzpicture}%
-}
+}}
 \caption{Arquitetura SAC-TOPSIS: fluxo vertical de decisão. O módulo \gls{TOPSIS} comprime $N$ candidatos em vetor fixo $\mathbb{R}^6$; o \gls{SAC} \textit{Actor} decide binariamente entre execução local e \textit{offload} para o rank$_1$. A seta tracejada cinza indica \textit{bypass} direto de $C_j$ e $D_j$; a tracejada direita mostra o loop de recompensa durante o treinamento \textit{offline}.}
 \label{fig:sac-topsis-arch}
 \end{figure}
@@ -707,6 +708,7 @@ A soma $4{,}6 + 24{,}2 + 4{,}3 + 12{,}2 = 45{,}3\%$ é exata, confirmando que o 
 \centering
 \caption{Decomposição causal dos ganhos ao longo do caminho de ablação.}
 \label{tab:ablacao-decomposicao}
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{p{3.8cm} c p{8.5cm}}
 \toprule
 \textbf{Componente (transição)} & \textbf{$\Delta$ taxa} & \textbf{Interpretação} \\
@@ -723,7 +725,7 @@ Estado 6D compacto manual (Base $\to$ S1) &
 \midrule
 \textbf{Ganho total} & $\mathbf{+40{,}7}$ \textbf{pp} & SAC-TOPSIS vs.\ SAC-Base \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 Para isolar o efeito da recompensa \textit{deadline-aware} sem alterar o estado, a variante SAC-R1 atinge $38{,}4\%$ ($+33{,}8$ pp sobre o \textit{baseline} com estado 11D e ação ternária). Esse valor é maior que o de S1 ($28{,}8\%$), evidenciando que o sinal de recompensa assimétrico é individualmente mais poderoso que a compressão de estado quando aplicados em isolamento. Entretanto, no caminho sequencial, a maior parte do ganho de R1 é compartilhada com S1: o estado 6D já codifica urgência temporal em $\widehat{\text{JCT}}/D_i$, de modo que acrescentar a recompensa deadline-aware sobre S1 produz um incremento marginal de apenas $+4{,}3$ pp (transição S1$\to$T1, que combina as duas mudanças).
@@ -813,11 +815,11 @@ Em contraste, o PPO-TOPSIS sofre das três falhas simétricas: aprende uma pergu
 
 As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são: taxa de \textit{deadline} (\%), SWQ ($= \hat{\tau}\cdot\overline{(D_j - \text{JCT}_j)/D_j}_{\text{sucesso}}$), JCT médio em segundos, energia média por tarefa em joules e o objetivo $J(\pi) = 0{,}60\cdot\hat{\tau} - 0{,}40\cdot\overline{(0{,}35\,\text{JCT} + 0{,}35\,E)/(D + 0{,}35\,E_{\max})}$ com $E_{\max} = 432{,}6\,\text{J}$ (percentil 99 global).
 
-\begin{landscape}
 \begin{table}[htbp]
 \centering
 \caption{Ranking completo das 25 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa \gls{TOPSIS}.}
 \label{tab:ranking-completo}
+\makebox[\linewidth][c]{%
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{clrrrrrrrrr}
 \toprule
@@ -850,18 +852,18 @@ As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os result
 25 & rsu                         & 658 &  1,86 & 0,0030 & 144,191 & 4,843 & $-$0,123 &  1,2 & 98,8 & Heurística \\
 \bottomrule
 \end{tabular}%
-}
+}}
 \end{table}
-\end{landscape}
 
-A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmos, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
+A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmo, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
 
 \begin{table}[htbp]
 \centering
 \caption{Ganho do \gls{TOPSIS} por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
 \label{tab:ganho-topsis}
 \small
-\resizebox{\textwidth}{!}{%
+\makebox[\linewidth][c]{%
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{llrrrrrrr}
 \toprule
 \multirow{2}{*}{\textbf{Algoritmo}} & \multirow{2}{*}{\textbf{Versão}} & \multicolumn{2}{c}{\textbf{Taxa\%}} & \multicolumn{2}{c}{\textbf{SWQ}} & \multicolumn{2}{c}{\textbf{J($\pi$)}} & \multirow{2}{*}{\textbf{Destaques}} \\
@@ -889,5 +891,5 @@ A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada famíli
  & topsis & ---   & 42,32  & ---    & 0,1418 & --- & 0,2295 & \textbf{$+$20,6 pp / $+$84\% SWQ} \\
 \bottomrule
 \end{tabular}%
-}
+}}
 \end{table}
