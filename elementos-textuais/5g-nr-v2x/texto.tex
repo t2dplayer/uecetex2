@@ -1,6 +1,6 @@
 % \input{elementos-textuais/5g-nr-v2x/stallings-5g}
 
-\section{Arquitetura e Modelagem \gls{5G} \gls{V2I} e \gls{C-V2X}}
+\section{Arquitetura e Modelagem \texorpdfstring{\gls{5G}}{5G} \texorpdfstring{\gls{V2I}}{\gls{V2I}} e \texorpdfstring{\gls{C-V2X}}{C-\gls{V2X}}}
 \label{sec:comunicacao-5g-e-sidelink}
 
 A quinta geração de comunicações móveis celulares, o \gls{5G}, representou um avanço tecnológico disruptivo, projetado para revolucionar não apenas o setor de telecomunicações, mas também a sociedade como um todo~\cite{stallings2021}. Suas especificações foram fundamentadas pelo padrão internacional IMT-2020, sob avaliação e monitoramento da \gls{ITU}~\cite{itu2015m2083, itu2017m2410, itu2021m2150}, e formalizadas pelo \gls{3GPP} em sucessivos \textit{Releases}~\cite{asplund2025, cox2025}.
@@ -79,7 +79,7 @@ Para garantir baixas latências, foi necessário distribuir as funções de proc
 
 Na rede de acesso \gls{5G}, a estação base \gls{gNB} adotou uma arquitetura modular que separa suas funções em duas unidades. A \gls{CU} processa serviços em tempo não real, hospedando os protocolos de maior nível como \gls{RRC}, \gls{PDCP} e \gls{SDAP}. Já as \glspl{DU} operam localmente próximas às antenas, executando serviços de tempo real como agendamento de recursos de rádio, correção de erros e processamento de sinais --- responsabilidade dos protocolos \gls{RLC}, \gls{MAC} e da camada Física (\gls{PHY})~\cite{fowdur2025, cox2025}.
 
-\subsection{Interface Aérea \gls{5G} \gls{NR}: \gls{OFDMA} e Adaptação de Enlace}
+\subsection{Interface Aérea \texorpdfstring{\gls{5G}}{5G} \texorpdfstring{\gls{NR}}{\gls{NR}}: \texorpdfstring{\gls{OFDMA}}{OFDMA} e Adaptação de Enlace}
 \label{subsec:interface-aerea-5g}
 
 Os sinais transmitidos pela interface aérea do \gls{5G} \gls{NR} utilizam o esquema de \gls{OFDMA}. Esse esquema divide a largura de banda total em múltiplas subportadoras ortogonais, eliminando a interferência entre elas. Os recursos são gerenciados como uma matriz bidimensional de tempo e frequência, agrupados em \glspl{RB} com 12 subportadoras cada, permitindo que diferentes fatias do espectro sejam alocadas simultaneamente a diferentes usuários~\cite{stallings2021, asplund2025}. O \gls{5G} \gls{NR} introduziu ainda uma numerologia escalável, com espaçamento de subportadoras $\Delta f = 15 \times 2^{\mu}$~kHz para $\mu \in \{0, 1, 2, 3, 4, 5, 6\}$, permitindo adaptar a latência e a capacidade de acordo com a faixa de frequência e o cenário de uso~\cite{cox2025}. O espectro suportado abrange a faixa \gls{FR1} (sub-6~GHz, até 100~MHz de largura de banda) e a faixa \gls{FR2} ou \gls{mmWave} (24,25~GHz a 71~GHz, até 400~MHz), com o emprego de \textit{Massive} \gls{MIMO} e \textit{beamforming} para compensar a atenuação nas frequências milimétricas~\cite{stallings2021, asplund2025}.
@@ -147,7 +147,7 @@ Na camada física, a informação digital é mapeada em ondas eletromagnéticas 
 
 Para contornar a degradação, a rede emprega o mecanismo de adaptação de enlace (\textit{Link Adaptation}): avalia continuamente a qualidade do canal e regride dinamicamente para esquemas de modulação mais simples (como QPSK) em condições adversas, preservando a confiabilidade da entrega dos pacotes~\cite{cox2025, stallings2021}. É essa dinâmica de seleção do \gls{MCS} que determina a taxa de canal instantânea --- um dos critérios multicritério avaliados pelo \gls{TOPSIS} na seleção do melhor candidato ao descarregamento de tarefas neste trabalho.
 
-\subsection{Comunicação Veicular \gls{C-V2X} e Interface \textit{Sidelink} \gls{PC5}}
+\subsection{Comunicação Veicular \texorpdfstring{\gls{C-V2X}}{C-\gls{V2X}} e Interface \textit{Sidelink} \texorpdfstring{\gls{PC5}}{PC5}}
 \label{subsec:cv2x-sidelink}
 
 O próximo passo natural, após essa evolução na arquitetura da comunicação móvel, foi o aprimoramento da comunicação direta entre os \glspl{UE}. No que tange à comunicação veicular, a tecnologia de quinta geração consolidou o paradigma \gls{C-V2X}~\cite{garcia2021}. Ao herdar a robustez do \gls{5G} \gls{NR}, o \gls{C-V2X} supera as limitações de tecnologias baseadas em redes \textit{ad-hoc} (como o \gls{DSRC/IEEE} 802.11p), garantindo a latência e a confiabilidade necessárias para aplicações críticas de segurança e condução autônoma.

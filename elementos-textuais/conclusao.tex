@@ -1,21 +1,16 @@
 \chapter{Conclusões}
 \label{chap:conclusoes}
 
-Este texto resume o progresso feito durante a fase de qualificação e destaca a importância do modelo proposto para o futuro das redes veiculares habilitadas por \gls{5G}.
-
-\section{Resumo do Progresso}
-\label{sec:resumo-progresso}
-
-Durante esta etapa da pesquisa, foi realizada uma revisão abrangente da literatura para identificar as lacunas no descarregamento de tarefas multiobjetivo em ambientes \gls{VEC} altamente dinâmicos. O modelo proposto, combinando Lógica \textit{Fuzzy} para normalização de estado e Aprendizado por Reforço Profundo (\gls{PPO}) para tomada de decisão otimizada, aborda os desafios críticos de escalabilidade e invariância de escala.
+Este capítulo apresenta as conclusões desta etapa de qualificação. O modelo proposto, combinando o ranqueamento multicritério \gls{TOPSIS} para normalização de estado e Aprendizado por Reforço Profundo (\gls{SAC}) para tomada de decisão otimizada, aborda os desafios críticos de escalabilidade e invariância de escala em redes \gls{VEC}.
 
 As principais contribuições alcançadas até agora incluem:
 \begin{itemize}
-    \item A formulação de um estado triplete invariante à escala;
-    \item O projeto de uma função de recompensa que equilibra latência, eficiência energética e justiça;
-    \item O desenvolvimento de um \textit{framework} de simulação integrado com NS-3 e SUMO.
+    \item A formulação de um estado compacto 6D invariante à escala via \gls{TOPSIS};
+    \item O projeto de uma função de recompensa \textit{deadline-aware} que equilibra latência e eficiência energética;
+    \item O desenvolvimento de um simulador de eventos discretos em C++20 para avaliação de desempenho.
 \end{itemize}
 
 \section{Considerações Finais}
 \label{sec:consideracoes-finais}
 
-Como um documento de qualificação, este trabalho demonstra a viabilidade da abordagem proposta e fornece uma base teórica e metodológica sólida para a tese final. Os próximos passos envolvem a implementação completa do agente \textit{Fuzzy}-\gls{PPO} e uma comparação extensiva de desempenho com \textit{baselines} do estado da arte. Espera-se que os resultados finais contribuam significativamente para o gerenciamento eficiente de recursos computacionais na próxima geração de sistemas de transporte inteligentes.
+Como um documento de qualificação, este trabalho demonstra a viabilidade da abordagem \gls{SAC}-\gls{TOPSIS} e fornece uma base teórica e metodológica sólida para a tese final. Os próximos passos envolvem o refinamento do agente e uma comparação extensiva de desempenho com \textit{baselines} do estado da arte. Espera-se que os resultados finais contribuam significativamente para o gerenciamento eficiente de recursos computacionais na próxima geração de sistemas de transporte inteligentes.

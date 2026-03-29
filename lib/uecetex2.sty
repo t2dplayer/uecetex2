@@ -33,7 +33,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \RequirePackage{ifplatform}
-\ProvidesPackage{url6023}
+\ProvidesPackage{uecetex2}
 
 % Importa o arquivo com as entradas do glassario
 \input{elementos-pos-textuais/glossario}
@@ -380,6 +380,7 @@
 \SetKwBlock{Inicio}{início}{fim}
 
 % Numeracao da tabela comeca em 1
+\setcounter{table}{0}
 \ifwindows
 \setcounter{table}{-1}
 \fi
@@ -388,7 +389,7 @@
 \fi
 \ifmacosx
 \setcounter{table}{0}
-\fi % This needs to be \fi, not \if
+\fi
 
 % Comandos para inserir figuras, tabelas e quadros
 \newcommand{\UECEfig}[3]{\IBGEtab{#1}{#2}{#3}}

@@ -2,235 +2,257 @@
 
 O \gls{RL} é um paradigma de \gls{ML} onde o treinamento dos modelos se dá com a interação direta com o ambiente através de ações e a observação da recompensa ou penalização por tal ato~\cite{sutton2018}. Nela, o agente, aquele que procura aprender as relações intrínsecas do problema que se busca resolver, não tem acesso a nenhum supervisor que indique qual a melhor ação a ser tomada, e nem mesmo a um conjunto de dados de partida rotulados para que ele possa analisar e buscar reconhecer padrões~\cite{hu2024, sutton2018}.
 
-De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um ciclo de interação contínua entre o agente e o ambiente, dinâmica que pode ser observada na Figura \ref{fig:rl_loop}~\cite{hu2024, sutton2018}. Embora esse mecanismo iterativo de tentativa e erro seja conceitualmente simples, ele serve de base para o desenvolvimento de modelos de \gls{IA} capazes de resolver problemas complexos de tomada de decisão em áreas desafiadoras, como robótica, condução autônoma e jogos de alto desempenho~\cite{hu2024}. Além disso, essa mesma interação tem sido fundamental para auxiliar no treinamento e alinhamento de \glspl{LLM}, empregando algoritmos de otimização de políticas aliados ao \gls{RLHF} para refinar e instruir sistemas avançados, a exemplo do InstructGPT e do ChatGPT~\cite{ouyang2022, hu2024}.
+De maneira geral, o aprendizado em problemas de \gls{RL} ocorre por meio de um ciclo de interação contínua entre o agente e o ambiente, dinâmica que pode ser observada na Figura~\ref{fig:rl_loop}~\cite{hu2024, sutton2018}. Embora esse mecanismo iterativo de tentativa e erro seja conceitualmente simples, ele serve de base para o desenvolvimento de modelos de \gls{IA} capazes de resolver problemas complexos de tomada de decisão em áreas desafiadoras, como robótica, condução autônoma e jogos de alto desempenho~\cite{hu2024}. Além disso, essa mesma interação tem sido fundamental para auxiliar no treinamento e alinhamento de \glspl{LLM}, empregando algoritmos de otimização de políticas aliados ao \gls{RLHF} para refinar e instruir sistemas avançados, a exemplo do InstructGPT e do ChatGPT~\cite{ouyang2022, hu2024}.
 
-\begin{figure}[ht!]
-\centering
+\begin{figure}[ht!] 
+\centering 
 \begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.9, transform shape]
+    % Faixas de fundo 
+    \fill[blue!5, rounded corners=4pt]  (-4.5, 0.6) rectangle (4.5, -1.4); 
+    \fill[green!5, rounded corners=4pt] (-4.5, -2.6) rectangle (4.5, -4.6);
 
-% Faixas de fundo
-\fill[blue!5, rounded corners=4pt]  (-4.5, 0.6) rectangle (4.5, -1.4);
-\fill[green!5, rounded corners=4pt] (-4.5, -2.6) rectangle (4.5, -4.6);
+    % Separador 
+    \draw[gray!30, thick, dashed] (-4.5, -2.0) -- (4.5, -2.0);
 
-% Separador
-\draw[gray!30, thick, dashed] (-4.5, -2.0) -- (4.5, -2.0);
+    % Nós principais 
+    \node[draw=blue!60!black, fill=blue!12, minimum width=4.5cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (agent) at (0, -0.4) {Agente\\ \footnotesize Observa o estado e escolhe uma ação};
+    \node[draw=green!60!black, fill=green!12, minimum width=4.5cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (env) at (0, -3.6) {Ambiente\\ \footnotesize Executa a ação e retorna o resultado};
 
-% Nós principais
-\node[draw=blue!60!black, fill=blue!12, minimum width=4.5cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (agent) at (0, -0.4) {Agente\\{\footnotesize Observa o estado e escolhe uma ação}};
+    % Seta: Agente -> Ambiente (Ação) 
+    \draw[->, blue!60!black, very thick] (agent.east) -- ++(2.0,0) |- node[pos=0.25, right, font=\small\bfseries, text=blue!60!black] {Ação} (env.east);
 
-\node[draw=green!60!black, fill=green!12, minimum width=4.5cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (env) at (0, -3.6) {Ambiente\\{\footnotesize Executa a ação e retorna o resultado}};
-
-% Seta: Agente -> Ambiente (Ação)
-\draw[->, blue!60!black, very thick] (agent.east) -- ++(2.0,0) |- node[pos=0.25, right, font=\small\bfseries, text=blue!60!black] {Ação} (env.east);
-
-% Seta: Ambiente -> Agente (Estado + Recompensa)
-\draw[->, green!60!black, very thick] (env.west) -- ++(-2.0,0) |- node[pos=0.25, left, align=center, font=\small\bfseries, text=green!60!black] {Novo Estado\\Recompensa} (agent.west);
-
-\end{tikzpicture}
-\caption{Ciclo básico de interação Agente-Ambiente no \gls{RL}. A cada passo, o agente observa o estado atual, escolhe uma ação, e o ambiente responde com uma recompensa e um novo estado.}
-\label{fig:rl_loop}
-\Fonte{Elaborado pelo autor com base em~\cite{hu2024, sutton2018}.}
+    % Seta: Ambiente -> Agente (Estado + Recompensa) 
+    \draw[->, green!60!black, very thick] (env.west) -- ++(-2.0,0) |- node[pos=0.25, left, align=center, font=\small\bfseries, text=green!60!black] {Novo Estado\\ Recompensa} (agent.west);
+\end{tikzpicture} 
+\caption{Ciclo básico de interação Agente-Ambiente no \gls{RL}. A cada passo, o agente observa o estado atual, escolhe uma ação, e o ambiente responde com uma recompensa e um novo estado.} 
+\label{fig:rl_loop} 
+\Fonte{Elaborado pelo autor com base em~\cite{hu2024, sutton2018}.} 
 \end{figure}
 
-\section*{Processos de Decisão de Markov (\gls{MDP}) e seus Componentes}
+\section*{Processos de Decisão de Markov (\texorpdfstring{\gls{MDP}}{\gls{MDP}}) e seus Componentes}
 
-Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente~\cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição~\cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$~\cite{hu2024}. 
+Um \gls{MDP} é uma estrutura matemática utilizada para modelar problemas de tomada de decisão sequencial sob incerteza~\cite{sutton2018, zhao2024}. Um problema modelado sob o paradigma \gls{MDP} é frequentemente representado pela tupla $(S, A, P, R, \gamma)$~\cite{sutton2018, hu2024}. Nela, $S$ representa o espaço de estados, contendo todas as configurações possíveis do ambiente, e $A$ denota o espaço de ações disponíveis para o agente~\cite{hu2024}. A função de transição, $P(s' | s, a)$, define a probabilidade de o ambiente transitar para um estado sucessor $s'$ dado que a ação $a$ foi tomada no estado atual $s$~\cite{sutton2018, zhao2024}. Por sua vez, a Função de Recompensa ($R$) especifica a retribuição numérica imediata (que pode ser positiva ou negativa) indicando o ganho ou custo da transição~\cite{sutton2018, hu2024}. A recompensa esperada para um par estado-ação é formalmente expressa por $R(s,a) = \mathbb{E}[R_t | S_t = s, A_t = a]$~\cite{hu2024}. O parâmetro $\gamma \in [0,1)$ atua como um fator de desconto, controlando o peso que o agente dará às recompensas futuras em comparação às imediatas~\cite{sutton2018, zhao2024}. 
 
-O parâmetro $\gamma \in [0, 1]$ atua como um fator de desconto, controlando o peso que o agente dará às recompensas futuras em comparação às imediatas~\cite{sutton2018}. Além disso, o agente pode seguir uma estratégia para mapear estados e tomar suas ações, mecanismo este conhecido como política ($\pi$)~\cite{hu2024}. A dinâmica desse sistema atende rigorosamente à Propriedade de Markov, a qual postula que o futuro independe do passado dado o estado e a ação presentes~\cite{sutton2018}. Por fim, em cenários onde o agente não observa o estado real, mas recebe apenas uma observação corrompida ou baseada em probabilidades, o modelo é generalizado para os \glspl{POMDP}~\cite{sutton2018, hu2024}.
+Além disso, o agente pode seguir uma estratégia para mapear estados e tomar suas ações, mecanismo este conhecido como política ($\pi$)~\cite{hu2024}. A dinâmica desse sistema atende rigorosamente à Propriedade de Markov, a qual postula que o futuro independe do passado dado o estado e a ação presentes~\cite{sutton2018, zhao2024}. Por fim, em cenários onde o agente não observa o estado real, mas recebe apenas uma observação corrompida ou baseada em probabilidades, o modelo é generalizado para os Processos de Decisão de Markov Parcialmente Observáveis (\gls{POMDP})~\cite{sutton2018, hu2024}.
 
-\begin{figure}[ht!]
-\centering
+A Figura~\ref{fig:mdp_steps} detalha o ciclo de interação na modelagem de \gls{MDP}~\cite{sutton2018}. Primeiramente (Passo 1), o agente observa o estado ($S_t$) em que o ambiente se encontra~\cite{sutton2018}. Depois, guiado por sua política $\pi$, o agente seleciona uma ação $A_t$ a ser tomada (Passo 2)~\cite{sutton2018}. Em seguida (Passo 3), essa ação é executada, e com base na probabilidade $P(s'|s,a)$, o estado atual muda de $s$ para $s'$~\cite{sutton2018}. Como consequência dessa alteração, o ambiente devolve ao agente um sinal de recompensa imediato $R_{t+1}$ (Passo 4), que beneficia ou penaliza a ação tomada frente ao objetivo do problema~\cite{sutton2018}. Por fim (Passo 5), o ambiente convergiu para um novo estado sucessor $S_{t+1}$, e o agente captura a nova observação, reiniciando o ciclo iterativamente ao longo do tempo~\cite{sutton2018}.
+
+\begin{figure}[ht!] 
+\centering 
 \begin{tikzpicture}[>=Latex, font=\sffamily, scale=0.85, transform shape]
+    % FAIXAS DE FUNDO
+    \fill[blue!5, rounded corners=4pt]    (-5.5, 0.8) rectangle (5.5, -1.8); 
+    \fill[yellow!5, rounded corners=4pt]  (-5.5, -2.1) rectangle (5.5, -4.2); 
+    \fill[green!5, rounded corners=4pt]   (-5.5, -4.5) rectangle (5.5, -6.6); 
+    \fill[orange!5, rounded corners=4pt]  (-5.5, -6.9) rectangle (5.5, -9.0); 
+    \fill[cyan!5, rounded corners=4pt]    (-5.5, -9.3) rectangle (5.5, -11.4);
 
-% ===================== FAIXAS DE FUNDO =====================
-\fill[blue!5, rounded corners=4pt]    (-5.5, 0.8) rectangle (5.5, -1.8);
-\fill[yellow!5, rounded corners=4pt]  (-5.5, -2.1) rectangle (5.5, -4.2);
-\fill[green!5, rounded corners=4pt]   (-5.5, -4.5) rectangle (5.5, -6.6);
-\fill[orange!5, rounded corners=4pt]  (-5.5, -6.9) rectangle (5.5, -9.0);
-\fill[cyan!5, rounded corners=4pt]    (-5.5, -9.3) rectangle (5.5, -11.4);
+    % Rótulos laterais 
+    \node[font=\scriptsize\bfseries, text=blue!70!black, rotate=90, align=center]   at (-5.1, -0.5) {PASSO 1}; 
+    \node[font=\scriptsize\bfseries, text=yellow!70!black, rotate=90, align=center] at (-5.1, -3.15) {PASSO 2}; 
+    \node[font=\scriptsize\bfseries, text=green!70!black, rotate=90, align=center]  at (-5.1, -5.55) {PASSO 3}; 
+    \node[font=\scriptsize\bfseries, text=orange!70!black, rotate=90, align=center] at (-5.1, -7.95) {PASSO 4}; 
+    \node[font=\scriptsize\bfseries, text=cyan!70!black, rotate=90, align=center]   at (-5.1, -10.35) {PASSO 5};
 
-% Rótulos laterais
-\node[font=\scriptsize\bfseries, text=blue!70!black, rotate=90, align=center]   at (-5.1, -0.5) {PASSO 1};
-\node[font=\scriptsize\bfseries, text=yellow!70!black, rotate=90, align=center] at (-5.1, -3.15) {PASSO 2};
-\node[font=\scriptsize\bfseries, text=green!70!black, rotate=90, align=center]  at (-5.1, -5.55) {PASSO 3};
-\node[font=\scriptsize\bfseries, text=orange!70!black, rotate=90, align=center] at (-5.1, -7.95) {PASSO 4};
-\node[font=\scriptsize\bfseries, text=cyan!70!black, rotate=90, align=center]   at (-5.1, -10.35) {PASSO 5};
+    % Separadores 
+    \draw[gray!30, thick, dashed] (-5.5, -1.95) -- (5.5, -1.95); 
+    \draw[gray!30, thick, dashed] (-5.5, -4.35) -- (5.5, -4.35); 
+    \draw[gray!30, thick, dashed] (-5.5, -6.75) -- (5.5, -6.75); 
+    \draw[gray!30, thick, dashed] (-5.5, -9.15) -- (5.5, -9.15);
 
-% Separadores
-\draw[gray!30, thick, dashed] (-5.5, -1.95) -- (5.5, -1.95);
-\draw[gray!30, thick, dashed] (-5.5, -4.35) -- (5.5, -4.35);
-\draw[gray!30, thick, dashed] (-5.5, -6.75) -- (5.5, -6.75);
-\draw[gray!30, thick, dashed] (-5.5, -9.15) -- (5.5, -9.15);
+    % PASSO 1: OBSERVAÇÃO DO ESTADO
+    \node[draw=blue!60!black, fill=blue!12, minimum width=7cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (obs) at (0, -0.5) {Observação do Estado ($S_t$)\\ \footnotesize O agente percebe a configuração atual do ambiente};
 
-% ===================== PASSO 1: OBSERVAÇÃO DO ESTADO =====================
-\node[draw=blue!60!black, fill=blue!12, minimum width=7cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (obs) at (0, -0.5)
-      {Observação do Estado ($S_t$)\\{\footnotesize O agente percebe a configuração atual do ambiente}};
+    % PASSO 2: SELEÇÃO DA AÇÃO
+    \node[draw=yellow!60!black, fill=yellow!12, minimum width=7cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (pol) at (0, -3.15) {Seleção da Ação pela Política $\pi(a|s)$ \\ \footnotesize O agente escolhe a ação $A_t$ conforme sua política};
 
-% ===================== PASSO 2: SELEÇÃO DA AÇÃO =====================
-\node[draw=yellow!60!black, fill=yellow!12, minimum width=7cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (pol) at (0, -3.15)
-      {Seleção da Ação pela Política $\pi(a|s)$\\{\footnotesize O agente escolhe a ação $A_t$ conforme sua política}};
+    % PASSO 3: EXECUÇÃO NO AMBIENTE
+    \node[draw=green!60!black, fill=green!12, minimum width=7cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (exec) at (0, -5.55) {Execução da Ação no Ambiente\\ \footnotesize O ambiente aplica a transição $P(s'|s,a)$};
 
-% ===================== PASSO 3: EXECUÇÃO NO AMBIENTE =====================
-\node[draw=green!60!black, fill=green!12, minimum width=7cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (exec) at (0, -5.55)
-      {Execução da Ação no Ambiente\\{\footnotesize O ambiente aplica a transição $P(s'|s,a)$}};
+    % PASSO 4: RETORNO DA RECOMPENSA
+    \node[draw=orange!60!black, fill=orange!12, minimum width=7cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (rew) at (0, -7.95) {Retorno da Recompensa ($R_{t+1}$)\\ \footnotesize O ambiente sinaliza o ganho ou custo da transição};
 
-% ===================== PASSO 4: RETORNO DA RECOMPENSA =====================
-\node[draw=orange!60!black, fill=orange!12, minimum width=7cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (rew) at (0, -7.95)
-      {Retorno da Recompensa ($R_{t+1}$)\\{\footnotesize O ambiente sinaliza o ganho ou custo da transição}};
+    % PASSO 5: NOVO ESTADO
+    \node[draw=cyan!60!black, fill=cyan!12, minimum width=7cm, minimum height=1.2cm, rounded corners=4pt, thick, align=center, font=\small\bfseries] (new) at (0, -10.35) {Transição para Novo Estado ($S_{t+1}$)\\ \footnotesize O ciclo recomeça a partir do novo estado};
 
-% ===================== PASSO 5: NOVO ESTADO =====================
-\node[draw=cyan!60!black, fill=cyan!12, minimum width=7cm, minimum height=1.2cm,
-      rounded corners=4pt, thick, align=center, font=\small\bfseries]
-      (new) at (0, -10.35)
-      {Transição para Novo Estado ($S_{t+1}$)\\{\footnotesize O ciclo recomeça a partir do novo estado}};
+    % SETAS
+    \draw[->, blue!60!black, very thick] (obs.south) -- (pol.north); 
+    \draw[->, yellow!60!black, very thick] (pol.south) -- (exec.north); 
+    \draw[->, green!60!black, very thick] (exec.south) -- (rew.north); 
+    \draw[->, orange!60!black, very thick] (rew.south) -- (new.north);
 
-% ===================== SETAS =====================
-\draw[->, blue!60!black, very thick] (obs.south) -- (pol.north);
-\draw[->, yellow!60!black, very thick] (pol.south) -- (exec.north);
-\draw[->, green!60!black, very thick] (exec.south) -- (rew.north);
-\draw[->, orange!60!black, very thick] (rew.south) -- (new.north);
+    % Seta de retorno (ciclo) 
+    \draw[->, cyan!60!black, very thick, dashed] (new.east) -- ++(1.5,0) |- node[pos=0.07, right, font=\scriptsize\bfseries, text=cyan!60!black, align=center] {Próximo\\passo ($t{+}1$)} (obs.east);
 
-% Seta de retorno (ciclo)
-\draw[->, cyan!60!black, very thick, dashed] (new.east) -- ++(1.5,0) |- node[pos=0.07, right, font=\scriptsize\bfseries, text=cyan!60!black, align=center] {Próximo\\passo ($t{+}1$)} (obs.east);
-
-% Bolinhas numéricas
-\node[circle, draw=blue!70!black, fill=blue!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=blue!80!black] at (5.0, -0.5) {1};
-\node[circle, draw=yellow!70!black, fill=yellow!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=yellow!80!black] at (5.0, -3.15) {2};
-\node[circle, draw=green!70!black, fill=green!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=green!80!black] at (5.0, -5.55) {3};
-\node[circle, draw=orange!70!black, fill=orange!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=orange!80!black] at (5.0, -7.95) {4};
-\node[circle, draw=cyan!70!black, fill=cyan!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=cyan!80!black] at (5.0, -10.35) {5};
-
-\end{tikzpicture}
-\caption{Sequência de interação em um \gls{MDP}.}
-\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.}
+    % Bolinhas numéricas 
+    \node[circle, draw=blue!70!black, fill=blue!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=blue!80!black] at (5.0, -0.5) {1}; 
+    \node[circle, draw=yellow!70!black, fill=yellow!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=yellow!80!black] at (5.0, -3.15) {2}; 
+    \node[circle, draw=green!70!black, fill=green!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=green!80!black] at (5.0, -5.55) {3}; 
+    \node[circle, draw=orange!70!black, fill=orange!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=orange!80!black] at (5.0, -7.95) {4}; 
+    \node[circle, draw=cyan!70!black, fill=cyan!15, font=\footnotesize\bfseries, inner sep=1.5pt, text=cyan!80!black] at (5.0, -10.35) {5};
+\end{tikzpicture} 
+\caption{Sequência de interação em um \gls{MDP}.} 
+\label{fig:mdp_steps} 
+\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.} 
 \end{figure}
 
 \section*{Retorno Esperado, Fator de Desconto e Horizontes}
 
-O \gls{MDP} é capaz de modelar problemas que possuem um final natural bem definido, conhecidos na literatura como tarefas episódicas (Horizonte Finito), como uma partida de xadrez, ou problemas em que o agente continua interagindo com o ambiente perpetuamente, chamados de tarefas contínuas (Horizonte Infinito)~\cite{sutton2018, hu2024}. Em tarefas episódicas, que finalizam em um passo de tempo terminal $T$, o agente busca maximizar o retorno cumulativo simples, dado pela soma $G_t = R_{t+1} + R_{t+2} + \dots + R_T$~\cite{sutton2018}. 
+O \gls{MDP} é capaz de modelar problemas que possuem um final natural bem definido, conhecidos na literatura como tarefas episódicas (Horizonte Finito), como uma partida de xadrez, ou problemas em que o agente continua interagindo com o ambiente perpetuamente, chamados de tarefas contínuas (Horizonte Infinito)~\cite{sutton2018, hu2024}. Em tarefas episódicas, que finalizam em um passo de tempo terminal $T$, o agente busca maximizar o retorno cumulativo simples, dado pela soma $G_t = R_{t+1} + R_{t+2} + \dots + R_T$~\cite{sutton2018}.
 
-No entanto, para tarefas contínuas (Horizonte Infinito), a simples soma das recompensas ao longo do tempo poderia divergir e tender ao infinito~\cite{hu2024, sutton2018}. Para solucionar esse problema, aplica-se o Fator de Desconto $\gamma \in [0,1)$~\cite{sutton2018, zhao2024}. O Retorno Descontado $G_t$, iniciado no passo $t$, é calculado como a soma infinita das recompensas futuras, onde cada recompensa é penalizada exponencialmente pelo quão distante no futuro ela for recebida~\cite{sutton2018}:
-
-\begin{equation}
-    G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
-    \label{eq:retorno_descontado_infinito}
+No entanto, para tarefas contínuas (Horizonte Infinito), a simples soma das recompensas ao longo do tempo poderia divergir e tender ao infinito~\cite{hu2024, sutton2018}. Para solucionar esse problema, aplica-se o fator de desconto $\gamma \in [0,1)$~\cite{sutton2018, zhao2024}. O Retorno Descontado $G_t$, iniciado no passo $t$, é calculado como a soma infinita das recompensas futuras, onde as mais próximas são menos penalizadas que as mais distantes~\cite{sutton2018}:
+\begin{equation} 
+G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1} 
+\label{eq:retorno_descontado_infinito} 
 \end{equation}
 
-Para garantir matematicamente que o valor desse retorno descontado seja finito, utiliza-se a convergência das séries geométricas~\cite{sutton2018, zhao2024}. Caso a recompensa máxima possível do ambiente seja um valor constante $R$ não nulo (por exemplo, se o agente receber $+1$ a cada passo), a soma infinita converge limitando o retorno a $G_t = \sum_{k=0}^{\infty} \gamma^k R = \frac{R}{1-\gamma}$~\cite{sutton2018, zhao2024}. 
+% Para garantir matematicamente que o valor desse retorno descontado seja finito, utiliza-se a convergência das séries geométricas~\cite{sutton2018, zhao2024}. Caso a recompensa máxima possível do ambiente seja um valor constante $R$ não nulo (por exemplo, se o agente receber $+1$ a cada passo), a soma infinita converge limitando o retorno a $G_t = \sum_{k=0}^{\infty} \gamma^k R = \frac{R}{1-\gamma}$~\cite{sutton2018, zhao2024}.
 
-Além disso, uma propriedade algébrica fundamental do retorno em \gls{RL} é que a Equação \ref{eq:retorno_descontado_infinito} pode ser reescrita de forma exata como uma relação recursiva~\cite{hu2024, sutton2018}. Ela separa a recompensa imediatamente recebida do retorno descontado do próximo passo de tempo~\cite{sutton2018, hu2024}.
-
-\begin{equation}
-    G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots = R_{t+1} + \gamma G_{t+1}
-    \label{eq:retorno_recursivo}
+Além disso, uma propriedade algébrica do retorno em \gls{RL} é que a Equação~\ref{eq:retorno_descontado_infinito} pode ser reescrita de forma exata como uma relação recursiva~\cite{hu2024, sutton2018}. Ela separa a recompensa imediatamente do retorno descontado do próximo passo de tempo~\cite{sutton2018, hu2024}:
+\begin{equation} 
+G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots = R_{t+1} + \gamma G_{t+1} 
+\label{eq:retorno_recursivo} 
 \end{equation}
 
-Esta decomposição recursiva forma a base matemática que torna possíveis as Equações de Bellman e a atualização iterativa das estimativas das funções de valor nos algoritmos de aprendizado~\cite{hu2024, sutton2018}. Em última análise, o objetivo central do agente é maximizar o retorno esperado $\mathbb{E}[G_t]$, ponderando tanto a dinâmica estocástica do ambiente quanto as ações definidas pela sua política, que pode ser determinística ($a = \pi(s)$) ou estocástica ($\pi(a|s) = P(A_t = a | S_t = s)$)~\cite{sutton2018, hu2024}.
+Esta decomposição recursiva forma a base matemática que torna possíveis as Equações de Bellman e a atualização iterativa das estimativas das funções de valor nos algoritmos de aprendizado~\cite{hu2024, sutton2018}. Em última análise, o objetivo central do agente é maximizar o retorno esperado $\mathbb{E}[G_t]$, ponderando tanto a dinâmica aleatória do ambiente quanto as ações definidas pela sua política, que pode ser determinística ($a = \pi(s)$) ou estocástica ($\pi(a|s) = P(A_t = a | S_t = s)$)~\cite{sutton2018, hu2024}.
 
 \section*{Funções de Valor e Equações de Bellman}
 
-Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao seguir uma determinada política por meio da estimativa do retorno esperado a longo prazo~\cite{sutton2018}. Para quantificar formalmente esse desempenho, a literatura estabelece duas abordagens principais: estimar o valor de estar no estado atual ($s$), ou estimar o valor de selecionar uma ação específica ($a$) a partir desse estado ($s$)~\cite{hu2024, sutton2018}. A primeira estimativa é calculada utilizando a Função de Valor de Estado ($V^\pi$), enquanto a segunda é obtida por meio da Função de Valor de Ação ($Q^\pi$)~\cite{hu2024, sutton2018}. Ambas as funções fundamentam-se em uma propriedade de consistência recursiva, expressas matematicamente pelas Equações de Expectativa de Bellman~\cite{sutton2018}:
-
-\begin{align}
-    V^\pi(s) &= \sum_{a} \pi(a|s) \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^\pi(s') \right] \\
-    Q^\pi(s,a) &= \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \sum_{a'} \pi(a'|s') Q^\pi(s',a') \right]
+Em problemas de \gls{RL}, o agente avalia o quão bom é o seu comportamento ao seguir uma determinada política por meio da estimativa do retorno esperado a longo prazo~\cite{sutton2018}. Para quantificar formalmente esse desempenho, a literatura estabelece duas abordagens principais: (i) estimar o valor de estar no estado atual ($s$), ou (ii) estimar o valor de selecionar uma ação específica ($a$) a partir desse estado ($s$)~\cite{hu2024, sutton2018}. A primeira estimativa é calculada utilizando a Função de Valor de Estado ($V^\pi$), enquanto a segunda é obtida por meio da Função de Valor de Ação ($Q^\pi$)~\cite{hu2024, sutton2018}. Ambas as funções fundamentam-se em uma propriedade de consistência recursiva, expressas matematicamente pelas equações de expectativa de Bellman~\cite{sutton2018}:
+\begin{align} 
+V^\pi(s) &= \sum_{a} \pi(a|s) \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^\pi(s') \right] \\
+Q^\pi(s,a) &= \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \sum_{a'} \pi(a'|s') Q^\pi(s',a') \right] 
 \end{align}
 
-% As \textbf{Equações de Otimidade de Bellman} encontram o máximo valor possível da política ótima inserindo o operador $\max$:
-% \begin{equation}
-%     Q^*(s,a) = \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right]
-% \end{equation}
+Para resolver o problema de \gls{RL}, não basta apenas avaliar ações; é preciso encontrar o comportamento que gere a maior recompensa possível a longo prazo, ou seja, a política ótima ($\pi^*$)~\cite{hu2024, sutton2018}. Para isso, o objetivo passa a ser encontrar as Funções de Valor Ótimas ($V^*$ e $Q^*$), que representam o máximo retorno esperado que pode ser alcançado entre todas as políticas possíveis~\cite{hu2024, sutton2018}. Essas funções devem satisfazer as Equações de Otimidade de Bellman, que introduzem o operador \textit{max} para selecionar ativamente a ação que maximiza o ganho~\cite{sutton2018, hu2024}: 
+\begin{align} 
+V^*(s) &= \max_{a} \sum_{s', r} p(s',r|s,a) \left[ r + \gamma V^*(s') \right] \\
+Q^*(s,a) &= \sum_{s', r} p(s',r|s,a) \left[ r + \gamma \max_{a'} Q^*(s',a') \right] 
+\end{align}
 
-Também é possível definir a Função de Vantagem (\textit{Advantage}), que mede quão melhor é uma ação isolada comparada à média das demais ações daquele estado~\cite{wang2016dueling}:
-\begin{equation}
-    A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)
+Uma vez que o agente descobre a função de valor de ação ótima, a política ótima ($\pi^*$) pode ser facilmente determinada agindo de forma gulosa, ou seja, escolhendo sempre a ação que fornece o valor máximo através da relação $\pi^*(s) = \arg\max_a Q^*(s, a)$~\cite{hu2024, sutton2018}. Além disso, a conexão entre as duas funções ótimas estabelece que o valor de um estado sob a política ótima é exatamente equivalente ao valor dessa melhor ação escolhida, o que é expresso matematicamente por $V^*(s) = \max_a Q^*(s, a)$~\cite{hu2024, sutton2018}. Também é possível definir a Função de Vantagem (\textit{Advantage}), que quantifica o quão melhor é tomar uma ação específica isolada em comparação ao retorno esperado caso o agente simplesmente seguisse a política atual naquele estado~\cite{wang2016dueling}: 
+\begin{equation} 
+A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s) 
 \end{equation}
 
-\section*{Métodos de Aprendizado e Diferença Temporal}
+\section*{Dilema Exploração-Explotação e Métodos de Aprendizado}
 
-% O \gls{RL} requer balanço com o \textbf{Dilema Exploração-Explotação}. 
-De forma geral, durante o ciclo de interação, o agente enfrenta o \textbf{Dilema Exploração-Explotação} (\textit{Exploration-Exploitation Dilemma}), precisando decidir continuamente entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa~\cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é fundamental para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões~\cite{hu2024}.
+De forma geral, durante o ciclo de interação para otimizar as funções de valor, o agente enfrenta o dilema exploração-explotação (\textit{Exploration-Exploitation Dilemma}), precisando decidir entre explorar o ambiente para descobrir novas ações e estados, e explotar o conhecimento já adquirido para maximizar sua recompensa cumulativa~\cite{sutton2018, hu2024}. O balanceamento adequado entre essas duas estratégias é importante para evitar a convergência prematura para comportamentos subótimos e garantir a descoberta das melhores decisões~\cite{hu2024}.
 
-Quanto ao conhecimento prévio sobre as dinâmicas do ambiente (as regras de transição e recompensa), a literatura divide os métodos em duas categorias principais~\cite{sutton2018, moerland2023}. Em abordagens \textit{Model-Based} (Baseadas em Modelo), o agente possui ou aprende um modelo matemático do ambiente, permitindo o uso de técnicas de planejamento como a Programação Dinâmica para simular trajetórias e antecipar ações~\cite{sutton2018, hu2024}. Por outro lado, nas abordagens \textit{Model-Free} (Livres de Modelo), o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente~\cite{hu2024, sutton2018}.
+Para resolver o problema de como o agente descobre essas melhores decisões, a literatura divide os métodos em duas categorias principais: Métodos baseado em modelo (\textit{Model-Based}) e livres de modelo (\textit{Model-Free})~\cite{sutton2018, moerland2023}. No primeiro método, o agente possui ou aprende as regras de funcionamento do ambiente, permitindo o uso de técnicas de planejamento para simular trajetórias e antecipar ações~\cite{sutton2018, hu2024}. Já no segundo método, o agente não constrói um modelo das regras do jogo, mas aprende as funções de valor ou as políticas diretamente a partir da experiência obtida por tentativa e erro no ambiente~\cite{hu2024, sutton2018}.
 
-Para resolver problemas \textit{Model-Free}, destacam-se duas estratégias: os \textit{Métodos de Monte Carlo}, que atualizam as estimativas de valor apenas ao final de um episódio, utilizando o retorno total e real acumulado~\cite{sutton2018, hu2024} e através da \textit{Aprendizagem por Diferença Temporal (TD Learning)}, que atualiza suas estimativas a cada passo, utilizando o retrocesso (\textit{bootstrapping}) embasado na estimativa de valor do próximo estado e na recompensa imediata~\cite{sutton2018}. 
+Para resolver problemas \textit{Model-Free}, existem duas estratégias principais~\cite{sutton2018}. Os Métodos de Monte Carlo esperam até o final de um episódio para atualizar as estimativas de valor, utilizando a soma real de todas as recompensas obtidas ao longo de toda a trajetória~\cite{sutton2018, hu2024}. Por outro lado, a Aprendizagem por Diferença Temporal (\textit{TD Learning}) não espera o fim do episódio, ela atualiza as estimativas a cada passo, ou seja, o agente ajusta o valor do estado atual somando a recompensa imediata recebida com o valor que ele já estimava para o próximo estado~\cite{sutton2018}.
 
-% A unificação formal entre essas suas técnicas se dá por meio dos \textit{Traços de Elegibilidade (TD($\lambda$))}, onde a taxa de decaimento $\lambda$ atua como uma ponte contínua entre o passo único e o episódio completo~\cite{sutton2018, zhao2024}.
+% A unificação entre esses dois extremos ocorre por meio dos Traços de Elegibilidade (TD($\lambda$)), que adicionam uma memória de curto prazo ao agente~\cite{sutton2018}. Nesse método, a taxa de decaimento $\lambda$ funciona como uma escala deslizante que define o quão longe no passado uma recompensa recente deve distribuir seus "créditos" aos estados visitados anteriormente~\cite{sutton2018, morales2020}. Se $\lambda=0$, o método age exatamente como o TD tradicional de um único passo; se $\lambda=1$, ele se comporta como o Monte Carlo, propagando o valor até o início do episódio~\cite{sutton2018}.
 
-% Dentro do TD Learning voltado para controle, existem dois algoritmos clássicos~\cite{sutton2018} [20, 21]. O \textbf{SARSA} realiza um aprendizado \textbf{On-policy}, onde o agente estima o valor e otimiza a exata mesma política exploratória que utiliza para interagir com o ambiente~\cite{hu2024, sutton2018} [22-24]:
-% \begin{equation}
-%     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
-% \end{equation}
-% E o clássico \textbf{Q-Learning}~\cite{watkins1992}, que opera de forma \textbf{Off-policy}, aproximando a função de valor da política ótima independentemente da política comportamental utilizada para explorar o ambiente~\cite{sutton2018, hu2024} [21, 25, 26]:
-% \begin{equation}
-%     Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) \right]
-% \end{equation}
-% Por fim, para evitar o viés de superestimação matemática causado pela operação do máximo no Q-Learning clássico, introduziu-se o \textbf{Double Q-Learning}, que dissocia a seleção da melhor ação da avaliação do seu valor real, usando duas tabelas ou funções independentes~\cite{hasselt2010double, hu2024} [27-30].
-
-\section*{Aprendizagem por Reforço Profundo (\gls{DRL})}
-
-A era profunda começa integrando Redes Neurais à função Q. A clássica \textbf{Rede Q Profunda (\gls{DQN})}~\cite{mnih2015} minimiza o Erro TD usando um Replay Buffer e Redes Alvo ($\theta^-$) estáticas:
+Dentro do \textit{TD Learning}, destacam-se dois algoritmos clássicos~\cite{sutton2018}. O \gls{SARSA} realiza um aprendizado \textit{On-policy}, o que significa que a política que o agente busca aprender (política alvo) e a política que ele usa para gerar experiências no ambiente são exatamente a mesma~\cite{hu2024, sutton2018}. Dessa forma, a atualização do valor esperado da ação é calculada de forma direta com base na próxima ação que o agente efetivamente escolheu e executou no ambiente~\cite{sutton2018}:
 \begin{equation}
-    L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right]
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
 \end{equation}
 
-Evoluções incluem a \textbf{Repetição de Experiência Priorizada (PER)}, que amostra transições com base na magnitude do erro TD em vez de uniforme~\cite{schaul2016per}, a já citada \textbf{Double DQN}, e a \textbf{Dueling DQN} que ramifica a rede neural final estimando separadamente valor ($V$) e vantagem ($A$)~\cite{wang2016dueling}.
-
-\subsection{Policy Gradients e REINFORCE}
-Nos \textbf{Gradientes de Política}, não calculamos o valor para extrair política; otimizamos diretamente uma política parametrizada $\pi_\theta$. O \textbf{Teorema do Gradiente de Política} embasa essas atualizações estocásticas. Utiliza-se o \textbf{Truque da Razão de Verossimilhança} $\nabla_\theta P = P \nabla_\theta \log P$ para derivar a expectativa~\cite{sutton2018}:
+E o \textit{\textit{Q-Learning}}~\cite{watkins1992}, que opera de forma \textit{Off-policy}, aproximando diretamente a função de valor da política ótima independentemente da política comportamental utilizada para explorar o ambiente~\cite{hu2024, sutton2018}:
 \begin{equation}
-    \nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \nabla_\theta \log \pi_\theta(A_t|S_t) Q^\pi(S_t, A_t) \right]
+    Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_{a'} Q(S_{t+1}, a') - Q(S_t, A_t) \right]
 \end{equation}
-A versão de Monte Carlo é o famoso \textbf{Algoritmo REINFORCE}, trocando $Q^\pi$ pelo retorno do episódio amostrado $G_t$~\cite{williams1992}.
 
-\subsection{Actor-Critic, \gls{PPO}, TRPO e \gls{SAC}}
-Para diminuir a alta variância dos gradientes, introduzem-se as \textbf{Arquiteturas Ator-Crítico}~\cite{sutton2018}: o Ator ajusta as probabilidades $\pi(a|s)$, enquanto o Crítico estima o valor $V(s)$ que atua como \textit{baseline} para um Erro TD redutor de ruído de gradiente. Tais arquiteturas permitiram resolver \textbf{Espaços de Ação Contínuos}.
+Por fim, no \textit{\textit{Q-Learning}} clássico, a operação de máximo utiliza as mesmas amostras de dados tanto para determinar a melhor ação quanto para calcular o seu valor, o que frequentemente gera um viés de superestimação matemática~\cite{sutton2018, hu2024}. Para mitigar esse problema, introduziu-se o \textit{Double Q-Learning}, que previne a superestimação ao dissociar a seleção da melhor ação da avaliação do seu valor real utilizando duas tabelas ou funções independentes, $Q_1$ e $Q_2$~\cite{hasselt2010double, hu2024}. Com probabilidade igual a cada passo, a atualização de $Q_1$ ocorre selecionando a melhor ação futura com base nela mesma, mas avaliando seu valor real através de $Q_2$~\cite{sutton2018}:
+\begin{equation}
+    Q_1(S_t, A_t) \leftarrow Q_1(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma Q_2(S_{t+1}, \arg\max_{a} Q_1(S_{t+1}, a)) - Q_1(S_t, A_t) \right]
+\end{equation}
+O processo ocorre de forma simétrica caso $Q_2$ seja sorteada para a atualização, garantindo que as estimativas de ambas as funções permaneçam não enviesadas~\cite{sutton2018}.
 
-\begin{figure}[ht!]
-\centering
+
+\section*{Aprendizagem por Reforço Profundo (\texorpdfstring{\gls{DRL}}{\gls{DRL}})}
+
+A \gls{DRL} consolida-se ao utilizar redes neurais profundas para aproximar a função de valor de ação em vez de empregar tabelas clássicas para armazenar os valores $Q$. Dessa forma, permite-se que o agente aprenda e generalize eficientemente em espaços de estados contínuos e de alta dimensão~\cite{mnih2015}. O algoritmo \gls{DQN} estabiliza esse processo de aprendizado através de duas inovações estruturais~\cite{mnih2015}.
+
+A primeira é a utilização de um \textit{Replay Buffer} (memória de repetição de experiências). Em vez de aprender com as amostras na ordem sequencial exata em que são geradas no ambiente, o agente armazena suas transições no buffer e sorteia mini-lotes aleatórios para o treinamento~\cite{mnih2015}. Isso é é necessário porque amostras consecutivas em uma trajetória são correlacionadas no tempo; a amostragem aleatória quebra essa correlação, reduz a variância das atualizações e melhora a eficiência do aprendizado, já que cada experiência pode ser reutilizada múltiplas vezes.
+
+A segunda inovação é a introdução de uma rede alvo ($\theta^-$)~\cite{mnih2015}. No \textit{\textit{Q-Learning}} padrão com redes neurais, o alvo da atualização depende dos mesmos pesos que estão sendo continuamente ajustados. Isso cria um problema de ``alvo móvel'', onde a rede tenta alcançar uma estimativa que também se altera a cada passo, o que frequentemente gera instabilidade, oscilações severas ou divergência da política. Para contornar isso, o algoritmo dissocia o cálculo do alvo da atualização da rede principal. A rede alvo possui a mesma arquitetura, mas seus pesos permanecem congelados e são sincronizados com a rede principal ($\theta$) apenas periodicamente. Essa separação estabiliza o treinamento ao fixar os alvos por um determinado número de passos, minimizando o Erro TD através da seguinte função de perda:
+
+\begin{equation} 
+L(\theta) = \mathbb{E}_{(s,a,r,s') \sim D} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right] 
+\end{equation}
+
+A partir dessas ideias, outros algoritmos foram propostos para sanar limitações estruturais no aprendizado. Como a operação de máximo no \gls{DQN} induz a um viés de superestimação, o \textit{Double DQN} adapta o conceito de duplo aprendizado para redes neurais, utilizando a rede principal para selecionar a melhor ação futura e a rede alvo para avaliar o valor real dessa mesma ação~\cite{hasselt2010double, mnih2015}.
+
+% Para otimizar a eficiência amostral, introduziu-se a Repetição de Experiência Priorizada (\gls{PER}). Em vez de amostrar as transições do Replay Buffer de maneira aleatória e uniforme, a \gls{PER} prioriza as experiências com base na magnitude do seu Erro TD absoluto, garantindo que o agente concentre seu processamento em situações onde sua estimativa falhou mais, ou seja, nas experiências mais surpreendentes e informativas~\cite{schaul2016per}.
+
+Por fim, a arquitetura \textit{Dueling DQN} aprimora a própria estrutura interna da rede neural, bifurcando a última camada oculta em duas ramificações independentes, uma responsável por estimar o valor do estado ($V$) e outra para estimar a vantagem relativa de cada ação ($A$)~\cite{wang2016dueling}. Ao agregar esses dois sinais apenas na camada de saída, o modelo consegue aprender o valor do estado independentemente das ações que são tomadas, o que acelera drasticamente a convergência em cenários onde múltiplas escolhas produzem resultados semelhantes~\cite{wang2016dueling}.
+
+\section*{Gradientes de Política e REINFORCE}
+
+Diferente dos métodos baseados em valor, os métodos de Gradiente de Política parametrizam a política diretamente, $\pi_\theta(a|s)$, e a otimizam por ascensão de gradiente para maximizar o desempenho esperado $J(\theta)$. O Teorema do Gradiente de Política viabiliza essa otimização ao fornecer uma expressão exata para o gradiente sem exigir o conhecimento prévio das dinâmicas de transição do ambiente. Ao aplicar o truque da razão de verossimilhança, a formulação se transforma na Equação~\ref{eq:gradiente}, que permite o uso de amostragens reais. O objetivo prático dessa equação é simples, ajustar a rede neural para aumentar a probabilidade de uma ação exatamente na proporção do retorno que ela gerou.
+
+\begin{equation} \nabla_\theta J(\theta) = \mathbb{E}{\pi\theta} \left[ \nabla_\theta \log \pi_\theta(A_t|S_t) Q^\pi(S_t, A_t) \right] \label{eq:gradiente} \end{equation}
+
+A partir dessa base teórica, derivou-se o algoritmo REINFORCE~\cite{williams1992}. Ele contorna a necessidade de calcular a função de valor $Q^\pi(S_t, A_t)$ estimando-a empiricamente. Ele utiliza o retorno real acumulado ao final do episódio ($G_t$) como um estimador não enviesado do valor daquela ação~\cite{sutton2018}. Consequentemente, o agente atualiza os parâmetros da política apenas após a conclusão de cada episódio, movendo os pesos matematicamente na direção que aumenta a probabilidade das ações que geraram altos retornos ($G_t$), ao mesmo tempo em que inibe aquelas associadas a retornos ruins~\cite{sutton2018}.
+
+\section*{Ator-Crítico, \texorpdfstring{\gls{PPO}}{\gls{PPO}} e \texorpdfstring{\gls{SAC}}{\gls{SAC}}} 
+
+As arquiteturas Ator-Crítico foram desenvolvidas para diminuir a alta variância dos métodos de gradiente de política tradicionais ~\cite{sutton2018}. Nessas arquiteturas, o aprendizado é dividido em dois componentes simultâneos: o Ator ajusta as probabilidades de seleção de uma ação para um determinado estado ao seguir uma política $\pi(a|s)$, enquanto o Crítico estima a função de valor $V(s)$~\cite{sutton2018}. Essas funções podem utilizar \gls{DNN} de duas maneiras diferentes~\cite{hu2024}. A primeira utiliza redes neurais separadas e independentes para o Ator e para o Crítico, o que confere maior flexibilidade na otimização de cada função, mas exige maior esforço computacional~\cite{hu2024}. A segunda utiliza uma única rede neural com pesos compartilhados, onde as camadas ocultas iniciais extraem características comuns do estado e, em seguida, bifurcam-se em ramificações de saída independentes, uma para calcular a probabilidade de seleção da ação e outra para estimar a função de valor~\cite{hu2024}.
+
+\begin{figure}[ht!] 
+\centering 
 \begin{tikzpicture}[
     >=Latex,
-    node distance=2.5cm,
-    box/.style={draw, rectangle, rounded corners, minimum width=2.5cm, minimum height=1cm, font=\bfseries, thick, align=center},
-    arrow/.style={->, thick}
+    font=\sffamily,
+    thick_line/.style={draw=blue!70!black, line width=1.4pt},
+    box/.style={draw=blue!70!black, fill=blue!2, line width=1.5pt, rectangle, rounded corners=8pt, minimum width=4cm, minimum height=1.4cm, align=center, font=\large},
+    agent_box/.style={draw=blue!70!black, fill=blue!10, line width=1.5pt, rectangle, rounded corners=15pt, minimum width=6cm, minimum height=5.8cm}
 ]
-    \node[box, fill=purple!15] (actor) {Ator (Policy)\\ $\pi_\theta(a|s)$};
-    \node[box, fill=orange!15, below of=actor, yshift=-1.5cm] (critic) {Crítico (Value)\\ $V_w(s)$};
-    \node[box, fill=green!15, right of=actor, xshift=3.5cm, yshift=-1.25cm] (env) {Ambiente};
 
-    \draw[arrow] (actor.0) -| node[pos=0.2, above] {Ação} (env.90);
-    \draw[arrow] (env.270) |- node[pos=0.8, below] {Estado, Recompensa} (critic.0);
-    \draw[arrow] (env.180) -- ++(-2,0) |- (actor.345); 
-    
-    \draw[arrow, dashed, red] (critic.90) -- node[left] {Erro TD ($\delta$)} (actor.270);
-\end{tikzpicture}
-\caption{Dinâmica Ator-Crítico.}
-\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.}
+    % Fundo do Agente de Aprendizado
+    \node[agent_box] (agent) at (0, 0.5) {};
+    \node[anchor=south west, font=\Large, text=black] at ([yshift=0.1cm]agent.north west) {Agente de Aprendizado};
+
+    % Componentes internos
+    \node[box] (actor) at (0, 2.2) {Ator\\[2pt] {\normalsize $\pi_\theta(a|s)$}};
+    \node[box] (critic) at (0, -1.2) {Crítico\\[2pt] {\normalsize $V_w(s)$}};
+
+    % Ambiente
+    \node[box, minimum width=5cm, font=\Large] (env) at (0, -4.5) {AMBIENTE};
+
+    % Linha do Estado
+    \draw[thick_line] (env.west) -- node[below, font=\small, text=gray!80!black] {Estado} ++(-2.2,0) coordinate (s_bot);
+    \draw[thick_line] (s_bot) -- (s_bot |- actor.west) coordinate (s_top);
+    \draw[->, thick_line] (s_top) -- (actor.west);
+    \path ([yshift=-0.2cm]critic.west) coordinate (critic_west_low);
+    \draw[->, thick_line] (s_bot |- critic_west_low) -- (critic_west_low);
+
+    % Linha de Ação
+    \draw[thick_line] (actor.east) -- ++(2.5,0) coordinate (a_top);
+    \draw[->, thick_line] (a_top) -- node[right, font=\small, text=gray!80!black] {Ação} (a_top |- env.east) -- (env.east);
+
+    % Linha de Recompensa
+    \draw[->, thick_line] (env.north) -- node[right, font=\small, text=gray!80!black] {Recompensa} (critic.south);
+
+    % Linhas do Erro TD
+    \draw[thick_line] (critic.north) -- ++(0, 0.8) coordinate (td_branch);
+    \draw[->, thick_line] (td_branch) -- (actor.south);
+    \draw[->, thick_line] (td_branch) -- node[below, font=\scriptsize, text=gray!80!black] {Erro TD} ++(-2.5, 0) |- ([yshift=0.2cm]critic.west);
+
+\end{tikzpicture} 
+\caption{Dinâmica Ator-Crítico.} 
+\label{fig:ator_critico}
+\Fonte{Elaborado pelo autor com base em~\cite{sutton2018}.} 
 \end{figure}
 
-Para mitigar o colapso por passos muito largos nas atualizações de gradiente contínuo:
-\begin{itemize}
-    \item \textbf{TRPO:} Impõe uma restrição (Trust Region) usando Divergência KL para travar passos agressivos~\cite{schulman2015trpo}.
-    \item \textbf{PPO:} Muito mais simples que TRPO, ele "corta" (clip) a função objetivo de modo a desincentivar uma política nova de se afastar demais da antiga~\cite{schulman2017ppo}:
-    \begin{equation}
-        L^{CLIP}(\theta) = \mathbb{E}\left[ \min(r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t) \right]
-    \end{equation}
-    onde $r_t(\theta) = \frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$.
-    \item \textbf{DDPG:} Ator-Crítico para espaços determinísticos contínuos usando técnicas de replay do \gls{DQN}~\cite{sutton2018}.
-    \item \textbf{SAC:} Abordagem focada em regularização de entropia; o agente tenta escalar recompensas ao máximo mas preservando a máxima entropia (agindo aleatoriamente onde possível)~\cite{haarnoja2018sac}.
-\end{itemize}
+A Figura~\ref{fig:ator_critico} ilustra a dinâmica clássica de interação em uma arquitetura Ator-Crítico. No início, o agente obtém do ambiente o estado atual do problema, que é passado para a entrada da \gls{DNN} em ambos os componentes do Agente de Aprendizado. Com base nesse estado, o Ator emprega sua política $\pi_\theta(a|s)$ para selecionar e aplicar uma ação no ambiente, o que causa a transição para um novo estado e a emissão de um sinal de recompensa. O Crítico utiliza essa nova informação para calcular o Erro TD ($\delta = R_{t+1} + \gamma V_w(S_{t+1}) - V_w(S_t)$), que mede a adequação da escolha realizada comparada ao que era esperado. Esse erro é então propagado tanto para atualizar os próprios parâmetros do Crítico -- aprimorando suas futuras estimativas de valor $V_w(s)$ -- quanto para escalar os gradientes e guiar a atualização dos pesos do Ator, reforçando ações que resultaram em retornos maiores que o esperado e desencorajando escolhas subótimas~\cite{sutton2018}.
 
-\subsection{Avanços e Extensões}
-Dentre outras áreas sofisticadas constam o \textbf{Aprendizado por Reforço Multi-Agente (MARL)}, onde agentes interagem no mesmo ambiente. O \textbf{Independent Q-Learning} treina agentes individuais tratando os outros como parte estacionária do ambiente, o que na prática gera um \gls{POMDP} instável. O \textbf{Curriculum Learning} ataca a \textbf{Lida com Recompensas Esparsas} submetendo o agente a tarefas crescentemente difíceis. \textbf{Aprendizado por Reforço Inverso (IRL)} decodifica a função de recompensa baseando-se num especialista humano, enquanto o \textbf{Aprendizado por Reforço \textit{Offline}} procura aprender comportamentos unicamente consumindo um dataset preexistente gigante, sem tocar ou explorar ativamente o simulador ao vivo.
+% Nos métodos de gradiente de política, atualizações baseadas em passos de otimização muito largos frequentemente levam a um colapso de desempenho, onde a nova política torna-se substancialmente pior que a anterior. Para mitigar esse problema e estabilizar o aprendizado contínuo, destacam-se os seguintes algoritmos~\cite{sutton2018}: 
+% \begin{itemize} 
+%     \item Otimização de Política Proximal (\gls{PPO}): Introduz uma função objetivo substituta que previne atualizações destrutivas~\cite{schulman2017ppo}. O algoritmo utiliza um mecanismo de corte (\textit{clipping}) que restringe a razão de probabilidade entre a política atual e a anterior, denotada por $r_t(\theta) = \frac{\pi_\theta(a|s)}{\pi_{\theta_{old}}(a|s)}$, a um intervalo de segurança restrito. Isso desincentiva a nova política de se afastar excessivamente da política antiga em um único passo, garantindo uma melhoria mais segura e estável~\cite{schulman2017ppo}: 
+%     \begin{equation} 
+%     L^{CLIP}(\theta) = \mathbb{E}\left[ \min(r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t) \right] 
+%     \end{equation} 
+%     \item Gradiente de Política Determinístico Profundo (\gls{DDPG}): Adapta o sucesso dos algoritmos baseados em valor para o domínio de controle contínuo~\cite{sutton2018}. Tratando-se de um método \textit{Off-policy}, ele treina uma política determinística utilizando inovações clássicas como a repetição de experiências (replay buffer) e redes alvo (\textit{target networks}) para estabilizar a aproximação das funções. 
+%     \item Ator-Crítico Suave (\gls{SAC}): Uma abordagem \textit{Off-policy} que regulariza o aprendizado através da maximização da entropia estocástica~\cite{haarnoja2018sac}. Em vez de focar apenas na maximização da recompensa, o agente é incentivado a maximizar simultaneamente a recompensa e a entropia da sua política. Na prática, isso significa buscar o melhor desempenho possível enquanto age da forma mais aleatória viável, o que previne a convergência prematura para soluções subótimas e garante uma exploração robusta do ambiente~\cite{haarnoja2018sac}. 
+% \end{itemize}
+
+% \subsection*{Avanços e Extensões} 
+% Dentre outras áreas sofisticadas constam o \textbf{Aprendizado por Reforço Multi-Agente (MARL)}, onde múltiplos agentes interagem no mesmo ambiente de forma competitiva ou colaborativa~\cite{albrecht2024}. O \textbf{Independent Q-Learning} treina agentes individuais tratando os outros como parte estacionária do ambiente, o que na prática gera um \gls{POMDP} instável~\cite{albrecht2024}. O \textbf{Curriculum Learning} ataca a \textbf{Lida com Recompensas Esparsas} submetendo o agente a tarefas crescentemente difíceis~\cite{hu2024}. Por fim, o \textbf{Aprendizado por Reforço Inverso (IRL)} decodifica a função de recompensa baseando-se num especialista humano, enquanto o \textbf{Aprendizado por Reforço Offline} procura aprender comportamentos unicamente consumindo um dataset preexistente gigante, sem tocar ou explorar ativamente o simulador ao vivo~\cite{hu2024}.
+
+% Qual a diferença prática entre modelos Model-Free e Model-Based?
+% Como o parâmetro lambda unifica Monte Carlo e TD Learning?
+% Por que o Double Q-Learning evita a superestimação de valores?

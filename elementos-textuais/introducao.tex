@@ -2,16 +2,16 @@
 \chapter{Introdução}
 \label{cap:introducao}
 
-Este capítulo apresenta uma visão geral do trabalho, descrevendo o contexto e os desafios que o motivaram (Seção \ref{sec:contextualizacao} e Seção \ref{sec:motivacao}). A partir disso, formaliza-se o problema de pesquisa (Seção \ref{sec:definicao-do-problema}), as questões norteadoras (Seção \ref{sec:questoes-de-pesquisa}) e as hipóteses elencadas (Seção \ref{sec:hipoteses}). Por fim, são traçados os objetivos (Seção \ref{sec:objetivos}), as contribuições esperadas (Seção \ref{sec:contribuicoes}), as publicações decorrentes da pesquisa (Seção \ref{sec:publicacao}) e a forma como o documento está estruturado (Seção \ref{sec:organizacao}).
+Este capítulo apresenta uma visão geral do trabalho, descrevendo o contexto e os desafios que o motivaram (Seção~\ref{sec:contextualizacao} e Seção~\ref{sec:motivacao}). A partir disso, formaliza-se o problema de pesquisa (Seção~\ref{sec:definicao-do-problema}), as questões norteadoras (Seção~\ref{sec:questoes-de-pesquisa}) e as hipóteses elencadas (Seção~\ref{sec:hipoteses}). Por fim, são traçados os objetivos (Seção~\ref{sec:objetivos}), as contribuições esperadas (Seção~\ref{sec:contribuicoes}), as publicações decorrentes da pesquisa (Seção~\ref{sec:publicacao}) e a forma como o documento está estruturado (Seção~\ref{sec:organizacao}).
 
 \section{Contextualização}
 \label{sec:contextualizacao}
 
 A convergência entre tecnologias de comunicação, eletrificação veicular e condução autônoma tem moldado um novo paradigma para o setor de transportes. O conceito de \gls{IoV} transforma veículos em sistemas computacionais sofisticados, capazes de viabilizar diversas aplicações de \gls{ITS}~\cite{RANI2023108543}. 
 
-Veículos modernos são equipados com múltiplos sensores, unidades de processamento e interfaces de comunicação, permitindo a coleta e o processamento de grandes volumes de dados. Contudo, a complexidade das aplicações e a quantidade crescente de dados a serem processados podem exceder a capacidade computacional das \glspl{OBU} instaladas.
+Veículos modernos são equipados com múltiplos sensores, unidades de processamento e interfaces de comunicação, permitindo a coleta e o processamento de grandes volumes de dados. Contudo, a complexidade das aplicações e a quantidade crescente de dados a serem processados podem exceder a capacidade computacional das \gls{OBU} instaladas.
 
-Uma solução imediata seria aumentar a capacidade computacional dessas OBUs, possibilitando maior processamento local. No entanto, o atual período de transição tecnológica resulta em cenários heterogêneos, no qual coexistem OBUs com diferentes capacidades computacionais~\cite{luo2024} e distintas tecnologias de comunicação~\cite{zheng2015}. Essa diversidade representa um desafio para a implementação de aplicações veiculares em larga escala, especialmente no contexto das cidades inteligentes (\textit{\textit{Smart Cities}})~\cite{luo2024}.
+Uma solução imediata seria aumentar a capacidade computacional dessas \glspl{OBU}, possibilitando maior processamento local. No entanto, o atual período de transição tecnológica resulta em cenários heterogêneos, no qual coexistem \glspl{OBU} com diferentes capacidades computacionais~\cite{luo2024} e distintas tecnologias de comunicação~\cite{zheng2015}. Essa diversidade representa um desafio para a implementação de aplicações veiculares em larga escala, especialmente no contexto das cidades inteligentes (\textit{Smart Cities})~\cite{luo2024}.
 
 Nesse ambiente fortemente dinâmico e caótico, muitas aplicações, em particular aquelas voltadas à condução autônoma, impõem requisitos rigorosos de latência~\cite{chao2025}. A execução integral do processamento nos dispositivos embarcados frequentemente inviabiliza o atendimento a tais requisitos, devido às limitações físicas de energia e capacidade computacional~\cite{luo2024}.
 
@@ -21,20 +21,20 @@ O descarregamento de tarefas surge como o mecanismo central para operacionalizar
 
 O principal desafio, entretanto, está em decidir quando e para onde descarregar as tarefas, considerando múltiplos fatores conflitantes, como tempo limite de processamento, custo energético, balanceamento de carga e qualidade do enlace de comunicação. Abordagens determinísticas, baseadas exclusivamente em heurísticas, apresentam desempenho limitado diante da alta variabilidade espacial e temporal do ambiente veicular~\cite{ahmed2022}. Mobilidade intensa, flutuações do canal e mudanças abruptas na carga computacional tornam as decisões estáticas rapidamente obsoletas, comprometendo a eficiência do sistema.
 
-Essa limitação tem impulsionado a busca por soluções adaptativas e mais robustas, baseadas em aprendizado de máquina e sistemas inteligentes~\cite{mao2017,zhang2018,zhou2019,huang2020,shi2023,nieto2024}. Diante desse cenário, este trabalho de qualificação propõe uma solução para o descarregamento de tarefas em redes \gls{VEC} que integra ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}. O \gls{TOPSIS} avalia multicritérios como latência estimada, ocupação de fila, taxa de canal e consumo energético, reduzindo o conjunto variável de candidatos ao descarregamento --- \glspl{RSU} e veículos vizinhos --- a um vetor de estado compacto e de dimensão fixa (6D), contornando o problema da entrada variável nas redes neurais. Com o melhor candidato já identificado pelo \gls{TOPSIS}, o \gls{SAC} aprende uma política de decisão binária (descarregar para esse candidato ou executar localmente), beneficiando-se da regularização por entropia máxima para manter a exploração em ambientes não-estacionários. Como extensão planejada, o \gls{TOPSIS} será substituído por \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística aos critérios de avaliação dos candidatos.
+Essa limitação tem impulsionado a busca por soluções adaptativas e mais robustas, baseadas em aprendizado de máquina e sistemas inteligentes~\cite{mao2017,zhang2018,zhou2019,huang2020,shi2023,nieto2024}. Diante desse cenário, este trabalho de qualificação propõe uma solução para o descarregamento de tarefas em redes \gls{VEC} que integra ranqueamento multicritério por \gls{TOPSIS}~\cite{hwang1981} com \gls{DRL} baseado no algoritmo \gls{SAC}. O \gls{TOPSIS} avalia multicritérios como latência estimada, ocupação de fila, taxa de canal e consumo energético, reduzindo o conjunto variável de candidatos ao descarregamento --- \gls{RSU} e veículos vizinhos --- a um vetor de estado compacto e de dimensão fixa (6D), contornando o problema da entrada variável nas redes neurais. Com o melhor candidato já identificado pelo \gls{TOPSIS}, o \gls{SAC} aprende uma política de decisão binária (descarregar para esse candidato ou executar localmente), beneficiando-se da regularização por entropia máxima para manter a exploração em ambientes não-estacionários. Como extensão planejada, o \gls{TOPSIS} será substituído por \textit{\textit{Fuzzy}}-\gls{TOPSIS}~\cite{chen2000}, incorporando incerteza linguística aos critérios de avaliação dos candidatos.
 
 \section{Motivação}
 \label{sec:motivacao}
 
 A motivação para esta pesquisa fundamenta-se em quatro pilares críticos que representam lacunas tecnológicas e científicas no estado da arte de redes veiculares:
 
-Primeiramente, existe a necessidade de viabilizar soluções de descarregamento de tarefas em cenários de alta heterogeneidade computacional. O atual período de transição tecnológica resulta na coexistência de veículos com \glspl{OBU} de capacidades distintas, exigindo modelos de decisão que operem de forma eficiente independentemente do \textit{\textit{hardware}} disponível~\cite{zheng2015,luo2024}.
+Primeiramente, existe a necessidade de viabilizar soluções de descarregamento de tarefas em cenários de alta heterogeneidade computacional. O atual período de transição tecnológica resulta na coexistência de veículos com \gls{OBU} de capacidades distintas, exigindo modelos de decisão que operem de forma eficiente independentemente do \textit{hardware} disponível~\cite{zheng2015,luo2024}.
 
 Em segundo lugar, identifica-se um importante \textit{\textit{gap}} de pesquisa relacionado à escalabilidade do \gls{DRL} em cenários de mundo real. Como o \gls{DRL} utiliza redes neurais que dependem de entradas de dimensão fixa, a maioria das soluções existentes exige o retreinamento do agente sempre que o número de veículos vizinhos (agentes) varia~\cite{uddin2025,tang2024}. Desenvolver uma abordagem que lide com essa variação sem necessidade de retreinamento é um dos principais desafios abordados neste trabalho~\cite{ma2025}.
 
 Adicionalmente, a realização de reengenharia de estado e de recompensa em \gls{DRL} é frequentemente descrita como um processo empírico e complexo devido à alta dimensionalidade e à falta de estruturação dos dados de entrada~\cite{shi2023}. Esta pesquisa propõe mitigar esse problema ao utilizar o método de ranqueamento multicritério \gls{TOPSIS}~\cite{hwang1981} como um facilitador da engenharia de estado, reduzindo a complexidade da entrada da rede neural e estruturando a tomada de decisão~\cite{vieira2025}.
 
-Por fim, este trabalho de qualificação propõe uma abordagem evolutiva: inicialmente, emprega-se o \gls{TOPSIS} auxiliando o agente de decisão para validar a arquitetura proposta. Como etapa subsequente da pesquisa de doutorado, planeja-se a evolução para a lógica \textit{Fuzzy}-TOPSIS, visando incorporar a capacidade de lidar com a incerteza e a imprecisão inerentes aos cenários veiculares reais, aumentando a robustez do modelo final.
+Por fim, este trabalho de qualificação propõe uma abordagem evolutiva: inicialmente, emprega-se o \gls{TOPSIS} auxiliando o agente de decisão para validar a arquitetura proposta. Como etapa subsequente da pesquisa de doutorado, planeja-se a evolução para a lógica \textit{\textit{Fuzzy}}-\gls{TOPSIS}, visando incorporar a capacidade de lidar com a incerteza e a imprecisão inerentes aos cenários veiculares reais, aumentando a robustez do modelo final.
 
 \section{Definição do Problema}
 \label{sec:definicao-do-problema}
@@ -42,7 +42,7 @@ Por fim, este trabalho de qualificação propõe uma abordagem evolutiva: inicia
 Diante das limitações de processamento local e da elevada variabilidade do ambiente veicular, o problema central investigado neste trabalho pode ser formulado da seguinte maneira:
 
 \begin{quote}
-\textbf{Como tomar decisões de descarregamento de tarefas em redes \gls{VEC}/\gls{V2X}, com número variável de candidatos (\glspl{RSU} e veículos vizinhos), de forma confiável e adaptativa, cumprindo restrições de prazo e minimizando latência e consumo energético, sem necessidade de retreinamento diante de variações na densidade veicular?}
+\textbf{Como tomar decisões de descarregamento de tarefas em redes \gls{VEC}/\gls{V2X}, com número variável de candidatos (\gls{RSU} e veículos vizinhos), de forma confiável e adaptativa, cumprindo restrições de prazo e minimizando latência e consumo energético, sem necessidade de retreinamento diante de variações na densidade veicular?}
 \end{quote}
 
 Estudos recentes reforçam que a alta mobilidade, a intermitência dos enlaces e a heterogeneidade de recursos tornam esse desafio ainda mais complexo~\cite{liu2021,mao2017,shi2023,nieto2024}. Para delimitar o escopo da solução proposta, é importante destacar que o problema de descarregamento de tarefas, em sua essência, configura-se como um problema de otimização \textit{NP-hard}~\cite{mao2017,feng2017}. Isso implica que soluções exatas em tempo polinomial são inviáveis para cenários dinâmicos como o veicular, o que direciona a busca por métodos de baixa complexidade computacional e boa capacidade de adaptação. 
@@ -59,11 +59,11 @@ O processo de descarregamento de tarefas pode ser classificado em três categori
     }
 \end{figure}
 
-Além disso, as estratégias de decisão variam entre abordagens que processam conjuntos de tarefas em lote (\textit{batch}) ou aquelas que decidem dinamicamente para cada tarefa individual, o que impacta diretamente a arquitetura e a complexidade das soluções propostas. O ambiente alvo desta pesquisa caracteriza-se por uma rede \gls{VEC} altamente heterogênea e volátil, operando sob cobertura \gls{5G} \gls{NR} para comunicação com infraestruturas de borda e interfaces \gls{V2X} \textit{\textit{Sidelink}} para cooperação entre veículos vizinhos. A principal dificuldade reside na modelagem de um cenário onde a densidade veicular e a topologia da rede mudam abruptamente, alterando o número de candidatos disponíveis para o descarregamento e a estabilidade dos enlaces de comunicação~\cite{chao2025,luo2024}.
+Além disso, as estratégias de decisão variam entre abordagens que processam conjuntos de tarefas em lote (\textit{batch}) ou aquelas que decidem dinamicamente para cada tarefa individual, o que impacta diretamente a arquitetura e a complexidade das soluções propostas. O ambiente alvo desta pesquisa caracteriza-se por uma rede \gls{VEC} altamente heterogênea e volátil, operando sob cobertura \gls{5G} \gls{NR} para comunicação com infraestruturas de borda e interfaces \gls{V2X} \textit{Sidelink} para cooperação entre veículos vizinhos. A principal dificuldade reside na modelagem de um cenário onde a densidade veicular e a topologia da rede mudam abruptamente, alterando o número de candidatos disponíveis para o descarregamento e a estabilidade dos enlaces de comunicação~\cite{chao2025,luo2024}.
 
-Nesse contexto, aplicações com alta demanda computacional e baixa carga de dados --- como visão computacional e algoritmos de navegação --- impõem restrições de latência que superam a capacidade de processamento das \glspl{OBU} locais. Para viabilizar tais aplicações, a tomada de decisão deve integrar, em tempo real, múltiplos indicadores conflitantes (latência, energia, carga de \gls{CPU} e qualidade do canal) sob forte incerteza de medição~\cite{liu2021}. 
+Nesse contexto, aplicações com alta demanda computacional e baixa carga de dados --- como visão computacional e algoritmos de navegação --- impõem restrições de latência que superam a capacidade de processamento das \gls{OBU} locais. Para viabilizar tais aplicações, a tomada de decisão deve integrar, em tempo real, múltiplos indicadores conflitantes (latência, energia, carga de \gls{CPU} e qualidade do canal) sob forte incerteza de medição~\cite{liu2021}. 
 
-Embora a literatura apresente métodos baseados em programação linear ou meta-heurísticas~\cite{li2020genetic,you2021efficient}, tais abordagens operam majoritariamente sobre instantes isolados da rede (\textit{snapshots}). Essa natureza míope limita sua eficácia em cenários veiculares, pois falham em considerar a evolução futura da topologia e o impacto de longo prazo das decisões sequenciais. Por outro lado, soluções de \textit{Deep Reinforcement Learning} (\gls{DRL}) puro, embora capazes de otimizar recompensas futuras, enfrentam o problema da entrada de dimensão variável. Assim, a integração de métodos de ranqueamento multicritério (\gls{TOPSIS}) com \gls{DRL} surge como a estratégia necessária para estruturar esse ambiente caótico em uma representação de estado compacta e invariante à densidade, permitindo decisões robustas e escaláveis. 
+Embora a literatura apresente métodos baseados em programação linear ou meta-heurísticas~\cite{li2020genetic,you2021efficient}, tais abordagens operam majoritariamente sobre instantes isolados da rede (\textit{snapshots}). Essa natureza míope limita sua eficácia em cenários veiculares, pois falham em considerar a evolução futura da topologia e o impacto de longo prazo das decisões sequenciais. Por outro lado, soluções de \textit{Deep \textit{Reinforcement Learning}} (\gls{DRL}) puro, embora capazes de otimizar recompensas futuras, enfrentam o problema da entrada de dimensão variável. Assim, a integração de métodos de ranqueamento multicritério (\gls{TOPSIS}) com \gls{DRL} surge como a estratégia necessária para estruturar esse ambiente caótico em uma representação de estado compacta e invariante à densidade, permitindo decisões robustas e escaláveis. 
 
 % Os principais desafios inerentes a esse ambiente são sintetizados na Figura~\ref{fig:problems}.
 
@@ -145,7 +145,7 @@ Embora a literatura apresente métodos baseados em programação linear ou meta-
 %             {\textbf{Energia}\\
 %              Custo variável por ciclo.\\
 %              Bateria / estado Energético.\\
-%              \textit{Trade-off} energia--tempo};
+%              Trade-off energia--tempo};
 
 %           \node[box, below=of hetero] (unc)
 %             {\textbf{Incerteza}\\
@@ -189,14 +189,14 @@ Embora a literatura apresente métodos baseados em programação linear ou meta-
 
 Este trabalho busca responder às seguintes questões de pesquisa, formuladas a partir das limitações inerentes ao ambiente veicular, da complexidade do problema de descarregamento de tarefas e da necessidade de garantir confiabilidade, eficiência energética e baixa latência em sistemas \gls{VEC}/\gls{V2X}:
 
-\begin{alineas}[label=\textbf{QP\arabic*.}]
+\begin{alineas}[label=QP\arabic*.]
     \item \textbf{Como realizar o descarregamento de tarefas em ambientes \gls{VEC}/\gls{V2X} de maneira confiável e adaptativa, considerando a alta variabilidade da mobilidade veicular, do canal de comunicação e da carga computacional?}
 
     \item \textbf{De que forma a integração de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado em \gls{SAC} pode melhorar a tomada de decisão de descarregamento em cenários veiculares dinâmicos, contornando o problema da entrada variável nas redes neurais e mantendo estabilidade de aprendizado independentemente da densidade veicular?}
 
-    \item \textbf{Em que medida a substituição do \gls{TOPSIS} clássico por \textit{Fuzzy}-TOPSIS --- incorporando incerteza linguística nos critérios de avaliação dos candidatos ao descarregamento --- aprimora a robustez da representação de estado e o desempenho do agente \gls{SAC} em cenários de alta mobilidade e informação imprecisa?}
+    \item \textbf{Em que medida a substituição do \gls{TOPSIS} clássico por \textit{\textit{Fuzzy}}-\gls{TOPSIS} --- incorporando incerteza linguística nos critérios de avaliação dos candidatos ao descarregamento --- aprimora a robustez da representação de estado e o desempenho do agente \gls{SAC} em cenários de alta mobilidade e informação imprecisa?}
 
-    \item \textbf{Quais são os impactos do uso conjunto de comunicação 5G NR e \gls{V2X}, modelados no simulador NS-3 versão 3.42 com o módulo 5G-LENA, no desempenho da solução SAC-\textit{Fuzzy}-TOPSIS, especialmente na redução da latência, no consumo energético e na taxa de cumprimento de prazo (\textit{deadline})?}
+    \item \textbf{Quais são os impactos do uso conjunto de comunicação 5G \gls{NR} e \gls{V2X}, modelados no simulador NS-3 versão 3.42 com o módulo 5G-LENA, no desempenho da solução \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS}, especialmente na redução da latência, no consumo energético e na taxa de cumprimento de prazo (\textit{deadline})?}
 
     % \item \textbf{Como diferentes perfis de aplicação veicular, especialmente aquelas com baixa carga de dados e alta demanda computacional, influenciam a decisão de quando, para onde e quanto descarregar, considerando limites de latência, balanceamento de carga e consumo energético?}
 
@@ -208,14 +208,14 @@ Este trabalho busca responder às seguintes questões de pesquisa, formuladas a 
 
 A partir das questões acima e da fundamentação teórica apresentada, formulam-se as seguintes hipóteses de pesquisa:
 
-\begin{alineas}[label=\textbf{H\arabic*.}]
+\begin{alineas}[label=H\arabic*.]
     \item \textbf{A combinação de \gls{TOPSIS} com \gls{SAC} é capaz de produzir um modelo de decisão adaptativo que supera métodos puramente determinísticos ou heurísticos em cenários \gls{VEC}/\gls{V2X} altamente dinâmicos, graças à representação de estado compacta (6D) e à regularização por entropia máxima do \gls{SAC}.}
 
     \item \textbf{O ranqueamento multicritério por \gls{TOPSIS} reduz o impacto da variabilidade do número de candidatos ao descarregamento, permitindo que o agente \gls{SAC} generalize para cenários com densidades veiculares distintas sem necessidade de retreinamento.}
 
-    \item \textbf{A substituição do \gls{TOPSIS} clássico por \textit{Fuzzy}-TOPSIS aprimora a robustez da representação de estado ao incorporar incerteza linguística nos critérios de avaliação, resultando em maior taxa de cumprimento de prazo e melhor função objetivo $J(\pi)$ em cenários de alta mobilidade e informação imprecisa.}
+    \item \textbf{A substituição do \gls{TOPSIS} clássico por \textit{\textit{Fuzzy}}-\gls{TOPSIS} aprimora a robustez da representação de estado ao incorporar incerteza linguística nos critérios de avaliação, resultando em maior taxa de cumprimento de prazo e melhor função objetivo $J(\pi)$ em cenários de alta mobilidade e informação imprecisa.}
 
-    \item \textbf{A validação da arquitetura SAC-\textit{Fuzzy}-TOPSIS no simulador NS-3 versão 3.42, com modelagem realista de 5G NR e comunicação \gls{V2X} (\textit{sidelink}), confirmará a viabilidade da solução proposta em condições de rede mais próximas do ambiente real, preservando as vantagens de generalização observadas na etapa intermediária.}
+    \item \textbf{A validação da arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} no simulador NS-3 versão 3.42, com modelagem realista de 5G \gls{NR} e comunicação \gls{V2X} (\textit{sidelink}), confirmará a viabilidade da solução proposta em condições de rede mais próximas do ambiente real, preservando as vantagens de generalização observadas na etapa intermediária.}
 
     % \item \textbf{Aplicações com baixa carga de dados e alta demanda computacional apresentam o maior ganho com o descarregamento, desde que o modelo consiga estimar adequadamente o custo energético e o impacto na latência de processamento.}
 
@@ -230,38 +230,38 @@ A fim de formalizar o propósito desta pesquisa e as etapas necessárias para su
 
 \subsection{Objetivo Geral}
 \label{sec:objetivo-geral}
-Desenvolver e avaliar uma solução completa de descarregamento de tarefas em redes \gls{VEC}/\gls{V2X} baseada na arquitetura SAC-\textit{Fuzzy}-TOPSIS, validada no simulador NS-3 versão 3.42 com modelagem realista de \gls{5G} \gls{NR} e comunicação \gls{V2X}. Como etapa intermediária --- objeto desta qualificação --- propõe-se e valida-se a combinação de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}, produzindo um vetor de estado compacto (6D) e invariante à escala que permite generalização \textit{zero-shot} a cenários com densidades veiculares variáveis. A conclusão do trabalho prevê a substituição do \gls{TOPSIS} clássico por \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística nos critérios de avaliação dos candidatos ao descarregamento, e a migração da validação para o NS-3 3.42.
+Desenvolver e avaliar uma solução completa de descarregamento de tarefas em redes \gls{VEC}/\gls{V2X} baseada na arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS}, validada no simulador NS-3 versão 3.42 com modelagem realista de \gls{5G} \gls{NR} e comunicação \gls{V2X}. Como etapa intermediária --- objeto desta qualificação --- propõe-se e valida-se a combinação de ranqueamento multicritério por \gls{TOPSIS} com \gls{DRL} baseado no algoritmo \gls{SAC}, produzindo um vetor de estado compacto (6D) e invariante à escala que permite generalização \textit{zero-shot} a cenários com densidades veiculares variáveis. A conclusão do trabalho prevê a substituição do \gls{TOPSIS} clássico por \textit{\textit{Fuzzy}}-\gls{TOPSIS}, incorporando incerteza linguística nos critérios de avaliação dos candidatos ao descarregamento, e a migração da validação para o NS-3 3.42.
 
 
 \subsection{Objetivos Específicos}
 \label{sec:objetivos-especificos}
 
 
-\begin{alineas}[label=\textbf{OE\arabic*.}]
+\begin{alineas}[label=OE\arabic*.]
     \item \textbf{Realizar uma revisão sistemática de algoritmos de descarregamento de tarefas em cenários \gls{VEC}, focando em abordagens de \gls{DRL}, métodos multicritério e técnicas de engenharia de estado}.
-    \item \textbf{Projetar e implementar um módulo \gls{TOPSIS} para ranqueamento multicritério dos candidatos ao descarregamento (\glspl{RSU} e veículos vizinhos), reduzindo o espaço de estado a um vetor 6D normalizado e invariante à escala, independentemente da densidade veicular --- constituindo a etapa intermediária desta qualificação}.
-    \item \textbf{Desenvolver e treinar um agente \gls{SAC} que utilize o vetor de estado produzido pelo \gls{TOPSIS} para aprender uma política de descarregamento que otimize simultaneamente latência, consumo energético e taxa de cumprimento de prazo (\textit{deadline}), validando a arquitetura SAC-TOPSIS em simulador customizado com comunicação \gls{V2X}}.
-    \item \textbf{Estender o módulo de ranqueamento para \textit{Fuzzy}-TOPSIS, incorporando incerteza linguística nos critérios de avaliação dos candidatos, e integrar a arquitetura SAC-\textit{Fuzzy}-TOPSIS ao simulador NS-3 versão 3.42, com 5G-LENA e suporte a \gls{V2X}, para validação final e comparação sistemática com heurísticas e demais algoritmos de \gls{DRL}}.
+    \item \textbf{Projetar e implementar um módulo \gls{TOPSIS} para ranqueamento multicritério dos candidatos ao descarregamento (\gls{RSU} e veículos vizinhos), reduzindo o espaço de estado a um vetor 6D normalizado e invariante à escala, independentemente da densidade veicular --- constituindo a etapa intermediária desta qualificação}.
+    \item \textbf{Desenvolver e treinar um agente \gls{SAC} que utilize o vetor de estado produzido pelo \gls{TOPSIS} para aprender uma política de descarregamento que otimize simultaneamente latência, consumo energético e taxa de cumprimento de prazo (\textit{deadline}), validando a arquitetura \gls{SAC}-\gls{TOPSIS} em simulador customizado com comunicação \gls{V2X}}.
+    \item \textbf{Estender o módulo de ranqueamento para \textit{\textit{Fuzzy}}-\gls{TOPSIS}, incorporando incerteza linguística nos critérios de avaliação dos candidatos, e integrar a arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} ao simulador NS-3 versão 3.42, com 5G-LENA e suporte a \gls{V2X}, para validação final e comparação sistemática com heurísticas e demais algoritmos de \gls{DRL}}.
 \end{alineas}
 
 \section{Contribuições Esperadas}
 \label{sec:contribuicoes}
 Espera-se que este trabalho produza contribuições relevantes tanto do ponto de vista científico quanto do ponto de vista prático, sobretudo no contexto de sistemas veiculares inteligentes e computação de borda. As principais contribuições previstas são:
 
-\begin{alineas}[label=\textbf{CE\arabic*.}]
-\item \textbf{Proposição e validação intermediária da arquitetura SAC-TOPSIS, que combina ranqueamento multicritério com \gls{DRL} de entropia máxima, demonstrando tomada de decisão adaptativa e generalização \textit{zero-shot} a cenários de densidades veiculares distintas. Essa etapa fundamenta e antecede a contribuição final: a arquitetura SAC-\textit{Fuzzy}-TOPSIS validada no NS-3 3.42}.
+\begin{alineas}[label=CE\arabic*.]
+\item \textbf{Proposição e validação intermediária da arquitetura \gls{SAC}-\gls{TOPSIS}, que combina ranqueamento multicritério com \gls{DRL} de entropia máxima, demonstrando tomada de decisão adaptativa e generalização \textit{zero-shot} a cenários de densidades veiculares distintas. Essa etapa fundamenta e antecede a contribuição final: a arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} validada no NS-3 3.42}.
 
-\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G NR (com alinhamento às diretrizes do \gls{3GPP} \textit{Release}~16), comunicação \textit{Sidelink} \gls{V2X}, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
+\item \textbf{Modelagem detalhada do ambiente de comunicação e processamento veicular, incluindo enlaces 5G \gls{NR} (com alinhamento às diretrizes do \gls{3GPP} \textit{Release}~16), comunicação \textit{Sidelink} \gls{V2X}, parâmetros de mobilidade e heterogeneidade computacional entre veículos e servidores de borda. Essa modelagem fornece uma plataforma de simulação realista para decisões de descarregamento}.
 
-\item \textbf{Desenvolvimento do módulo \gls{TOPSIS} para avaliação multicritério dos candidatos ao descarregamento, considerando critérios como latência estimada, ocupação de fila, taxa de canal e consumo energético; e, como etapa final da dissertação, desenvolvimento do módulo \textit{Fuzzy}-TOPSIS, que incorporará incerteza linguística para maior robustez em cenários de alta mobilidade e informação imprecisa}.
+\item \textbf{Desenvolvimento do módulo \gls{TOPSIS} para avaliação multicritério dos candidatos ao descarregamento, considerando critérios como latência estimada, ocupação de fila, taxa de canal e consumo energético; e, como etapa final da dissertação, desenvolvimento do módulo \textit{\textit{Fuzzy}}-\gls{TOPSIS}, que incorporará incerteza linguística para maior robustez em cenários de alta mobilidade e informação imprecisa}.
 
 \item \textbf{Treinamento e avaliação do agente \gls{SAC}, cujo mecanismo de regularização por entropia máxima previne o colapso de política em ambientes não-estacionários e cuja aprendizagem \textit{off-policy} confere eficiência amostral superior à de algoritmos \textit{on-policy} como o \gls{PPO}}.
 
-\item \textbf{Implementação e avaliação da arquitetura SAC-TOPSIS em simulador customizado com comunicação \gls{V2X} (etapa intermediária), e implementação final da arquitetura SAC-\textit{Fuzzy}-TOPSIS no NS-3 versão 3.42 com 5G-LENA, avaliando métricas como taxa de cumprimento de prazo, \textit{Success-Weighted Quality} (SWQ) e função objetivo $J(\pi)$ em cenários de simulação distintos}.
+\item \textbf{Implementação e avaliação da arquitetura \gls{SAC}-\gls{TOPSIS} em simulador customizado com comunicação \gls{V2X} (etapa intermediária), e implementação final da arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} no NS-3 versão 3.42 com 5G-LENA, avaliando métricas como taxa de cumprimento de prazo, \textit{Success-Weighted Quality} (SWQ) e função objetivo $J(\pi)$ em cenários de simulação distintos}.
 
-\item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais e outras famílias de algoritmos de \gls{DRL}, destacando os ganhos obtidos pela arquitetura SAC-TOPSIS na etapa intermediária e pela arquitetura SAC-\textit{Fuzzy}-TOPSIS na validação final}.
+\item \textbf{Comparação sistemática com métodos de referência da literatura, incluindo heurísticas tradicionais e outras famílias de algoritmos de \gls{DRL}, destacando os ganhos obtidos pela arquitetura \gls{SAC}-\gls{TOPSIS} na etapa intermediária e pela arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} na validação final}.
 
-\item \textbf{Produção de um conjunto de diretrizes práticas para pesquisadores e engenheiros interessados em projetar sistemas de descarregamento de tarefas veicular, evidenciando cenários onde a arquitetura SAC-\textit{Fuzzy}-TOPSIS apresenta maior vantagem em relação a heurísticas e algoritmos de \gls{DRL} sem ranqueamento multicritério}.
+\item \textbf{Produção de um conjunto de diretrizes práticas para pesquisadores e engenheiros interessados em projetar sistemas de descarregamento de tarefas veicular, evidenciando cenários onde a arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} apresenta maior vantagem em relação a heurísticas e algoritmos de \gls{DRL} sem ranqueamento multicritério}.
 
 
 \end{alineas}
@@ -269,7 +269,7 @@ Espera-se que este trabalho produza contribuições relevantes tanto do ponto de
 \section{Publicação}
 \label{sec:publicacao}
 
-Como parte do desenvolvimento deste trabalho, foi submetido e aceito um artigo no periódico internacional \textit{Journal of Cloud Computing} (Springer), classificado como Q1 nas bases \textit{Scopus/SJR} e posicionado no percentil superior da área de \textit{Computer Networks and Communications}. O artigo, intitulado ``\textit{FOFF: descarregamento de tarefas eficiente energeticamente em redes veiculares baseadas em \gls{VEC} usando \textit{fuzzy} TOPSIS}''~\cite{vieira2025}, apresenta uma versão preliminar do modelo híbrido de descarregamento de tarefas proposto nesta dissertação, incluindo a arquitetura conceitual e os primeiros resultados derivados de experimentos em simulação. A publicação serviu tanto como validação da relevância científica da abordagem quanto como etapa intermediária para o refinamento metodológico, a ampliação dos cenários simulados e o aprofundamento das análises apresentadas nos capítulos seguintes.
+Como parte do desenvolvimento deste trabalho, foi submetido e aceito um artigo no periódico internacional \textit{Journal of Cloud Computing} (Springer), classificado como Q1 nas bases \textit{Scopus/SJR} e posicionado no percentil superior da área de \textit{Computer Networks and Communications}. O artigo, intitulado ``\textit{FOFF: descarregamento de tarefas eficiente energeticamente em redes veiculares baseadas em \gls{VEC} usando \textit{\textit{fuzzy}} \gls{TOPSIS}}''~\cite{vieira2025}, apresenta uma versão preliminar do modelo híbrido de descarregamento de tarefas proposto nesta dissertação, incluindo a arquitetura conceitual e os primeiros resultados derivados de experimentos em simulação. A publicação serviu tanto como validação da relevância científica da abordagem quanto como etapa intermediária para o refinamento metodológico, a ampliação dos cenários simulados e o aprofundamento das análises apresentadas nos capítulos seguintes.
 
 \section{Organização do Trabalho}
 \label{sec:organizacao}
@@ -279,11 +279,11 @@ Este documento está estruturado partindo dos fundamentos teóricos até o delin
 \begin{itemize}
     \item \textbf{Capítulo~\ref{cap:introducao} --- Introdução:} apresenta o contexto geral, a motivação, a definição do problema, as questões de pesquisa, hipóteses e objetivos, além das contribuições esperadas e publicações decorrentes.
 
-    \item \textbf{Capítulo~\ref{cap:fundamentacao-teorica} --- Fundamentação Teórica:} discute os conceitos essenciais que sustentam este trabalho, abrangendo arquiteturas \gls{5G} \gls{NR} e \textit{Sidelink} \gls{V2X}, o paradigma de descarregamento de tarefas em ambientes \gls{VEC}, fundamentos de \textit{Deep Reinforcement Learning} (\gls{DRL}) e a lógica \textit{fuzzy}.
+    \item \textbf{Capítulo~\ref{cap:fundamentacao-teorica} --- Fundamentação Teórica:} discute os conceitos essenciais que sustentam este trabalho, abrangendo arquiteturas \gls{5G} \gls{NR} e \textit{Sidelink} \gls{V2X}, o paradigma de descarregamento de tarefas em ambientes \gls{VEC}, fundamentos de \textit{Deep \textit{Reinforcement Learning}} (\gls{DRL}) e a lógica \textit{\textit{fuzzy}}.
 
         \item \textbf{Capítulo~\ref{cap:revisao-literatura} --- Revisão da Literatura:} realiza uma análise crítica de trabalhos recentes, explorando as principais técnicas e tendências voltadas ao descarregamento de tarefas em cenários veiculares altamente dinâmicos.
 
-        \item \textbf{Capítulo~\ref{chap:proposta} --- Proposta:} detalha a arquitetura \gls{SAC}-\textit{Fuzzy}-\gls{TOPSIS} desenvolvida, descrevendo a integração entre o algoritmo \textit{Soft Actor-Critic} e o ranqueamento multicritério, bem como a modelagem do ambiente de simulação.
+        \item \textbf{Capítulo~\ref{chap:proposta} --- Proposta:} detalha a arquitetura \gls{SAC}-\textit{\textit{Fuzzy}}-\gls{TOPSIS} desenvolvida, descrevendo a integração entre o algoritmo Soft \textit{Actor}-\textit{Critic} e o ranqueamento multicritério, bem como a modelagem do ambiente de simulação.
 
 
     \item \textbf{Capítulo~\ref{cap:cronograma-pesquisa} --- Cronograma:} descreve o planejamento das atividades futuras para a conclusão do doutorado, estabelecendo os prazos para experimentos finais, redação da tese e defesa.

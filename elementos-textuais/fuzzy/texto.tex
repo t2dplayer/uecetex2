@@ -1,66 +1,114 @@
+Nesta seção, serão apresentados os métodos \gls{TOPSIS} e sua extensão \textit{\textit{Fuzzy}}-\gls{TOPSIS}. Esses métodos são responsáveis por ranquear um conjunto de alternativas com base em múltiplos critérios simultaneamente. Como etapa intermediária para a validação da arquitetura proposta neste trabalho, o \gls{TOPSIS} clássico foi inicialmente integrado ao algoritmo \gls{SAC} para a resolução do problema de descarregamento de tarefas, permitindo a avaliação dos candidatos e a redução do espaço de observação. No entanto, o objetivo final da pesquisa consiste em incorporar o \textit{\textit{Fuzzy}}-\gls{TOPSIS} para mitigar as incertezas e a imprecisão das medições inerentes aos cenários veiculares de alta mobilidade, modelando a incerteza linguística nos critérios de avaliação.
+
 % ------------------------------------------------------------
-\subsection{O Algoritmo TOPSIS}
+\section*{O Algoritmo TOPSIS}
 \label{subsec:topsis-algoritmo}
 % ------------------------------------------------------------
 
-O \textbf{\gls{TOPSIS}} (\textit{Technique for Order of Preference by Similarity to Ideal Solution}) é um método \gls{MCDM} que ranqueia alternativas pela proximidade relativa à \textbf{Solução Ideal Positiva} (PIS — melhor valor possível em cada critério) e pela distância à \textbf{Solução Ideal Negativa} (NIS — pior valor possível). Uma alternativa é preferível se estiver simultaneamente próxima da PIS e distante da NIS.
+O \gls{TOPSIS} é um método \gls{MCDM} que ranqueia alternativas pela proximidade relativa à \gls{PIS} (melhor valor possível em cada critério) e pela distância à \gls{NIS} (pior valor possível). Uma alternativa é preferível se estiver simultaneamente próxima da \gls{PIS} e distante da \gls{NIS}. A Figura~\ref{fig:topsis_geometrico} ilustra esse conceito de forma geométrica em um espaço bidimensional. Nela e na formulação matemática do método, a letra $d$ representa a distância euclidiana entre os pontos, os sobrescritos sinalizam qual é a fronteira de referência sendo medida (onde $^+$ simboliza o cálculo em direção à PIS, e $^-$ em direção à NIS), e o subscrito numérico refere-se a qual candidato $A_i$ está sendo avaliado. Observa-se que a alternativa $A_1$, por exemplo, apresenta uma distância menor em direção à métrica ideal positiva ($d^+_1$) e uma distância maior para a solução anti-ideal ($d^-_1$), tornando-se preferível em comparação direta com a alternativa $A_3$.
 
-Seja $\mathbf{X} \in \mathbb{R}^{m \times n}$ a matriz de decisão com $m$ candidatos e $n = 4$ critérios: latência $(\tau)$, carga de \gls{CPU} $(\rho_{cpu})$, taxa de dados $(C)$ e energia $(E)$. O procedimento se desenvolve em cinco passos.
+\begin{figure}[htb] 
+\centering 
+\begin{tikzpicture}[
+    >=Latex,
+    font=\sffamily,
+    scale=1.2,
+    dot/.style={circle, inner sep=0pt, minimum size=6pt},
+    pis/.style={dot, fill=green!60!black, draw=black, thick},
+    nis/.style={dot, fill=red!70, draw=black, thick},
+    alt/.style={dot, fill=blue!50, draw=black, thick},
+    line/.style={dashed, thick}
+]
+    % Box/Grid boundary
+    \draw[dotted, thick, gray] (1, 1) rectangle (5, 4);
 
-\paragraph{Passo 1 — Normalização vetorial.} Normaliza cada coluna para remover efeitos de escala:
+    % Axes
+    \draw[->, thick, gray!80!black] (-0.5, 0) -- (6.5, 0) node[right, text=black] {Critério 1};
+    \draw[->, thick, gray!80!black] (0, -0.5) -- (0, 5) node[above, text=black] {Critério 2};
+    
+    % Ideal Solutions
+    \node[nis] (NIS) at (1, 1) {};
+    \node[below left=2pt, font=\bfseries] at (NIS) {NIS ($A^-$)};
+    
+    \node[pis] (PIS) at (5, 4) {};
+    \node[above right=2pt, font=\bfseries] at (PIS) {PIS ($A^+$)};
+    
+    % Alternatives
+    \node[alt] (A1) at (4.2, 2.5) {};
+    \node[above=3pt] at (A1) {$A_1$};
+    
+    \node[alt] (A2) at (3.2, 2.5) {};
+    \node[above right=2pt] at (A2) {$A_2$};
+    
+    \node[alt] (A3) at (2.0, 3.2) {};
+    \node[above left=1pt] at (A3) {$A_3$};
 
-\begin{equation}
-    r_{ij} = \frac{x_{ij}}{\sqrt{\displaystyle\sum_{k=1}^{m} x_{kj}^2}}.
-    \label{eq:normalizacao-topsis}
-\end{equation}
+    % Distances for A1
+    \draw[line, green!60!black] (A1) -- node[pos=0.4, right=2pt, font=\small, text=black] {$d^+_1$} (PIS);
+    \draw[line, red!60!black] (A1) -- node[pos=0.4, below right=1pt, font=\small, text=black] {$d^-_1$} (NIS);
+    
+    % Distances for A3
+    \draw[line, green!60!black] (A3) -- node[pos=0.4, above=2pt, font=\small, text=black] {$d^+_3$} (PIS);
+    \draw[line, red!60!black] (A3) -- node[pos=0.4, left=2pt, font=\small, text=black] {$d^-_3$} (NIS);
 
-\paragraph{Passo 2 — Matriz normalizada ponderada.} Aplica os pesos $\mathbf{w} = [w_1, w_2, w_3, w_4]^T$ com $\sum_j w_j = 1$:
+\end{tikzpicture} 
+\caption{Representação geométrica bidimensional do ranqueamento TOPSIS baseada em critérios de benefício.} 
+\label{fig:topsis_geometrico}
+\Fonte{Elaborado pelo autor.} 
+\end{figure}
 
-\begin{equation}
-    v_{ij} = w_j \cdot r_{ij}.
-    \label{eq:ponderacao-topsis}
-\end{equation}
+\begin{algorithm}[htb]
+\LinesNumbered
+\caption{Processo de Avaliação Multi-critério TOPSIS}
+\label{alg:topsis}
+\SetKwInOut{Input}{Entrada}
+\SetKwInOut{Output}{Saída}
+\Input{Matriz de decisão $\mathbf{X} \in \mathbb{R}^{m \times n}$ com $m$ alternativas em $n$ critérios; vetor normatizado de pesos $\mathbf{w}$.}
+\Output{Vetor de proximidade $\mathbf{C}^*$ e alternativas ranqueadas decorrentemente.}
+\BlankLine
+\tcp{Passos 1 e 2: Normalização Vetorial e Ponderação}
+\For{$j = 1$ \KwTo $n$}{
+    \For{$i = 1$ \KwTo $m$}{
+        $r_{ij} \gets x_{ij} \left/ \sqrt{\sum_{k=1}^{m} x_{kj}^2} \right.$\label{algline:norm}\;
+        $v_{ij} \gets w_j \cdot r_{ij}$\label{algline:pond}\;
+    }
+    \BlankLine
+    \tcp{Passo 3: Dimensionamento das Fronteiras PIS ($A^+$) e NIS ($A^-$)}
+    \eIf{critério $j$ é de benefício}{
+        $A^+_j \gets \max_i v_{ij}$\label{algline:pisnis_start}\;
+        $A^-_j \gets \min_i v_{ij}$\;
+    }{
+        $A^+_j \gets \min_i v_{ij}$ \tcp*{Critério de custo (minimizar)}
+        $A^-_j \gets \max_i v_{ij}$\label{algline:pisnis_end}\;
+    }
+}
+\BlankLine
+\tcp{Passos 4 e 5: Distâncias Euclidianas e Coeficiente de Similaridade}
+\For{$i = 1$ \KwTo $m$}{
+    $d^+_i \gets \sqrt{\sum_{j=1}^{n} (v_{ij} - A^+_j)^2}$\label{algline:distpis}\;
+    $d^-_i \gets \sqrt{\sum_{j=1}^{n} (v_{ij} - A^-_j)^2}$\label{algline:distnis}\;
+    $C^*_i \gets d^-_i / (d^+_i + d^-_i)$\label{algline:coeff}\;
+}
+\Return Ordenação decrescente de $\mathbf{C}^*$\label{algline:rank}\;
+\end{algorithm}
 
-Os pesos adotados são $\mathbf{w} = [0{,}35;\;0{,}25;\;0{,}25;\;0{,}15]$ para $[\tau,\;\rho_{cpu},\;C,\;E]$, respectivamente, conforme justificado na Seção~\ref{subsec:topsis-motivacao}.
+De forma geral, o \gls{TOPSIS} organiza os dados em formato de matriz ($\mathbb{R}^{m \times n}$) e ranqueia $m$ alternativas candidatas simultaneamente considerando $n$ critérios através de um conjunto de passos. Tal procedimento, está abstraído no Algoritmo~\ref{alg:topsis}.
+Ele funciona em três fases principais. Inicialmente, os dados de entrada são normalizados por coluna (linha~\ref{algline:norm}), o que unifica as métricas para que possuam a mesma escala, permitindo a comparação de critérios com naturezas e unidades diferentes. Em seguida, os valores normalizados são multiplicados por um vetor de pesos $\mathbf{w}$ que define a prioridade de cada critério (linha~\ref{algline:pond}).
 
-\paragraph{Passo 3 — Soluções ideais positiva e negativa.} Os critérios são classificados em \textit{custo} (minimizar: latência, carga, energia) e \textit{benefício} (maximizar: taxa de dados):
+Com os dados padronizados, o método identifica os pontos extremos. Para cada critério de benefício, busca-se o valor máximo; para critérios de custo, o valor mínimo. O agrupamento dos melhores valores forma a PIS, enquanto os piores formam a NIS (linhas~\ref{algline:pisnis_start}--\ref{algline:pisnis_end}).
 
-\begin{align}
-    A^+_j &= \begin{cases} \min_i v_{ij} & \text{se critério $j$ é custo} \\ \max_i v_{ij} & \text{se critério $j$ é benefício} \end{cases}, \label{eq:pis} \\[6pt]
-    A^-_j &= \begin{cases} \max_i v_{ij} & \text{se critério $j$ é custo} \\ \min_i v_{ij} & \text{se critério $j$ é benefício} \end{cases}. \label{eq:nis}
-\end{align}
+Por último, o \gls{TOPSIS} calcula a distância Euclidiana de cada candidato até essas duas soluções ideais (linhas~\ref{algline:distpis} e~\ref{algline:distnis}). O coeficiente de proximidade $C^*_i \in [0,1]$ é obtido calculando a razão entre a distância à NIS e a distância total para ambos os extremos (linha~\ref{algline:coeff}). As alternativas são então ranqueadas ordenando $C^*_i$ decrescentemente (linha~\ref{algline:rank}). O uso específico da distância Euclidiana garante que alternativas com falhas simultâneas em vários critérios sofram penalidades maiores, valorizando soluções balanceadas. 
 
-\paragraph{Passo 4 — Distâncias à PIS e NIS.} A distância de cada candidato $i$ às soluções ideais é calculada pela \textbf{norma $L_2$ Euclidiana}:
-
-\begin{align}
-    d^+_i &= \sqrt{\sum_{j=1}^{n} \left(v_{ij} - A^+_j\right)^2}, \label{eq:dist-pis} \\
-    d^-_i &= \sqrt{\sum_{j=1}^{n} \left(v_{ij} - A^-_j\right)^2}. \label{eq:dist-nis}
-\end{align}
-
-A escolha da norma $L_2$ segue a formulação original de \citeonline{hwang1981} e possui uma propriedade geométrica fundamental para o problema de descarregamento. Considere dois candidatos $A$ e $B$ com desvios em relação à PIS: $A$ apresenta desvio $\delta$ em um único critério (e.g., latência muito alta) e zero nos demais; $B$ apresenta desvio $\delta/\sqrt{n}$ em todos os $n = 4$ critérios igualmente. Pela norma $L_1$, ambos têm distância $\delta$ à PIS — portanto seriam indiferentes. Pela norma $L_2$:
-\begin{align}
-    d^+_A &= \sqrt{\delta^2 + 0 + 0 + 0} = \delta, \\
-    d^+_B &= \sqrt{n \cdot (\delta/\sqrt{n})^2} = \delta.
-\end{align}
-A distância euclidiana é idêntica nos dois casos, mas a geometria da $L_2$ introduz uma curvatura que favorece, no ranqueamento final pelo coeficiente $C^*$, soluções Pareto-balanceadas sobre soluções extremistas. Isso ocorre porque a superfície de nível da $L_2$ é esférica: candidatos com desvios distribuídos igualmente entre critérios habitam a mesma esfera que candidatos com desvio concentrado em um critério — mas a projeção nos critérios custo/benefício faz com que os primeiros recebam menor penalidade total no cálculo conjunto de $d^+$ e $d^-$. Para o cenário \gls{VEC}, onde um servidor com latência extremamente alta \textit{e} fila cheia \textit{e} baixa taxa de dados deve ser severamente penalizado, a $L_2$ garante que afastamentos simultâneos em múltiplos critérios sejam superlinearmente penalizados em relação a afastamentos isolados — propriedade que a $L_1$ (soma linear) não possui.
-
-\paragraph{Passo 5 — Coeficiente de proximidade.} O escore final de cada candidato é:
-
-\begin{equation}
-    C^*_i = \frac{d^-_i}{d^+_i + d^-_i} \in [0, 1].
-    \label{eq:closeness}
-\end{equation}
-
-O coeficiente $C^*_i \to 1$ indica que o candidato $i$ está próximo da solução ideal e distante da anti-ideal (preferível); $C^*_i \to 0$ indica o oposto. O ranqueamento final dos candidatos é determinado por $C^*_i$ em ordem decrescente.
+% Neste trabalho, conforme detalhado na Seção~\ref{subsec:topsis-motivacao}, a modelagem adota $n=4$ critérios principais para a tomada de decisão: latência ($\tau$), carga de \gls{CPU}, disponibilidade de banda ($C$) e consumo de energia ($E$).
 
 % ------------------------------------------------------------
-\subsection{Extensão \textit{Fuzzy} do TOPSIS}
+\section*{Extensão Fuzzy do TOPSIS}
 \label{subsec:fuzzy-topsis}
 % ------------------------------------------------------------
 
-Em ambientes \gls{VEC}, estimativas de qualidade de canal chegam com atraso de um passo de tempo (o agente observa as condições do canal do instante $t-1$ ao tomar a decisão em $t$), e ocupações de fila são observadas com ruído de sondagem. Esta incerteza de medição abre espaço para uma generalização natural do \gls{TOPSIS}: a extensão \textit{fuzzy} via \textbf{Números \textit{Fuzzy} Triangulares} (\textit{Triangular \textit{Fuzzy} Numbers}, TFNs).
+Em ambientes \gls{VEC}, por exemplo, as estimativas de qualidade do canal de comunicação, podem estar desatualizadas. Isto significa que o agente observa as condições do ambiente e ao tomar a decisão,  está tomando ações com base em informações incertas. Esta incerteza de medição abre espaço para uma generalização natural do \gls{TOPSIS}, a extensão \textit{\textit{fuzzy}}-\gls{TOPSIS}.
 
-Nesta extensão, cada valor $x_{ij}$ da matriz de decisão é modelado como um TFN $\tilde{x}_{ij} = (L_{ij},\;M_{ij},\;U_{ij})$, onde $L_{ij}$ é o limite inferior, $M_{ij}$ é o valor modal e $U_{ij}$ é o limite superior do intervalo de confiança. A \textbf{fuzzificação} é realizada a partir da estatística da coluna $j$:
+Nela, cada valor $x_{ij}$ da matriz de decisão é modelado como um TFN $\tilde{x}_{ij} = (L_{ij},\;M_{ij},\;U_{ij})$, onde $L_{ij}$ é o limite inferior, $M_{ij}$ é o valor modal e $U_{ij}$ é o limite superior do intervalo de confiança. A fuzzificação é realizada a partir da estatística da coluna $j$:
 
 \begin{align}
     L_{ij} &= x_{ij} - \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-lower} \\
@@ -68,15 +116,15 @@ Nesta extensão, cada valor $x_{ij}$ da matriz de decisão é modelado como um T
     U_{ij} &= x_{ij} + \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-upper}
 \end{align}
 
-\noindent onde $\hat{\sigma}_j$ é o desvio padrão empírico da coluna $j$ e $\sigma_{\text{frac}} \in [0, 1]$ é um hiperparâmetro de fuzzificação. A \textbf{defuzzificação} pelo centroide recupera um valor escalar:
+\noindent onde $\hat{\sigma}_j$ é o desvio padrão empírico da coluna $j$ e $\sigma_{\text{frac}} \in [0, 1]$ é um hiperparâmetro de fuzzificação. A defuzzificação pelo centroide recupera um valor escalar:
 
 \begin{equation}
     \bar{x}_{ij} = \frac{L_{ij} + M_{ij} + U_{ij}}{3} = x_{ij},
     \label{eq:defuzz-centroid}
 \end{equation}
 
-\noindent que neste caso resulta exatamente no valor original (pois o TFN é simétrico em torno de $M_{ij}$), porém a estrutura \textit{fuzzy} influencia os cálculos intermediários de PIS e NIS ao considerar os extremos do intervalo.
+\noindent que neste caso resulta exatamente no valor original (pois o TFN é simétrico em torno de $M_{ij}$), porém a estrutura \textit{\textit{fuzzy}} influencia os cálculos intermediários de PIS e NIS ao considerar os extremos do intervalo.
 
-A justificativa para esta extensão é de natureza teórica: quando dois candidatos possuem escores $C^*$ muito próximos, qualquer perturbação de medição pode inverter o ranqueamento, gerando inconsistência na política do agente~\cite{farimani2024}. A extensão \textit{fuzzy} modela este intervalo de incerteza via TFN, prevenindo inversões instáveis de ranqueamento ao considerar explicitamente os extremos do intervalo de confiança de cada medição.
+A justificativa para esta extensão é de natureza teórica: quando dois candidatos possuem escores $C^*$ muito próximos, qualquer perturbação de medição pode inverter o ranqueamento, gerando inconsistência na política do agente~\cite{farimani2024}. A extensão \textit{\textit{fuzzy}} modela este intervalo de incerteza via TFN, prevenindo inversões instáveis de ranqueamento ao considerar explicitamente os extremos do intervalo de confiança de cada medição.
 
-A propriedade de unificação paramétrica é central para a arquitetura proposta: quando $\sigma_{\text{frac}} = 0$, tem-se $L_{ij} = M_{ij} = U_{ij} = x_{ij}$, e o método reduz-se exatamente ao \gls{TOPSIS} padrão. Esta parametrização permite que o mesmo módulo opere tanto no modo determinístico quanto no modo \textit{fuzzy}, com a transição controlada por um único hiperparâmetro — sem qualquer alteração estrutural da arquitetura. Na presente proposta, adota-se $\sigma_{\text{frac}} = 0{,}0$, correspondendo ao \gls{TOPSIS} determinístico padrão. A extensão \textit{fuzzy} está disponível como grau de liberdade de projeto para adaptação a ambientes com maior incerteza de medição, sem custo de redesenho do sistema.
+A propriedade de unificação paramétrica é central para a arquitetura proposta: quando $\sigma_{\text{frac}} = 0$, tem-se $L_{ij} = M_{ij} = U_{ij} = x_{ij}$, e o método reduz-se exatamente ao \gls{TOPSIS} padrão. Esta parametrização permite que o mesmo módulo opere tanto no modo determinístico quanto no modo \textit{\textit{fuzzy}}, com a transição controlada por um único hiperparâmetro — sem qualquer alteração estrutural da arquitetura. Na presente proposta, adota-se $\sigma_{\text{frac}} = 0{,}0$, correspondendo ao \gls{TOPSIS} determinístico padrão. A extensão \textit{\textit{fuzzy}} está disponível como grau de liberdade de projeto para adaptação a ambientes com maior incerteza de medição, sem custo de redesenho do sistema.
