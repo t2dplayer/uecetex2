@@ -99,32 +99,88 @@ Com os dados padronizados, o método identifica os pontos extremos. Para cada cr
 
 Por último, o \gls{TOPSIS} calcula a distância Euclidiana de cada candidato até essas duas soluções ideais (linhas~\ref{algline:distpis} e~\ref{algline:distnis}). O coeficiente de proximidade $C^*_i \in [0,1]$ é obtido calculando a razão entre a distância à NIS e a distância total para ambos os extremos (linha~\ref{algline:coeff}). As alternativas são então ranqueadas ordenando $C^*_i$ decrescentemente (linha~\ref{algline:rank}). O uso específico da distância Euclidiana garante que alternativas com falhas simultâneas em vários critérios sofram penalidades maiores, valorizando soluções balanceadas. 
 
-% Neste trabalho, conforme detalhado na Seção~\ref{subsec:topsis-motivacao}, a modelagem adota $n=4$ critérios principais para a tomada de decisão: latência ($\tau$), carga de \gls{CPU}, disponibilidade de banda ($C$) e consumo de energia ($E$).
-
 % ------------------------------------------------------------
 \section*{Extensão Fuzzy do TOPSIS}
 \label{subsec:fuzzy-topsis}
 % ------------------------------------------------------------
 
-Em ambientes \gls{VEC}, por exemplo, as estimativas de qualidade do canal de comunicação, podem estar desatualizadas. Isto significa que o agente observa as condições do ambiente e ao tomar a decisão,  está tomando ações com base em informações incertas. Esta incerteza de medição abre espaço para uma generalização natural do \gls{TOPSIS}, a extensão \textit{\textit{fuzzy}}-\gls{TOPSIS}.
+A lógica \textit{fuzzy} (ou lógica difusa) fornece uma estrutura matemática para tratar a incerteza e a imprecisão inerentes aos fenômenos físicos e a informações qualitativas ou incompletas~\cite{zadeh1965fuzzy, cruz2014ciencia}. Nela, diferentemente da lógica clássica, que é rígida e restringe os resultados a valores absolutos de verdadeiro (1) ou falso (0), a lógica \textit{fuzzy} utiliza valores no intervalo contínuo $[0, 1]$ para representar o grau de adequação (pertinência) de uma variável, permitindo que se trabalhe de forma suave com as chamadas ``meias-verdades''~\cite{cruz2014ciencia}.
 
-Nela, cada valor $x_{ij}$ da matriz de decisão é modelado como um TFN $\tilde{x}_{ij} = (L_{ij},\;M_{ij},\;U_{ij})$, onde $L_{ij}$ é o limite inferior, $M_{ij}$ é o valor modal e $U_{ij}$ é o limite superior do intervalo de confiança. A fuzzificação é realizada a partir da estatística da coluna $j$:
+% Um sistema de controle \textit{fuzzy} opera convertendo números exatos (\textit{crisp}) em graus de pertinência em conjuntos \textit{fuzzy}, etapa conhecida como \textit{fuzzificação}~\cite{matos2019controlador}. Para isto, pode-se utilizar \glspl{TFN}. O \gls{TFN} dimensiona a incerteza de uma variável a partir de um limite inferior, um valor modal e um limite superior~\cite{qu2023adaptive, li2024promoting}. Além da forma triangular, funções de pertinência gaussianas também são utilizadas quando a distribuição exige maior precisão e uniformidade de aproximação~\cite{li2024promoting}.
 
-\begin{align}
-    L_{ij} &= x_{ij} - \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-lower} \\
-    M_{ij} &= x_{ij}, \label{eq:fuzz-modal} \\
-    U_{ij} &= x_{ij} + \sigma_{\text{frac}} \cdot \hat{\sigma}_j, \label{eq:fuzz-upper}
-\end{align}
+% Após a classificação das variáveis, o mecanismo de inferência processa as informações guiado pela base de conhecimento, que reúne regras linguísticas baseadas em condicionais do tipo ``SE-ENTÃO'' (\textit{If-Then})~\cite{matos2019controlador, qu2023adaptive}. Essa estrutura lógica mimetiza a \textit{expertise} e o raciocínio humano, permitindo tomar decisões e controlar sistemas complexos e incertos sem a estrita necessidade de modelos matemáticos analíticos ou exatos do processo~\cite{qu2023adaptive, leite2025evolving}. Finalmente, a etapa de \textit{defuzzificação} atua como uma interface de conversão, utilizando métodos estatísticos (como o Centro de Gravidade -- \gls{COG}) para traduzir os resultados inferidos no domínio difuso de volta para valores contínuos aplicáveis ao mundo real~\cite{matos2019controlador}.
 
-\noindent onde $\hat{\sigma}_j$ é o desvio padrão empírico da coluna $j$ e $\sigma_{\text{frac}} \in [0, 1]$ é um hiperparâmetro de fuzzificação. A defuzzificação pelo centroide recupera um valor escalar:
 
-\begin{equation}
-    \bar{x}_{ij} = \frac{L_{ij} + M_{ij} + U_{ij}}{3} = x_{ij},
-    \label{eq:defuzz-centroid}
-\end{equation}
+No contexto do \gls{TOPSIS}, o método determinístico exige valores escalares precisos. Contudo, em situações onde os dados de entrada possuem incertezas ou ruídos de medição, o uso de valores pontuais pode levar a instabilidades no ranqueamento. A extensão \textit{Fuzzy}-TOPSIS substitui os valores escalares por \glspl{TFN}, permitindo que o modelo considere intervalos de confiança em vez de pontos fixos.
 
-\noindent que neste caso resulta exatamente no valor original (pois o TFN é simétrico em torno de $M_{ij}$), porém a estrutura \textit{\textit{fuzzy}} influencia os cálculos intermediários de PIS e NIS ao considerar os extremos do intervalo.
+O processo de cálculo segue a lógica do \gls{TOPSIS} convencional, mas adaptado para operações com números \textit{fuzzy}. As distâncias entre as alternativas e as soluções ideais (\gls{PIS} e \gls{NIS}) são calculadas utilizando métricas de distância espacial iterando sobre os vértices dos conjuntos geométricos, conforme ilustrado pela abstração na Figura~\ref{fig:fuzzy-topsis-distancia}. Ao final, o valor \textit{fuzzy} resultante é defuzzificado para um escalar, permitindo a ordenação das alternativas. Esta abordagem torna o ranqueamento mais robusto a variações nos dados de entrada, uma vez que a incerteza é explicitamente modelada durante todo o processo de decisão.
 
-A justificativa para esta extensão é de natureza teórica: quando dois candidatos possuem escores $C^*$ muito próximos, qualquer perturbação de medição pode inverter o ranqueamento, gerando inconsistência na política do agente~\cite{farimani2024}. A extensão \textit{\textit{fuzzy}} modela este intervalo de incerteza via TFN, prevenindo inversões instáveis de ranqueamento ao considerar explicitamente os extremos do intervalo de confiança de cada medição.
+\begin{figure}[ht!]
+\centering
+\Caption{\label{fig:fuzzy-topsis-distancia} Distância de Alternativas para as Soluções Ideais no \textit{Fuzzy}-TOPSIS}
+\vspace{0.2cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm,
+    height=8cm,
+    view={-35}{25},
+    grid=major,
+    grid style={gray!30},
+    xlabel={Distância},
+    ylabel style={align=center},
+    ylabel={Domínio\\Paramétrico},
+    zlabel={Pertinência $\mu(x)$},
+    xmin=0, xmax=1,
+    ymin=-0.1, ymax=2.1,
+    zmin=0, zmax=1.15,
+    xtick={0, 0.2, 0.4, 0.6, 0.8, 1.0},
+    ytick={0, 1, 2},
+    yticklabels={$l$, $m$, $u$},
+    ztick={0, 0.2, 0.4, 0.6, 0.8, 1.0},
+    legend style={at={(0.5,1.02)}, anchor=south, legend columns=-1, font=\footnotesize,
+        draw=gray!50, fill=white, fill opacity=0.9}
+]
 
-A propriedade de unificação paramétrica é central para a arquitetura proposta: quando $\sigma_{\text{frac}} = 0$, tem-se $L_{ij} = M_{ij} = U_{ij} = x_{ij}$, e o método reduz-se exatamente ao \gls{TOPSIS} padrão. Esta parametrização permite que o mesmo módulo opere tanto no modo determinístico quanto no modo \textit{\textit{fuzzy}}, com a transição controlada por um único hiperparâmetro — sem qualquer alteração estrutural da arquitetura. Na presente proposta, adota-se $\sigma_{\text{frac}} = 0{,}0$, correspondendo ao \gls{TOPSIS} determinístico padrão. A extensão \textit{\textit{fuzzy}} está disponível como grau de liberdade de projeto para adaptação a ambientes com maior incerteza de medição, sem custo de redesenho do sistema.
+% --- FNIS (Solução Ideal Negativa) ---
+\addplot3[color=red, very thick, mark=*, mark size=1.5pt] coordinates {
+    (0.1, 0, 0) (0.1, 1, 1) (0.1, 2, 0)
+};
+\addlegendentry{$A^-$ (FNIS)}
+
+% --- Alternativa Avaliada ---
+\addplot3[color=blue, very thick, mark=*, mark size=1.5pt] coordinates {
+    (0.5, 0, 0) (0.5, 1, 1) (0.5, 2, 0)
+};
+\addlegendentry{$A_i$ (Alternativa)}
+
+% --- FPIS (Solução Ideal Positiva) ---
+\addplot3[color=green!60!black, very thick, mark=*, mark size=1.5pt] coordinates {
+    (0.9, 0, 0) (0.9, 1, 1) (0.9, 2, 0)
+};
+\addlegendentry{$A^*$ (FPIS)}
+
+% --- Conexões entre vértices l (y=0) ---
+\addplot3[black, thick, dotted] coordinates {(0.1, 0, 0) (0.5, 0, 0)};
+\node[font=\scriptsize, above] at (axis cs:0.3, 0, 0.04) {$0{,}40$};
+
+\addplot3[black, thick, dotted] coordinates {(0.5, 0, 0) (0.9, 0, 0)};
+\node[font=\scriptsize, above] at (axis cs:0.7, 0, 0.04) {$0{,}40$};
+
+% --- Conexões entre vértices m (y=1, z=1) ---
+\addplot3[black, thick, dotted] coordinates {(0.1, 1, 1) (0.5, 1, 1)};
+\node[font=\scriptsize, above] at (axis cs:0.3, 1, 1.02) {$0{,}40$};
+
+\addplot3[black, thick, dotted] coordinates {(0.5, 1, 1) (0.9, 1, 1)};
+\node[font=\scriptsize, above] at (axis cs:0.7, 1, 1.02) {$0{,}40$};
+
+% --- Conexões entre vértices u (y=2) ---
+\addplot3[black, thick, dotted] coordinates {(0.1, 2, 0) (0.5, 2, 0)};
+\node[font=\scriptsize, above] at (axis cs:0.3, 2, 0.04) {$0{,}40$};
+
+\addplot3[black, thick, dotted] coordinates {(0.5, 2, 0) (0.9, 2, 0)};
+\node[font=\scriptsize, above] at (axis cs:0.7, 2, 0.04) {$0{,}40$};
+
+\end{axis}
+\end{tikzpicture}
+\Fonte{Elaborado pelo autor}
+\end{figure}

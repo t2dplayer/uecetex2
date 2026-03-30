@@ -1,0 +1,2958 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows.meta,positioning,calc,fit,backgrounds,shadows,decorations.pathreplacing}
+\usepackage{amsmath,amssymb}
+
+\title{Os Fundamentos do Aprendizado por Reforço}
+\subtitle{Do RL Clássico ao Deep RL (DRL) Explicados de Forma Simples}
+\author{Gemini CLI}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% 1. Aprendizado por Reforço
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily APRENDIZADO POR REFORÇO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA ABORDAGEM DE APRENDIZADO DE MÁQUINA NA QUAL UM AGENTE APRENDE
+A TOMAR DECISÕES REALIZANDO AÇÕES EM UM AMBIENTE E RECEBENDO
+RECOMPENSAS OU PENALIDADES, MELHORANDO GRADUALMENTE SEU
+COMPORTAMENTO PARA MAXIMIZAR A RECOMPENSA ACUMULADA.
+}
+\end{minipage}
+
+\vspace{0.5cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  %--- Robô (scale 0.45, centrado em -3.6) ---
+  \begin{scope}[xshift=-3.6cm, scale=0.45]
+    \draw[black, line width=1.2pt] (0, 2.2) -- (0, 2.7);
+    \fill[black] (0, 2.88) circle (0.18);
+    \draw[black, line width=1.5pt] (-0.65, 1.4) rectangle (0.65, 2.2);
+    \fill[black] (-0.38, 1.62) rectangle (-0.08, 1.92);
+    \fill[black] ( 0.08, 1.62) rectangle ( 0.38, 1.92);
+    \draw[black, line width=1.5pt] (-0.85, -0.5) rectangle (0.85, 1.4);
+    \draw[black, line width=1.5pt] (-1.3, 0.3) rectangle (-0.85, 0.82);
+    \draw[black, line width=1.5pt] ( 0.85, 0.3) rectangle ( 1.3, 0.82);
+    \draw[black, line width=1.5pt] (-0.52, -1.1) rectangle (-0.12, -0.5);
+    \draw[black, line width=1.5pt] ( 0.12, -1.1) rectangle ( 0.52, -0.5);
+  \end{scope}
+
+  % Seta: Robô -> POLÍTICA
+  \draw[black, ->, line width=1.2pt] (-2.95, 0.25) -- (-2.1, 0.25);
+
+  % Caixa POLÍTICA
+  \draw[black, line width=1.5pt] (-2.08, -0.02) rectangle (-0.52, 0.52);
+  \node[black, font=\scriptsize\ttfamily] at (-1.3, 0.25) {POLÍTICA};
+
+  % Retângulo pontilhado: AGENTE
+  \draw[black, dotted, line width=1.2pt] (-4.45, -0.72) rectangle (-0.28, 1.60);
+  \node[black, font=\scriptsize\ttfamily] at (-2.37, -1.05) {AGENTE};
+
+  % Seta AÇÃO (direita, acima)
+  \draw[black, ->, line width=1.2pt] (-0.18, 0.44) -- (1.55, 0.44);
+  \node[black, font=\tiny\ttfamily] at (0.69, 0.64) {AÇÃO};
+
+  % Seta RECOMPENSA (esquerda, abaixo)
+  \draw[black, <-, line width=1.2pt] (-0.18, 0.06) -- (1.55, 0.06);
+  \node[black, font=\tiny\ttfamily] at (0.69, -0.16) {RECOMPENSA};
+
+  %--- Globo (centro em 2.55, 0.25) ---
+  \draw[black, line width=1.5pt] (2.55, 0.25) circle (0.78);
+  \draw[black, line width=0.7pt]
+    (2.62, 0.95) .. controls (2.75, 0.70) and (2.80, 0.45) .. (2.74, 0.18)
+    .. controls (2.68, -0.10) and (2.50, -0.38) .. (2.44, -0.47);
+  \draw[black, line width=0.7pt]
+    (2.20, 0.80) .. controls (2.28, 0.68) and (2.44, 0.65) .. (2.55, 0.95);
+  \draw[black, line width=0.7pt]
+    (1.90, 0.62) .. controls (1.78, 0.35) and (1.82, 0.05) .. (1.94, -0.30);
+  \draw[black, line width=0.5pt] (1.77, 0.25) arc (180:0:0.78 and 0.22);
+  \node[black, font=\scriptsize\ttfamily] at (2.55, -0.75) {AMBIENTE};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 2. Agente
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AGENTE}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA ENTIDADE AUTÔNOMA QUE PERCEBE SEU AMBIENTE POR MEIO DE SENSORES,
+TOMA DECISÕES COM BASE EM SEU ESTADO E POLÍTICA ATUAIS, E REALIZA
+AÇÕES PARA MAXIMIZAR A RECOMPENSA ACUMULADA AO LONGO DO TEMPO.
+}
+\end{minipage}
+
+\vspace{0.9cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % ESTADO (fora da caixa pontilhada)
+  \node[black, font=\scriptsize\ttfamily] at (-5.5, 0.25) {ESTADO};
+  \draw[black, ->, line width=1.2pt] (-5.05, 0.25) -- (-4.15, 0.25);
+
+  %--- Robô centrado em (-3.1, 0), scale 0.40 ---
+  \begin{scope}[xshift=-3.1cm, scale=0.40]
+    \draw[black, line width=1.2pt] (0, 2.2) -- (0, 2.7);
+    \fill[black] (0, 2.88) circle (0.18);
+    \draw[black, line width=1.5pt] (-0.65, 1.4) rectangle (0.65, 2.2);
+    \fill[black] (-0.38, 1.62) rectangle (-0.08, 1.92);
+    \fill[black] ( 0.08, 1.62) rectangle ( 0.38, 1.92);
+    \draw[black, line width=1.5pt] (-0.85, -0.5) rectangle (0.85, 1.4);
+    \draw[black, line width=1.5pt] (-1.3,  0.3)  rectangle (-0.85, 0.82);
+    \draw[black, line width=1.5pt] ( 0.85, 0.3)  rectangle ( 1.3,  0.82);
+    \draw[black, line width=1.5pt] (-0.52, -1.1) rectangle (-0.12, -0.5);
+    \draw[black, line width=1.5pt] ( 0.12, -1.1) rectangle ( 0.52, -0.5);
+  \end{scope}
+
+  % Seta: Robô -> POLÍTICA
+  \draw[black, ->, line width=1.2pt] (-2.52, 0.25) -- (-1.78, 0.25);
+
+  % Caixa POLÍTICA
+  \draw[black, line width=1.5pt] (-1.78, -0.02) rectangle (-0.28, 0.52);
+  \node[black, font=\scriptsize\ttfamily] at (-1.03, 0.25) {POLÍTICA};
+
+  % Retângulo pontilhado: AGENTE
+  \draw[black, dotted, line width=1.2pt] (-3.90, -0.62) rectangle (-0.10, 1.42);
+  \node[black, font=\scriptsize\ttfamily] at (-2.00, -0.95) {AGENTE};
+
+  % Seta: POLÍTICA -> AÇÃO
+  \draw[black, ->, line width=1.2pt] (-0.08, 0.25) -- (0.82, 0.25);
+  \node[black, font=\scriptsize\ttfamily] at (1.35, 0.25) {AÇÃO};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 3. Ação
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AÇÃO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA ESCOLHA OU MOVIMENTO ESPECÍFICO DISPONÍVEL PARA O AGENTE NO
+ESTADO ATUAL, QUE CAUSA UMA TRANSIÇÃO PARA UM NOVO ESTADO NO AMBIENTE.
+}
+\end{minipage}
+
+\vspace{0.4cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % "ESPAÇO DE AÇÕES DO ROBÔ" (canto superior esquerdo) + sublinhado tracejado
+  \node[black, font=\tiny\ttfamily, anchor=north west] at (-3.3, 2.8)  {ESPAÇO DE AÇÕES};
+  \node[black, font=\tiny\ttfamily, anchor=north west] at (-3.3, 2.45) {DO ROBÔ};
+  \draw[black, dashed, line width=0.8pt] (-3.3, 2.12) -- (-0.8, 2.12);
+
+  %--- Robô centrado na origem, scale 0.45 ---
+  \begin{scope}[scale=0.45]
+    \draw[black, line width=1.2pt] (0, 2.2) -- (0, 2.7);
+    \fill[black] (0, 2.88) circle (0.18);
+    \draw[black, line width=1.5pt] (-0.65, 1.4) rectangle (0.65, 2.2);
+    \fill[black] (-0.38, 1.62) rectangle (-0.08, 1.92);
+    \fill[black] ( 0.08, 1.62) rectangle ( 0.38, 1.92);
+    \draw[black, line width=1.5pt] (-0.85, -0.5) rectangle (0.85, 1.4);
+    \draw[black, line width=1.5pt] (-1.3,  0.3)  rectangle (-0.85, 0.82);
+    \draw[black, line width=1.5pt] ( 0.85, 0.3)  rectangle ( 1.3,  0.82);
+    \draw[black, line width=1.5pt] (-0.52, -1.1) rectangle (-0.12, -0.5);
+    \draw[black, line width=1.5pt] ( 0.12, -1.1) rectangle ( 0.52, -0.5);
+  \end{scope}
+
+  % PULAR (acima)
+  \draw[black, ->, line width=1.5pt] (0, 1.42) -- (0, 2.35);
+  \node[black, font=\scriptsize\ttfamily] at (0, 2.62) {PULAR};
+
+  % MOVER PARA TRÁS (esquerda)
+  \draw[black, ->, line width=1.5pt] (-0.70, 0.25) -- (-2.10, 0.25);
+  \node[black, font=\scriptsize\ttfamily, align=center] at (-2.95, 0.25) {MOVER PARA\\TRÁS};
+
+  % MOVER PARA FRENTE (direita)
+  \draw[black, ->, line width=1.5pt] (0.70, 0.25) -- (2.10, 0.25);
+  \node[black, font=\scriptsize\ttfamily, align=center] at (2.95, 0.25) {MOVER PARA\\FRENTE};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 4. Ambiente
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AMBIENTE}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O MUNDO EXTERNO COM O QUAL O AGENTE INTERAGE. RECEBE AS AÇÕES DO
+AGENTE, REALIZA TRANSIÇÕES PARA NOVOS ESTADOS E FORNECE SINAIS DE
+RECOMPENSA DE VOLTA AO AGENTE.
+}
+\end{minipage}
+
+\vspace{0.7cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Rótulo "AMBIENTE DO TETRIS" + sublinhado tracejado
+  \node[black, font=\scriptsize\ttfamily, anchor=north] at (0, 2.4) {AMBIENTE DO TETRIS};
+  \draw[black, dashed, line width=0.8pt] (-1.85, 2.05) -- (1.85, 2.05);
+
+  % --- ESTADO 1 (J-tetromino): células (col,row) = (0,2),(0,1),(1,1),(0,0),(1,0) ---
+  \begin{scope}[xshift=-2.2cm, yshift=0cm]
+    \foreach \col/\row in {0/2, 0/1, 1/1, 0/0, 1/0}{
+      \draw[black, line width=1.2pt]
+        ({\col*0.38}, {\row*0.38}) rectangle ({(\col+1)*0.38}, {(\row+1)*0.38});
+    }
+  \end{scope}
+  \node[black, font=\scriptsize\ttfamily] at (-1.81, -0.28) {ESTADO 1};
+
+  % Seta AÇÃO
+  \draw[black, ->, line width=1.5pt] (-0.85, 0.75) -- (0.85, 0.75);
+  \node[black, font=\scriptsize\ttfamily] at (0, 1.05) {AÇÃO};
+
+  % --- ESTADO 2 (L-tetromino rotacionado): células (0,2),(1,2),(1,1),(1,0) ---
+  \begin{scope}[xshift=1.0cm, yshift=0cm]
+    \foreach \col/\row in {0/2, 1/2, 1/1, 1/0}{
+      \draw[black, line width=1.2pt]
+        ({\col*0.38}, {\row*0.38}) rectangle ({(\col+1)*0.38}, {(\row+1)*0.38});
+    }
+  \end{scope}
+  \node[black, font=\scriptsize\ttfamily] at (1.57, -0.28) {ESTADO 2};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 5. Estado
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ESTADO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA DESCRIÇÃO COMPLETA DA SITUAÇÃO OU CONFIGURAÇÃO ATUAL DO
+AMBIENTE EM UM MOMENTO ESPECÍFICO NO TEMPO.
+}
+\end{minipage}
+
+\vspace{0.5cm}
+\centering
+\begin{tikzpicture}[>=Stealth]
+
+  % Rótulo superior + sublinhado tracejado
+  \node[black, font=\tiny\ttfamily, align=center] at (1.2, 3.35)
+    {ESTADO INICIAL DO AMBIENTE DE XADREZ};
+  \draw[black, dashed, line width=0.8pt] (-0.1, 3.05) -- (2.5, 3.05);
+
+  % --- Tabuleiro de xadrez (8x8, célula = 0.30cm) ---
+  \foreach \c in {0,...,7}{
+    \foreach \r in {0,...,7}{
+      \pgfmathtruncatemacro{\dark}{mod(\c+\r,2)}
+      \ifnum\dark=0
+        \fill[black!65] ({\c*0.30},{\r*0.30}) rectangle ({(\c+1)*0.30},{(\r+1)*0.30});
+      \fi
+    }
+  }
+
+  % Peças brancas
+  \foreach \c in {0,...,7}{
+    \fill[white]  ({\c*0.30+0.04},       {0.04})         rectangle ({(\c+1)*0.30-0.04}, {0.30-0.04});
+    \draw[black, line width=0.5pt] ({\c*0.30+0.04},{0.04}) rectangle ({(\c+1)*0.30-0.04},{0.30-0.04});
+    \fill[white]  ({\c*0.30+0.04},       {0.30+0.04})    rectangle ({(\c+1)*0.30-0.04}, {0.60-0.04});
+    \draw[black, line width=0.5pt] ({\c*0.30+0.04},{0.30+0.04}) rectangle ({(\c+1)*0.30-0.04},{0.60-0.04});
+  }
+
+  % Peças pretas
+  \foreach \c in {0,...,7}{
+    \fill[black!90] ({\c*0.30+0.04},{6*0.30+0.04}) rectangle ({(\c+1)*0.30-0.04},{7*0.30-0.04});
+    \fill[black!90] ({\c*0.30+0.04},{7*0.30+0.04}) rectangle ({(\c+1)*0.30-0.04},{8*0.30-0.04});
+  }
+
+  % Borda
+  \draw[black, line width=1.2pt] (0,0) rectangle ({8*0.30},{8*0.30});
+  \draw[black, line width=0.4pt] (-0.06,-0.06) rectangle ({8*0.30+0.06},{8*0.30+0.06});
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 6. Recompensa
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily RECOMPENSA}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UM SINAL DE FEEDBACK NUMÉRICO RECEBIDO IMEDIATAMENTE APÓS TOMAR
+UMA AÇÃO, INDICANDO O QUÃO BOA OU RUIM FOI AQUELA AÇÃO NO
+ESTADO ATUAL.
+}
+\end{minipage}
+
+\vspace{1.0cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  %--- Gráfico de LUCRO (esquerda) ---
+  \begin{scope}[xshift=-3.2cm, yshift=-0.3cm, scale=0.85]
+    \foreach \x/\h in {0/0.35, 0.32/0.55, 0.64/0.80, 0.96/1.10}{
+      \draw[black, line width=1.0pt, fill=black!75]
+        (\x, 0) rectangle (\x+0.26, \h);
+    }
+    \draw[black, ->, line width=1.2pt]
+      (0.0, 0.15) .. controls (0.55, 0.55) .. (1.22, 1.15);
+    \node[black, font=\tiny\ttfamily] at (0.60, -0.25) {LUCRO};
+  \end{scope}
+
+  %--- Setas: LUCRO ↔ BOT ---
+  \draw[black, <-, line width=1.0pt] (-2.0,  0.22) -- (-0.55,  0.22);
+  \node[black, font=\tiny\ttfamily]  at (-1.28,  0.42) {AÇÃO 1};
+  \draw[black, ->, line width=1.0pt] (-2.0, -0.10) -- (-0.55, -0.10);
+  \node[black, font=\tiny\ttfamily]  at (-1.28, -0.30) {RECOMP.: +50};
+
+  %--- Trading Bot (centro) ---
+  \draw[black, line width=1.5pt, rounded corners=3pt]
+    (-0.42, -0.42) rectangle (0.42, 0.42);
+  \fill[black] (-0.20, 0.50) circle (0.07);
+  \fill[black] ( 0.20, 0.50) circle (0.07);
+  \fill[black] (-0.17,  0.10) circle (0.08);
+  \fill[black] ( 0.17,  0.10) circle (0.08);
+  \draw[black, line width=0.8pt] (-0.17, -0.14) -- (0.17, -0.14);
+  \node[black, font=\tiny\ttfamily] at (0, -0.72) {BOT DE TRADING};
+
+  %--- Setas: BOT ↔ PERDA ---
+  \draw[black, ->, line width=1.0pt] (0.55,  0.22) -- (2.0,  0.22);
+  \node[black, font=\tiny\ttfamily]  at (1.28,  0.42) {AÇÃO 2};
+  \draw[black, <-, line width=1.0pt] (0.55, -0.10) -- (2.0, -0.10);
+  \node[black, font=\tiny\ttfamily]  at (1.28, -0.30) {RECOMP.: -100};
+
+  %--- Gráfico de PERDA (direita) ---
+  \begin{scope}[xshift=2.05cm, yshift=-0.3cm, scale=0.85]
+    \foreach \x/\h in {0/1.10, 0.32/0.80, 0.64/0.55, 0.96/0.35}{
+      \draw[black, line width=1.0pt, fill=black!75]
+        (\x, 0) rectangle (\x+0.26, \h);
+    }
+    \draw[black, ->, line width=1.2pt]
+      (0.0, 1.0) .. controls (0.55, 0.55) .. (1.22, 0.10);
+    \node[black, font=\tiny\ttfamily] at (0.60, -0.25) {PERDA};
+  \end{scope}
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 7. Propriedade de Markov
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily PROPRIEDADE DE MARKOV}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA PROPRIEDADE QUE AFIRMA QUE O ESTADO FUTURO DE UM PROCESSO
+DEPENDE APENAS DO ESTADO ATUAL, E NÃO DA SEQUÊNCIA DE EVENTOS
+QUE LEVOU A ELE.
+}
+\end{minipage}
+
+\vspace{1.0cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Três círculos
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s1) at (-3.0, 0) {ESTADO\\1};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s2) at ( 0.0, 0) {ESTADO\\2};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s3) at ( 3.0, 0) {ESTADO\\3};
+
+  % Setas sólidas (ações)
+  \draw[black, ->, line width=1.2pt] (s1) -- node[below=2pt] {AÇÃO 1} (s2);
+  \draw[black, ->, line width=1.2pt] (s2) -- node[below=2pt] {AÇÃO 2} (s3);
+
+  % Arco tracejado de S1 para S3 (passado não afeta futuro diretamente)
+  \draw[black, ->, dotted, line width=1.2pt, bend left=42]
+    (s1.north) to (s3.north);
+
+  % Símbolo × no meio do arco
+  \node[black, font=\normalsize\bfseries] at (0, 1.62) {$\times$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 8. MDP
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily MDP}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily PROCESSO DE DECISÃO DE MARKOV}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UM FRAMEWORK MATEMÁTICO PARA TOMADA DE DECISÃO SEQUENCIAL SOB
+INCERTEZA, DEFINIDO POR ESTADOS, AÇÕES, PROBABILIDADES DE TRANSIÇÃO
+E RECOMPENSAS, COM O OBJETIVO DE ENCONTRAR UMA POLÍTICA QUE
+MAXIMIZE A RECOMPENSA ACUMULADA ESPERADA.
+}
+\end{minipage}
+
+\vspace{0.3cm}
+\centering
+\begin{tikzpicture}[>=Stealth,
+  caixa/.style={draw=black, line width=1.0pt, font=\tiny\ttfamily,
+                minimum width=1.45cm, minimum height=0.45cm, align=center}]
+
+  % Nós da grade 3x3
+  \node[caixa] (s1)  at (-2.4,  1.3) {ESTADO 1};
+  \node[caixa] (a1t) at ( 0.0,  1.3) {AÇÃO 1};
+  \node[caixa] (s2)  at ( 2.4,  1.3) {ESTADO 2};
+  \node[caixa] (a2)  at (-2.4,  0.0) {AÇÃO 2};
+  \node[caixa, minimum width=1.7cm, minimum height=0.60cm] (cr)
+               at ( 0.0,  0.0) {RECOMPENSA\\ACUMULADA};
+  \node[caixa] (a1r) at ( 2.4,  0.0) {AÇÃO 1};
+  \node[caixa] (s3)  at (-2.4, -1.3) {ESTADO 3};
+  \node[caixa] (a1b) at ( 0.0, -1.3) {AÇÃO 1};
+  \node[caixa] (s4)  at ( 2.4, -1.3) {ESTADO 4};
+
+  % Setas
+  \draw[black, dotted, ->, line width=1.0pt] (s1)  -- (a1t);
+  \draw[black, dotted, ->, line width=1.0pt] (a1t) -- (s2);
+  \draw[black, dotted, ->, line width=1.0pt] (s1)  -- (a2);
+  \draw[black, dotted, ->, line width=1.0pt] (a2)  -- (s3);
+  \draw[black, dotted, ->, line width=1.0pt] (s2)  -- (a1r);
+  \draw[black, dotted, ->, line width=1.0pt] (a1r) -- (s4);
+  \draw[black, dotted, ->, line width=1.0pt] (s4)  -- (a1b);
+  \draw[black, dotted, ->, line width=1.0pt] (a1b) -- (s3);
+
+  % Setas para o centro (recompensas)
+  \draw[black, dotted, ->, line width=1.0pt] (a1t) --
+    node[right, font=\tiny\ttfamily] {+3} (cr);
+  \draw[black, dotted, ->, line width=1.0pt] (a2)  --
+    node[above, font=\tiny\ttfamily] {-2} (cr);
+  \draw[black, dotted, ->, line width=1.0pt] (cr)  --
+    node[above, font=\tiny\ttfamily] {0}  (a1r);
+  \draw[black, dotted, ->, line width=1.0pt] (a1b) --
+    node[right, font=\tiny\ttfamily] {+1} (cr);
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 9. Ciclo do MDP
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily CICLO DO MDP}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+A INTERAÇÃO ENTRE AGENTE E AMBIENTE REPETE-SE ITERATIVAMENTE
+EM 5 PASSOS SEQUENCIAIS.
+}
+\end{minipage}
+
+\vspace{0.20cm}
+\centering
+\begin{tikzpicture}[>=Stealth,
+  passo/.style={draw=black, line width=1.0pt, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=7.5cm,
+                minimum height=0.50cm, align=center}]
+
+  \node[passo, fill=black!10] (p1) at (0,  0.00) {PASSO 1 — OBSERVAR O ESTADO ($S_t$)};
+  \node[passo, fill=black!06] (p2) at (0, -0.88) {PASSO 2 — SELECIONAR AÇÃO PELA POLÍTICA $\pi(a|s)$};
+  \node[passo, fill=black!10] (p3) at (0, -1.76) {PASSO 3 — EXECUTAR AÇÃO NO AMBIENTE};
+  \node[passo, fill=black!06] (p4) at (0, -2.64) {PASSO 4 — RECEBER RECOMPENSA ($R_{t+1}$)};
+  \node[passo, fill=black!10] (p5) at (0, -3.52) {PASSO 5 — TRANSITAR PARA NOVO ESTADO ($S_{t+1}$)};
+
+  \draw[black,->,line width=1.0pt] (p1.south) -- (p2.north);
+  \draw[black,->,line width=1.0pt] (p2.south) -- (p3.north);
+  \draw[black,->,line width=1.0pt] (p3.south) -- (p4.north);
+  \draw[black,->,line width=1.0pt] (p4.south) -- (p5.north);
+
+  % Seta de retorno (ciclo)
+  \draw[black,->,dotted,line width=1.0pt]
+    (p5.east) -- ++(0.85,0) -- ++(0,3.52) -- (p1.east);
+  \node[black, font=\tiny\ttfamily, anchor=south] at (4.175, 0.08)
+    {PRÓXIMO PASSO ($t{+}1$)};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 9b. Ciclo de Treinamento em RL (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily CICLO DE TREINAMENTO EM RL}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+DURANTE O TREINAMENTO, O CICLO DE INTERAÇÃO GANHA UMA ETAPA CRUCIAL:
+A ATUALIZAÇÃO. APÓS AGIR E OBSERVAR $(S, A, R, S')$, O AGENTE CALCULA
+O ERRO DE SUA PREVISÃO E ATUALIZA ITERATIVAMENTE SUA POLÍTICA OU
+FUNÇÃO DE VALOR, MELHORANDO SEU COMPORTAMENTO A CADA PASSO.
+}
+\end{minipage}
+
+\vspace{0.20cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Bloco INTERAÇÃO (topo)
+  \node[draw=black, line width=1.5pt, rounded corners=4pt,
+        minimum width=4.8cm, minimum height=1.05cm, fill=black!08,
+        font=\scriptsize\ttfamily, align=center] (int) at (0, 1.9)
+    {INTERAÇÃO\\[2pt]{\tiny\ttfamily AGENTE EXECUTA $A_t$; AMBIENTE DEVOLVE $R_{t+1}$, $S_{t+1}$}};
+
+  % Bloco AVALIAÇÃO (inferior direito)
+  \node[draw=black, line width=1.5pt, rounded corners=4pt,
+        minimum width=4.4cm, minimum height=1.05cm, fill=black!05,
+        font=\scriptsize\ttfamily, align=center] (aval) at (3.4, -0.9)
+    {AVALIAÇÃO\\[2pt]{\tiny\ttfamily CALCULA ERRO TD: $\delta = R + \gamma V(S') - V(S)$}};
+
+  % Bloco ATUALIZAÇÃO (inferior esquerdo)
+  \node[draw=black, line width=1.5pt, rounded corners=4pt,
+        minimum width=4.4cm, minimum height=1.05cm, fill=black!12,
+        font=\scriptsize\ttfamily, align=center] (atu) at (-3.4, -0.9)
+    {ATUALIZAÇÃO\\[2pt]{\tiny\ttfamily OTIMIZA POLÍTICA OU FUNÇÃO DE VALOR}};
+
+  % Seta: INTERAÇÃO -> AVALIAÇÃO (curva à direita)
+  \draw[black, ->, line width=1.5pt]
+    (int.south east) .. controls (4.0, 1.0) ..
+    node[right=3pt, font=\tiny\ttfamily, align=left] {$(S,A,R,S')$}
+    (aval.north);
+
+  % Seta: AVALIAÇÃO -> ATUALIZAÇÃO (horizontal)
+  \draw[black, ->, line width=1.5pt]
+    (aval.west) -- node[below=3pt, font=\tiny\ttfamily] {ERRO TD ($\delta$)} (atu.east);
+
+  % Seta: ATUALIZAÇÃO -> INTERAÇÃO (curva à esquerda)
+  \draw[black, ->, line width=1.5pt]
+    (atu.north) .. controls (-4.0, 1.0) ..
+    node[left=3pt, font=\tiny\ttfamily, align=right] {PARÂM.\\ATUALIZADOS}
+    (int.south west);
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 10. Trajetória
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily TRAJETÓRIA}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+A SEQUÊNCIA DE ESTADOS, AÇÕES E RECOMPENSAS QUE UM AGENTE VIVENCIA
+AO INTERAGIR COM O AMBIENTE, PODENDO SER FINITA (TERMINANDO EM UM
+ESTADO TERMINAL) OU INFINITA (EM TAREFAS CONTÍNUAS).
+}
+\end{minipage}
+
+\vspace{0.6cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Círculos dos estados (raio 0.55cm)
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s1) at (-3.2, 0) {ESTADO\\1};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s2) at (-0.5, 0) {ESTADO\\2};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s3) at ( 2.2, 0) {ESTADO\\3};
+
+  % Setas horizontais (ações)
+  \draw[black, ->, line width=1.2pt] (s1) -- node[below=2pt] {AÇÃO 1} (s2);
+  \draw[black, ->, line width=1.2pt] (s2) -- node[below=2pt] {AÇÃO 2} (s3);
+
+  % Recompensas
+  \draw[black, ->, line width=1.2pt] (-1.85, 0.20) -- (-1.85, 1.10);
+  \node[black] at (-1.85, 1.32) {RECOMPENSA 1};
+
+  \draw[black, ->, line width=1.2pt] ( 0.85, 0.20) -- ( 0.85, 1.10);
+  \node[black] at ( 0.85, 1.32) {RECOMPENSA 2};
+
+  % Continuação tracejada
+  \draw[black, ->, dotted, line width=1.2pt] (s3.east) -- ++(1.55, 0)
+    node[below=2pt, pos=0.55] {AÇÃO X};
+  \draw[black, ->, dotted, line width=1.2pt] (3.42, 0.20) -- (3.42, 1.10);
+  \node[black] at (3.42, 1.32) {RECOMPENSA X};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 11. Episódio
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily EPISÓDIO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA TRAJETÓRIA FINITA DE ESTADOS, AÇÕES E RECOMPENSAS QUE COMEÇA
+EM UM ESTADO INICIAL E TERMINA EM UM ESTADO TERMINAL.
+}
+\end{minipage}
+
+\vspace{0.8cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Círculos dos estados
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s1) at (-3.0, 0) {ESTADO\\1};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s2) at ( 0.0, 0) {ESTADO\\2};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s3) at ( 3.0, 0) {ESTADO\\3};
+
+  % Setas horizontais
+  \draw[black, ->, line width=1.2pt] (s1) -- node[below=2pt] {AÇÃO 1} (s2);
+  \draw[black, ->, line width=1.2pt] (s2) -- node[below=2pt] {AÇÃO 2} (s3);
+
+  % Recompensas
+  \draw[black, ->, line width=1.2pt] (-1.5, 0.20) -- (-1.5, 1.10);
+  \node[black] at (-1.5, 1.32) {RECOMPENSA 1};
+
+  \draw[black, ->, line width=1.2pt] ( 1.5, 0.20) -- ( 1.5, 1.10);
+  \node[black] at ( 1.5, 1.32) {RECOMPENSA 2};
+
+  % Linha START-END abaixo
+  \draw[black, line width=1.5pt] (-3.55, -0.85) -- (3.55, -0.85);
+  \draw[black, line width=1.5pt] (-3.55, -0.78) -- (-3.55, -0.92);
+  \draw[black, line width=1.5pt] ( 3.55, -0.78) -- ( 3.55, -0.92);
+  \node[black, font=\tiny\ttfamily] at (-3.55, -1.12) {INÍCIO};
+  \node[black, font=\tiny\ttfamily] at ( 3.55, -1.12) {FIM};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 12. Retorno
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily RETORNO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O RETORNO $G_t$ É A SOMA DE TODAS AS RECOMPENSAS FUTURAS QUE
+O AGENTE RECEBE A PARTIR DO INSTANTE $t$, ATÉ O FIM DO EPISÓDIO.
+}
+\end{minipage}
+
+\vspace{0.4cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Círculos dos estados
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s1) at (-3.0, 0) {ESTADO\\1};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s2) at ( 0.0, 0) {ESTADO\\2};
+  \node[black, draw=black, circle, minimum size=1.1cm, line width=1.2pt,
+        align=center] (s3) at ( 3.0, 0) {ESTADO\\3};
+
+  % Setas horizontais
+  \draw[black, ->, line width=1.2pt] (s1) -- node[below=2pt] {AÇÃO 1} (s2);
+  \draw[black, ->, line width=1.2pt] (s2) -- node[below=2pt] {AÇÃO 2} (s3);
+
+  % Recompensas
+  \draw[black, ->, line width=1.2pt] (-1.5, 0.20) -- (-1.5, 1.00);
+  \node[black] at (-1.5, 1.22) {RECOMPENSA 1};
+
+  \draw[black, ->, line width=1.2pt] ( 1.5, 0.20) -- ( 1.5, 1.00);
+  \node[black] at ( 1.5, 1.22) {RECOMPENSA 2};
+
+  % Fórmula de G_t
+  \node[black, font=\scriptsize] at (0, -1.32)
+    {$G_t = R_{t+1} + R_{t+2} + R_{t+3} + \cdots = \displaystyle\sum_{k=0}^{\infty} R_{t+k+1}$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 13. Fator de Desconto
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily FATOR DE DESCONTO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UM VALOR ($\gamma$) ENTRE 0 E 1 QUE DETERMINA O QUANTO AS RECOMPENSAS
+FUTURAS VALEM EM RELAÇÃO ÀS IMEDIATAS. $\gamma = 0$ SIGNIFICA QUE APENAS
+A RECOMPENSA IMEDIATA IMPORTA; $\gamma = 1$ SIGNIFICA QUE TODAS AS
+RECOMPENSAS FUTURAS TÊM O MESMO PESO.
+}
+\end{minipage}
+
+\vspace{0.35cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % 4 círculos
+  \node[black, draw=black, circle, minimum size=1.05cm, line width=1.2pt,
+        align=center] (s1) at (-4.2, 0) {ESTADO\\1};
+  \node[black, draw=black, circle, minimum size=1.05cm, line width=1.2pt,
+        align=center] (s2) at (-2.0, 0) {ESTADO\\2};
+  \node[black, draw=black, circle, minimum size=1.05cm, line width=1.2pt,
+        align=center] (s3) at ( 0.2, 0) {ESTADO\\3};
+  \node[black, draw=black, circle, minimum size=1.05cm, line width=1.2pt,
+        align=center] (s4) at ( 2.6, 0) {ESTADO\\APÓS K\\AÇÕES};
+
+  % Setas horizontais
+  \draw[black, ->, line width=1.2pt] (s1) -- node[below=2pt] {AÇÃO 1}  (s2);
+  \draw[black, ->, line width=1.2pt] (s2) -- node[below=2pt] {AÇÃO 2}  (s3);
+  \draw[black, ->, line width=1.2pt] (s3) -- node[below=2pt] {K AÇÕES} (s4);
+
+  % Recompensas
+  \draw[black, ->, line width=1.2pt] (-3.1, 0.20) -- (-3.1, 1.00);
+  \node[black] at (-3.1, 1.22) {RECOMPENSA 1};
+
+  \draw[black, ->, line width=1.2pt] (-0.9, 0.20) -- (-0.9, 1.00);
+  \node[black] at (-0.9, 1.22) {$\gamma$ * RECOMPENSA 2};
+
+  \draw[black, ->, line width=1.2pt] ( 1.4, 0.20) -- ( 1.4, 1.00);
+  \node[black] at ( 1.4, 1.22) {$\gamma^{k-1}$ * RECOMPENSA K};
+
+\end{tikzpicture}
+
+\vspace{0.25cm}
+\centering
+{\normalsize $G_t = \displaystyle\sum_{k=0}^{\infty} \gamma^k\, R_{t+k+1} = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots$}
+
+\end{frame}
+}
+
+% 14. Funções de Valor
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily FUNÇÕES DE VALOR}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+ESTIMAM O RETORNO ESPERADO A LONGO PRAZO — QUÃO BOM É ESTAR EM UM
+ESTADO OU TOMAR UMA AÇÃO SEGUINDO UMA POLÍTICA $\pi$.
+}
+\end{minipage}
+
+\vspace{0.4cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Caixa V^pi
+  \draw[black, line width=1.2pt, rounded corners=3pt]
+    (-4.8, -0.78) rectangle (-0.3, 1.15);
+  \node[black, font=\normalsize\bfseries] at (-2.55, 0.82) {$V^\pi(s)$};
+  \draw[black, dashed, line width=0.6pt] (-4.62, 0.58) -- (-0.48, 0.58);
+  \node[black, font=\tiny\ttfamily] at (-2.55,  0.34) {FUNÇÃO DE VALOR DE ESTADO};
+  \node[black, font=\tiny\ttfamily, align=center] at (-2.55, -0.10)
+    {RETORNO ESPERADO PARTINDO\\DO ESTADO $s$ SEGUINDO $\pi$};
+  \node[black, font=\scriptsize] at (-2.55, -0.55)
+    {$V^\pi(s) = \mathbb{E}_\pi[G_t \mid S_t{=}s]$};
+
+  % Caixa Q^pi
+  \draw[black, line width=1.2pt, rounded corners=3pt]
+    (0.3, -0.78) rectangle (4.8, 1.15);
+  \node[black, font=\normalsize\bfseries] at (2.55, 0.82) {$Q^\pi(s,a)$};
+  \draw[black, dashed, line width=0.6pt] (0.48, 0.58) -- (4.62, 0.58);
+  \node[black, font=\tiny\ttfamily] at (2.55,  0.34) {FUNÇÃO DE VALOR DE AÇÃO};
+  \node[black, font=\tiny\ttfamily, align=center] at (2.55, -0.10)
+    {RETORNO ESPERADO TOMANDO $a$\\NO ESTADO $s$ SEGUINDO $\pi$};
+  \node[black, font=\scriptsize] at (2.55, -0.55)
+    {$Q^\pi(s,a) = \mathbb{E}_\pi[G_t \mid S_t{=}s, A_t{=}a]$};
+
+  % Relação: Vantagem
+  \draw[black, line width=0.8pt] (-4.8, -0.78) -- (-4.8, -1.25);
+  \draw[black, line width=0.8pt] ( 4.8, -0.78) -- ( 4.8, -1.25);
+  \draw[black, line width=0.8pt] (-4.8, -1.25) -- ( 4.8, -1.25);
+  \draw[black, ->, line width=0.8pt] (0, -1.25) -- (0, -1.62);
+  \node[black, font=\scriptsize\ttfamily] at (0, -1.92)
+    {VANTAGEM:\ \ $A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s)$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 15. Equação de Bellman (MODIFICADO: adicionada equação de otimalidade Q*)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily EQUAÇÃO DE BELLMAN}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UMA RELAÇÃO RECURSIVA QUE EXPRESSA O VALOR DE UM ESTADO COMO A
+RECOMPENSA IMEDIATA MAIS O VALOR DESCONTADO DO PRÓXIMO ESTADO.
+}
+\end{minipage}
+
+\vspace{0.25cm}
+\centering
+
+{\normalsize\ttfamily\bfseries $V^\pi(s) = R(s) + \gamma \cdot V^\pi(s')$}
+
+\vspace{0.20cm}
+
+\begin{minipage}{0.80\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.8\baselineskip}
+$\bullet$\ \ $V^\pi(s)$ = VALOR DO ESTADO ATUAL \quad
+$\bullet$\ \ $R(s)$ = RECOMPENSA IMEDIATA\\
+$\bullet$\ \ $\gamma$\ \ \ = FATOR DE DESCONTO \qquad\quad
+$\bullet$\ \ $V^\pi(s')$ = VALOR DO PRÓXIMO ESTADO
+}
+\end{minipage}
+
+\vspace{0.30cm}
+
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily EQUAÇÃO DE OTIMALIDADE ($Q^*$):}
+\end{minipage}
+
+\vspace{0.15cm}
+\centering
+
+{\normalsize\ttfamily\bfseries $Q^*(s,a) = R(s,a) + \gamma \cdot \boxed{\max_{a'}} Q^*(s',a')$}
+
+\vspace{0.15cm}
+
+\begin{minipage}{0.80\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O OPERADOR $\boxed{\max_{a'}}$ ESCOLHE A AÇÃO FUTURA DE MAIOR VALOR,
+GARANTINDO A POLÍTICA ÓTIMA.
+}
+\end{minipage}
+
+\end{frame}
+}
+
+% 16. Dilema Exploração-Explotação
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily DILEMA EXPLORAÇÃO-EXPLOTAÇÃO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O AGENTE DEVE EQUILIBRAR EXPLORAR O AMBIENTE (DESCOBRIR NOVOS ESTADOS)
+E EXPLOTAR O CONHECIMENTO ATUAL (MAXIMIZAR RECOMPENSA IMEDIATA).
+}
+\end{minipage}
+
+\vspace{0.7cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Agente
+  \node[draw=black, line width=1.5pt, rounded corners=3pt,
+        font=\scriptsize\ttfamily, minimum width=1.9cm,
+        minimum height=0.58cm] (ag) at (0, 0) {AGENTE};
+
+  % Seta para EXPLORAR (esquerda)
+  \draw[black,->,line width=1.5pt] (ag.west) -- (-2.1, 0);
+  \node[draw=black, line width=1.2pt, rounded corners=3pt,
+        minimum width=2.2cm, minimum height=0.52cm]
+    (ex) at (-3.5, 0) {EXPLORAR};
+  \node[black, align=center] at (-3.5, -0.62) {AÇÃO ALEATÓRIA\\DESCOBRE NOVOS ESTADOS};
+  \node[black] at (-3.5, -1.15) {PROBABILIDADE: $\varepsilon$};
+
+  % Seta para EXPLOTAR (direita)
+  \draw[black,->,line width=1.5pt] (ag.east) -- (2.1, 0);
+  \node[draw=black, line width=1.2pt, rounded corners=3pt,
+        minimum width=2.2cm, minimum height=0.52cm]
+    (et) at (3.5, 0) {EXPLOTAR};
+  \node[black, align=center] at (3.5, -0.62) {MELHOR AÇÃO CONHECIDA\\MAXIMIZA RECOMPENSA};
+  \node[black] at (3.5, -1.15) {PROBABILIDADE: $1 - \varepsilon$};
+
+  % Caixa epsilon-greedy
+  \draw[black, line width=0.8pt, rounded corners=3pt]
+    (-4.8, -1.55) rectangle (4.8, -2.08);
+  \node[black] at (0, -1.82)
+    {ESTRATÉGIA $\varepsilon$-GREEDY: $\varepsilon$ ELEVADO NO INÍCIO, DECAI GRADUALMENTE DURANTE O TREINO};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 16b. Com Modelo vs. Sem Modelo (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ABORDAGENS: COM MODELO VS. SEM MODELO}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+EM ABORDAGENS COM MODELO (MODEL-BASED), O AGENTE USA OU APRENDE UM
+MODELO DO AMBIENTE PARA SIMULAR FUTUROS E PLANEJAR AÇÕES. MÉTODOS
+SEM MODELO (MODEL-FREE) APRENDEM DIRETAMENTE POR TENTATIVA E ERRO,
+SEM CONHECER AS REGRAS INTERNAS DO AMBIENTE.
+}
+\end{minipage}
+
+\vspace{0.15cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick,
+  bloco/.style={draw=black, line width=1.0pt, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=1.7cm,
+                minimum height=0.48cm, align=center}]
+
+  % ===== COM MODELO (MODEL-BASED) =====
+  \node[black, font=\scriptsize\ttfamily\bfseries, anchor=west]
+    at (-5.5, 0.88) {COM MODELO (MODEL-BASED)};
+
+  \node[bloco, fill=black!08] (mb_ag)  at (-4.3, 0.10) {AGENTE};
+  \node[bloco, fill=black!05, minimum width=2.1cm] (mb_sim) at (-1.8, 0.10)
+    {SIMULADOR\\INTERNO};
+  \node[bloco] (mb_ac) at (0.9, 0.10) {AÇÃO};
+  \node[bloco, fill=black!08] (mb_env) at (3.6, 0.10) {AMBIENTE};
+
+  \draw[black,->,line width=1.0pt] (mb_ag)  -- (mb_sim);
+  \draw[black,->,line width=1.0pt] (mb_sim) -- (mb_ac);
+  \draw[black,->,line width=1.0pt] (mb_ac)  -- (mb_env);
+  \draw[black,->,dotted,line width=1.0pt]
+    (mb_env.south) -- ++(0,-0.35) -|
+    node[below, pos=0.25, font=\tiny\ttfamily] {$R_{t+1},\,S_{t+1}$}
+    (mb_ag.south);
+
+  % Separador
+  \draw[black, line width=0.6pt] (-5.5, -0.62) -- (5.5, -0.62);
+
+  % ===== SEM MODELO (MODEL-FREE) =====
+  \node[black, font=\scriptsize\ttfamily\bfseries, anchor=west]
+    at (-5.5, -0.85) {SEM MODELO (MODEL-FREE)};
+
+  \node[bloco, fill=black!08] (mf_ag)  at (-3.5, -1.65) {AGENTE};
+  \node[bloco] (mf_ac)  at (0.5, -1.65) {AÇÃO};
+  \node[bloco, fill=black!08] (mf_env) at (3.6, -1.65) {AMBIENTE};
+
+  \draw[black,->,line width=1.0pt] (mf_ag) --
+    node[above, font=\tiny\ttfamily] {TENTATIVA E ERRO} (mf_ac);
+  \draw[black,->,line width=1.0pt] (mf_ac) -- (mf_env);
+  \draw[black,->,dotted,line width=1.0pt]
+    (mf_env.south) -- ++(0,-0.35) -|
+    node[below, pos=0.25, font=\tiny\ttfamily] {$R_{t+1},\,S_{t+1}$}
+    (mf_ag.south);
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 16c. On-Policy vs. Off-Policy (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily APRENDIZADO: ON-POLICY VS. OFF-POLICY}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+NO APRENDIZADO ON-POLICY (EX: SARSA), O AGENTE APRENDE E AGE COM A
+MESMA POLÍTICA. NO OFF-POLICY (EX: Q-LEARNING, DQN), O AGENTE OTIMIZA
+UMA POLÍTICA ALVO ENQUANTO EXPLORA COM UMA POLÍTICA DIFERENTE,
+PODENDO REUTILIZAR EXPERIÊNCIAS PASSADAS DE UM REPLAY BUFFER.
+}
+\end{minipage}
+
+\vspace{0.10cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick,
+  bloco/.style={draw=black, line width=1.0pt, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=2.2cm,
+                minimum height=0.52cm, align=center}]
+
+  % Divisor central
+  \draw[black, line width=0.6pt] (0, 2.05) -- (0, -2.50);
+
+  % ===== ON-POLICY (esquerda) =====
+  \node[black, font=\scriptsize\ttfamily\bfseries] at (-2.7, 1.95) {ON-POLICY};
+  \node[black, font=\tiny\ttfamily] at (-2.7, 1.63) {EX: SARSA};
+
+  \node[bloco, fill=black!08] (on_ag)  at (-2.7, 0.80) {AGENTE $\pi$};
+  \node[bloco, fill=black!05] (on_env) at (-2.7, -0.35) {AMBIENTE};
+
+  \draw[black,->,line width=1.2pt] (on_ag) --
+    node[right=2pt, font=\tiny\ttfamily] {AÇÃO} (on_env);
+  \draw[black,->,dotted,line width=1.0pt]
+    (on_env.east) -- ++(0.5,0) |-
+    node[right=2pt, pos=0.5, font=\tiny\ttfamily] {$R,\,S'$} (on_ag.east);
+
+  % Loop de atualização própria
+  \draw[black,->,line width=1.2pt]
+    (on_ag.west) -- ++(-0.65,0) -- ++(0,0.62) -- ++(0.65,0) -- (on_ag.north);
+  \node[black, font=\tiny\ttfamily] at (-3.70, 1.12) {ATUALIZA};
+
+  \node[black, font=\scriptsize, align=center] at (-2.7, -1.10)
+    {$\pi_{\rm alvo} = \pi_{\rm comp.}$};
+  \node[black, font=\tiny\ttfamily, align=center] at (-2.7, -1.58)
+    {APRENDE COM A PRÓPRIA\\EXPERIÊNCIA};
+
+  % ===== OFF-POLICY (direita) =====
+  \node[black, font=\scriptsize\ttfamily\bfseries] at (2.8, 1.95) {OFF-POLICY};
+  \node[black, font=\tiny\ttfamily] at (2.8, 1.63) {EX: Q-LEARNING, DQN};
+
+  \node[bloco, fill=black!05] (off_mu)  at (2.8,  0.75) {POLÍTICA COMP. $\mu$};
+  \node[bloco, fill=black!08] (off_buf) at (2.8, -0.28) {REPLAY BUFFER};
+  \node[bloco, fill=black!12] (off_pi)  at (2.8, -1.30) {POLÍTICA ALVO $\pi^*$};
+
+  \draw[black,->,line width=1.0pt] (off_mu) --
+    node[right=2pt, font=\tiny\ttfamily] {$(s,a,r,s')$} (off_buf);
+  \draw[black,->,line width=1.0pt] (off_buf) --
+    node[right=2pt, font=\tiny\ttfamily] {amostras} (off_pi);
+
+  \node[black, font=\scriptsize, align=center] at (2.8, -2.00)
+    {$\pi_{\rm alvo} \neq \pi_{\rm comp.}$};
+  \node[black, font=\tiny\ttfamily, align=center] at (2.8, -2.42)
+    {APRENDE COM EXPERIÊNCIAS PASSADAS};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 16d. Arquitetura Geral e Modular do RL (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ARQUITETURA GERAL E MODULAR DO RL}
+
+\vspace{0.30cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O RL PODE SER VISTO COMO QUATRO BLOCOS MODULARES: DADOS/AMBIENTE,
+MODELO, PLANEJAMENTO E VALOR/POLÍTICA. O ALGORITMO ESCOLHIDO APENAS
+\textbf{LIGA OU DESLIGA} CONEXÕES ENTRE ELES: MÉTODOS MODEL-FREE CONECTAM
+DADOS DIRETAMENTE À POLÍTICA; MÉTODOS MODEL-BASED PASSAM PELO MODELO
+E PELO PLANEJAMENTO PARA ATUALIZAR A POLÍTICA COM MAIS EFICIÊNCIA.
+}
+\end{minipage}
+
+\vspace{0.10cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick,
+  bloco/.style={draw=black, line width=1.5pt, rounded corners=4pt,
+                font=\scriptsize\ttfamily, minimum width=2.6cm,
+                minimum height=0.75cm, align=center},
+  mf/.style ={black, line width=2.2pt},
+  mb/.style ={black!55, dashed, line width=1.8pt},
+  ac/.style ={black, line width=1.0pt}
+]
+
+  % ---- Quatro blocos em losango ----
+  \node[bloco, fill=black!10] (dados) at ( 0.0, -1.55) {DADOS\\AMBIENTE};
+  \node[bloco, fill=black!14] (valor) at ( 3.5,  0.15) {VALOR\\POLÍTICA};
+  \node[bloco, fill=black!05] (plan)  at (-3.5,  0.15) {PLANEJAMENTO};
+  \node[bloco, fill=black!07] (mod)   at ( 0.0,  1.75) {MODELO};
+
+  % ---- AÇÃO: VALOR → DADOS (thin) ----
+  \draw[ac,->] (valor.south)
+    to[bend left=12]
+    node[right=3pt, font=\tiny\ttfamily, align=left, pos=0.45]
+      {AÇÃO\\(ATUAR)}
+    (dados.east);
+
+  % ---- ROTA MODEL-FREE: DADOS → VALOR (grossa, sólida) ----
+  \draw[mf,->] (dados.north east)
+    to[bend left=12]
+    node[left=3pt, font=\tiny\ttfamily, align=right, pos=0.45]
+      {ATUALIZ.\\MODEL-FREE}
+    (valor.south west);
+
+  % ---- ROTA MODEL-BASED (tracejada, cinza) ----
+  % DADOS → MODELO
+  \draw[mb,->] (dados.north west)
+    to[bend right=12]
+    node[left=3pt, font=\tiny\ttfamily, align=right, pos=0.50]
+      {APRENDER\\MODELO}
+    (mod.south west);
+
+  % MODELO → PLANEJAMENTO
+  \draw[mb,->] (mod.west)
+    to[bend left=12]
+    node[above=2pt, font=\tiny\ttfamily, pos=0.50]
+      {SIMULAR}
+    (plan.north);
+
+  % PLANEJAMENTO → VALOR
+  \draw[mb,->] (plan.east)
+    to[bend right=12]
+    node[below=2pt, font=\tiny\ttfamily, align=center, pos=0.50]
+      {ATUALIZ. MODEL-BASED}
+    (valor.west);
+
+  % ---- Legenda ----
+  \draw[mf] (-1.5, -2.45) -- ++(0.9, 0);
+  \node[black, font=\tiny\ttfamily, anchor=west] at (-0.50, -2.45)
+    {ROTA MODEL-FREE (conexão direta)};
+  \draw[mb] (-1.5, -2.80) -- ++(0.9, 0);
+  \node[black, font=\tiny\ttfamily, anchor=west] at (-0.50, -2.80)
+    {ROTA MODEL-BASED (via modelo e planejamento)};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 17. Algoritmos de RL
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.3cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ALGORITMOS DE RL}
+
+\vspace{0.2cm}
+\centering
+\scalebox{0.82}{
+\begin{tikzpicture}[
+  raiz/.style ={draw=black, fill=black!15, rounded corners=3pt,
+                font=\scriptsize\ttfamily, minimum width=2.2cm,
+                minimum height=0.48cm, align=center},
+  ramo1/.style={draw=black, fill=black!10, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=2.0cm,
+                minimum height=0.42cm, align=center},
+  ramo2/.style={draw=black, fill=black!08, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=1.9cm,
+                minimum height=0.40cm, align=center},
+  folha/.style={draw=black, fill=white, rounded corners=2pt,
+                font=\tiny\ttfamily, minimum width=1.75cm,
+                minimum height=0.36cm, align=center},
+  linha/.style={black, line width=0.8pt}
+]
+
+%--- Raiz ---
+\node[raiz] (root) at (0, 0) {Algoritmos de RL};
+
+%--- Nível 1 ---
+\node[ramo1] (mf) at (-3.8, -1.0) {RL Sem Modelo};
+\node[ramo1] (mb) at ( 3.8, -1.0) {RL Com Modelo};
+\draw[linha] (root.south) -- ++(0,-0.28) -| (mf.north);
+\draw[linha] (root.south) -- ++(0,-0.28) -| (mb.north);
+
+%--- Nível 2 (RL Sem Modelo: 3 ramos) ---
+\node[ramo2] (bp) at (-6.2, -2.1) {Baseado em\\Política};
+\node[ramo2] (ac) at (-3.8, -2.1) {Ator-Crítico};
+\node[ramo2] (bv) at (-1.4, -2.1) {Baseado em\\Valor};
+\node[ramo2] (lm) at ( 1.8, -2.1) {Aprender\\Modelo};
+\node[ramo2] (gm) at ( 5.8, -2.1) {Modelo\\Dado};
+
+\draw[linha] (mf.south) -- ++(0,-0.22) -| (bp.north);
+\draw[linha] (mf.south) --              (ac.north);
+\draw[linha] (mf.south) -- ++(0,-0.22) -| (bv.north);
+\draw[linha] (mb.south) -- ++(0,-0.22) -| (lm.north);
+\draw[linha] (mb.south) -- ++(0,-0.22) -| (gm.north);
+
+%--- Espinhas dorsais para as folhas ---
+\draw[linha] (bp.south) -- (-6.2, -3.55+0.18);
+\draw[linha] (ac.south) -- (-3.8, -5.35+0.18);
+\draw[linha] (bv.south) -- (-1.4, -4.45+0.18);
+\draw[linha] (lm.south) -- ( 1.8, -4.45+0.18);
+\draw[linha] (gm.south) -- ( 5.8, -3.10+0.18);
+
+%--- Folhas: Baseado em Política ---
+\foreach \y/\txt in {-3.10/REINFORCE, -3.55/Policy Gradient}{
+  \node[folha] at (-6.2, \y) {\txt};
+}
+
+%--- Folhas: Ator-Crítico ---
+\foreach \y/\txt in {-3.10/A2C / A3C, -3.55/PPO,
+                     -4.00/TRPO, -4.45/DDPG, -4.90/TD3, -5.35/SAC}{
+  \node[folha] at (-3.8, \y) {\txt};
+}
+
+%--- Folhas: Baseado em Valor ---
+\foreach \y/\txt in {-3.10/Q-Learning, -3.55/DQN,
+                     -4.00/Double DQN, -4.45/Dueling DQN}{
+  \node[folha] at (-1.4, \y) {\txt};
+}
+
+%--- Folhas: Aprender Modelo ---
+\foreach \y/\txt in {-3.10/World Models, -3.55/I2A,
+                     -4.00/MBMF, -4.45/MBVE}{
+  \node[folha] at (1.8, \y) {\txt};
+}
+
+%--- Folha: Modelo Dado ---
+\node[folha] at (5.8, -3.10) {AlphaZero};
+
+\end{tikzpicture}
+}
+\end{frame}
+}
+
+% 18. Q-Learning (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily Q-LEARNING}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+UM ALGORITMO CLÁSSICO SEM MODELO QUE APRENDE A FUNÇÃO DE VALOR
+ÓTIMA $Q^*(s,a)$ DIRETAMENTE DA EXPERIÊNCIA, ATUALIZANDO UMA
+TABELA USANDO A EQUAÇÃO DE BELLMAN DE OTIMALIDADE.
+}
+\end{minipage}
+
+\vspace{0.25cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Q-TABLE
+  \node[black, font=\scriptsize\ttfamily\bfseries] at (1.15, 1.90) {Q-TABELA};
+
+  % Cabeçalhos de coluna (ações)
+  \node[black, font=\tiny\ttfamily] at (0.5,  1.52) {$a_1$};
+  \node[black, font=\tiny\ttfamily] at (1.55, 1.52) {$a_2$};
+  \node[black, font=\tiny\ttfamily] at (2.60, 1.52) {$a_3$};
+
+  % Linha s1
+  \node[black, font=\tiny\ttfamily, anchor=east] at (-0.05, 0.95) {$s_1$};
+  \draw[black, line width=0.8pt] (0.0,  0.68) rectangle (1.05, 1.22);
+  \node[black, font=\tiny\ttfamily] at (0.5,  0.95) {0.2};
+  \draw[black, line width=0.8pt] (1.10, 0.68) rectangle (2.05, 1.22);
+  \node[black, font=\tiny\ttfamily] at (1.55, 0.95) {0.5};
+  \draw[black, line width=0.8pt] (2.10, 0.68) rectangle (3.15, 1.22);
+  \node[black, font=\tiny\ttfamily] at (2.60, 0.95) {0.1};
+
+  % Linha s2 (estado atual — destaque no max = a1 com 0.8)
+  \node[black, font=\tiny\ttfamily, anchor=east] at (-0.05, 0.25) {$s_2$ $\leftarrow$};
+  \draw[black, line width=2.0pt] (0.0,  -0.02) rectangle (1.05, 0.52);
+  \node[black, font=\tiny\bfseries] at (0.5,  0.25) {0.8};
+  \draw[black, line width=0.8pt] (1.10, -0.02) rectangle (2.05, 0.52);
+  \node[black, font=\tiny\ttfamily] at (1.55, 0.25) {0.3};
+  \draw[black, line width=0.8pt] (2.10, -0.02) rectangle (3.15, 0.52);
+  \node[black, font=\tiny\ttfamily] at (2.60, 0.25) {0.6};
+
+  % Linha s3
+  \node[black, font=\tiny\ttfamily, anchor=east] at (-0.05, -0.45) {$s_3$};
+  \draw[black, line width=0.8pt] (0.0,  -0.72) rectangle (1.05, -0.18);
+  \node[black, font=\tiny\ttfamily] at (0.5,  -0.45) {0.1};
+  \draw[black, line width=0.8pt] (1.10, -0.72) rectangle (2.05, -0.18);
+  \node[black, font=\tiny\ttfamily] at (1.55, -0.45) {0.7};
+  \draw[black, line width=0.8pt] (2.10, -0.72) rectangle (3.15, -0.18);
+  \node[black, font=\tiny\ttfamily] at (2.60, -0.45) {0.4};
+
+  % Borda externa da tabela
+  \draw[black, line width=1.2pt] (0.0, -0.72) rectangle (3.15, 1.22);
+
+  % Seta max
+  \draw[black, ->, line width=0.8pt] (0.5, -0.02) -- (0.5, -0.92);
+  \node[black, font=\tiny\ttfamily] at (0.5, -1.10) {$\max_{a'}$};
+
+  % Lado direito: regra de atualização
+  \draw[black, line width=1.0pt, rounded corners=3pt]
+    (3.55, -1.10) rectangle (9.80, 1.22);
+  \node[black, font=\tiny\ttfamily\bfseries] at (6.68, 0.98) {REGRA DE ATUALIZAÇÃO};
+  \draw[black, dashed, line width=0.5pt] (3.75, 0.78) -- (9.60, 0.78);
+
+  \node[black, font=\scriptsize] at (6.68, 0.42)
+    {$Q(s,a) \leftarrow Q(s,a)$};
+  \node[black, font=\scriptsize] at (6.68, -0.08)
+    {$+ \,\alpha\!\left[\,R + \gamma \max_{a'} Q(s',a') - Q(s,a)\,\right]$};
+
+  \draw[black, line width=0.6pt, rounded corners=3pt]
+    (3.75, -0.42) rectangle (9.60, -1.00);
+  \node[black, font=\tiny\ttfamily, align=left, anchor=west] at (3.90, -0.62)
+    {$\alpha$: taxa de aprendizado \quad $\gamma$: fator de desconto};
+  \node[black, font=\tiny\ttfamily, align=left, anchor=west] at (3.90, -0.85)
+    {$\max_{a'}$: melhor ação futura no estado $s'$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 18b. REPLAY BUFFER
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily REPLAY BUFFER}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily REPETIÇÃO DE EXPERIÊNCIA}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+\textbf{PROBLEMA:} TREINAR DIRETO NA SEQUÊNCIA $s_t, s_{t+1}, s_{t+2}, \ldots$
+FAZ A REDE VICIAR NO PADRÃO RECENTE E ESQUECER EXPERIÊNCIAS ANTERIORES,
+POIS AMOSTRAS CONSECUTIVAS SÃO ALTAMENTE CORRELACIONADAS.\\[4pt]
+\textbf{SOLUÇÃO:} GUARDAR AS ÚLTIMAS $N$ TUPLAS $(S,A,R,S')$ NUM BUFFER
+E SORTEAR UM MINI-BATCH ALEATÓRIO A CADA ATUALIZAÇÃO.
+AMOSTRAS DISTANTES NO TEMPO SÃO MISTURADAS $\Rightarrow$
+GRADIENTES ESTÁVEIS E CADA EXPERIÊNCIA É REUTILIZADA VÁRIAS VEZES.
+}
+\end{minipage}
+
+\vspace{0.3cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % --- nós esquerdos: ciclo AGENTE <-> AMBIENTE ---
+  \node[draw=black, line width=1.2pt, fill=black!08,
+        minimum width=1.6cm, minimum height=0.7cm,
+        font=\tiny\ttfamily, align=center] (ag) at (-5.6, 0.4) {AGENTE};
+  \node[draw=black, line width=1.2pt, fill=black!08,
+        minimum width=1.6cm, minimum height=0.7cm,
+        font=\tiny\ttfamily, align=center] (env) at (-5.6, -0.9) {AMBIENTE};
+
+  % AGENTE -> AMBIENTE (ação)
+  \draw[black, ->, line width=1.2pt]
+    (ag.south) -- (env.north)
+    node[midway, right, font=\tiny\ttfamily] {AÇÃO};
+
+  % AMBIENTE -> AGENTE (recompensa/estado) — seta para cima, à esquerda
+  \draw[black, ->, line width=1.2pt]
+    (env.north west) -- (ag.south west)
+    node[midway, left, font=\tiny\ttfamily, align=right] {ESTADO\\RECOMP.};
+
+  % seta da tupla: AMBIENTE -> REPLAY BUFFER
+  \draw[black, ->, line width=1.2pt]
+    (env.east) -- (-2.55, -0.9)
+    node[midway, below, font=\tiny\ttfamily] {NOVA TUPLA $(S,A,R,S')$};
+
+  % --- cilindro: REPLAY BUFFER ---
+  % corpo
+  \draw[black, line width=1.2pt] (-2.55,  0.38) -- (-2.55, -0.90);
+  \draw[black, line width=1.2pt] (-0.95,  0.38) -- (-0.95, -0.90);
+  % topo (elipse completa)
+  \draw[black, line width=1.2pt] (-1.75, 0.38) ellipse (0.80 and 0.22);
+  % base (arco inferior)
+  \draw[black, line width=1.2pt] (-2.55, -0.90) arc (180:360:0.80 and 0.22);
+  % rótulo
+  \node[font=\tiny\ttfamily, align=center] at (-1.75, -0.26)
+    {REPLAY\\BUFFER\\(FIFO)};
+
+  % --- seta: REPLAY BUFFER -> MINI-BATCH ---
+  \draw[black, ->, line width=1.2pt]
+    (-0.95, -0.26) -- (0.55, -0.26)
+    node[midway, above, font=\tiny\ttfamily, align=center] {AMOSTR.\\ALEAT.};
+
+  % --- nó: MINI-BATCH ---
+  \node[draw=black, line width=1.2pt, fill=black!05,
+        minimum width=1.7cm, minimum height=0.65cm,
+        font=\tiny\ttfamily, align=center] (mb) at (1.55, -0.26) {MINI-BATCH};
+
+  % --- seta: MINI-BATCH -> REDE NEURAL ---
+  \draw[black, ->, line width=1.2pt]
+    (mb.south) -- ++(0, -0.65)
+    node[below, font=\tiny\ttfamily, align=center] {REDE NEURAL\\(TREINAMENTO)};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 19. DQN (MODIFICADO: texto vinculado ao Q-Learning)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily DQN}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily DEEP Q-NETWORK}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+ESTENDE O Q-LEARNING SUBSTITUINDO A Q-TABELA POR UMA REDE NEURAL
+$Q(s,a;\theta)$, PERMITINDO LIDAR COM ESPAÇOS DE ESTADOS CONTÍNUOS
+E DE ALTA DIMENSÃO (EX.: PIXELS DE JOGOS ATARI).
+}
+\end{minipage}
+
+\vspace{0.30cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % Entrada: ESTADO
+  \node[draw=black, line width=1.2pt, rounded corners=3pt,
+        minimum width=1.4cm, minimum height=0.58cm, align=center,
+        font=\scriptsize\ttfamily] (s) at (-4.0, 0) {ESTADO\\$s$};
+
+  % Rede Neural
+  \node[draw=black, line width=1.5pt, rounded corners=3pt,
+        minimum width=2.6cm, minimum height=1.0cm, align=center,
+        font=\scriptsize\ttfamily] (nn) at (-1.0, 0) {REDE NEURAL\\$Q(s,a;\theta)$};
+  \draw[black,->,line width=1.2pt] (s) -- (nn);
+
+  % Q-values por ação
+  \node[draw=black, line width=1.0pt, rounded corners=2pt,
+        minimum width=2.1cm, minimum height=0.38cm] (q1) at (2.2,  0.58) {$Q(s,\ \text{AÇÃO}_1)$};
+  \node[draw=black, line width=1.0pt, rounded corners=2pt,
+        minimum width=2.1cm, minimum height=0.38cm] (q2) at (2.2,  0.10) {$Q(s,\ \text{AÇÃO}_2)$};
+  \node[draw=black, line width=1.0pt, rounded corners=2pt,
+        minimum width=2.1cm, minimum height=0.38cm] (q3) at (2.2, -0.38) {$Q(s,\ \text{AÇÃO}_3)$};
+  \draw[black,->,line width=1.0pt] (nn.east) |- (q1.west);
+  \draw[black,->,line width=1.0pt] (nn.east) -- (q2.west);
+  \draw[black,->,line width=1.0pt] (nn.east) |- (q3.west);
+
+  % Decisão
+  \draw[black,->,line width=1.2pt] (q1.east) -- ++(0.5,0)
+    node[right, font=\tiny\ttfamily] {$\arg\max_a\, Q(s,a)$};
+
+  % Inovações
+  \draw[black, line width=0.8pt, rounded corners=3pt]
+    (-4.5, -1.08) rectangle (4.5, -3.00);
+  \node[black, font=\tiny\ttfamily\bfseries] at (0, -1.28) {INOVAÇÕES DO DQN SOBRE O Q-LEARNING CLÁSSICO};
+  \draw[black, dashed, line width=0.5pt] (-4.3, -1.45) -- (4.3, -1.45);
+  \node[black, font=\tiny\ttfamily, anchor=north west, text width=8.4cm] at (-4.2, -1.52)
+    {$\bullet$\ \ REPLAY BUFFER: armazena $(s,a,r,s')$ e amostra aleatoriamente para quebrar correlações temporais.};
+  \node[black, font=\tiny\ttfamily, anchor=north west, text width=8.4cm] at (-4.2, -2.05)
+    {$\bullet$\ \ REDE ALVO ($\theta^-$): segunda cópia da rede, congelada por $K$ passos.
+     O alvo $y = R + \gamma\max_{a'}Q(s',a';\theta^-)$ usa $\theta^-$ em vez de $\theta$,
+     evitando que o alvo mude a cada passo e cause instabilidade no treinamento.};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 20. Gradiente de Política (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily GRADIENTE DE POLÍTICA}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily REINFORCE}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+OTIMIZA DIRETAMENTE A POLÍTICA $\pi_\theta(a|s)$ AJUSTANDO $\theta$ (PESOS
+E VIESES DA REDE NEURAL) NA DIREÇÃO DO GRADIENTE DO RETORNO ESPERADO.
+NÃO PRECISA ESTIMAR $Q(s,a)$ (APROXIMADOR DE VALOR = REDE QUE APRENDE
+O QUANTO VALE CADA AÇÃO).
+}
+\end{minipage}
+
+\vspace{0.25cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Input nodes
+  \foreach \y in {0.6, 0.0, -0.6}{
+    \fill[black] (-3.5, \y) circle (0.12);
+  }
+  \node[black, font=\tiny\ttfamily] at (-3.5, -1.00) {ESTADO $s$};
+
+  % Hidden nodes
+  \foreach \y in {0.9, 0.3, -0.3, -0.9}{
+    \fill[black] (-1.5, \y) circle (0.12);
+  }
+
+  % Output nodes
+  \foreach \y in {0.6, 0.0, -0.6}{
+    \fill[black] (0.5, \y) circle (0.12);
+  }
+  \node[black, font=\tiny\ttfamily] at (0.5, -1.00) {SOFTMAX};
+
+  % Connections: input -> hidden
+  \foreach \yi in {0.6, 0.0, -0.6}{
+    \foreach \yh in {0.9, 0.3, -0.3, -0.9}{
+      \draw[black, line width=0.3pt] (-3.38, \yi) -- (-1.62, \yh);
+    }
+  }
+
+  % Connections: hidden -> output
+  \foreach \yh in {0.9, 0.3, -0.3, -0.9}{
+    \foreach \yo in {0.6, 0.0, -0.6}{
+      \draw[black, line width=0.3pt] (-1.38, \yh) -- (0.38, \yo);
+    }
+  }
+
+  % Rótulos de saída com probabilidades
+  \node[black, font=\tiny\ttfamily, anchor=west] at (0.68,  0.60) {$\pi_\theta(a_1|s) = 0.60$};
+  \node[black, font=\tiny\ttfamily, anchor=west] at (0.68,  0.00) {$\pi_\theta(a_2|s) = 0.30$};
+  \node[black, font=\tiny\ttfamily, anchor=west] at (0.68, -0.60) {$\pi_\theta(a_3|s) = 0.10$};
+
+  % Título da rede
+  \node[black, font=\tiny\ttfamily, align=center] at (-1.5, -1.30)
+    {REDE NEURAL $\pi_\theta$};
+
+  % Caixa de atualização
+  \draw[black, line width=0.8pt, rounded corners=3pt]
+    (-3.8, -1.72) rectangle (3.8, -4.50);
+  \node[black, font=\tiny\ttfamily\bfseries] at (0, -1.92) {ATUALIZAÇÃO (REINFORCE)};
+  \draw[black, dashed, line width=0.5pt] (-3.6, -2.10) -- (3.6, -2.10);
+  \node[black, font=\scriptsize] at (0, -2.32)
+    {$\theta \leftarrow \theta + \alpha \cdot G_t \cdot \nabla_\theta \log \pi_\theta(a_t|s_t)$};
+  \node[black, font=\tiny\ttfamily, anchor=north west, text width=7.4cm] at (-3.7, -2.62) {%
+    $\bullet$ \textbf{Por que $\log$?} Não dá para derivar $\pi_\theta$ diretamente pela
+    amostra. Usa-se $\nabla_\theta\pi = \pi\cdot\nabla_\theta\log\pi$ para reescrever o
+    gradiente como uma esperança — estimável por Monte Carlo.\\[3pt]
+    $\bullet$ \textbf{$G_t$}: soma de recompensas futuras descontadas. Se $G_t > 0$,
+    $\theta$ é ajustado para aumentar $\pi_\theta(a_t|s_t)$; se $G_t < 0$, para diminuir.%
+  };
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 21. Ator-Crítico
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ATOR-CRÍTICO}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O ATOR APRENDE A POLÍTICA $\pi_\theta(a|s)$ ENQUANTO O CRÍTICO ESTIMA A FUNÇÃO DE 
+VALOR $V_\phi(s)$. O CRÍTICO USA O ERRO TD $\delta = R_{t+1} + \gamma V_\phi(S_{t+1}) - V_\phi(S_t)$ 
+PARA AVALIAR SE A AÇÃO FOI MELHOR OU PIOR DO QUE O ESPERADO, ENVIANDO ESSE SINAL 
+PARA GUIAR A ATUALIZAÇÃO DO ATOR E REDUZIR A VARIÂNCIA DO APRENDIZADO.
+}
+\end{minipage}
+
+\vspace{0.55cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily]
+
+  % ATOR (topo esquerdo)
+  \node[draw=black, line width=1.5pt, rounded corners=3pt,
+        minimum width=2.8cm, minimum height=0.72cm, align=center,
+        font=\scriptsize\ttfamily] (ator) at (-3.0, 0.90) {ATOR\\$\pi_\theta(a|s)$};
+
+  % AMBIENTE (topo direito)
+  \node[draw=black, line width=1.5pt, rounded corners=3pt,
+        minimum width=2.5cm, minimum height=0.72cm, align=center,
+        font=\scriptsize\ttfamily] (env) at (3.0, 0.90) {AMBIENTE};
+
+  % CRÍTICO (base esquerda)
+  \node[draw=black, line width=1.5pt, rounded corners=3pt,
+        minimum width=2.8cm, minimum height=0.72cm, align=center,
+        font=\scriptsize\ttfamily] (crit) at (-3.0, -1.20) {CRÍTICO\\$V_\phi(s)$};
+
+  % 1. ATOR → AMBIENTE (ação)
+  \draw[black,->,line width=1.2pt] (ator.east) --
+    node[above, font=\tiny\ttfamily] {AÇÃO ($A_t$)} (env.west);
+
+  % 2. AMBIENTE → CRÍTICO (estado + recompensa)
+  \draw[black,->,line width=1.2pt] (env.south) |- (crit.east);
+  \node[black, font=\tiny\ttfamily, align=center] at (0.8, -0.92)
+    {ESTADO, RECOMP.\\($S_{t+1},\,R_{t+1}$)};
+
+  % 3. CRÍTICO → ATOR (sinal delta, tracejado)
+  \draw[black,->,dashed,line width=1.2pt]
+    (crit.north) -- node[left, align=center] {ERRO TD\\($\delta$)} (ator.south);
+
+  % 4. AMBIENTE → ATOR (estado, arco superior)
+  \draw[black,->,line width=1.0pt]
+    (env.north) -- ++(0,0.42) -|
+    node[pos=0.22, above, font=\tiny\ttfamily] {ESTADO}
+    (ator.north);
+
+\end{tikzpicture}
+
+\vspace{0.25cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\tiny\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+$\bullet$ \textbf{CRÍTICO:} ESTIMA O RETORNO ESPERADO $V_\phi(S_t)$ PARA CALCULAR O ERRO TD ($\delta$).\\
+SE $\delta{>}0$: AÇÃO LEVOU A UM ESTADO MELHOR QUE O ESPERADO $\rightarrow$ ATOR REFORÇA A AÇÃO.\\
+SE $\delta{<}0$: AÇÃO LEVOU A UM ESTADO PIOR QUE O ESPERADO $\rightarrow$ ATOR INIBE A AÇÃO.\\
+O CRÍTICO SIMULTANEAMENTE ATUALIZA SEUS PESOS $\phi$ MINIMIZANDO A MAGNITUDE DESTE ERRO ($\delta^2$).
+}
+\end{minipage}
+
+\end{frame}
+}
+
+% 22. PPO
+% {
+% \setbeamercolor{background canvas}{bg=white}
+% \begin{frame}[plain, t]
+% \color{black}
+
+% \vspace{0.35cm}
+% \hspace{0.3cm}{\Large\bfseries\ttfamily PPO}\\[2pt]
+% \hspace{0.3cm}{\scriptsize\ttfamily PROXIMAL POLICY OPTIMIZATION}
+
+% \vspace{0.35cm}
+% \hspace{0.3cm}
+% \begin{minipage}{0.92\textwidth}
+% {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+% UM ALGORITMO DE APRENDIZADO POR REFORÇO USADO NO PÓS-TREINO DE
+% LLMs QUE USA UM MECANISMO DE CLIPPING PARA EVITAR QUE O MODELO
+% MUDE DRASTICAMENTE DO COMPORTAMENTO ANTERIOR, GARANTINDO UM
+% APRENDIZADO ESTÁVEL E CONTROLADO.
+% }
+% \end{minipage}
+
+% \vspace{0.3cm}
+% \centering
+% \begin{tikzpicture}[>=Stealth,
+%   caixa/.style={draw=black, line width=1.0pt, font=\tiny\ttfamily,
+%                 minimum width=1.7cm, minimum height=0.44cm, align=center},
+%   letra/.style={draw=black, line width=1.0pt, font=\tiny\ttfamily,
+%                 minimum width=0.44cm, minimum height=0.44cm, align=center},
+%   lw/.style={line width=1.0pt}
+% ]
+
+% % Q, POLICY MODEL, O
+% \node[letra] (Q)  at (-5.2, 0)   {Q};
+% \node[caixa, minimum width=1.9cm] (pm) at (-3.4, 0) {POLICY\\MODEL};
+% \node[letra] (O)  at (-1.7, 0)   {O};
+% \draw[black,->,lw] (Q)  -- (pm);
+% \draw[black,->,lw] (pm) -- (O);
+
+% % Três modelos
+% \node[caixa, minimum width=2.0cm] (ref) at (0.4, 1.10) {REFERENCE\\MODEL};
+% \node[caixa, minimum width=1.8cm] (rew) at (0.4, 0.00) {REWARD\\MODEL};
+% \node[caixa, minimum width=1.7cm] (val) at (0.4,-1.10) {VALUE\\MODEL};
+
+% % O -> três modelos (bifurcação)
+% \draw[black,->,lw] (O.east) |- (ref.west);
+% \draw[black,->,lw] (O.east) -- (rew.west);
+% \draw[black,->,lw] (O.east) |- (val.west);
+
+% % KL (saída do REFERENCE MODEL)
+% \node[black, font=\tiny\ttfamily] (kl) at (1.95, 1.10) {KL};
+% \draw[black,->,lw] (ref.east) -- (kl.west);
+
+% % Círculo ⊕
+% \node[draw=black, circle, inner sep=2pt, line width=1.0pt,
+%       font=\scriptsize] (plus) at (2.7, 0.55) {$\oplus$};
+% \draw[black,->,lw] (kl.east)  -- (plus.north);
+% \draw[black,->,lw] (rew.east) -| (plus.west);
+
+% % R
+% \node[letra] (R) at (3.55, 0.55) {R};
+% \draw[black,->,lw] (plus) -- (R);
+
+% % V (saída do VALUE MODEL)
+% \node[letra] (V) at (2.0, -1.10) {V};
+% \draw[black,->,lw] (val.east) -- (V);
+
+% % GAE
+% \node[caixa, minimum width=1.1cm] (gae) at (4.5, 0) {GAE};
+% \draw[black,->,lw] (R.east) -| (gae.north);
+% \draw[black,->,lw] (V.east) -| (gae.south);
+
+% % A
+% \node[letra] (A) at (5.55, 0) {A};
+% \draw[black,->,lw] (gae) -- (A);
+
+% % Arco tracejado de feedback: A -> POLICY MODEL
+% \draw[black, dotted, ->, line width=1.0pt]
+%   (A.north) .. controls (5.55, 2.4) and (-3.4, 2.4) .. (pm.north);
+
+% \end{tikzpicture}
+
+% \end{frame}
+% }
+
+% 23. SAC — Conceito (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily SOFT ACTOR-CRITIC (SAC)}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O SAC É UM ALGORITMO ATOR-CRÍTICO AVANÇADO \textit{OFF-POLICY} QUE TREINA UMA
+POLÍTICA ESTOCÁSTICA. SUA PRINCIPAL INOVAÇÃO É ADICIONAR A ENTROPIA DA
+POLÍTICA À FUNÇÃO DE VALOR: AO MAXIMIZAR CONJUNTAMENTE RECOMPENSA E
+ENTROPIA, O SAC GARANTE ALTA EXPLORAÇÃO, ROBUSTEZ E EFICIÊNCIA DE DADOS.
+}
+\end{minipage}
+
+\vspace{0.15cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Eixo da balança (triângulo)
+  \fill[black] (-0.22, -0.60) -- (0.22, -0.60) -- (0, -0.10) -- cycle;
+  \draw[black, line width=1.2pt] (-0.22, -0.60) -- (0.22, -0.60) -- (0, -0.10) -- cycle;
+
+  % Haste horizontal
+  \draw[black, line width=2.0pt] (-3.5, -0.10) -- (3.5, -0.10);
+
+  % Prato esquerdo (Recompensa)
+  \draw[black, line width=1.0pt] (-3.5, -0.10) -- (-3.5, -0.55);
+  \draw[black, line width=1.0pt] (-3.0, -0.55) -- (-4.0, -0.55);
+  \draw[black, line width=1.5pt, rounded corners=3pt]
+    (-4.15, -0.55) rectangle (-2.85, -1.28);
+  \node[black, font=\tiny\ttfamily, align=center] at (-3.50, -0.92)
+    {RECOMPENSA\\(EXPLOTAÇÃO)};
+
+  % Prato direito (Entropia)
+  \draw[black, line width=1.0pt] (3.5, -0.10) -- (3.5, -0.55);
+  \draw[black, line width=1.0pt] (3.0, -0.55) -- (4.0, -0.55);
+  \draw[black, line width=1.5pt, rounded corners=3pt]
+    (2.85, -0.55) rectangle (4.15, -1.28);
+  \node[black, font=\tiny\ttfamily, align=center] at (3.50, -0.92)
+    {ENTROPIA\\(EXPLORAÇÃO)};
+
+  % Parâmetro alpha no centro
+  \node[black, draw=black, line width=1.2pt, rounded corners=3pt,
+        font=\scriptsize\bfseries, minimum width=0.8cm, minimum height=0.5cm]
+    at (0, 0.32) {$\alpha$};
+  \node[black, font=\tiny\ttfamily] at (0, 0.82) {TEMPERATURA};
+
+  % Fórmula abaixo
+  \draw[black, line width=0.8pt, rounded corners=3pt]
+    (-4.8, -1.68) rectangle (4.8, -2.55);
+  \node[black, font=\tiny\ttfamily\bfseries] at (0, -1.88) {ALVO DO CRÍTICO};
+  \draw[black, dashed, line width=0.5pt] (-4.6, -2.05) -- (4.6, -2.05);
+  \node[black, font=\scriptsize] at (0, -2.30)
+    {$Q_{\text{target}} = r + \gamma \Bigl[\min_{i=1,2} Q_i(s',a') - \alpha \log \pi(a'|s')\Bigr]$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 24. SAC — Arquitetura e Eficiência (NOVO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily SAC: ARQUITETURA E EFICIÊNCIA}
+
+\vspace{0.4cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O SAC USA DUAS REDES CRÍTICAS SEPARADAS (DOUBLE Q-LEARNING) PARA
+EVITAR SUPERESTIMAÇÃO, TOMANDO SEMPRE O VALOR MÍNIMO. O COEFICIENTE
+$\alpha$ É OTIMIZADO AUTOMATICAMENTE VIA GRADIENTE DURANTE O TREINO,
+ELIMINANDO A NECESSIDADE DE AJUSTE MANUAL DESTE HIPERPARÂMETRO.
+}
+\end{minipage}
+
+\vspace{0.20cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick, font=\tiny\ttfamily,
+  bloco/.style={draw=black, line width=1.2pt, rounded corners=3pt,
+                font=\tiny\ttfamily, minimum width=2.0cm,
+                minimum height=0.55cm, align=center}
+]
+
+  % Replay Buffer (cilindro)
+  \draw[black, line width=1.2pt] (-4.0, 0.38) ellipse (0.80 and 0.22);
+  \draw[black, line width=1.2pt] (-4.8,  0.38) -- (-4.8, -0.38);
+  \draw[black, line width=1.2pt] (-3.2,  0.38) -- (-3.2, -0.38);
+  \draw[black, line width=1.2pt] (-4.8, -0.38) arc (180:360:0.80 and 0.22);
+  \node[black, font=\tiny\ttfamily, align=center] at (-4.0, 0)
+    {REPLAY\\BUFFER};
+
+  % Setas do buffer para os críticos
+  \draw[black, ->, line width=1.0pt] (-3.2, 0.15) -- (-1.35, 0.55);
+  \draw[black, ->, line width=1.0pt] (-3.2, -0.15) -- (-1.35, -0.55);
+
+  % Crítico Q1
+  \node[bloco, fill=black!08] (q1) at (-0.1, 0.60) {CRÍTICO $Q_1$};
+
+  % Crítico Q2
+  \node[bloco, fill=black!08] (q2) at (-0.1, -0.60) {CRÍTICO $Q_2$};
+
+  % Círculo min
+  \node[draw=black, circle, line width=1.2pt, inner sep=3pt,
+        font=\scriptsize\bfseries] (mn) at (1.85, 0) {$\min$};
+  \draw[black, ->, line width=1.0pt] (q1.east) -- (mn.north);
+  \draw[black, ->, line width=1.0pt] (q2.east) -- (mn.south);
+
+  % Ator
+  \node[bloco, fill=black!12] (ator) at (3.8, 0) {ATOR $\pi_\theta$};
+  \draw[black, ->, line width=1.2pt] (mn) -- (ator);
+
+  % Ajuste automático de alpha
+  \node[bloco, minimum width=2.4cm] (alpha) at (3.8, -1.25)
+    {AJUSTE AUTO. DE $\alpha$};
+  \draw[black, ->, dashed, line width=1.0pt] (ator.south) -- (alpha.north);
+
+  % Rótulo
+  \node[black, font=\tiny\ttfamily] at (3.8, -1.85)
+    {OTIMIZADO VIA GRADIENTE};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 24b. AMBIENTE DE SIMULAÇÃO
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AMBIENTE DE SIMULAÇÃO}
+
+\vspace{0.20cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+CRUZAMENTO VEICULAR ESTOCÁSTICO COM COMUNICAÇÃO V2I (VEÍCULO--INFRAESTRUTURA)
+E V2V (VEÍCULO--VEÍCULO). INCORPORA MOBILIDADE DINÂMICA, CHEGADA ESTOCÁSTICA
+DE TAREFAS, ATRASOS DE PROPAGAÇÃO E LIMITAÇÕES DE PROCESSAMENTO (\textit{THROTTLING}).
+}
+\end{minipage}
+
+\vspace{0.10cm}
+\centering
+\resizebox{0.55\textwidth}{!}{%
+\begin{tikzpicture}[
+    font=\sffamily,
+    >=Stealth,
+    car right/.pic={
+        \begin{scope}[scale=0.6]
+            \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                (-1.8,-0.75) rectangle (1.8,0.75);
+            \filldraw[fill=black!60, draw=black, thick]
+                (-0.55,-0.55) -- (-1.05,-0.45) -- (-1.05,0.45) -- (-0.55,0.55) -- cycle;
+            \filldraw[fill=black!60, draw=black, thick]
+                (0.45,-0.55) -- (0.95,-0.45) -- (0.95,0.45) -- (0.45,0.55) -- cycle;
+            \filldraw[fill=black!25, draw=black, thick]
+                (-0.55,-0.55) rectangle (0.45,0.55);
+            \filldraw[fill=yellow!80, draw=none]
+                (1.55,-0.65) rectangle (1.75,-0.35);
+            \filldraw[fill=yellow!80, draw=none]
+                (1.55,0.35) rectangle (1.75,0.65);
+        \end{scope}
+    },
+    car up/.pic={
+        \begin{scope}[scale=0.6]
+            \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                (-0.75,-1.8) rectangle (0.75,1.8);
+            \filldraw[fill=black!60, draw=black, thick]
+                (-0.55,-0.45) -- (-0.45,-0.95) -- (0.45,-0.95) -- (0.55,-0.45) -- cycle;
+            \filldraw[fill=black!60, draw=black, thick]
+                (-0.55,0.55) -- (-0.45,1.05) -- (0.45,1.05) -- (0.55,0.55) -- cycle;
+            \filldraw[fill=black!25, draw=black, thick]
+                (-0.55,-0.45) rectangle (0.55,0.55);
+            \filldraw[fill=yellow!80, draw=none]
+                (-0.65,1.55) rectangle (-0.35,1.75);
+            \filldraw[fill=yellow!80, draw=none]
+                (0.35,1.55) rectangle (0.65,1.75);
+        \end{scope}
+    },
+    semaforo/.pic={
+        \begin{scope}[scale=0.45]
+            \filldraw[fill=gray!70, draw=black, thick, rounded corners=3pt]
+                (-0.55,-1.6) rectangle (0.55,1.6);
+            \fill[red!90] (0, 1.0) circle (0.38);
+            \fill[yellow!90] (0, 0) circle (0.38);
+            \fill[green!70!black] (0,-1.0) circle (0.38);
+            \draw[gray!60, line width=4pt] (0,-1.6) -- (0,-2.5);
+        \end{scope}
+    },
+    label text/.style={font=\scriptsize\bfseries, align=center, fill=white, draw=black!50, rounded corners=1pt, inner sep=2pt}
+]
+    \clip (0,0) rectangle (20,18);
+    \fill[green!18] (0,0) rectangle (20,18);
+    \fill[black!45] (0,6) rectangle (20,10);
+    \fill[black!45] (8,0) rectangle (12,18);
+    \fill[black!45] (8,6) rectangle (12,10);
+    \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,0)  -- (10,6);
+    \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,10) -- (10,18);
+    \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (0,8)   -- (8,8);
+    \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (12,8)  -- (20,8);
+    \pic at (3.5,7) {car right};
+    \node[fill=blue!15, draw=blue!70, rounded corners=2pt, thick,
+          font=\small\bfseries, align=center, inner sep=3pt]
+        (lagente) at (3.5,4.5) {Agente (V1)};
+    \draw[blue!70, thick] (lagente.north) -- (3.5,6.4);
+    \draw[->, very thick, orange!90!black] (5.3,7.0) -- (7.4,7.0);
+    \node[fill=white, draw=orange!80, rounded corners=2pt,
+          font=\scriptsize\bfseries, inner sep=2pt]
+        at (6.3,5.6) {Mobilidade Din\^amica};
+    \draw[orange!70, thin] (6.3,5.88) -- (6.3,6.55);
+    \pic[rotate=180] at (16.5,9) {car right};
+    \draw[->, very thick, orange!90!black] (14.7,9.0) -- (12.6,9.0);
+    \node[fill=white, draw=gray!60, rounded corners=2pt,
+          font=\scriptsize\bfseries, inner sep=2pt]
+        at (16.5,11.5) {V2};
+    \draw[gray!60, thin] (16.5,11.2) -- (16.5,9.7);
+    \pic at (11,2.5) {car up};
+    \draw[->, very thick, orange!90!black] (11,4.3) -- (11,5.6);
+    \node[fill=white, draw=gray!60, rounded corners=2pt,
+          font=\scriptsize\bfseries, inner sep=2pt]
+        at (13.8,2.5) {V3};
+    \draw[gray!60, thin] (13.1,2.5) -- (11.7,2.5);
+    \pic at (7.3,11.2) {semaforo};
+    \node[draw=black, fill=red!8, thick, rounded corners=4pt,
+          align=center, font=\small\bfseries, inner sep=5pt]
+        (edge) at (4.0,14.2) {Edge Server\\(Dispositivo de Borda)};
+    \draw[thick, gray!70] (7.3,11.8) -- (edge.south east);
+    \node[draw=blue!70, fill=blue!5, thick, rounded corners=4pt,
+          align=center, font=\scriptsize\bfseries, inner sep=5pt]
+        (workload) at (2.5,2.0) {Carga de Trabalho\\(Tra\c{c}os Reais / Estoc\'astico)};
+    \draw[->, dotted, thick, blue!70] (workload.north east) -- (3.0,6.2);
+    \draw[<->, dashed, line width=1.5pt, red!70!black]
+        (3.5,7.8) -- (edge.south);
+    \node[fill=white, draw=red!60, rounded corners=2pt,
+          font=\scriptsize\bfseries, text=red!80!black, inner sep=2pt]
+        at (2.2,11.5) {V2I / V2E};
+    \node[fill=white, font=\scriptsize, text=red!70!black, inner sep=1pt]
+        at (2.2,10.8) {Atraso de Propaga\c{c}\~ao};
+    \node[draw=red!70, fill=white, dashed, thick, rounded corners=3pt,
+          align=center, font=\scriptsize\bfseries]
+        (throttle) at (4.5,16.8) {\textit{Throttling}\\Limita\c{c}\~oes de Processamento};
+    \draw[->, dotted, thick, red!70] (throttle.south) -- (edge.north);
+    \draw[<->, dashed, line width=1.5pt, purple!80]
+        (4.8,6.4) -- (10.3,3.5);
+    \node[fill=white, draw=purple!70, rounded corners=2pt,
+          font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+        at (7.3,4.3) {V2V};
+    \draw[<->, dashed, line width=1.5pt, purple!80]
+        (5.2,7.6) -- (14.6,8.5);
+    \node[fill=white, draw=purple!70, rounded corners=2pt,
+          font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+        at (10.0,9.0) {V2V};
+    \node[fill=white, draw=purple!70, thick, rounded corners=3pt,
+          align=center, font=\scriptsize\bfseries, text=purple!80, inner sep=4pt]
+        at (15.5,4.0) {Intera\c{c}\~ao Multiagente\\N\~ao-Estacionariedade};
+    \node[draw=black!50, fill=gray!5, very thick, dashed, rounded corners=4pt,
+          align=left, font=\footnotesize, inner sep=7pt, anchor=north east]
+        at (19.5,17.8) {
+        \textbf{Restri\c{c}\~oes do Ambiente:}\\[2pt]
+        $\bullet$ Mobilidade Din\^amica Veicular\\
+        $\bullet$ Chegada Estoc\'astica de Tarefas\\
+        $\bullet$ Atrasos e Ru\'idos na Comunica\c{c}\~ao\\
+        $\bullet$ \textit{Throttling} (Gargalos de Proc.)\\
+        $\bullet$ N\~ao-Estacionariedade Multiagente
+    };
+    \draw[thick] (0,0) rectangle (20,18);
+\end{tikzpicture}%
+}
+
+\end{frame}
+}
+
+% 25. O PROBLEMA: DIMENSIONALIDADE VARIÁVEL EM VEC
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily O PROBLEMA: DIMENSIONALIDADE VARIÁVEL EM VEC}
+
+\vspace{0.35cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O DESCARREGAMENTO EM REDES VEC LIDA COM ALTA MOBILIDADE: O NÚMERO
+DE NÓS CANDIDATOS (RSUs E VEÍCULOS V2V) MUDA A TODO INSTANTE.
+COMO REDES NEURAIS DE DRL EXIGEM ENTRADAS DE DIMENSÃO FIXA,
+AS SOLUÇÕES TRADICIONAIS FALHAM AO GENERALIZAR PARA DIFERENTES
+DENSIDADES SEM RETREINAMENTOS. O DESAFIO: CRIAR UMA REPRESENTAÇÃO
+DE ESTADO INVARIANTE À ESCALA.
+}
+\end{minipage}
+
+\vspace{0.20cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick,
+  bloco/.style={draw=black, line width=1.2pt, fill=black!07,
+                rounded corners=3pt, minimum width=1.8cm,
+                minimum height=0.65cm, font=\tiny\ttfamily, align=center},
+  slot/.style={draw=black, line width=0.8pt, fill=black!04,
+               minimum width=0.55cm, minimum height=0.55cm,
+               font=\tiny\ttfamily}
+]
+
+  % Veículo
+  \node[bloco, fill=black!13] (vei) at (-5.2, 0) {VEÍCULO\\(TAREFA)};
+
+  % Seta para bloco de input
+  \draw[black, ->, line width=1.2pt] (vei.east) -- (-3.2, 0)
+    node[midway, above, font=\tiny\ttfamily] {ESTADO};
+
+  % Bloco de entrada variável
+  \node[draw=black, line width=1.2pt, fill=black!03,
+        minimum width=3.0cm, minimum height=1.4cm,
+        rounded corners=3pt, font=\tiny\ttfamily, align=center]
+    (inp) at (-1.35, 0) {};
+  \node[font=\tiny\bfseries\ttfamily] at (-1.35, 0.55)
+    {INPUT VARIÁVEL};
+  \node[slot] at (-2.1, -0.10) {$N_1$};
+  \node[slot] at (-1.55, -0.10) {$N_2$};
+  \node[slot, draw=black!40, fill=white, font=\scriptsize\bfseries]
+    at (-1.00, -0.10) {?};
+  \node[slot, draw=black!40, fill=white, font=\scriptsize\bfseries]
+    at (-0.50, -0.10) {?};
+  \node[font=\tiny\ttfamily, text=black!50] at (-1.35, -0.55)
+    {$N$ CANDIDATOS (VARIÁVEL)};
+
+  % Seta para rede neural — cortada por X
+  \draw[black, ->, line width=1.2pt] (inp.east) -- (1.45, 0);
+
+  % Símbolo de incompatibilidade (X)
+  \node[font=\large\bfseries, text=black] at (1.0, 0.28) {$\times$};
+
+  % Rede neural
+  \node[bloco, fill=black!10, minimum width=2.2cm] (nn) at (2.8, 0)
+    {REDE NEURAL\\(AGENTE DRL)\\DIMENSÃO FIXA};
+
+  % Seta de erro saindo da rede
+  \draw[black, ->, dashed, line width=1.0pt] (nn.south) -- ++(0, -0.65)
+    node[below, font=\tiny\ttfamily, align=center]
+    {INCOMPATÍVEL:\\$\dim(\text{input}) \neq \text{fixo}$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 26. A PROPOSTA: PIPELINE SAC-TOPSIS (MELHORADO)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily A PROPOSTA: PIPELINE SAC-TOPSIS}
+
+\vspace{0.20cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
+(ELIMINA A VARIABILIDADE DIMENSIONAL); O SAC RESPONDE \emph{``DESCARREGAR?''}
+(DECISÃO BINÁRIA, APRENDIDA COM ENTROPIA MÁXIMA E REPLAY BUFFER).
+}
+\end{minipage}
+
+\vspace{0.08cm}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+  bl/.style={draw=black, line width=1.6pt, fill=black!08, rounded corners=5pt,
+             minimum width=2.6cm, minimum height=0.78cm,
+             font=\large\ttfamily, align=center},
+  dest/.style={draw=black, line width=1.2pt, fill=black!05, rounded corners=4pt,
+               minimum width=2.6cm, minimum height=0.70cm,
+               font=\large\ttfamily, align=center},
+  ann/.style={draw=black!55, line width=0.9pt, fill=black!04,
+              rounded corners=4pt, font=\large\ttfamily,
+              align=center, inner sep=8pt}
+]
+
+% ═══ LINHA 1 — pipeline (y=0) ════════════════════════════════════════════════
+\node[bl, fill=black!05, minimum width=2.0cm] (task) at (-8.2, 0) {TAREFA\\$C_j,D_j$};
+\node[bl, minimum width=2.8cm]               (cand) at (-5.2, 0) {$N$ CAND.\\(VARIÁVEL)};
+\node[bl, fill=black!16, minimum width=3.0cm](top)  at (-1.8, 0) {MÓDULO\\TOPSIS};
+\node[bl, fill=black!10, minimum width=2.8cm](est)  at ( 1.8, 0) {$\mathbf{S}_t\in\mathbb{R}^6$\\(FIXO)};
+\node[bl, fill=black!18, minimum width=2.8cm](sac)  at ( 5.4, 0) {ATOR SAC\\(MLP)};
+
+% Setas do pipeline
+\draw[black,->,line width=1.6pt] (task.east) -- (cand.west);
+\draw[black,->,line width=1.6pt] (cand.east) -- (top.west);
+\draw[black,->,line width=1.6pt] (top.east)  -- (est.west);
+\draw[black,->,line width=1.6pt] (est.east)  -- (sac.west);
+
+% Labels acima dos blocos — nós SEPARADOS em y=0.78 (acima do topo dos blocos em y=0.39)
+\node[font=\normalsize\ttfamily] at (-3.50, 0.78) {$N\!\times\!3$};
+\node[font=\normalsize\ttfamily] at ( 0.00, 0.78) {rank$_1$,\;$C^*_i$};
+\node[font=\normalsize\ttfamily] at ( 3.60, 0.78) {obs.};
+
+% ═══ LINHA 2 — decisão binária (y=-2.30, bem abaixo do pipeline) ═══════════
+\node[dest] (loc) at (4.0,-2.30) {$a_t{=}0$\\LOCAL};
+\node[dest] (off) at (6.8,-2.30) {$a_t{=}1$\\RANK$_1$};
+
+% Setas SAC → LOCAL/RANK1: horizontal alta, verticais longas até as caixas
+\draw[black,->,line width=1.4pt] (sac.south) -- ++(0,-0.45) -| (loc.north);
+\draw[black,->,line width=1.4pt] (sac.south) -- ++(0,-0.45) -| (off.north);
+
+% ═══ SEPARADOR ═══════════════════════════════════════════════════════════════
+\draw[black!30, line width=0.8pt] (-9.5,-3.20) -- (9.5,-3.20);
+
+% ═══ LINHA 3 — anotações (y≈-4.5, bem abaixo do separador) ══════════════════
+% Caixa A: TOPSIS critérios + fórmula — centro em x=-4.8
+\draw[black!45, dashed, line width=0.8pt] (-1.8,-0.40) -- (-4.8,-3.30);
+\node[ann, minimum width=4.4cm] at (-4.8,-4.50) {%
+  $C_1$: $\widehat{\text{JCT}}$ ($w{=}0{,}40$)\\[4pt]
+  $C_2$: Energia ($w{=}0{,}30$)\\[4pt]
+  $C_3$: Distância ($w{=}0{,}30$)\\[8pt]
+  $\displaystyle C^*_i = \frac{d^-_i}{d^+_i + d^-_i}$};
+
+% Caixa B: Estado 6D — centro em x=1.0
+\draw[black!45, dashed, line width=0.8pt] (1.8,-0.40) -- (1.0,-3.30);
+\node[ann, minimum width=5.6cm] at (1.0,-4.40) {%
+  $\mathbf{S}_t = \bigl[\,\Delta_{\text{obj}},\;
+  \tfrac{\widehat{\text{JCT}}_\ell}{D_i},\;
+  \tfrac{\widehat{\text{JCT}}_{\text{r1}}}{D_i},$\\[5pt]
+  $\tfrac{|Q_{\text{r1}}|}{Q_{\max}},\;
+  \tfrac{|Q_\ell|}{Q_{\max}},\;
+  \tfrac{C_j}{C_{\max}}\,\bigr]$};
+
+% Caixa C: Arquitetura SAC — centro em x=7.4
+\node[ann, minimum width=3.0cm] at (7.4,-4.10) {%
+  $6\!\to\!64\!\to\!64\!\to\!2$\\[4pt]
+  ReLU + Softmax};
+
+\end{tikzpicture}}%
+
+\end{frame}
+}
+
+% 26b. TOPSIS: CRITÉRIOS, ESCORE E ESTADO 6D
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily TOPSIS: CRITÉRIOS, ESCORE E ESTADO 6D}
+
+\vspace{0.15cm}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+
+  % --- Caixa esquerda: critérios + fórmula ---
+  \node[draw=black, line width=1.0pt, fill=black!04, rounded corners=4pt,
+        minimum width=5.5cm, minimum height=6.4cm, anchor=north west]
+    at (-6.4, 0.25) {};
+  \node[font=\scriptsize\bfseries\ttfamily] at (-3.70, 0.02)
+    {CRITÉRIOS DO TOPSIS};
+
+  % mini-tabela de critérios
+  \node[font=\tiny\ttfamily, align=left] at (-3.70, -0.72) {%
+    \begin{tabular}{@{}clc@{}}
+    \hline
+    \textbf{Crit.} & \textbf{Descrição} & \textbf{Peso}\\
+    \hline
+    $C_1$ & $\widehat{\text{JCT}}$ (latência estimada) & 0,40\\
+    $C_2$ & Energia total (J) & 0,30\\
+    $C_3$ & Distância física (m) & 0,30\\
+    \hline
+    \end{tabular}};
+
+  % fórmula do escore C*
+  \node[font=\tiny\bfseries\ttfamily] at (-3.70, -2.10) {ESCORE DE PROXIMIDADE};
+  \node[draw=black, fill=white, rounded corners=2pt,
+        font=\small, inner sep=4pt] at (-3.70, -2.90)
+    {$\displaystyle C^*_i = \frac{d^-_i}{d^+_i + d^-_i}$};
+  \node[font=\tiny\ttfamily, align=center] at (-3.70, -3.85)
+    {$d^\pm_i = \sum_{j=1}^{3}\!|v_{ij} - a^\pm_j|$ \quad ($L_1$)};
+  \node[font=\tiny\ttfamily, align=center] at (-3.70, -4.45)
+    {rank$_1$ = candidato de maior $C^*_i$};
+
+  % --- Separador vertical ---
+  \draw[black!40, dashed, line width=0.8pt] (-0.60, 0.25) -- (-0.60, -5.95);
+
+  % --- Caixa direita: estado 6D ---
+  \node[draw=black, line width=1.0pt, fill=black!04, rounded corners=4pt,
+        minimum width=6.8cm, minimum height=6.4cm, anchor=north east]
+    at (6.4, 0.25) {};
+  \node[font=\scriptsize\bfseries\ttfamily] at (3.00, 0.02)
+    {VETOR DE ESTADO $\mathbf{S}_t \in \mathbb{R}^6$};
+
+  % equação 6D — centralizada no centro da caixa cinza (x=3.0)
+  \node[draw=black, fill=white, rounded corners=2pt,
+        font=\scriptsize, inner sep=5pt, align=center] at (3.00, -0.72)
+    {$\mathbf{S}_t = \bigl[\,
+      \Delta_{\text{obj}},\;
+      \tfrac{\widehat{\text{JCT}}_\ell}{D_i},\;
+      \tfrac{\widehat{\text{JCT}}_{\text{r1}}}{D_i},\;
+      \tfrac{|Q_{\text{r1}}|}{Q_{\max}},\;
+      \tfrac{|Q_\ell|}{Q_{\max}},\;
+      \tfrac{C_j}{C_{\max}}\,\bigr]$};
+
+  % Definição de delta_obj
+  \node[font=\tiny\ttfamily, align=center] at (3.00, -1.62)
+    {$\Delta_{\text{obj}} = 1 - \tfrac{\text{custo}_{r_1}}{\text{custo}_\ell}$\\[2pt]
+     $>0$: offload mais barato\quad $<0$: local mais barato};
+
+  % Semântica de cada componente — coluna p{} para quebrar linha e não extravazar
+  \node[font=\tiny\ttfamily, align=left, anchor=west] at (0.30, -3.10) {%
+    \begin{tabular}{@{}l@{\ }p{3.0cm}@{}}
+    $s_1 = \Delta_{\text{obj}}$              & redução relativa de custo (offload vs.\ local)\\
+    $s_2 = \widehat{\text{JCT}}_\ell/D_i$   & urgência local\\
+    $s_3 = \widehat{\text{JCT}}_{r1}/D_i$   & urgência do offload\\
+    $s_4 = |Q_{r1}|/Q_{\max}$               & congestion.\ do candidato\\
+    $s_5 = |Q_\ell|/Q_{\max}$               & congestion.\ local\\
+    $s_6 = C_j/C_{\max}$                    & complexidade da tarefa\\
+    \end{tabular}};
+
+  % Decisão de ação
+  \node[font=\tiny\ttfamily, align=center] at (3.00, -4.50)
+    {$\text{modo}_t = \begin{cases}
+      \textsc{local} & a_t = 0 \\
+      \text{rank}_1 \in \{\text{RSU},\text{V2V}\} & a_t = 1
+    \end{cases}$};
+
+\end{tikzpicture}}%
+
+\end{frame}
+}
+
+% 26c. ATOR SAC: REDE NEURAL MLP 6→64→64→2
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ATOR SAC: REDE NEURAL MLP}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily ARQUITETURA $6 \to 64 \to 64 \to 2$ \quad RELU + SOFTMAX}
+
+\vspace{0.10cm}
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+  nin/.style={circle, draw=black, thick, fill=black!15,
+              minimum size=0.62cm, inner sep=0pt, font=\tiny},
+  nhid/.style={circle, draw=black, thick, fill=black!08,
+               minimum size=0.62cm, inner sep=0pt},
+  nout/.style={circle, draw=black, thick,
+               minimum size=0.66cm, inner sep=0pt, font=\tiny},
+  ew/.style={->, black!25, line width=0.35pt},
+  lbl/.style={font=\tiny\ttfamily, align=left}
+]
+
+  % Camada de entrada: 6 neurônios
+  \foreach \i/\name/\desc in {
+      1/{$s_1$}/{$\Delta_{\mathrm{obj}}$},
+      2/{$s_2$}/{$\widehat{\mathrm{JCT}}_\ell/D_i$},
+      3/{$s_3$}/{$\widehat{\mathrm{JCT}}_{\mathrm{r1}}/D_i$},
+      4/{$s_4$}/{$|Q_{\mathrm{r1}}|/Q_{\max}$},
+      5/{$s_5$}/{$|Q_\ell|/Q_{\max}$},
+      6/{$s_6$}/{$C_j/C_{\max}$}}{
+    \node[nin] (I\i) at (0, {-(\i-1)*0.85}) {\name};
+    \node[lbl, right=0.08cm of I\i] {\desc};
+  }
+
+  % Camada oculta 1 (5 visíveis de 64)
+  \foreach \i in {1,...,5}{
+    \node[nhid] (H1\i) at (4.0, {-(\i-1)*0.85}) {};}
+  \node[font=\tiny, black!60] at (4.0,-4.40) {$\vdots$};
+  \node[font=\tiny\ttfamily, black!60] at (4.0,-4.90) {(64 neur.)};
+
+  % Camada oculta 2 (5 visíveis de 64)
+  \foreach \i in {1,...,5}{
+    \node[nhid] (H2\i) at (7.0, {-(\i-1)*0.85}) {};}
+  \node[font=\tiny, black!60] at (7.0,-4.40) {$\vdots$};
+  \node[font=\tiny\ttfamily, black!60] at (7.0,-4.90) {(64 neur.)};
+
+  % Camada de saída: 2 neurônios
+  \node[nout, fill=black!05] (O1) at (10.0,-0.85) {$a_0$};
+  \node[nout, fill=black!18] (O2) at (10.0,-3.40) {$a_1$};
+
+  % Rótulos de saída
+  \node[lbl, right=0.2cm of O1] {\textbf{LOCAL}};
+  \node[lbl, right=0.2cm of O2] {\textbf{OFFLOAD}};
+
+  % Conexões entrada → H1
+  \foreach \i in {1,...,6}{
+    \foreach \j in {1,...,5}{\draw[ew] (I\i.east) -- (H1\j.west);}}
+  % Conexões H1 → H2
+  \foreach \i in {1,...,5}{
+    \foreach \j in {1,...,5}{\draw[ew] (H1\i.east) -- (H2\j.west);}}
+  % Conexões H2 → saída
+  \foreach \i in {1,...,5}{
+    \draw[ew] (H2\i.east) -- (O1.west);
+    \draw[ew] (H2\i.east) -- (O2.west);}
+
+  % Rótulos das camadas
+  \node[font=\tiny\bfseries\ttfamily, above=0.4cm of I1]  {Entrada ($\mathbb{R}^6$)};
+  \node[font=\tiny\bfseries\ttfamily, above=0.4cm of H11] {Oculta 1 (ReLU)};
+  \node[font=\tiny\bfseries\ttfamily, above=0.4cm of H21] {Oculta 2 (ReLU)};
+  \node[font=\tiny\bfseries\ttfamily] at (10.0, 0.40)      {Saída (Softmax)};
+
+  % Chave lateral — à esquerda dos nós de entrada
+  \draw[decorate, decoration={brace, amplitude=5pt, mirror}, thick, black!50]
+    (-0.65, {-(6-1)*0.85-0.31}) -- (-0.65, 0.31)
+    node[midway, left=6pt, font=\tiny\ttfamily, align=right]
+      {$\mathbf{S}_t \in \mathbb{R}^6$\\(saída TOPSIS)};
+
+  % Hiperparâmetros — tabela separada abaixo do diagrama
+  \node[font=\tiny\ttfamily, align=center] at (5.5, -6.30) {%
+    \begin{tabular}{@{}clc@{}}
+    \hline
+    \textbf{Param.} & \textbf{Descrição} & \textbf{Valor}\\
+    \hline
+    $\eta$                & Taxa de aprendizado (Adam)  & $3\times10^{-4}$\\
+    $\gamma$              & Fator de desconto           & $0{,}99$\\
+    $\alpha_{\text{ent}}$ & Coeficiente de entropia     & $0{,}10$\\
+    $|\mathcal{B}|$       & Tamanho do replay buffer    & $50\,000$\\
+    batch                 & Tamanho do mini-batch       & $1\,024$\\
+    \hline
+    \end{tabular}};
+
+\end{tikzpicture}}
+
+\end{frame}
+}
+
+% 27. ESTUDO DE ABLAÇÃO: DESIGN EXPERIMENTAL
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ESTUDO DE ABLAÇÃO: DESIGN EXPERIMENTAL}
+
+\vspace{0.20cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+CADA VARIANTE REMOVE OU SUBSTITUI \textbf{UM ÚNICO COMPONENTE} DA
+PROPOSTA COMPLETA. PERMITE QUANTIFICAR A CONTRIBUIÇÃO CAUSAL ISOLADA
+DE CADA DECISÃO DE DESIGN: ESPAÇO DE ESTADO, ESPAÇO DE AÇÃO,
+FUNÇÃO DE RECOMPENSA E PAPEL DO TOPSIS.
+}
+\end{minipage}
+
+\vspace{0.25cm}
+\hspace{0.3cm}
+{\scriptsize\ttfamily
+\begin{tabular}{lllll}
+\hline
+\textbf{POLÍTICA} & \textbf{ESTADO} & \textbf{AÇÃO} & \textbf{RECOMPENSA} & \textbf{TOPSIS} \\
+\hline
+SAC-BASE   & 11D (bruto)   & 3 classes & WSM            & ---      \\
+SAC-A1     & 11D (bruto)   & binária   & WSM            & ---      \\
+SAC-S1     & 6D (manual)   & 3 classes & WSM            & ---      \\
+SAC-R1     & 11D (bruto)   & 3 classes & Deadline-aware & ---      \\
+SAC-T1     & 6D (TOPSIS)   & 3 classes & Deadline-aware & Feature  \\
+\textbf{SAC-TOPSIS} & \textbf{6D (TOPSIS)} & \textbf{binária} & \textbf{Deadline-aware} & \textbf{Decisão} \\
+\hline
+\end{tabular}}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+\begin{minipage}{0.94\textwidth}
+{\tiny\ttfamily
+\textbf{3 classes:} $a_t \in \{\textsc{local},\;\textsc{rsu},\;\textsc{v2v}\}$ \quad\textbf{Binária:} $a_t \in \{\textsc{local},\;\textsc{offload}\!\to\!\text{rank}_1\}$\\[5pt]
+\textbf{WSM:} $r \in [-1,1]$ proporcional ao custo (JCT + energia + fila). \textbf{Problema:} não penaliza
+violação de prazo — tarefa atrasada com custo baixo recebe recompensa positiva.\\[5pt]
+\textbf{DEADLINE-AWARE:} dois regimes separados por lacuna de 1,5 unidades:\\
+\quad $\bullet$ JCT $\leq D_i$ (sucesso): $r \in [0{,}5;\,1{,}0]$ — quanto menor o custo, maior a recompensa.\\
+\quad $\bullet$ JCT $> D_i$ (falha): $r \in [-2{,}0;\,-1{,}0]$ — penalidade cresce com o atraso.\\
+\textbf{Efeito:} cumprir o prazo é \textit{sempre} melhor que qualquer falha, independente do custo.
+}
+\end{minipage}
+
+\end{frame}
+}
+
+% 27b. ESTUDO DE ABLAÇÃO: DECOMPOSIÇÃO CAUSAL
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily ESTUDO DE ABLAÇÃO: DECOMPOSIÇÃO CAUSAL}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+{\scriptsize\ttfamily
+\begin{tabular}{lrrrr}
+\hline
+\textbf{POLÍTICA} & \textbf{TAXA DEADLINE (\%)} & \textbf{JCT (s)} & \textbf{ENERGIA (J)} & \textbf{$\Delta$ pp} \\
+\hline
+SAC-BASE    &  4,6 & 57,1 & 2422 & ---     \\
+SAC-A1      & 39,2 & 13,7 & 2106 & $+34,6$ \\
+SAC-S1      & 28,8 & 39,2 & 2028 & $+24,2$ \\
+SAC-R1      & 38,4 & 13,3 & 3153 & $+33,8$ \\
+SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
+\textbf{SAC-TOPSIS} & \textbf{45,3} & \textbf{6,6} & 2582 & $\mathbf{+40,7}$ \\
+\hline
+\end{tabular}}
+
+\vspace{0.28cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick]
+
+  % Caminho sequencial aditivo
+  \node[draw=black, fill=black!08, rounded corners=3pt,
+        font=\tiny\ttfamily, align=center,
+        minimum width=1.4cm, minimum height=0.55cm] (b0) at (-5.5, 0)
+    {SAC-BASE\\4,6\%};
+
+  \node[draw=black, fill=black!08, rounded corners=3pt,
+        font=\tiny\ttfamily, align=center,
+        minimum width=1.4cm, minimum height=0.55cm] (b1) at (-2.8, 0)
+    {SAC-S1\\28,8\%};
+
+  \node[draw=black, fill=black!10, rounded corners=3pt,
+        font=\tiny\ttfamily, align=center,
+        minimum width=1.4cm, minimum height=0.55cm] (b2) at (0.0, 0)
+    {SAC-T1\\33,1\%};
+
+  \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
+        font=\tiny\bfseries\ttfamily, align=center,
+        minimum width=1.6cm, minimum height=0.62cm] (b3) at (3.0, 0)
+    {SAC-TOPSIS\\45,3\%};
+
+  \draw[black,->,line width=1.2pt] (b0.east) -- (b1.west)
+    node[midway, above, font=\tiny\ttfamily] {$+24{,}2$ pp};
+  \draw[black,->,line width=1.2pt] (b1.east) -- (b2.west)
+    node[midway, above, font=\tiny\ttfamily] {$+4{,}3$ pp};
+  \draw[black,->,line width=1.8pt] (b2.east) -- (b3.west)
+    node[midway, above, font=\tiny\bfseries\ttfamily] {$+12{,}2$ pp};
+
+  % Rótulos das transições
+  \node[font=\tiny\ttfamily, align=center] at (-4.15, -0.65)
+    {Estado 6D\\manual};
+  \node[font=\tiny\ttfamily, align=center] at (-1.4, -0.65)
+    {TOPSIS feat.\\+ deadline};
+  \node[font=\tiny\bfseries\ttfamily, align=center] at (1.5, -0.70)
+    {\textbf{TOPSIS prior}\\de decisão};
+
+  % Hierarquia de contribuição
+  \node[font=\tiny\ttfamily, align=center] at (-1.2, -1.45)
+    {$\Delta_{\text{estado}} > \Delta_{\text{TOPSIS-decisão}} > \Delta_{\text{reward+feature}} \gg \Delta_{\text{ação-binária}}$};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 28a. AVALIAÇÃO COMPARATIVA: POSIÇÕES 1–12
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AVALIAÇÃO COMPARATIVA — POSIÇÕES 1–12}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily 658 CENÁRIOS V2X $\bullet$ ORDENADO POR SWQ DECRESCENTE $\bullet$ $\star$ = USA TOPSIS}\\[3pt]
+\hspace{0.3cm}{\scriptsize $\mathrm{SWQ}(\pi) = \underbrace{\hat{\tau}(\pi)}_{\text{taxa de sucesso}} \;\times\;
+\underbrace{\dfrac{1}{|\mathcal{S}|}\displaystyle\sum_{j\in\mathcal{S}} \dfrac{D_j - \mathrm{JCT}_j}{D_j}}_{\text{folga norm.\ média — só tarefas que cumpriram o prazo}}$}\\[2pt]
+\hspace{0.3cm}{\tiny\ttfamily $\Rightarrow$ política boa = cumpre prazo frequentemente \textbf{e} com margem}
+
+\vspace{0.08cm}
+\hspace{0.3cm}
+{\tiny\ttfamily
+\begin{tabular}{rlrrrrl}
+\hline
+\textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
+\hline
+ 1 & \textbf{sac-topsis}$^\star$ & \textbf{45,21} & \textbf{0,1484} &  6,5 & 25,8 & RL+TOPSIS \\
+ 2 & ppo-topsis$^\star$          & 42,66 & 0,1426 &  5,9 & 21,3 & RL+TOPSIS \\
+ 3 & ppo-base                    & 42,32 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
+ 4 & ppo-topsis-compact$^\star$  & 42,32 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
+ 5 & td3-base                    & 42,32 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
+ 6 & a2c-topsis$^\star$          & 42,32 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
+ 7 & td3-topsis$^\star$          & 43,91 & 0,1388 &  3,7 & 23,0 & RL+TOPSIS \\
+ 8 & sac-topsis-9d$^\star$       & 42,82 & 0,1386 &  5,9 & 21,0 & RL+TOPSIS \\
+ 9 & sac-topsis-manhattan$^\star$& 41,66 & 0,1385 & 11,8 & 23,7 & RL+TOPSIS \\
+10 & sac-t1$^\star$              & 32,96 & 0,1270 & 11,5 & 26,1 & RL+TOPSIS \\
+11 & greedy-unfair               & 41,29 & 0,1262 &  5,6 &  7,4 & Heurística\\
+12 & sac-a1                      & 39,11 & 0,1256 & 13,7 & 21,1 & RL-Base   \\
+\hline
+\end{tabular}}
+
+\vspace{0.20cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O SAC-TOPSIS LIDERA COM SWQ 0,1484. OS ALGORITMOS PPO, TD3 E A2C
+CONVERGEM PARA 100\% LOCAL (SWQ $\approx$ 0,1418). O GREEDY-UNFAIR COM
+CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-TOPSIS (0,1262).
+}
+\end{minipage}
+
+\end{frame}
+}
+
+% 28b. AVALIAÇÃO COMPARATIVA: POSIÇÕES 13–25
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily AVALIAÇÃO COMPARATIVA — POSIÇÕES 13–25}\\[2pt]
+\hspace{0.3cm}{\scriptsize\ttfamily 658 CENÁRIOS V2X $\bullet$ ORDENADO POR SWQ DECRESCENTE $\bullet$ $\star$ = USA TOPSIS}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+{\tiny\ttfamily
+\begin{tabular}{rlrrrrl}
+\hline
+\textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
+\hline
+13 & sac-r1        & 38,26 & 0,1223 & 13,4 & 31,4 & RL-Base   \\
+14 & sac-s1        & 28,69 & 0,1122 & 39,3 & 20,3 & RL-Base   \\
+15 & gini          & 35,24 & 0,1057 &  3,5 & 39,4 & Heurística\\
+16 & dqn-topsis$^\star$ & 25,90 & 0,0997 & 21,7 & 24,0 & RL+TOPSIS \\
+17 & jain          & 32,54 & 0,0973 &  3,6 & 39,3 & Heurística\\
+18 & random        & 30,02 & 0,0950 & 17,9 & 27,3 & Heurística\\
+19 & roundrobin    & 28,50 & 0,0905 & 17,9 & 31,1 & Heurística\\
+20 & greedy        & 29,03 & 0,0823 & 29,3 &  6,2 & Heurística\\
+21 & a2c-base      & 21,74 & 0,0772 & 13,7 & 48,9 & RL-Base   \\
+22 & dqn-base      & 22,10 & 0,0686 & 13,6 & 44,4 & RL-Base   \\
+23 & greedy-fair   & 20,61 & 0,0528 & 40,8 &  5,6 & Heurística\\
+24 & sac-base      &  4,52 & 0,0119 & 57,1 & 24,2 & RL-Base   \\
+25 & rsu           &  1,86 & 0,0030 &144,2 &  4,8 & Heurística\\
+\hline
+\end{tabular}}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O SAC-BASE (4,52\%) COLAPSA POR USAR ESTADO 11D BRUTO SEM TOPSIS:
+94,9\% DAS AÇÕES SÃO V2V SEM CRITÉRIO. O DQN-TOPSIS (25,9\%) MOSTRA
+QUE O TOPSIS TAMBÉM AJUDA ALGORITMOS BASEADOS EM VALOR, MAS EM
+MENOR ESCALA QUE COM O SAC.
+}
+\end{minipage}
+
+\end{frame}
+}
+
+% 28c. RESULTADOS: OTIMIZAÇÃO DA FUNÇÃO OBJETIVO J(π)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily RESULTADOS: OTIMIZAÇÃO DA FUNÇÃO OBJETIVO}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O PROBLEMA FOI FORMULADO COMO POMDP COM FUNÇÃO OBJETIVO QUE ESTABELECE
+UM TRADE-OFF RÍGIDO: $w_s{=}0{,}60$ PARA TAXA DE SUCESSO DE DEADLINE
+E $w_c{=}0{,}40$ PARA CUSTO NORMALIZADO DE LATÊNCIA E ENERGIA.
+AVALIADO EM 658 CENÁRIOS V2X, O SAC-TOPSIS ATINGIU $J(\pi){=}0{,}2454$.
+}
+\end{minipage}
+
+\vspace{0.08cm}
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+
+  % Equação J(π) em destaque
+  \node[draw=black, line width=1.4pt, fill=black!06, rounded corners=4pt,
+        inner sep=8pt, font=\small, align=center] (eqbox) at (0, 0) {
+    $\displaystyle J(\pi) \;=\;
+      \underbrace{w_s \cdot \mathbb{E}_\pi\!\bigl[\mathbf{1}(\text{JCT}_i \leq D_i)\bigr]}_{\text{taxa de sucesso}\;(w_s = 0{,}60)}
+      \;-\;
+      \underbrace{w_c \cdot \mathbb{E}_\pi\!\left[\frac{\alpha\,\text{JCT}_i + \beta\,E_i}{\alpha\,D_i + \beta\,E_{\max}}\right]}_{\text{custo normalizado}\;(w_c = 0{,}40)}$};
+
+  % Parâmetros — abaixo da caixa com folga
+  \node[font=\tiny\ttfamily, align=center, below=0.20cm of eqbox]
+    {$\alpha = 0{,}35$ (peso JCT)\quad $\beta = 0{,}35$ (peso energia)\quad
+     $E_{\max} = 432{,}6\,\text{J}$ (percentil 99)};
+
+  % Top 3 ranking de J(π)
+  \node[font=\scriptsize\bfseries\ttfamily] at (0,-2.20) {TOP 3 — FUNÇÃO OBJETIVO $J(\pi)$};
+
+  \node[draw=black, line width=1.6pt, fill=black!16, rounded corners=3pt,
+        font=\tiny\bfseries\ttfamily, align=center,
+        minimum width=3.0cm, minimum height=0.55cm] at (-4.2,-2.80)
+    {1º SAC-TOPSIS\\$J{=}0{,}2454$};
+
+  \node[draw=black, line width=0.9pt, fill=black!08, rounded corners=3pt,
+        font=\tiny\ttfamily, align=center,
+        minimum width=2.8cm, minimum height=0.52cm] at (0.0,-2.80)
+    {2º PPO-TOPSIS\\$J{=}0{,}2344$};
+
+  \node[draw=black, line width=0.9pt, fill=black!05, rounded corners=3pt,
+        font=\tiny\ttfamily, align=center,
+        minimum width=2.8cm, minimum height=0.52cm] at (4.0,-2.80)
+    {3º PPO-Base\\$J{=}0{,}2295$};
+
+  % Barras de J(π): escala * 30
+  \draw[black, line width=0.6pt] (-6.5,-3.55) -- (1.5,-3.55);
+  \fill[black!80] (-6.5,-3.90) rectangle (-6.5+7.36,-3.60);
+  \fill[black!35] (-6.5,-4.20) rectangle (-6.5+7.03,-3.90);
+  \fill[black!20] (-6.5,-4.50) rectangle (-6.5+6.89,-4.20);
+  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-3.75) {SAC-TOPSIS 0,2454};
+  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-4.05) {PPO-TOPSIS 0,2344};
+  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-4.35) {PPO-Base 0,2295};
+  \node[font=\tiny\ttfamily] at (-2.5,-4.75) {$J(\pi)$ (FUNÇÃO OBJETIVO)};
+
+\end{tikzpicture}}
+
+\end{frame}
+}
+
+% 28d. O IMPACTO DO TOPSIS NOS ALGORITMOS DRL CLÁSSICOS
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily O IMPACTO DO TOPSIS NOS ALGORITMOS DRL}
+
+\vspace{0.18cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O TOPSIS ATUA COMO PRECONDICIONADOR AGNÓSTICO AO ALGORITMO.
+ACOPLADO AO A2C: $+$84\% EM SWQ. AO DQN: $+$45\%. AO TD3: JCT
+REDUZIDO EM 44,5\%. AO SAC: $+$1147\% (4,52\% $\to$ 45,21\%).\\
+COMPARAÇÃO MAIS JUSTA: SAC-T1 (TOPSIS COMO FEATURE, 3 CLASSES) $\to$
+SAC-TOPSIS (TOPSIS COMO DECISÃO, BINÁRIA): $+$12,3 PP, $+$16,8\% SWQ.
+ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
+}
+\end{minipage}
+
+\vspace{0.10cm}
+\centering
+\begin{tikzpicture}[>=Stealth,
+  lw/.style={line width=1.0pt}
+]
+
+  % Escala: 45.21% = 7.2 cm
+  % SAC-Base=0.72, SAC-TOPSIS=7.22
+  % A2C-Base=3.48, A2C-TOPSIS=6.76
+  % DQN-Base=3.54, DQN-TOPSIS=4.14
+  % TD3-Base=6.76, TD3-TOPSIS=7.02 (43.91%)
+
+  % SAC-BASE → SAC-TOPSIS
+  \node[font=\tiny\bfseries\ttfamily, anchor=east] at (-0.25, 0.22)  {SAC};
+  \fill[black!22] (0, -0.05) rectangle (0.72, 0.40);
+  \fill[black!72] (0.76,-0.05) rectangle (7.22, 0.40);
+  \node[font=\tiny\ttfamily, anchor=west] at (7.26, 0.22) {$+$40,7 pp ($+$1147\% SWQ)};
+
+  % SAC-T1 → SAC-TOPSIS (comparação justa: mesmo TOPSIS, só muda ação)
+  \node[font=\tiny\ttfamily, anchor=east] at (-0.25,-0.65) {\textit{SAC-T1}};
+  \fill[black!30] (0,-0.92) rectangle (5.27,-0.48);   % SAC-T1: 32.96%
+  \fill[black!72] (5.31,-0.92) rectangle (7.22,-0.48); % SAC-TOPSIS: 45.21%
+  \draw[black!60, dashed, line width=0.5pt] (5.27,-1.05) -- (5.27, 0.52);
+  \node[font=\tiny\ttfamily, anchor=west] at (7.26,-0.65)
+    {$+$12,3 pp ($+$16,8\% SWQ) \textit{← comparação justa}};
+
+  % A2C
+  \node[font=\tiny\bfseries\ttfamily, anchor=east] at (-0.25,-1.75) {A2C};
+  \fill[black!22] (0,-2.02) rectangle (3.48,-1.58);
+  \fill[black!55] (3.52,-2.02) rectangle (6.76,-1.58);
+  \node[font=\tiny\ttfamily, anchor=west] at (7.26,-1.80) {$+$20,6 pp ($+$84\% SWQ)};
+
+  % DQN
+  \node[font=\tiny\bfseries\ttfamily, anchor=east] at (-0.25,-2.72) {DQN};
+  \fill[black!22] (0,-2.99) rectangle (3.54,-2.55);
+  \fill[black!45] (3.58,-2.99) rectangle (4.14,-2.55);
+  \node[font=\tiny\ttfamily, anchor=west] at (7.26,-2.77) {$+$3,8 pp ($+$45\% SWQ)};
+
+  % TD3
+  \node[font=\tiny\bfseries\ttfamily, anchor=east] at (-0.25,-3.69) {TD3};
+  \fill[black!22] (0,-3.96) rectangle (6.76,-3.52);
+  \fill[black!50] (6.80,-3.96) rectangle (7.02,-3.52);
+  \node[font=\tiny\ttfamily, anchor=west] at (7.26,-3.74)
+    {$+$1,6 pp; JCT $-$44,5\%};
+
+  % Eixo ajustado
+  \draw[black, lw] (-0.20, 0.55) -- (-0.20, -4.60);
+  \draw[black, lw] (-0.20,-4.60) -- (8.00,-4.60);
+  \node[font=\tiny\ttfamily] at (3.9,-4.95) {TAXA DE DEADLINE (\%)};
+
+  % Legenda
+  \fill[black!22] (0.8,-4.22) rectangle (1.4,-4.42);
+  \draw[black, line width=0.6pt] (0.8,-4.22) rectangle (1.4,-4.42);
+  \node[font=\tiny\ttfamily, anchor=west] at (1.5,-4.32) {BASE (sem TOPSIS)};
+  \fill[black!55] (4.6,-4.22) rectangle (5.2,-4.42);
+  \draw[black, line width=0.6pt] (4.6,-4.22) rectangle (5.2,-4.42);
+  \node[font=\tiny\ttfamily, anchor=west] at (5.3,-4.32) {+TOPSIS};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 28e. A ASSIMETRIA: POR QUE O TOPSIS FALHOU NO PPO?
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily A ASSIMETRIA: POR QUE O TOPSIS FALHOU NO PPO?}
+
+\vspace{0.15cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+EXPERIMENTO CONTROLADO: PPO COM ESTADO 6D, AÇÃO BINÁRIA E MESMA
+RECOMPENSA DO SAC-TOPSIS. RESULTADO: PPO 18,4\% $\times$ SAC 45,3\%.
+DIFERENÇA ATRIBUÍVEL EXCLUSIVAMENTE AO ALGORITMO.
+}
+\end{minipage}
+
+\vspace{0.08cm}
+\centering
+\begin{tikzpicture}[>=Stealth,
+  hdr/.style={draw=black, line width=1.2pt, fill=black!14,
+              rounded corners=3pt, minimum width=4.0cm,
+              minimum height=0.55cm, font=\scriptsize\bfseries\ttfamily,
+              align=center},
+  pok/.style={draw=black!50, line width=0.7pt, fill=black!04,
+              rounded corners=2pt, minimum width=4.0cm,
+              minimum height=0.60cm, font=\tiny\ttfamily, align=center},
+  neg/.style={draw=black!50, line width=0.7pt, fill=black!16,
+              rounded corners=2pt, minimum width=4.0cm,
+              minimum height=0.60cm, font=\tiny\ttfamily, align=center},
+  lbl/.style={font=\tiny\bfseries\ttfamily, align=center}
+]
+
+  % Separador central
+  \draw[black!50, dashed, line width=0.8pt] (0, 0.35) -- (0,-3.80);
+
+  % Cabeçalhos
+  \node[hdr] at (-3.0, 0.22) {SAC (OFF-POLICY)};
+  \node[hdr] at ( 3.0, 0.22) {PPO (ON-POLICY)};
+
+  % Linha 1: Natureza
+  \node[lbl] at (-6.5,-0.45) {Natureza};
+  \node[pok] at (-3.0,-0.45) {Off-policy\\reutiliza experiências passadas};
+  \node[neg] at ( 3.0,-0.45) {On-policy\\cada lote descartado após uso};
+
+  % Linha 2: Eficiência amostral
+  \node[lbl] at (-6.5,-1.20) {Eficiência\\amostral};
+  \node[pok] at (-3.0,-1.20) {Replay Buffer $|\mathcal{B}|{=}50\,000$\\cada transição reciclada ${\approx}40\times$};
+  \node[neg] at ( 3.0,-1.20) {Descarta dados após $k{=}8$ épocas\\sobreajuste ao cenário único};
+
+  % Linha 3: Entropia
+  \node[lbl] at (-6.5,-1.95) {Entropia\\exploração};
+  \node[pok] at (-3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}10$ (ajuste auto.)\\resistência ao colapso};
+  \node[neg] at ( 3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}01$ (fixo 10$\times$ menor)\\$P(\text{rank}_1)\!\to\!1$: colapso};
+
+  % Linha 4: Consequência
+  \node[lbl] at (-6.5,-2.70) {Resultado};
+  \node[pok] at (-3.0,-2.70) {Pergunta nova: DESCARREGAR?\\Generalização zero-shot};
+  \node[neg] at ( 3.0,-2.70) {Aprendizado redundante:\\redescobre o que o TOPSIS já sabe};
+
+  % Resultado final numérico
+  \draw[black, line width=0.8pt] (-6.8,-3.20) -- (6.8,-3.20);
+  \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
+        font=\scriptsize\bfseries\ttfamily, minimum width=3.6cm,
+        minimum height=0.55cm] at (-3.0,-3.55) {45,3\% \ DEADLINE};
+  \node[draw=black, line width=0.8pt, fill=black!06, rounded corners=3pt,
+        font=\scriptsize\ttfamily, minimum width=3.6cm,
+        minimum height=0.55cm] at ( 3.0,-3.55) {18,4\% \ DEADLINE};
+  \draw[black,->,line width=1.6pt] (0.4,-3.55) -- (-1.4,-3.55)
+    node[midway, above, font=\tiny\bfseries\ttfamily] {$\Delta{=}26{,}9$\,pp};
+
+\end{tikzpicture}
+
+\end{frame}
+}
+
+% 29. PRÓXIMOS PASSOS: FUZZY-TOPSIS E SIMULAÇÃO NS-3
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.35cm}
+\hspace{0.3cm}{\Large\bfseries\ttfamily PRÓXIMOS PASSOS: FUZZY-TOPSIS E NS-3}
+
+\vspace{0.30cm}
+\hspace{0.3cm}
+\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+O AMBIENTE VEICULAR REAL É CAÓTICO: ESTIMATIVAS DE CANAL CHEGAM COM
+ATRASO E FILAS SOFREM FLUTUAÇÕES RÁPIDAS. O TOPSIS SERÁ SUBSTITUÍDO
+PELO FUZZY-TOPSIS: MODELANDO MEDIÇÕES COMO NÚMEROS FUZZY TRIANGULARES
+(TFNs), A ARQUITETURA ABSORVERÁ INCERTEZA LINGUÍSTICA, EVITANDO
+INVERSÕES INSTÁVEIS DE RANQUEAMENTO. O MODELO FINAL SAC-FUZZY-TOPSIS
+SERÁ VALIDADO NO SIMULADOR NS-3 (MÓDULO 5G-LENA), GARANTINDO ALTA
+FIDELIDADE FÍSICA AOS PADRÕES 3GPP.
+}
+\end{minipage}
+
+\vspace{0.25cm}
+\centering
+\begin{tikzpicture}[>=Stealth, thick,
+  etapa/.style={draw=black, line width=1.2pt, fill=black!08,
+                rounded corners=4pt, minimum width=3.0cm,
+                minimum height=1.10cm, font=\tiny\ttfamily, align=center},
+  num/.style={draw=black, circle, line width=1.0pt, fill=black!70,
+              text=white, font=\tiny\bfseries, inner sep=2pt}
+]
+  \node[etapa, fill=black!12] (b1) at (-4.2, 0)
+    {SAC-TOPSIS\\(QUALIFICAÇÃO)\\{\tiny $\checkmark$ 658 CENÁRIOS}};
+  \node[num] at (-4.2, 0.75) {1};
+  \draw[black, ->, line width=1.4pt] (b1.east) -- (-1.55, 0);
+  \node[etapa, fill=black!09] (b2) at (0.0, 0)
+    {SAC-FUZZY-TOPSIS\\(INCERTEZA)\\{\tiny TFNs + CANAL RUIDOSO}};
+  \node[num] at (0.0, 0.75) {2};
+  \draw[black, ->, line width=1.4pt] (b2.east) -- (2.65, 0);
+  \node[etapa, fill=black!06] (b3) at (4.2, 0)
+    {NS-3 / 5G-LENA\\(VALIDAÇÃO FINAL)\\{\tiny PADRÕES 3GPP}};
+  \node[num] at (4.2, 0.75) {3};
+  \node[font=\tiny\ttfamily, align=center] at (0.0, -0.95)
+    {ROBUSTEZ SOB INCERTEZA $\;\longrightarrow\;$ FIDELIDADE FÍSICA AOS PADRÕES 3GPP};
+\end{tikzpicture}
+
+\end{frame}
+}
+
+\end{document}
+
