@@ -1,7 +1,7 @@
 \chapter{Metodologia}
 \label{chap:metodologia}
 
-A metodologia deste trabalho é fundamentada na simulação, utilizando o simulador de redes NS-3, estendido com os módulos 5G-LENA e C-V2X para modelar com fidelidade o ambiente veicular 5G.
+A metodologia deste trabalho é fundamentada na simulação, utilizando o simulador de redes NS-3, estendido com os módulos 5G-LENA e C-\gls{V2X} para modelar com fidelidade o ambiente veicular 5G.
 
 \section{Modelagem do Sistema e Formulação do Problema}
 \label{sec:modelagem_sistema}
@@ -57,7 +57,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
             1.4.8.1 Enviar pedido de descarregamento
             1.4.8.2 Aguardar resposta
     1.5 Protocolo de Descoberta de Vizinhança, na camada de aplicação
-        1.5.1 Emissão de Beacons Periódicos (via \gls{5G} \gls{NR} e \gls{V2X} Sidelink)
+        1.5.1 Emissão de Beacons Periódicos (via \gls{5G} \gls{NR} e \gls{V2X} \textit{Sidelink})
             1.5.1.1 Conteúdo do Beacon (Device Specs, Estado Atual, velocidade, posição GPS, é \gls{VEC}?, é \gls{OBU}?, etc)
         1.5.2 Tabela de Vizinhos (Neighbor Table)
             1.5.2.1 Cálculo do Tempo de Vida Estimado do Enlace
@@ -68,7 +68,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
         2.1.1 Taxa de Transmissão (Shannon-Hartley)
         2.1.2 Modelagem de Interferência
         2.1.3 Mobilidade Veicular e Variação do Canal
-    2.2 Modelo de Canal \gls{V2X} Sidelink (\gls{PC5})
+    2.2 Modelo de Canal \gls{V2X} \textit{Sidelink} (\gls{PC5})
         2.2.1 Taxa de Transmissão (Shannon-Hartley)
         2.2.2 Modelagem de Interferência
         2.2.3 Mobilidade Veicular e Variação do Canal
@@ -78,7 +78,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
     3.1 Modos de Execução
         3.1.1 Processamento Local
         3.1.2 Descarregamento \gls{V2I} (para \gls{RSU} via \gls{5G} \gls{NR})
-        3.1.3 Descarregamento \gls{V2V} (para veículo vizinho via Sidelink)
+        3.1.3 Descarregamento \gls{V2V} (para veículo vizinho via \textit{Sidelink})
     3.2
 4. Coleta de métricas de desempenho do descarregamento de tarefas
     4.1 Métricas Globais
@@ -97,7 +97,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
         4.3.5 Índice de justiça de Jain por Política
     4.3 Análise de Sensibilidade
         4.3.1 Impacto dos Pesos na Função Objetivo
-        4.3.2 Trade-off entre Latência, Consumo Energético e Justiça
+        4.3.2 \textit{Trade-off} entre Latência, Consumo Energético e Justiça
     4.4 Função Objetivo Global
         4.4.1 Minimização do Atraso Total considerando incerteza
         4.4.2 Minimização do Consumo Energético Total considerando incerteza
@@ -133,7 +133,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 
 
 
-% Para validar a proposta de \textit{offloading} em um cenário veicular heterogêneo operando sob cobertura 5G NR e comunicação \gls{V2X} Sidelink, é fundamental estabelecer formalmente as entidades, as restrições físicas e os objetivos de otimização. Esta seção descreve o modelo matemático que fundamenta a arquitetura proposta.
+% Para validar a proposta de offloading em um cenário veicular heterogêneo operando sob cobertura 5G NR e comunicação \gls{V2X} Sidelink, é fundamental estabelecer formalmente as entidades, as restrições físicas e os objetivos de otimização. Esta seção descreve o modelo matemático que fundamenta a arquitetura proposta.
 
 % \subsection{Entidades e Heterogeneidade}
 
@@ -154,7 +154,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 
 % \subsection{Modelos de Computação e Comunicação}
 
-% O sistema permite três modos de execução: processamento local, \textit{offloading} \gls{V2I} (para \gls{RSU} via 5G) e \textit{offloading} \gls{V2V} (para veículo vizinho via Sidelink).
+% O sistema permite três modos de execução: processamento local, offloading \gls{V2I} (para \gls{RSU} via 5G) e offloading \gls{V2V} (para veículo vizinho via Sidelink).
 
 % \subsubsection{Modelo de Computação Local}
 % Caso o veículo decida processar a tarefa internamente, o tempo de execução $T_{i}^{loc}$ e o consumo energético $E_{i}^{loc}$ são dados por:
@@ -175,7 +175,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % \begin{equation}
 %     T_{i,j}^{off} = \frac{D_i}{R_{i,j}} + \frac{C_i}{f_j^{rem}}
 % \end{equation}
-% O consumo energético do veículo $i$ durante o \textit{offloading} considera a energia de transmissão de rádio:
+% O consumo energético do veículo $i$ durante o offloading considera a energia de transmissão de rádio:
 % \begin{equation}
 %     E_{i,j}^{off} = P_i^{tx} \left( \frac{D_i}{R_{i,j}} \right) + E_{tail}
 % \end{equation}
@@ -194,7 +194,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % \end{equation}
 
 % \subsubsection{Índice de Justiça de Jain}
-% Para garantir que veículos com \textit{hardware} inferior não sejam penalizados desproporcionalmente, utilizamos o Índice de Jain ($J$). Definindo a utilidade do veículo como o inverso do seu atraso percebido ($U_i = 1/T_i$), o índice é dado por:
+% Para garantir que veículos com hardware inferior não sejam penalizados desproporcionalmente, utilizamos o Índice de Jain ($J$). Definindo a utilidade do veículo como o inverso do seu atraso percebido ($U_i = 1/T_i$), o índice é dado por:
 % \begin{equation}
 %     J = \frac{\left( \sum_{i=1}^{V} U_i \right)^2}{V \cdot \sum_{i=1}^{V} (U_i)^2}
 % \end{equation}
@@ -223,9 +223,9 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 %     \end{equation}
 %     onde $\mathbf{Q}_t$ representa as filas de tarefas, $\mathbf{H}_t$ a matriz de estado do canal (CSI) para links \gls{V2I} e \gls{V2V}, e $\mathbf{B}_t$ o status de bateria/recursos das OBUs.
 
-%     \item \textbf{Espaço de Ações ($\mathcal{A}$):} O vetor de ações $a_t = [a_{1,t}, \dots, a_{V,t}]$ define o destino de \textit{offloading} para cada veículo, onde $a_{i,t} \in \{ \text{Local}, \text{RSU}, \text{Vizinhos} \}$.
+%     \item \textbf{Espaço de Ações ($\mathcal{A}$):} O vetor de ações $a_t = [a_{1,t}, \dots, a_{V,t}]$ define o destino de offloading para cada veículo, onde $a_{i,t} \in \{ \text{Local}, \text{RSU}, \text{Vizinhos} \}$.
 
-%     \item \textbf{Engenharia da Função de Recompensa ($\mathcal{R}$):} A recompensa imediata $r_t$ é projetada para alinhar o aprendizado do agente com a função objetivo da Equação \ref{eq:objective_function}:
+%     \item \textbf{Engenharia da Função de Recompensa ($\mathcal{R}$):} A recompensa imediata $r_t$ é projetada para alinhar o aprendizado do agente com a função objetivo da Equação~\ref{eq:objective_function}:
 %     \begin{equation}
 %         r_t(s_t, a_t) = - \left[ \omega_1 \bar{T}_{sys}(t) + \omega_2 \bar{E}_{sys}(t) \right] + \omega_3 \Phi(J_t)
 %     \end{equation}
@@ -259,7 +259,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % O módulo gerencia o ciclo de vida completo do descarregamento de tarefas e é composto por três componentes principais:
 % \begin{itemize}
 %     \item \textbf{Descoberta de Vizinhança:} A aplicação emite periodicamente pacotes de \textit{beacon} (via 5G NR e Sidelink \gls{V2X}) que contêm o estado atual do nó, incluindo suas especificações de dispositivo (\texttt{DeviceSpecs}: capacidade de CPU, nível de energia, tempo de fila). Os nós receptores utilizam essas informações para manter uma tabela de vizinhos (\texttt{NeighborTable}), que também calcula o tempo de vida estimado do enlace.
-%     \item \textbf{Geração de Tarefas:} O \texttt{TaskGenerator} é responsável por criar novas tarefas (\texttt{Task}) em cada UE, com base em distribuições estocásticas para definir seus atributos: tamanho de entrada (bytes), tamanho de saída (bytes), ciclos de processamento (CPU cycles) e \textit{deadline} (ms). Este componente é capaz de simular ambientes não-estacionários, aplicando um "drift" aos parâmetros das tarefas ao longo do tempo, o que é crucial para validar a robustez do modelo Fuzzy-DRL.
+%     \item \textbf{Geração de Tarefas:} O \texttt{TaskGenerator} é responsável por criar novas tarefas (\texttt{Task}) em cada UE, com base em distribuições estocásticas para definir seus atributos: tamanho de entrada (bytes), tamanho de saída (bytes), ciclos de processamento (CPU cycles) e deadline (ms). Este componente é capaz de simular ambientes não-estacionários, aplicando um "drift" aos parâmetros das tarefas ao longo do tempo, o que é crucial para validar a robustez do modelo Fuzzy-DRL.
 %     \item \textbf{Protocolo de descarregamento:} Um protocolo de comunicação baseado em UDP foi definido para gerenciar a negociação. O fluxo consiste em \texttt{TASK\_REQUEST} (pedido de descarregamento), \texttt{TASK\_RESPONSE} (aceite ou rejeição, ex: \texttt{REJECTED\_QUEUE\_FULL}), \texttt{TASK\_DATA} (envio dos dados da tarefa), \texttt{TASK\_RESULT} (retorno do resultado) e \texttt{TASK\_ACK} (confirmação).
 % \end{itemize}
 
@@ -270,7 +270,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % \end{center}
 % Neste contexto, o \textit{estado} do ambiente (\gls{MDP}) é composto pela \texttt{Task} (requisitos) e pela \texttt{NeighborTable} (recursos disponíveis). A \textit{ação} é a estrutura \texttt{OffloadDecision} (processar localmente ou descarregar para um vizinho VEC/V2V).
 
-% O modelo híbrido proposto será implementado como uma nova estratégia (ex: \texttt{FuzzyDrlStrategy}) que herda de \texttt{OffloadingStrategy}. O módulo de Lógica \textit{Fuzzy} atuará como um pré-processador de estado, analisando a \texttt{NeighborTable} para gerar indicadores linguísticos (ex: "carga da rede", "qualidade do enlace"). O agente \gls{DRL} receberá esses indicadores e aprenderá a política ótima de decisão. As estratégias mais simples, como \texttt{LocalOnlyStrategy} e \texttt{RandomStrategy}, servirão como \textit{baselines} para a avaliação de desempenho.
+% O modelo híbrido proposto será implementado como uma nova estratégia (ex: \texttt{FuzzyDrlStrategy}) que herda de \texttt{OffloadingStrategy}. O módulo de Lógica Fuzzy atuará como um pré-processador de estado, analisando a \texttt{NeighborTable} para gerar indicadores linguísticos (ex: "carga da rede", "qualidade do enlace"). O agente \gls{DRL} receberá esses indicadores e aprenderá a política ótima de decisão. As estratégias mais simples, como \texttt{LocalOnlyStrategy} e \texttt{RandomStrategy}, servirão como \textit{baselines} para a avaliação de desempenho.
 
 % Sed aliquam tortor non laoreet semper. Nunc aliquam dapibus urna, eu tincidunt ex viverra et. Mauris dapibus sagittis consectetur. Integer leo ligula, aliquam et consectetur non, fermentum at mi. Aliquam sodales fringilla rhoncus. Vivamus quis tortor magna. Donec semper odio libero, nec scelerisque massa dignissim eget. Morbi lectus metus, semper sed lacinia sit amet, porta nec turpis. Duis pretium mi eget consequat sagittis. Praesent porttitor elementum nisl, et molestie quam. Suspendisse vehicula vitae metus eu rhoncus. Nam vitae est augue. Fusce nec diam non nunc consequat aliquam id vitae lectus. In malesuada neque nec justo sagittis, in iaculis neque feugiat. Fusce eu risus purus.
 
@@ -388,7 +388,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % Praesent vestibulum, metus at suscipit rhoncus, metus eros elementum tortor, hendrerit finibus quam est egestas magna. Aliquam erat volutpat. Cras semper vel justo et vestibulum. Duis condimentum a sem eu posuere. Suspendisse varius, mi id interdum sollicitudin, velit metus auctor dolor, ac pellentesque ligula enim sed urna. Nulla finibus interdum ornare. Duis porttitor, nunc tempus vestibulum rutrum, diam ipsum lacinia diam, a molestie felis dui ac neque. Phasellus vestibulum vitae nunc non congue. Sed a mi gravida, posuere massa non, aliquet libero. Phasellus et diam viverra, fermentum dolor ac, ornare erat. Fusce vestibulum magna ut pretium consectetur. Sed bibendum sapien augue. Suspendisse vitae enim sollicitudin, posuere tellus et, interdum enim. Curabitur porttitor ultricies metus in pretium. Nunc quis tortor dui.
 
 % \index{figuras}Figuras podem ser criadas diretamente em LaTeX,
-% como o exemplo da \ref{fig-grafico-1}.
+% como o exemplo da~\ref{fig-grafico-1}.
 
 % \begin{figure}[ht!]
 % 	\centering
@@ -400,7 +400,7 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 % }
 % \end{figure}
 
-% Ou então figuras podem ser incorporadas de arquivos externos, como é o caso da \autoref{fig-grafico-1}. Se a figura que ser incluída se tratar de um diagrama, um gráfico ou uma ilustração que você mesmo produza, priorize o uso de imagens vetoriais no formato PDF. Com isso, o tamanho do arquivo final do trabalho será menor, e as imagens terão uma apresentação melhor, principalmente quando impressas, uma vez que imagens vetorias são perfeitamente escaláveis para qualquer dimensão. Nesse caso, se for utilizar o Microsoft Excel para produzir gráficos, ou o Microsoft Word para produzir ilustrações, exporte-os como PDF e os incorpore ao documento conforme o exemplo abaixo. No entanto, para manter a coerência no uso de \textit{software} livre (já que você está usando LaTeX e abnTeX),  teste a ferramenta InkScape\index{InkScape}. ao CorelDraw\index{CorelDraw} ou ao Adobe Illustrator\index{Adobe! Illustrator}.  De todo modo, caso não seja possível  utilizar arquivos de imagens como PDF, utilize qualquer outro formato, como JPEG, GIF, BMP, etc.  Nesse caso, você pode tentar aprimorar as imagens incorporadas com o \textit{software} livre \index{Gimp}Gimp. Ele é uma alternativa livre ao Adobe Photoshop\index{Adobe! Photoshop}.
+% Ou então figuras podem ser incorporadas de arquivos externos, como é o caso da \autoref{fig-grafico-1}. Se a figura que ser incluída se tratar de um diagrama, um gráfico ou uma ilustração que você mesmo produza, priorize o uso de imagens vetoriais no formato PDF. Com isso, o tamanho do arquivo final do trabalho será menor, e as imagens terão uma apresentação melhor, principalmente quando impressas, uma vez que imagens vetorias são perfeitamente escaláveis para qualquer dimensão. Nesse caso, se for utilizar o Microsoft Excel para produzir gráficos, ou o Microsoft Word para produzir ilustrações, exporte-os como PDF e os incorpore ao documento conforme o exemplo abaixo. No entanto, para manter a coerência no uso de software livre (já que você está usando LaTeX e abnTeX),  teste a ferramenta InkScape\index{InkScape}. ao CorelDraw\index{CorelDraw} ou ao Adobe Illustrator\index{Adobe! Illustrator}.  De todo modo, caso não seja possível  utilizar arquivos de imagens como PDF, utilize qualquer outro formato, como JPEG, GIF, BMP, etc.  Nesse caso, você pode tentar aprimorar as imagens incorporadas com o software livre \index{Gimp}Gimp. Ele é uma alternativa livre ao Adobe Photoshop\index{Adobe! Photoshop}.
 
 % \section{Usando Fórmulas Matemáticas}
 
@@ -578,14 +578,14 @@ A metodologia deste trabalho é fundamentada na simulação, utilizando o simula
 
 % Quando houver três autores na citação, apresentam se os três, separados por ponto e vírgula, caso estes estejam após o texto. Se os autores estiverem incluídos no texto, devem ser separados por vírgula e pela conjunção "e".
 
-% \citeautoronline{tresautores}
+%~\citeautoronline{tresautores}
 
 %~\cite{tresautores}
 
 % \subsection{Documentos com mais de três autores}
 % Havendo mais de três autores, indica-se o primeiro seguido da expressão \textit{et al.} (do latim \textit{et alli}, que significa e outros), do ano e da página.
 
-% \citeautoronline{quatroautores}
+%~\citeautoronline{quatroautores}
 
 %~\cite{quatroautores}
 
