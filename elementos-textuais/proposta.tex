@@ -283,31 +283,31 @@ Para resolver esse problema, a arquitetura proposta combina \gls{TOPSIS} e \gls{
 \label{alg:sac-topsis}
 \SetKwInOut{Input}{Entrada}
 \SetKwInOut{Output}{Saída}
-\Input{Tarefa $j$: complexidade $C_j$, \textit{deadline} $D_j$, posição $\mathbf{x}_j$;\\
+\Input{Tarefa $i$: complexidade $C_i$, \textit{deadline} $D_i$, posição $\mathbf{x}_i$;\\
        Conjunto de $N$ candidatos $\mathcal{M} = \{m_1,\ldots,m_N\}$ (\gls{V2I} e \gls{V2V});\\
        \textit{Actor} \gls{MLP} treinado $\pi_\theta$; filas $Q_{\ell}$, $Q_{\mathrm{r1}}$; $Q_{\max}$, $C_{\max}$.}
 \Output{Ação $a_t \in \{0,\,1\}$: executar localmente ou descarregar para \textit{rank}$_1$.}
 \BlankLine
 \tcp{Passo 1 --- Construção da matriz de decisão}
-\For{$i = 1$ \KwTo $N$}{
-    $x_{i1} \gets \widehat{\mathrm{JCT}}(m_i)$\tcp*{latência estimada (ms)}
-    $x_{i2} \gets E(m_i)$\tcp*{energia total estimada (J)}
-    $x_{i3} \gets \|\mathbf{x}_j - \mathbf{x}_{m_i}\|$\tcp*{distância física (m)}
+\For{$k = 1$ \KwTo $N$}{
+    $x_{k1} \gets \widehat{\mathrm{JCT}}(m_k)$\tcp*{latência estimada (ms)}
+    $x_{k2} \gets E(m_k)$\tcp*{energia total estimada (J)}
+    $x_{k3} \gets \|\mathbf{x}_i - \mathbf{x}_{m_k}\|$\tcp*{distância física (m)}
 }
 \BlankLine
 \tcp{Passo 2 --- Ranqueamento via Algoritmo~\ref{alg:topsis} (todos critérios de custo)}
 $\mathbf{w} \gets [0{,}40;\; 0{,}30;\; 0{,}30]$\;
 $\mathbf{C}^* \gets \text{Algoritmo~\ref{alg:topsis}}(\mathbf{X},\, \mathbf{w})$\tcp*{todos os critérios são de custo}
-$\mathrm{rank}_1 \gets \arg\max_i\; C^*_i$\;
+$\mathrm{rank}_1 \gets \arg\max_k\; C^*_k$\;
 \BlankLine
 \tcp{Passo 3 --- Construção do vetor de estado compacto 6D}
-$\Delta_{\mathrm{obj}} \gets \bigl(\widehat{\mathrm{JCT}}_{\ell} - \widehat{\mathrm{JCT}}_{\mathrm{r1}}\bigr) \;/\; D_j$\;
+$\Delta_{\mathrm{obj}} \gets \bigl(\widehat{\mathrm{JCT}}_{\ell} - \widehat{\mathrm{JCT}}_{\mathrm{r1}}\bigr) \;/\; D_i$\;
 $\mathbf{S}_t \gets \left[\,\Delta_{\mathrm{obj}},\;
-    \tfrac{\widehat{\mathrm{JCT}}_{\ell}}{D_j};
-    \tfrac{\widehat{\mathrm{JCT}}_{\mathrm{r1}}}{D_j};
+    \tfrac{\widehat{\mathrm{JCT}}_{\ell}}{D_i};
+    \tfrac{\widehat{\mathrm{JCT}}_{\mathrm{r1}}}{D_i};
     \tfrac{Q_{\mathrm{r1}}}{Q_{\max}},\;
     \tfrac{Q_{\ell}}{Q_{\max}},\;
-    \tfrac{C_j}{C_{\max}}\,\right]$\;
+    \tfrac{C_i}{C_{\max}}\,\right]$\;
 \BlankLine
 \tcp{Passo 4 --- Inferência e decisão}
 $a_t \gets \arg\max_{a}\; \pi_\theta(a \mid \mathbf{S}_t)$\;
@@ -318,7 +318,7 @@ $a_t \gets \arg\max_{a}\; \pi_\theta(a \mid \mathbf{S}_t)$\;
 }
 \end{algorithm}
 
-O Algoritmo~\ref{alg:sac-topsis} descreve o fluxo completo de decisão da arquitetura \gls{SAC}-\gls{TOPSIS} em quatro passos. No passo~1, constrói-se a matriz $\mathbf{X} \in \mathbb{R}^{N \times 3}$ com latência estimada, energia e distância de cada candidato. No passo~2, invoca-se o Algoritmo~\ref{alg:topsis} com pesos $\mathbf{w}$ e todos os critérios de custo, obtendo o vetor de escores $\mathbf{C}^*$; o candidato de maior escore torna-se o \textit{rank}$_1$. No passo~3, o resultado é comprimido no vetor de estado $\mathbf{S}_t \in \mathbb{R}^6$, cujos componentes capturam a vantagem relativa do descarregamento ($\Delta_{\mathrm{obj}}$), as urgências local e do \textit{rank}$_1$ em relação ao \textit{deadline}, as ocupações normalizadas das filas e a complexidade da tarefa --- sendo $C_j$ e $D_j$ inseridos diretamente, sem passar pelo \gls{TOPSIS}. Por fim, no passo~4, o \textit{Actor} \gls{MLP} ($6 \to 64 \to 64 \to 2$, ReLU, Softmax) recebe $\mathbf{S}_t$ e emite a decisão binária $a_t$: $a_t = 0$ corresponde à execução local; $a_t = 1$, ao descarregamento para o \textit{rank}$_1$.
+O Algoritmo~\ref{alg:sac-topsis} descreve o fluxo completo de decisão da arquitetura \gls{SAC}-\gls{TOPSIS} em quatro passos. No passo~1, constrói-se a matriz $\mathbf{X} \in \mathbb{R}^{N \times 3}$ com latência estimada, energia e distância de cada candidato. No passo~2, invoca-se o Algoritmo~\ref{alg:topsis} com pesos $\mathbf{w}$ e todos os critérios de custo, obtendo o vetor de escores $\mathbf{C}^*$; o candidato de maior escore torna-se o \textit{rank}$_1$. No passo~3, o resultado é comprimido no vetor de estado $\mathbf{S}_t \in \mathbb{R}^6$, cujos componentes capturam a vantagem relativa do descarregamento ($\Delta_{\mathrm{obj}}$), as urgências local e do \textit{rank}$_1$ em relação ao \textit{deadline}, as ocupações normalizadas das filas e a complexidade da tarefa --- sendo $C_i$ e $D_i$ inseridos diretamente, sem passar pelo \gls{TOPSIS}. Por fim, no passo~4, o \textit{Actor} \gls{MLP} ($6 \to 64 \to 64 \to 2$, ReLU, Softmax) recebe $\mathbf{S}_t$ e emite a decisão binária $a_t$: $a_t = 0$ corresponde à execução local; $a_t = 1$, ao descarregamento para o \textit{rank}$_1$.
 
 
 % ============================================================
@@ -343,11 +343,11 @@ $C_3$ & Distância física ao executor (metros) & Custo & $w_3 = 0{,}30$ \\
 
 O procedimento segue os passos clássicos do \gls{TOPSIS}: (i)~normalização vetorial da matriz de decisão por norma $L_2$ de cada coluna; (ii)~ponderação por $w_j$; (iii)~identificação das soluções ideal positiva $A^+$ (mínimo de cada critério) e ideal negativa $A^-$ (máximo), ambas calculadas por minimização; (iv)~cálculo das distâncias de cada alternativa a $A^+$ e $A^-$; (v)~escore de proximidade. Independentemente de existirem $2$ ou $50$ candidatos, o estado entregue à rede neural é sempre um vetor fixo de 6 dimensões construído a partir do resultado do \gls{TOPSIS}:
 \begin{equation}
-    \mathbf{S}_t = \left[\Delta_{\text{obj}},\; \frac{\widehat{\text{JCT}}_{\text{local}}}{D_i},\; \frac{\widehat{\text{JCT}}_{\text{rank}_1}}{D_i},\; \frac{|Q_{\text{rank}_1}|}{Q_{\max}},\; \frac{|Q_{\text{local}}|}{Q_{\max}},\; \frac{C_j}{C_{\max}}\right] \in \mathbb{R}^6
+    \mathbf{S}_t = \left[\Delta_{\text{obj}},\; \frac{\widehat{\text{JCT}}_{\text{local}}}{D_i},\; \frac{\widehat{\text{JCT}}_{\text{rank}_1}}{D_i},\; \frac{|Q_{\text{rank}_1}|}{Q_{\max}},\; \frac{|Q_{\text{local}}|}{Q_{\max}},\; \frac{C_i}{C_{\max}}\right] \in \mathbb{R}^6
     \label{eq:estado6d}
 \end{equation}
 
-Cada dimensão carrega uma semântica irredutível para a decisão. $\Delta_{\text{obj}}$ denota a diferença normalizada entre o custo estimado de execução local e o custo do candidato \textit{rank}$_1$ segundo o \gls{TOPSIS}; valor positivo indica que o \textit{offload} é vantajoso. $\widehat{\text{JCT}}_{\text{local}}/D_i$ calcula a razão entre o tempo de conclusão estimado localmente e o prazo, de modo que valores $> 1{,}0$ sinalizam violação iminente. $\widehat{\text{JCT}}_{\text{rank}_1}/D_i$ é a razão análoga para o melhor candidato, permitindo ao agente comparar diretamente as duas opções. $|Q_{\text{rank}_1}|/Q_{\max}$ representa a ocupação normalizada da fila do nó classificado em primeiro lugar pelo \gls{TOPSIS}, indicando deterioração futura da latência de \textit{offload} caso o agente decida descarregar. $|Q_{\text{local}}|/Q_{\max}$ informa a ocupação da fila local, refletindo o custo de aguardar execução no próprio dispositivo. Por fim, $C_j/C_{\max}$ normaliza o número de ciclos de \gls{CPU} da tarefa, ancorando o contexto computacional da decisão. Em conjunto, as seis dimensões fornecem ao agente os sinais necessários para avaliar, a cada instante, a vantagem relativa do \textit{offload} frente à execução local.
+Cada dimensão carrega uma semântica irredutível para a decisão. $\Delta_{\text{obj}}$ denota a diferença normalizada entre o custo estimado de execução local e o custo do candidato \textit{rank}$_1$ segundo o \gls{TOPSIS}; valor positivo indica que o \textit{offload} é vantajoso. $\widehat{\text{JCT}}_{\text{local}}/D_i$ calcula a razão entre o tempo de conclusão estimado localmente e o prazo, de modo que valores $> 1{,}0$ sinalizam violação iminente. $\widehat{\text{JCT}}_{\text{rank}_1}/D_i$ é a razão análoga para o melhor candidato, permitindo ao agente comparar diretamente as duas opções. $|Q_{\text{rank}_1}|/Q_{\max}$ representa a ocupação normalizada da fila do nó classificado em primeiro lugar pelo \gls{TOPSIS}, indicando deterioração futura da latência de \textit{offload} caso o agente decida descarregar. $|Q_{\text{local}}|/Q_{\max}$ informa a ocupação da fila local, refletindo o custo de aguardar execução no próprio dispositivo. Por fim, $C_i/C_{\max}$ normaliza o número de ciclos de \gls{CPU} da tarefa, ancorando o contexto computacional da decisão. Em conjunto, as seis dimensões fornecem ao agente os sinais necessários para avaliar, a cada instante, a vantagem relativa do \textit{offload} frente à execução local.
 
 % \section*{Seleção da Ação de Descarregamento}
 O agente \gls{SAC} opera sobre um espaço de ação discreto binário $a_t \in \{0, 1\}$. O mapeamento entre ação e modo de execução é mediado pelo resultado do \gls{TOPSIS}. Quando $a_t = 1$, a tarefa é encaminhada ao candidato melhor ranqueado, que pode ser o servidor \gls{VEC} ou um veículo vizinho. Caso nenhum candidato de \textit{offload} seja viável ($N = 0$), $a_t = 1$ é tratado como \textsc{LOCAL} por padrão. Essa separação de responsabilidades — \gls{TOPSIS} decide \textit{para onde} descarregar, \gls{SAC} decide \textit{se} descarregar — reduz o espaço de busca do agente de $N+1$ para $2$ ações, independente de $N$.
@@ -386,7 +386,7 @@ Como o \gls{TOPSIS} comprime qualquer conjunto de $N$ candidatos em um único ve
     3/{$s_3$}/{$\widehat{\mathrm{JCT}}_{\mathrm{r1}}/D_i$},
     4/{$s_4$}/{$Q_{\mathrm{r1}}/Q_{\max}$},
     5/{$s_5$}/{$Q_{\ell}/Q_{\max}$},
-    6/{$s_6$}/{$C_j/C_{\max}$}
+    6/{$s_6$}/{$C_i/C_{\max}$}
 }{
     \node[nin] (I\i) at (0, {-(\i-1)*1.0}) {\name};
     \node[lbl, right=0.06cm of I\i] {\desc};
@@ -499,8 +499,8 @@ Para isolar a contribuição de cada componente do \gls{SAC}-\gls{TOPSIS}, reali
 O \gls{SAC}-Base é o ponto de partida do estudo e serve de referência para medir o ganho de cada componente. Utiliza um estado bruto de 11 dimensões que concatena diretamente as métricas do ambiente sem nenhum pré-processamento multicritério:
 \begin{equation}
     \mathbf{S}^{\text{base}} = \left[
-        C_j,\;
-        D_j,\;
+        C_i,\;
+        D_i,\;
         d_{\text{VEC}},\;
         f_{\text{dvfs}},\;
         Q_{\text{VEC}},\;
@@ -552,7 +552,7 @@ A variante S1 mantém o espaço de ação ternário e a recompensa \gls{WSM} do 
 
 \begin{equation}
     \mathbf{S}^{\text{S1}} = \left[
-        \frac{C_j}{C_{\max}},\;
+        \frac{C_i}{C_{\max}},\;
         \min\!\left(1,\, \frac{\widehat{\text{JCT}}_{\text{local}}}{D_i}\right),\;
         \frac{d_{\text{VEC}}}{d_{max}},\;
         \min\!\left(1,\, \frac{|Q_{\text{VEC}}|}{Q_{max}}\right),\;

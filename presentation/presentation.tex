@@ -8,16 +8,80 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows.meta,positioning,calc,fit,backgrounds,shadows,decorations.pathreplacing}
 \usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[ruled,lined,linesnumbered]{algorithm2e}
 
-\title{Os Fundamentos do Aprendizado por Reforço}
-\subtitle{Do RL Clássico ao Deep RL (DRL) Explicados de Forma Simples}
-\author{Gemini CLI}
-\date{\today}
+\title{}
+\author{}
+\date{}
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
+% ── CAPA ──────────────────────────────────────────────────────────────────────
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture, overlay]
+
+  %--- barra superior ---
+  \fill[blue!80!black]
+    (current page.north west) rectangle
+    ([yshift=-2.6cm]current page.north east);
+
+  \node[white, anchor=north, font=\footnotesize\bfseries]
+    at ([yshift=-0.40cm]current page.north)
+    {UNIVERSIDADE ESTADUAL DO CEARÁ --- UECE};
+  \node[white, anchor=north, font=\scriptsize]
+    at ([yshift=-0.85cm]current page.north)
+    {Centro de Ciências e Tecnologia};
+  \node[white, anchor=north, font=\scriptsize]
+    at ([yshift=-1.25cm]current page.north)
+    {Programa de Pós-Graduação em Ciência da Computação};
+  \node[white, anchor=north, font=\scriptsize]
+    at ([yshift=-1.65cm]current page.north)
+    {Doutorado em Ciência da Computação $\cdot$ Redes de Computadores};
+
+  %--- título ---
+  \node[text width=10.5cm, align=center, anchor=center,
+        font=\large\bfseries]
+    at ([yshift=0.60cm]current page.center)
+    {Modelo de Decisão Baseado em Lógica \textit{Fuzzy}-TOPSIS e\\[4pt]
+     Aprendizado por Reforço Profundo\\[4pt]
+     para o \textit{Offloading} de Tarefas\\[4pt]
+     em Redes Veiculares 5G};
+
+  %--- linha divisória ---
+  \draw[blue!80!black, line width=1.2pt]
+    ([xshift=-4.5cm, yshift=-1.25cm]current page.center) --
+    ([xshift=4.5cm,  yshift=-1.25cm]current page.center);
+
+  %--- autor ---
+  \node[anchor=center, font=\normalsize\bfseries]
+    at ([yshift=-1.80cm]current page.center)
+    {Antônio Sérgio de Sousa Vieira};
+
+  %--- orientador ---
+  \node[anchor=center, font=\small]
+    at ([yshift=-2.40cm]current page.center)
+    {Orientador: Prof. Dr. Joaquim Celestino Júnior (UECE/CCT)};
+
+  %--- co-orientador ---
+  \node[anchor=center, font=\small]
+    at ([yshift=-2.95cm]current page.center)
+    {Co-orientador: Prof. Dr. Alisson Barbosa de Souza};
+
+  %--- barra inferior ---
+  \fill[blue!80!black]
+    (current page.south west) rectangle
+    ([yshift=1.1cm]current page.south east);
+
+  \node[white, anchor=south, font=\small\bfseries]
+    at ([yshift=0.60cm]current page.south)
+    {Fortaleza -- Ceará};
+  \node[white, anchor=south, font=\small]
+    at ([yshift=0.18cm]current page.south)
+    {2026};
+
+\end{tikzpicture}
 \end{frame}
 
 % 1. Aprendizado por Reforço
@@ -1903,7 +1967,7 @@ ELIMINANDO A NECESSIDADE DE AJUSTE MANUAL DESTE HIPERPARÂMETRO.
   \draw[black, line width=1.2pt] (-4.8,  0.38) -- (-4.8, -0.38);
   \draw[black, line width=1.2pt] (-3.2,  0.38) -- (-3.2, -0.38);
   \draw[black, line width=1.2pt] (-4.8, -0.38) arc (180:360:0.80 and 0.22);
-  \node[black, font=\tiny\ttfamily, align=center] at (-4.0, 0)
+  \node[black, font=\tiny\ttfamily, align=center] at (-4.0, -1.0)
     {REPLAY\\BUFFER};
 
   % Setas do buffer para os críticos
@@ -1939,6 +2003,76 @@ ELIMINANDO A NECESSIDADE DE AJUSTE MANUAL DESTE HIPERPARÂMETRO.
 
 \end{frame}
 }
+
+% 24b-0. ARTIGO DE REFERÊNCIA: FOFF
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain]
+\begin{center}
+\includegraphics[page=1, width=0.82\textwidth, height=0.92\textheight, keepaspectratio]{/home/sergiosvieira/Documentos/2025.2/qualifica/leitura-obrigatoria/FOFF_an_energy-efficient_task_offloading_in_VEC-en.pdf}
+\end{center}
+\end{frame}
+}
+
+% 24b-1. ARTIGO DE REFERÊNCIA: MIRIYALA
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain]
+\begin{center}
+\includegraphics[page=1, width=0.82\textwidth, height=0.92\textheight, keepaspectratio]{/home/sergiosvieira/Documentos/2025.2/qualifica/uecetex2/related-papers/section-related-works/literature-review/Deep learning approaches for computation offloading in edge.pdf}
+\end{center}
+\end{frame}
+}
+
+% 24b-2. ORIGINALIDADE: CONTRIBUIÇÃO CONCEITUAL
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+\vspace{0.25cm}
+\hspace{0.3cm}{\large\bfseries\ttfamily ORIGINALIDADE E POSICIONAMENTO NO ESTADO DA ARTE}
+\vspace{0.30cm}
+
+\hspace{0.3cm}\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.8\baselineskip}
+$\bullet$ \textbf{Contribuição Central:} Arquitetura híbrida SAC\,+\,TOPSIS para
+descarregamento de tarefas em redes VEC.\\[4pt]
+$\bullet$ \textbf{TOPSIS:} Comprime o espaço de estados variável ($N$ candidatos)
+em um vetor compacto de dimensão fixa (6D) --- invariante à escala.\\[4pt]
+$\bullet$ \textbf{SAC:} Política estocástica com entropia máxima para lidar com
+a não estacionariedade do ambiente veicular.\\[4pt]
+$\bullet$ \textbf{Publicado:} \textit{FOFF: an energy-efficient task offloading in
+VEC-enabled vehicular networks using fuzzy TOPSIS} [Vieira et~al., 2025].
+}
+\end{minipage}
+\end{frame}
+}
+
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+\vspace{0.25cm}
+\hspace{0.3cm}{\large\bfseries\ttfamily LACUNAS NO ESTADO DA ARTE E RESPOSTA DA PROPOSTA}
+\vspace{0.30cm}
+
+\hspace{0.3cm}\begin{minipage}{0.92\textwidth}
+{\scriptsize\ttfamily\setlength{\baselineskip}{1.8\baselineskip}
+\textbf{LACUNA 1 [Miriyala e Chirra, 2026]:}\\
+$\quad\bullet$ Literatura usa \textit{flat vectors} de dimensão fixa.\\
+$\quad\bullet$ Ignora densidade variável de veículos e mudanças de topologia.\\
+$\quad\Rightarrow$ \textbf{RESPOSTA:} TOPSIS como compressor de estado ---
+saída \textbf{6D fixo} independente de $N$.\\[8pt]
+\textbf{LACUNA 2 [Miriyala e Chirra, 2026]:}\\
+$\quad\bullet$ Políticas treinadas de forma estática divergem
+em ambientes de alta mobilidade.\\
+$\quad\Rightarrow$ \textbf{RESPOSTA:} SAC+TOPSIS com regularização por entropia
+previne colapso da política e mantém exploração contínua guiada por múltiplos critérios.
+}
+\end{minipage}
+\end{frame}
+}
+
 
 % 24b. AMBIENTE DE SIMULAÇÃO
 {
@@ -2201,7 +2335,7 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
 ]
 
 % ═══ LINHA 1 — pipeline (y=0) ════════════════════════════════════════════════
-\node[bl, fill=black!05, minimum width=2.0cm] (task) at (-8.2, 0) {TAREFA\\$C_j,D_j$};
+\node[bl, fill=black!05, minimum width=2.0cm] (task) at (-8.2, 0) {TAREFA\\$C_i,D_i$};
 \node[bl, minimum width=2.8cm]               (cand) at (-5.2, 0) {$N$ CAND.\\(VARIÁVEL)};
 \node[bl, fill=black!16, minimum width=3.0cm](top)  at (-1.8, 0) {MÓDULO\\TOPSIS};
 \node[bl, fill=black!10, minimum width=2.8cm](est)  at ( 1.8, 0) {$\mathbf{S}_t\in\mathbb{R}^6$\\(FIXO)};
@@ -2246,7 +2380,7 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
   \tfrac{\widehat{\text{JCT}}_{\text{r1}}}{D_i},$\\[5pt]
   $\tfrac{|Q_{\text{r1}}|}{Q_{\max}},\;
   \tfrac{|Q_\ell|}{Q_{\max}},\;
-  \tfrac{C_j}{C_{\max}}\,\bigr]$};
+  \tfrac{C_i}{C_{\max}}\,\bigr]$};
 
 % Caixa C: Arquitetura SAC — centro em x=7.4
 \node[ann, minimum width=3.0cm] at (7.4,-4.10) {%
@@ -2296,8 +2430,8 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
   \node[draw=black, fill=white, rounded corners=2pt,
         font=\small, inner sep=4pt] at (-3.70, -2.90)
     {$\displaystyle C^*_i = \frac{d^-_i}{d^+_i + d^-_i}$};
-  \node[font=\tiny\ttfamily, align=center] at (-3.70, -3.85)
-    {$d^\pm_i = \sum_{j=1}^{3}\!|v_{ij} - a^\pm_j|$ \quad ($L_1$)};
+  % \node[font=\tiny\ttfamily, align=center] at (-3.70, -3.85)
+  %   {$d^\pm_i = \sum_{j=1}^{3}\!|v_{ij} - a^\pm_j|$ \quad ($L_1$)};
   \node[font=\tiny\ttfamily, align=center] at (-3.70, -4.45)
     {rank$_1$ = candidato de maior $C^*_i$};
 
@@ -2320,12 +2454,12 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
       \tfrac{\widehat{\text{JCT}}_{\text{r1}}}{D_i},\;
       \tfrac{|Q_{\text{r1}}|}{Q_{\max}},\;
       \tfrac{|Q_\ell|}{Q_{\max}},\;
-      \tfrac{C_j}{C_{\max}}\,\bigr]$};
+      \tfrac{C_i}{C_{\max}}\,\bigr]$};
 
   % Definição de delta_obj
   \node[font=\tiny\ttfamily, align=center] at (3.00, -1.62)
-    {$\Delta_{\text{obj}} = 1 - \tfrac{\text{custo}_{r_1}}{\text{custo}_\ell}$\\[2pt]
-     $>0$: offload mais barato\quad $<0$: local mais barato};
+    {$\Delta_{\text{obj}} = \bigl(\widehat{\text{JCT}}_\ell - \widehat{\text{JCT}}_{r_1}\bigr)/D_i$\\[2pt]
+     $>0$: offload mais rápido\quad $<0$: local mais rápido};
 
   % Semântica de cada componente — coluna p{} para quebrar linha e não extravazar
   \node[font=\tiny\ttfamily, align=left, anchor=west] at (0.30, -3.10) {%
@@ -2335,7 +2469,7 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
     $s_3 = \widehat{\text{JCT}}_{r1}/D_i$   & urgência do offload\\
     $s_4 = |Q_{r1}|/Q_{\max}$               & congestion.\ do candidato\\
     $s_5 = |Q_\ell|/Q_{\max}$               & congestion.\ local\\
-    $s_6 = C_j/C_{\max}$                    & complexidade da tarefa\\
+    $s_6 = C_i/C_{\max}$                    & complexidade da tarefa\\
     \end{tabular}};
 
   % Decisão de ação
@@ -2381,7 +2515,7 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
       3/{$s_3$}/{$\widehat{\mathrm{JCT}}_{\mathrm{r1}}/D_i$},
       4/{$s_4$}/{$|Q_{\mathrm{r1}}|/Q_{\max}$},
       5/{$s_5$}/{$|Q_\ell|/Q_{\max}$},
-      6/{$s_6$}/{$C_j/C_{\max}$}}{
+      6/{$s_6$}/{$C_i/C_{\max}$}}{
     \node[nin] (I\i) at (0, {-(\i-1)*0.85}) {\name};
     \node[lbl, right=0.08cm of I\i] {\desc};
   }
@@ -2442,6 +2576,166 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
     batch                 & Tamanho do mini-batch       & $1\,024$\\
     \hline
     \end{tabular}};
+
+\end{tikzpicture}}
+
+\end{frame}
+}
+
+% 26d. ALGORITMO 1: TOPSIS
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.15cm}
+\hspace{0.3cm}{\large\bfseries\ttfamily ALGORITMO 1 — TOPSIS (RANQUEAMENTO MULTICRITÉRIO)}
+
+\vspace{0.05cm}
+\centering
+\scalebox{0.65}{%
+\begin{minipage}{14cm}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetAlgoLined
+\SetKwInOut{Input}{Entrada}
+\SetKwInOut{Output}{Saída}
+\Input{Matriz de decisão $\mathbf{X} \in \mathbb{R}^{m \times n}$; vetor de pesos $\mathbf{w}$}
+\Output{Vetor de proximidade $\mathbf{C}^*$ (alternativas ranqueadas)}
+\tcp{Passos 1--2: Normalização $L_2$ por coluna e ponderação}
+\For{$j = 1$ \KwTo $n$}{
+  \For{$i = 1$ \KwTo $m$}{
+    $r_{ij} \gets x_{ij} \big/ \sqrt{\sum_{k=1}^{m} x_{kj}^2}$\;
+    $v_{ij} \gets w_j \cdot r_{ij}$\;
+  }
+  \tcp{Passo 3: Soluções ideal positiva $A^+$ e negativa $A^-$}
+  \eIf{critério $j$ é de custo}{
+    $A^+_j \gets \min_i v_{ij}$;\quad $A^-_j \gets \max_i v_{ij}$\;
+  }{
+    $A^+_j \gets \max_i v_{ij}$;\quad $A^-_j \gets \min_i v_{ij}$\;
+  }
+}
+\tcp{Passos 4--5: Distâncias $L_2$ (Euclidianas) e coeficiente de proximidade}
+\For{$i = 1$ \KwTo $m$}{
+  $d^+_i \gets \sqrt{\sum_{j=1}^{n}(v_{ij}-A^+_j)^2}$;\quad
+  $d^-_i \gets \sqrt{\sum_{j=1}^{n}(v_{ij}-A^-_j)^2}$\;
+  $C^*_i \gets d^-_i\,/\,(d^+_i + d^-_i)$\;
+}
+\Return Ordenação decrescente de $\mathbf{C}^*$\;
+\end{algorithm}
+\end{minipage}}
+
+\end{frame}
+}
+
+% 26e. ALGORITMO 2: SAC-TOPSIS (INFERÊNCIA)
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.15cm}
+\hspace{0.3cm}{\large\bfseries\ttfamily ALGORITMO 2 — SAC-TOPSIS (INFERÊNCIA)}
+
+\vspace{0.05cm}
+\centering
+\scalebox{0.65}{%
+\begin{minipage}{14cm}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetAlgoLined
+\SetKwInOut{Input}{Entrada}
+\SetKwInOut{Output}{Saída}
+\Input{Tarefa $i$: $C_i$, $D_i$, $\mathbf{x}_i$;\; $N$ candidatos $\mathcal{M}$;\; MLP $\pi_\theta$;\; $Q_{\ell}$, $Q_{\mathrm{r1}}$, $Q_{\max}$, $C_{\max}$}
+\Output{Ação $a_t \in \{0,1\}$: local ou offload para rank$_1$}
+\tcp{Passo 1 — Matriz de decisão ($N \times 3$)}
+\For{$k = 1$ \KwTo $N$}{
+  $x_{k1} \gets \widehat{\mathrm{JCT}}(m_k)$;\quad
+  $x_{k2} \gets E(m_k)$;\quad
+  $x_{k3} \gets \|\mathbf{x}_i - \mathbf{x}_{m_k}\|$\;
+}
+\tcp{Passo 2 — Ranqueamento via Algoritmo 1 (todos critérios de custo)}
+$\mathbf{w} \gets [0{,}40;\;0{,}30;\;0{,}30]$;\quad
+$\mathbf{C}^* \gets \text{Algoritmo\,1}(\mathbf{X},\mathbf{w})$;\quad
+$\mathrm{rank}_1 \gets \arg\max_k C^*_k$\;
+\tcp{Passo 3 — Estado compacto 6D}
+$\Delta_{\mathrm{obj}} \gets (\widehat{\mathrm{JCT}}_\ell - \widehat{\mathrm{JCT}}_{\mathrm{r1}})\,/\,D_i$\;
+$\mathbf{S}_t \gets \bigl[\Delta_{\mathrm{obj}},\;
+  \widehat{\mathrm{JCT}}_\ell/D_i,\;
+  \widehat{\mathrm{JCT}}_{\mathrm{r1}}/D_i,\;
+  Q_{\mathrm{r1}}/Q_{\max},\;
+  Q_\ell/Q_{\max},\;
+  C_i/C_{\max}\bigr]$\;
+\tcp{Passo 4 — Inferência e decisão}
+$a_t \gets \arg\max_a\;\pi_\theta(a\mid\mathbf{S}_t)$\;
+\eIf{$a_t = 0$}{\Return \textsc{local}}{\Return \textsc{offload} para $\mathrm{rank}_1$}
+\end{algorithm}
+\end{minipage}}
+
+\end{frame}
+}
+
+% 26f. RECOMPENSA DEADLINE-AWARE
+{
+\setbeamercolor{background canvas}{bg=white}
+\begin{frame}[plain, t]
+\color{black}
+
+\vspace{0.15cm}
+\hspace{0.3cm}{\large\bfseries\ttfamily RECOMPENSA \textit{DEADLINE}-AWARE}
+
+\vspace{0.05cm}
+\centering
+\resizebox{0.97\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+
+  % rbox com anchor=north em (0,0): topo da caixa em y=0, cresce para baixo
+  \node[draw=black, line width=1.4pt, fill=black!06, rounded corners=4pt,
+        inner sep=10pt, font=\normalsize, align=center, anchor=north] (rbox) at (0,0) {%
+    $\displaystyle r_i =
+    \begin{cases}
+      \displaystyle 1{,}0 - \frac{1}{4}\!\left(\frac{\widehat{\text{JCT}}_i}{D_i} + \frac{E_i}{E^{\max}_i}\right), & \widehat{\text{JCT}}_i \leq D_i \;\;(\in [0{,}5,\;1{,}0]) \\[12pt]
+      \displaystyle -1{,}0 - \min\!\left(1{,}0,\;\frac{\widehat{\text{JCT}}_i - D_i}{D_i}\right), & \widehat{\text{JCT}}_i > D_i \;\;(\in [-2{,}0,\;-1{,}0])
+    \end{cases}$};
+
+  % E^max — abaixo da caixa
+  \node[font=\small\ttfamily, align=center, text width=12cm, below=0.30cm of rbox] (eref)
+    {$E^{\max}_i = \max\!\bigl(E^{\ell}_i,\; E^{\text{rsu}}_i\cdot\mathbf{1}_{\text{viável}},\; E^{\text{v2v}}_i\cdot\mathbf{1}_{\text{viável}}\bigr)$ — energia máxima entre os modos viáveis (por tarefa, por instante)};
+
+  % Eixo — abaixo do eref
+  \node[below=0.50cm of eref] (axisanchor) {};
+  \draw[black, line width=1.2pt, ->] (-6.2,-5.80) -- (6.8,-5.80)
+    node[right, font=\small\ttfamily]{$r_i$};
+
+  % FALHA [-2,-1]
+  \fill[black!22] (-6.0,-6.20) rectangle (-2.8,-5.80);
+  \node[font=\small\bfseries\ttfamily] at (-4.4,-6.02) {FALHA $[\,-2{,}0;\,-1{,}0\,]$};
+  \draw[black, line width=1.4pt] (-6.0,-6.30) -- (-6.0,-5.70);
+  \draw[black, line width=1.4pt] (-2.8,-6.30) -- (-2.8,-5.70);
+
+  % GAP
+  \draw[black!50, <->, line width=1.0pt] (-2.8,-6.50) -- (-1.2,-6.50)
+    node[midway, below, yshift=-8pt, font=\small\ttfamily]{gap $= 1{,}5$};
+  \draw[black, line width=1.4pt] (-1.2,-6.30) -- (-1.2,-5.70);
+
+  % SUCESSO [0.5,1]
+  \fill[black!65] (-1.2,-6.20) rectangle (4.2,-5.80);
+  \node[font=\small\bfseries\ttfamily, text=white] at (1.5,-6.02) {SUCESSO $[\,0{,}5;\,1{,}0\,]$};
+  \draw[black, line width=1.4pt] (4.2,-6.30) -- (4.2,-5.70);
+
+  % Labels
+  \node[font=\small\ttfamily] at (-6.0,-6.70) {$-2{,}0$};
+  \node[font=\small\ttfamily] at (-2.8,-6.70) {$-1{,}0$};
+  \node[font=\small\ttfamily] at (-1.2,-6.70) {$0{,}5$};
+  \node[font=\small\ttfamily] at ( 4.2,-6.70) {$1{,}0$};
+
+  % Anotações
+  \node[font=\small\ttfamily, align=center, text width=4.5cm] at (-4.4,-7.60)
+    {penalidade proporcional ao\\atraso relativo $(\widehat{\text{JCT}}-D_i)/D_i$};
+  \node[font=\small\ttfamily, align=center, text width=4.5cm] at (1.5,-7.60)
+    {recompensa decresce com\\latência e energia normalizadas};
+  \node[font=\small\ttfamily, align=center, text width=3.8cm] at (5.8,-7.60)
+    {cumprir prazo supera\\qualquer eficiência};
 
 \end{tikzpicture}}
 
@@ -2519,10 +2813,10 @@ violação de prazo — tarefa atrasada com custo baixo recebe recompensa positi
 \hline
 SAC-BASE    &  4,6 & 57,1 & 2422 & ---     \\
 SAC-A1      & 39,2 & 13,7 & 2106 & $+34,6$ \\
-SAC-S1      & 28,8 & 39,2 & 2028 & $+24,2$ \\
-SAC-R1      & 38,4 & 13,3 & 3153 & $+33,8$ \\
+SAC-S1      & 28,8 & 39,3 & 2028 & $+24,2$ \\
+SAC-R1      & 38,4 & 13,4 & 3153 & $+33,8$ \\
 SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
-\textbf{SAC-TOPSIS} & \textbf{45,3} & \textbf{6,6} & 2582 & $\mathbf{+40,7}$ \\
+\textbf{SAC-TOPSIS} & \textbf{45,29} & \textbf{6,6} & 2582 & $\mathbf{+40,7}$ \\
 \hline
 \end{tabular}}
 
@@ -2549,7 +2843,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
   \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
         font=\tiny\bfseries\ttfamily, align=center,
         minimum width=1.6cm, minimum height=0.62cm] (b3) at (3.0, 0)
-    {SAC-TOPSIS\\45,3\%};
+    {SAC-TOPSIS\\45,29\%};
 
   \draw[black,->,line width=1.2pt] (b0.east) -- (b1.west)
     node[midway, above, font=\tiny\ttfamily] {$+24{,}2$ pp};
@@ -2596,7 +2890,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
     {\scriptsize\ttfamily
     SAC-A1 (11D, binária, regra VEC$\succ$V2V): \textbf{39,2\%} $\to$ $+34,6$ pp sobre SAC-Base (4,6\%).\\
     SIMPLES REDUÇÃO DO ESPAÇO DE BUSCA TEM EFEITO EXPRESSIVO.\\
-    PORÉM NÃO ALCANÇA SAC-TOPSIS (45,3\%): A REGRA ESTÁTICA IGNORA\\
+    PORÉM NÃO ALCANÇA SAC-TOPSIS (45,29\%): A REGRA ESTÁTICA IGNORA\\
     CONDIÇÕES DINÂMICAS DE FILA E DISTÂNCIA NO MOMENTO DA DECISÃO.}
   };
 
@@ -2649,18 +2943,18 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
 \hline
 \textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
 \hline
- 1 & \textbf{sac-topsis}$^\star$ & \textbf{45,21} & \textbf{0,1484} &  6,5 & 25,8 & RL+TOPSIS \\
- 2 & ppo-topsis$^\star$          & 42,66 & 0,1426 &  5,9 & 21,3 & RL+TOPSIS \\
- 3 & ppo-base                    & 42,32 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
- 4 & ppo-topsis-compact$^\star$  & 42,32 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
- 5 & td3-base                    & 42,32 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
- 6 & a2c-topsis$^\star$          & 42,32 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
- 7 & td3-topsis$^\star$          & 43,91 & 0,1388 &  3,7 & 23,0 & RL+TOPSIS \\
- 8 & sac-topsis-9d$^\star$       & 42,82 & 0,1386 &  5,9 & 21,0 & RL+TOPSIS \\
- 9 & sac-topsis-manhattan$^\star$& 41,66 & 0,1385 & 11,8 & 23,7 & RL+TOPSIS \\
-10 & sac-t1$^\star$              & 32,96 & 0,1270 & 11,5 & 26,1 & RL+TOPSIS \\
-11 & greedy-unfair               & 41,29 & 0,1262 &  5,6 &  7,4 & Heurística\\
-12 & sac-a1                      & 39,11 & 0,1256 & 13,7 & 21,1 & RL-Base   \\
+ 1 & \textbf{sac-topsis}$^\star$ & \textbf{45,29} & \textbf{0,1484} &  6,5 & 25,8 & RL+TOPSIS \\
+ 2 & ppo-topsis$^\star$          & 42,75 & 0,1426 &  5,9 & 21,3 & RL+TOPSIS \\
+ 3 & ppo-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
+ 4 & ppo-topsis-compact$^\star$  & 42,42 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
+ 5 & td3-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
+ 6 & a2c-topsis$^\star$          & 42,42 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
+ 7 & td3-topsis$^\star$          & 44,00 & 0,1388 &  3,7 & 23,0 & RL+TOPSIS \\
+ 8 & sac-topsis-9d$^\star$       & 42,91 & 0,1386 &  5,9 & 21,0 & RL+TOPSIS \\
+ 9 & sac-topsis-manhattan$^\star$& 41,75 & 0,1385 & 11,8 & 23,7 & RL+TOPSIS \\
+10 & sac-t1$^\star$              & 33,06 & 0,1270 & 11,5 & 26,1 & RL+TOPSIS \\
+11 & greedy-unfair               & 41,38 & 0,1262 &  5,6 &  7,4 & Heurística\\
+12 & sac-a1                      & 39,21 & 0,1256 & 13,7 & 21,1 & RL-Base   \\
 \hline
 \end{tabular}}
 
@@ -2694,19 +2988,19 @@ CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-TOPSIS (0,1262
 \hline
 \textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
 \hline
-13 & sac-r1        & 38,26 & 0,1223 & 13,4 & 31,4 & RL-Base   \\
-14 & sac-s1        & 28,69 & 0,1122 & 39,3 & 20,3 & RL-Base   \\
-15 & gini          & 35,24 & 0,1057 &  3,5 & 39,4 & Heurística\\
-16 & dqn-topsis$^\star$ & 25,90 & 0,0997 & 21,7 & 24,0 & RL+TOPSIS \\
-17 & jain          & 32,54 & 0,0973 &  3,6 & 39,3 & Heurística\\
-18 & random        & 30,02 & 0,0950 & 17,9 & 27,3 & Heurística\\
-19 & roundrobin    & 28,50 & 0,0905 & 17,9 & 31,1 & Heurística\\
-20 & greedy        & 29,03 & 0,0823 & 29,3 &  6,2 & Heurística\\
-21 & a2c-base      & 21,74 & 0,0772 & 13,7 & 48,9 & RL-Base   \\
-22 & dqn-base      & 22,10 & 0,0686 & 13,6 & 44,4 & RL-Base   \\
-23 & greedy-fair   & 20,61 & 0,0528 & 40,8 &  5,6 & Heurística\\
-24 & sac-base      &  4,52 & 0,0119 & 57,1 & 24,2 & RL-Base   \\
-25 & rsu           &  1,86 & 0,0030 &144,2 &  4,8 & Heurística\\
+13 & sac-r1        & 38,36 & 0,1223 & 13,4 & 31,4 & RL-Base   \\
+14 & sac-s1        & 28,81 & 0,1122 & 39,3 & 20,3 & RL-Base   \\
+15 & gini          & 35,34 & 0,1057 &  3,5 & 39,4 & Heurística\\
+16 & dqn-topsis$^\star$ & 26,02 & 0,0997 & 21,7 & 24,0 & RL+TOPSIS \\
+17 & jain          & 32,64 & 0,0973 &  3,6 & 39,3 & Heurística\\
+18 & random        & 30,13 & 0,0950 & 17,9 & 27,3 & Heurística\\
+19 & roundrobin    & 28,61 & 0,0905 & 17,9 & 31,1 & Heurística\\
+20 & greedy        & 29,05 & 0,0823 & 29,3 &  6,2 & Heurística\\
+21 & a2c-base      & 21,85 & 0,0772 & 13,7 & 48,9 & RL-Base   \\
+22 & dqn-base      & 22,15 & 0,0686 & 13,6 & 44,4 & RL-Base   \\
+23 & greedy-fair   & 20,65 & 0,0528 & 40,8 &  5,6 & Heurística\\
+24 & sac-base      &  4,58 & 0,0119 & 57,1 & 24,2 & RL-Base   \\
+25 & rsu           &  1,93 & 0,0030 &144,2 &  4,8 & Heurística\\
 \hline
 \end{tabular}}
 
@@ -2714,7 +3008,7 @@ CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-TOPSIS (0,1262
 \hspace{0.3cm}
 \begin{minipage}{0.92\textwidth}
 {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
-O SAC-BASE (4,52\%) COLAPSA POR USAR ESTADO 11D BRUTO SEM TOPSIS:
+O SAC-BASE (4,58\%) COLAPSA POR USAR ESTADO 11D BRUTO SEM TOPSIS:
 94,9\% DAS AÇÕES SÃO V2V SEM CRITÉRIO. O DQN-TOPSIS (25,9\%) MOSTRA
 QUE O TOPSIS TAMBÉM AJUDA ALGORITMOS BASEADOS EM VALOR, MAS EM
 MENOR ESCALA QUE COM O SAC.
@@ -2755,40 +3049,41 @@ AVALIADO EM 658 CENÁRIOS V2X, O SAC-TOPSIS ATINGIU $J(\pi){=}0{,}2454$.
     $\displaystyle J(\pi) \;=\;
       \underbrace{w_s \cdot \mathbb{E}_\pi\!\bigl[\mathbf{1}(\text{JCT}_i \leq D_i)\bigr]}_{\text{taxa de sucesso}\;(w_s = 0{,}60)}
       \;-\;
-      \underbrace{w_c \cdot \mathbb{E}_\pi\!\left[\frac{1}{2}\!\left(\frac{\text{JCT}_i}{\text{JCT}^{\max}_i} + \frac{E_i}{E^{\text{ref}}_i}\right)\right]}_{\text{custo norm.\ min-max}\;\in\,[0,1]\;(w_c = 0{,}40)}$};
+      \underbrace{w_c \cdot \mathbb{E}_\pi\!\left[\frac{1}{2}\!\left(\frac{\text{JCT}_i}{\text{JCT}^{\max}_i} + \frac{E_i}{E^{\max}_i}\right)\right]}_{\text{custo norm.\ min-max}\;\in\,[0,1]\;(w_c = 0{,}40)}$};
 
   % Parâmetros — abaixo da caixa com folga
-  \node[font=\tiny\ttfamily, align=center, below=0.20cm of eqbox]
-    {$\text{JCT}^{\max}_i = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_i,\, \widehat{\text{JCT}}^{\text{rsu}}_i,\, \widehat{\text{JCT}}^{\text{v2v}}_i\bigr)$,\quad
-     $E^{\text{ref}}_i = \max\!\bigl(E^{\ell}_i,\, E^{\text{rsu}}_i,\, E^{\text{v2v}}_i\bigr)$: normalização min-max por tarefa --- garante custo $\in[0,1]$ para qualquer JCT};
+  \node[font=\scriptsize\ttfamily, align=center, text width=14cm, below=0.15cm of eqbox] (params) {%
+    $\text{JCT}^{\max}_i = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_i,\; \widehat{\text{JCT}}^{\text{rsu}}_i\cdot\mathbf{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_i\cdot\mathbf{1}_{\text{viável}}\bigr)$\\[2pt]
+    $E^{\max}_i = \max\!\bigl(E^{\ell}_i,\; E^{\text{rsu}}_i\cdot\mathbf{1}_{\text{viável}},\; E^{\text{v2v}}_i\cdot\mathbf{1}_{\text{viável}}\bigr)$\quad
+    normalização min-max por tarefa — garante custo $\in[0,1]$ para qualquer JCT};
 
   % Top 3 ranking de J(π)
-  \node[font=\scriptsize\bfseries\ttfamily] at (0,-2.20) {TOP 3 — FUNÇÃO OBJETIVO $J(\pi)$};
+  \node[font=\scriptsize\bfseries\ttfamily, below=0.15cm of params] (top3label) {TOP 3 — FUNÇÃO OBJETIVO $J(\pi)$};
 
   \node[draw=black, line width=1.6pt, fill=black!16, rounded corners=3pt,
-        font=\tiny\bfseries\ttfamily, align=center,
-        minimum width=3.0cm, minimum height=0.55cm] at (-4.2,-2.80)
+        font=\scriptsize\bfseries\ttfamily, align=center,
+        minimum width=3.2cm, minimum height=0.60cm] at (-4.2,-2.90)
     {1º SAC-TOPSIS\\$J{=}0{,}2454$};
 
   \node[draw=black, line width=0.9pt, fill=black!08, rounded corners=3pt,
-        font=\tiny\ttfamily, align=center,
-        minimum width=2.8cm, minimum height=0.52cm] at (0.0,-2.80)
+        font=\scriptsize\ttfamily, align=center,
+        minimum width=3.0cm, minimum height=0.58cm] at (0.0,-2.90)
     {2º PPO-TOPSIS\\$J{=}0{,}2344$};
 
   \node[draw=black, line width=0.9pt, fill=black!05, rounded corners=3pt,
-        font=\tiny\ttfamily, align=center,
-        minimum width=2.8cm, minimum height=0.52cm] at (4.0,-2.80)
+        font=\scriptsize\ttfamily, align=center,
+        minimum width=3.0cm, minimum height=0.58cm] at (4.0,-2.90)
     {3º PPO-Base\\$J{=}0{,}2295$};
 
   % Barras de J(π): escala * 30
-  \draw[black, line width=0.6pt] (-6.5,-3.55) -- (1.5,-3.55);
-  \fill[black!80] (-6.5,-3.90) rectangle (-6.5+7.36,-3.60);
-  \fill[black!35] (-6.5,-4.20) rectangle (-6.5+7.03,-3.90);
-  \fill[black!20] (-6.5,-4.50) rectangle (-6.5+6.89,-4.20);
-  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-3.75) {SAC-TOPSIS 0,2454};
-  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-4.05) {PPO-TOPSIS 0,2344};
-  \node[font=\tiny\ttfamily, anchor=west] at (0.90,-4.35) {PPO-Base 0,2295};
-  \node[font=\tiny\ttfamily] at (-2.5,-4.75) {$J(\pi)$ (FUNÇÃO OBJETIVO)};
+  \draw[black, line width=0.6pt] (-6.5,-3.65) -- (1.5,-3.65);
+  \fill[black!80] (-6.5,-4.00) rectangle (-6.5+7.36,-3.70);
+  \fill[black!35] (-6.5,-4.32) rectangle (-6.5+7.03,-4.02);
+  \fill[black!20] (-6.5,-4.64) rectangle (-6.5+6.89,-4.34);
+  \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-3.85) {SAC-TOPSIS 0,2454};
+  \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-4.17) {PPO-TOPSIS 0,2344};
+  \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-4.49) {PPO-Base 0,2295};
+  \node[font=\scriptsize\ttfamily] at (-2.5,-4.90) {$J(\pi)$ (FUNÇÃO OBJETIVO)};
 
 \end{tikzpicture}}
 
@@ -2810,7 +3105,7 @@ AVALIADO EM 658 CENÁRIOS V2X, O SAC-TOPSIS ATINGIU $J(\pi){=}0{,}2454$.
 {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
 O TOPSIS ATUA COMO PRECONDICIONADOR AGNÓSTICO AO ALGORITMO.
 ACOPLADO AO A2C: $+$84\% EM SWQ. AO DQN: $+$45\%. AO TD3: JCT
-REDUZIDO EM 44,5\%. AO SAC: $+$1147\% (4,52\% $\to$ 45,21\%).\\
+REDUZIDO EM 44,5\%. AO SAC: $+$1147\% (4,58\% $\to$ 45,29\%).\\
 COMPARAÇÃO MAIS JUSTA: SAC-T1 (TOPSIS COMO FEATURE, 3 CLASSES) $\to$
 SAC-TOPSIS (TOPSIS COMO DECISÃO, BINÁRIA): $+$12,3 PP, $+$16,8\% SWQ.
 ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
@@ -2881,82 +3176,84 @@ ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
 }
 
 % 28e. A ASSIMETRIA: POR QUE O TOPSIS FALHOU NO PPO?
-{
-\setbeamercolor{background canvas}{bg=white}
-\begin{frame}[plain, t]
-\color{black}
+% {
+% \setbeamercolor{background canvas}{bg=white}
+% \begin{frame}[plain, t]
+% \color{black}
 
-\vspace{0.35cm}
-\hspace{0.3cm}{\Large\bfseries\ttfamily A ASSIMETRIA: POR QUE O TOPSIS FALHOU NO PPO?}
+% \vspace{0.35cm}
+% \hspace{0.3cm}{\Large\bfseries\ttfamily A ASSIMETRIA: POR QUE O TOPSIS NÃO AJUDOU O PPO?}
 
-\vspace{0.15cm}
-\hspace{0.3cm}
-\begin{minipage}{0.92\textwidth}
-{\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
-EXPERIMENTO CONTROLADO: PPO COM ESTADO 6D, AÇÃO BINÁRIA E MESMA
-RECOMPENSA DO SAC-TOPSIS. RESULTADO: PPO 18,4\% $\times$ SAC 45,3\%.
-DIFERENÇA ATRIBUÍVEL EXCLUSIVAMENTE AO ALGORITMO.
-}
-\end{minipage}
+% \vspace{0.15cm}
+% \hspace{0.3cm}
+% \begin{minipage}{0.92\textwidth}
+% {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
+% EXPERIMENTO CONTROLADO: PPO COM ESTADO 6D, AÇÃO BINÁRIA E MESMA RECOMPENSA DO SAC-TOPSIS.
+% RESULTADO: PPO-TOPSIS-COMPACT COLAPSA PARA LOCAL (42,42\% = BASELINE LOCAL = PPO-BASE).
+% O TOPSIS NÃO AGREGA VALOR AO PPO: O AGENTE ON-POLICY APRENDE A IGNORAR O ESTADO E ESCOLHER
+% SEMPRE LOCAL. A DIFERENÇA SAC $-$ PPO (45,29\% $-$ 42,42\% $=$ 2,87\,pp) É ATRIBUÍVEL
+% EXCLUSIVAMENTE AO ALGORITMO: OFF-POLICY + ENTROPIA PREVINEM O COLAPSO.
+% }
+% \end{minipage}
 
-\vspace{0.08cm}
-\centering
-\begin{tikzpicture}[>=Stealth,
-  hdr/.style={draw=black, line width=1.2pt, fill=black!14,
-              rounded corners=3pt, minimum width=4.0cm,
-              minimum height=0.55cm, font=\scriptsize\bfseries\ttfamily,
-              align=center},
-  pok/.style={draw=black!50, line width=0.7pt, fill=black!04,
-              rounded corners=2pt, minimum width=4.0cm,
-              minimum height=0.60cm, font=\tiny\ttfamily, align=center},
-  neg/.style={draw=black!50, line width=0.7pt, fill=black!16,
-              rounded corners=2pt, minimum width=4.0cm,
-              minimum height=0.60cm, font=\tiny\ttfamily, align=center},
-  lbl/.style={font=\tiny\bfseries\ttfamily, align=center}
-]
+% \vspace{0.08cm}
+% \centering
+% \begin{tikzpicture}[>=Stealth,
+%   hdr/.style={draw=black, line width=1.2pt, fill=black!14,
+%               rounded corners=3pt, minimum width=4.0cm,
+%               minimum height=0.55cm, font=\scriptsize\bfseries\ttfamily,
+%               align=center},
+%   pok/.style={draw=black!50, line width=0.7pt, fill=black!04,
+%               rounded corners=2pt, minimum width=4.0cm,
+%               minimum height=0.60cm, font=\tiny\ttfamily, align=center},
+%   neg/.style={draw=black!50, line width=0.7pt, fill=black!16,
+%               rounded corners=2pt, minimum width=4.0cm,
+%               minimum height=0.60cm, font=\tiny\ttfamily, align=center},
+%   lbl/.style={font=\tiny\bfseries\ttfamily, align=center}
+% ]
 
-  % Separador central
-  \draw[black!50, dashed, line width=0.8pt] (0, 0.35) -- (0,-3.80);
+%   % Separador central
+%   \draw[black!50, dashed, line width=0.8pt] (0, 0.35) -- (0,-3.80);
 
-  % Cabeçalhos
-  \node[hdr] at (-3.0, 0.22) {SAC (OFF-POLICY)};
-  \node[hdr] at ( 3.0, 0.22) {PPO (ON-POLICY)};
+%   % Cabeçalhos
+%   \node[hdr] at (-3.0, 0.22) {SAC (OFF-POLICY)};
+%   \node[hdr] at ( 3.0, 0.22) {PPO (ON-POLICY)};
 
-  % Linha 1: Natureza
-  \node[lbl] at (-6.5,-0.45) {Natureza};
-  \node[pok] at (-3.0,-0.45) {Off-policy\\reutiliza experiências passadas};
-  \node[neg] at ( 3.0,-0.45) {On-policy\\cada lote descartado após uso};
+%   % Linha 1: Natureza
+%   \node[lbl] at (-6.5,-0.45) {Natureza};
+%   \node[pok] at (-3.0,-0.45) {Off-policy\\reutiliza experiências passadas};
+%   \node[neg] at ( 3.0,-0.45) {On-policy\\cada lote descartado após uso};
 
-  % Linha 2: Eficiência amostral
-  \node[lbl] at (-6.5,-1.20) {Eficiência\\amostral};
-  \node[pok] at (-3.0,-1.20) {Replay Buffer $|\mathcal{B}|{=}50\,000$\\cada transição reciclada ${\approx}40\times$};
-  \node[neg] at ( 3.0,-1.20) {Descarta dados após $k{=}8$ épocas\\sobreajuste ao cenário único};
+%   % Linha 2: Eficiência amostral
+%   \node[lbl] at (-6.5,-1.20) {Eficiência\\amostral};
+%   \node[pok] at (-3.0,-1.20) {Replay Buffer $|\mathcal{B}|{=}50\,000$\\cada transição reciclada ${\approx}40\times$};
+%   \node[neg] at ( 3.0,-1.20) {Descarta dados após $k{=}8$ épocas\\sobreajuste ao cenário único};
 
-  % Linha 3: Entropia
-  \node[lbl] at (-6.5,-1.95) {Entropia\\exploração};
-  \node[pok] at (-3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}10$ (ajuste auto.)\\resistência ao colapso};
-  \node[neg] at ( 3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}01$ (fixo 10$\times$ menor)\\$P(\text{rank}_1)\!\to\!1$: colapso};
+%   % Linha 3: Entropia
+%   \node[lbl] at (-6.5,-1.95) {Entropia\\exploração};
+%   \node[pok] at (-3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}10$ (ajuste auto.)\\resistência ao colapso};
+%   \node[neg] at ( 3.0,-1.95) {$\alpha_{\text{ent}}{=}0{,}01$ (fixo 10$\times$ menor)\\$P(\text{rank}_1)\!\to\!1$: colapso};
 
-  % Linha 4: Consequência
-  \node[lbl] at (-6.5,-2.70) {Resultado};
-  \node[pok] at (-3.0,-2.70) {Pergunta nova: DESCARREGAR?\\Generalização zero-shot};
-  \node[neg] at ( 3.0,-2.70) {Aprendizado redundante:\\redescobre o que o TOPSIS já sabe};
+%   % Linha 4: Consequência
+%   \node[lbl] at (-6.5,-2.70) {Resultado};
+%   \node[pok] at (-3.0,-2.70) {Pergunta nova: DESCARREGAR?\\Generalização zero-shot};
+%   \node[neg] at ( 3.0,-2.70) {Aprendizado redundante:\\redescobre o que o TOPSIS já sabe};
 
-  % Resultado final numérico
-  \draw[black, line width=0.8pt] (-6.8,-3.20) -- (6.8,-3.20);
-  \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
-        font=\scriptsize\bfseries\ttfamily, minimum width=3.6cm,
-        minimum height=0.55cm] at (-3.0,-3.55) {45,3\% \ DEADLINE};
-  \node[draw=black, line width=0.8pt, fill=black!06, rounded corners=3pt,
-        font=\scriptsize\ttfamily, minimum width=3.6cm,
-        minimum height=0.55cm] at ( 3.0,-3.55) {18,4\% \ DEADLINE};
-  \draw[black,->,line width=1.6pt] (0.4,-3.55) -- (-1.4,-3.55)
-    node[midway, above, font=\tiny\bfseries\ttfamily] {$\Delta{=}26{,}9$\,pp};
+%   % Resultado final numérico
+%   \draw[black, line width=0.8pt] (-6.8,-3.20) -- (6.8,-3.20);
+%   \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
+%         font=\scriptsize\bfseries\ttfamily, minimum width=3.6cm,
+%         minimum height=0.55cm] at (-3.0,-3.55) {45,29\% \ DEADLINE};
+%   \node[draw=black, line width=0.8pt, fill=black!06, rounded corners=3pt,
+%         font=\scriptsize\ttfamily, minimum width=3.6cm,
+%         minimum height=0.55cm] at ( 3.0,-3.55) {42,42\% \ DEADLINE};
+%   \draw[black,->,line width=1.6pt] (0.4,-3.55) -- (-1.4,-3.55)
+%     node[midway, above, font=\tiny\bfseries\ttfamily] {$\Delta{=}2{,}87$\,pp};
 
-\end{tikzpicture}
+% \end{tikzpicture}
 
-\end{frame}
-}
+% \end{frame}
+% }
 
 % 29. PRÓXIMOS PASSOS: FUZZY-TOPSIS E SIMULAÇÃO NS-3
 {
