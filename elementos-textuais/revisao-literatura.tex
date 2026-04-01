@@ -19,10 +19,10 @@ Para classificar e relacionar o estado da arte das soluções de descarregamento
 
 \begin{figure}[ht!]
 \centering
-\resizebox{0.9\textwidth}{!}{%
+\resizebox{\linewidth}{!}{%
 \begin{forest}
   for tree={
-    font=\sffamily\footnotesize,
+    font=\sffamily\normalsize,
     draw=teal!80!black,
     very thick,
     rounded corners=4pt,
@@ -34,21 +34,21 @@ Para classificar e relacionar o estado da arte das soluções de descarregamento
     s sep=2mm,
     if level=0{
       minimum height=8mm,
-      font=\sffamily\footnotesize\bfseries,
+      font=\sffamily\normalsize\bfseries,
     }{
       if level=1{
         fill=teal!60!black,
-        font=\sffamily\footnotesize\bfseries,
+        font=\sffamily\normalsize\bfseries,
         minimum height=7mm,
       }{
         if level=2{
           fill=teal!50!black,
-          font=\sffamily\scriptsize\bfseries,
+          font=\sffamily\normalsize\bfseries,
           minimum height=6mm,
         }{
           % Leaf nodes
           fill=teal!40!black,
-          font=\sffamily\tiny,
+          font=\sffamily\normalsize,
           draw=teal!50!black,
           rounded corners=3pt,
           align=left,
