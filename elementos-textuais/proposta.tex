@@ -602,13 +602,12 @@ SAC-S1    & 6D   & Ternária & \gls{WSM}                & 28,69 & 0,1122 & 39,29
 SAC-R1    & 11D bruto   & Ternária & \textit{Deadline-aware} & 38,26 & 0,1223 & 13,353 \\
 SAC-T1    & 6D \gls{TOPSIS} & Ternária & \textit{Deadline-aware} & 32,96 & 0,1270 & 11,487 \\
 \midrule
-\textbf{SAC-TOPSIS} & \textbf{6D \gls{TOPSIS}} & \textbf{Binária (2)} & \textbf{\textit{Deadline}-aware} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
+\textbf{SAC-TOPSIS} & \textbf{6D \gls{TOPSIS}} & \textbf{Binária} & \textbf{\textit{Deadline-aware}} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-
-Os resultados da Tabela~\ref{tab:ablacao-resultados} permitem traçar um caminho de ablação sequencial e aditivo (Equação~\ref{eq:decomposicao}). Cada seta representa a variação absoluta em pontos percentuais (pp) da taxa de sucesso ao se substituir exatamente um componente de design, mantendo os demais fixos.
+A decomposição causal consiste em medir o impacto isolado de cada mudança no desempenho. A Equação~\ref{eq:decomposicao} sintetiza o caminho sequencial percorrido do \gls{SAC}-Base ao \gls{SAC}-\gls{TOPSIS}, onde cada seta quantifica a variação absoluta em pontos percentuais (pp) da taxa de sucesso devida àquela transição.
 
 \begin{equation}
     \underbrace{4{,}52\%}_{\text{SAC-Base}}
@@ -621,35 +620,37 @@ Os resultados da Tabela~\ref{tab:ablacao-resultados} permitem traçar um caminho
     \label{eq:decomposicao}
 \end{equation}
 
-Além disso, a Tabela~\ref{tab:ablacao-decomposicao} interpreta cada modificação incremental realizada desde o SAC-Base até o SAC-TOPSIS.
+O caminho revela que as três modificações não contribuem de forma uniforme. A maior parcela do ganho provém da compressão de estado (primeiro salto, $+24{,}17$~pp), seguida pelo uso do \gls{TOPSIS} como responsável pela decisão de destino (terceiro salto, $+12{,}25$~pp). A incorporação do \gls{TOPSIS} como \textit{feature} de estado combinada com a recompensa \textit{deadline-aware} (segundo salto) contribui de forma mais modesta ($+4{,}27$~pp), pois o agente ainda precisava resolver por conta própria a ambiguidade \gls{VEC}/\gls{V2V}. 
 
-\begin{table}[htb]
-\centering
-\caption{Decomposição causal dos ganhos ao longo do caminho de ablação.}
-\label{tab:ablacao-decomposicao}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{p{3.8cm} c p{8.5cm}}
-\toprule
-\textbf{Componente (transição)} & \textbf{$\Delta$ taxa} & \textbf{Interpretação} \\
-\midrule
-Estado 6D compacto manual (Base $\to$ S1) &
-    $+24{,}17$ pp &
-    Substituir o vetor 11D bruto por 6 \textit{features} semanticamente compactas — especialmente a urgência relativa $\widehat{\text{JCT}}/D_i$ — reduz a dimensionalidade e melhora a generalização entre cenários \\[4pt]
-\gls{TOPSIS} como \textit{feature} + \textit{deadline} reward (S1 $\to$ T1) &
-    $+4{,}27$ pp &
-    Incorporar o escore $\Delta_{\text{obj}}$ e o \gls{JCT} do \textit{rank}$_1$ no estado e substituir WSM pela recompensa \textit{deadline}-aware acrescenta contexto semântico moderado; o ganho é limitado pois o agente ainda precisa resolver a escolha \gls{VEC} vs.\ \gls{V2V} \\[4pt]
-\gls{TOPSIS} como responsável pela decisão (T1 $\to$ \gls{SAC}-\gls{TOPSIS}) &
-    $+12{,}25$ pp &
-    Transferir a escolha de destino do agente para o \gls{TOPSIS} e reduzir o espaço de ação de 3 para 2 é o maior salto marginal: elimina a ambiguidade \gls{VEC}/\gls{V2V} e garante que o destino seja sempre o candidato de menor custo multicritério \\
-\midrule
-\textbf{Ganho total} & $\mathbf{+40{,}69}$ \textbf{pp} & \gls{SAC}-\gls{TOPSIS} vs.\ \gls{SAC}-Base \\
-\bottomrule
-\end{tabular}}
-\end{table}
+% A Tabela~\ref{tab:ablacao-decomposicao} detalha a interpretação causal de cada transição, relacionando o ganho numérico ao mecanismo subjacente que o explica.
+
+% \begin{table}[htb]
+% \centering
+% \caption{Decomposição causal dos ganhos ao longo do caminho de ablação.}
+% \label{tab:ablacao-decomposicao}
+% \resizebox{\linewidth}{!}{%
+% \begin{tabular}{p{3.8cm} c p{8.5cm}}
+% \toprule
+% \textbf{Componente (transição)} & \textbf{$\Delta$ taxa} & \textbf{Interpretação} \\
+% \midrule
+% Estado 6D compacto manual (Base $\to$ S1) &
+%     $+24{,}17$ pp &
+%     Substituir o vetor 11D bruto por 6 \textit{features} semanticamente compactas reduz a dimensionalidade e melhora a generalização entre cenários \\[4pt]
+% \gls{TOPSIS} como \textit{feature} + \textit{deadline} reward (S1 $\to$ T1) &
+%     $+4{,}27$ pp &
+%     Incorporar o escore $\Delta_{\text{obj}}$ e o \gls{JCT} do \textit{rank}$_1$ no estado e substituir WSM pela recompensa \textit{deadline-aware} acrescenta ganho limitado pois o agente ainda precisa resolver a escolha \gls{VEC} vs.\ \gls{V2V} \\[4pt]
+% \gls{TOPSIS} como responsável pela decisão (T1 $\to$ \gls{SAC}-\gls{TOPSIS}) &
+%     $+12{,}25$ pp &
+%     Transferir a escolha de destino do agente para o \gls{TOPSIS} e reduzir o espaço de ação de 3 para 2 é o maior salto marginal: elimina a ambiguidade \gls{VEC}/\gls{V2V} e garante que o destino seja sempre o candidato de menor custo multicritério \\
+% \midrule
+% \textbf{Ganho total} & $\mathbf{+40{,}69}$ \textbf{pp} & \gls{SAC}-\gls{TOPSIS} vs.\ \gls{SAC}-Base \\
+% \bottomrule
+% \end{tabular}}
+% \end{table}
 
 % Para isolar o efeito da recompensa \textit{deadline-aware} sem alterar o estado, a variante \gls{SAC}-R1 atinge $38{,}26\%$ ($+33{,}74$ pp sobre o \textit{baseline} com estado 11D e ação ternária). Esse valor é maior que o de S1 ($28{,}69\%$), evidenciando que o sinal de recompensa assimétrico é individualmente mais poderoso que a compressão de estado quando aplicados em isolamento. Entretanto, no caminho sequencial, a maior parte do ganho de R1 é compartilhada com S1: o estado 6D já codifica urgência temporal em $\widehat{\text{JCT}}/D_i$, de modo que acrescentar a recompensa \textit{deadline}-aware sobre S1 produz um incremento marginal de apenas $+4{,}27$ pp (transição S1$\to$T1, que combina as duas mudanças).
 
-\subsection{Análise dos Resultados}
+\section{Análise dos Resultados}
 
 Três achados principais emergem do estudo. Primeiro, a variante \gls{SAC}-A1 ($39{,}2\%$) demonstra que binarizar a ação \emph{sem} critério de seleção de destino já supera o \textit{baseline} em $+34{,}6$ pp — a simples redução do espaço de busca tem efeito expressivo — mas não alcança a proposta ($45{,}3\%$) porque a regra estática \gls{VEC}$\succ$\gls{V2V} ignora condições dinâmicas de fila e distância no momento da decisão. Segundo, a variante \gls{SAC}-T1 ($33{,}1\%$) mostra que usar o \gls{TOPSIS} apenas como \textit{feature} de estado contribui com $+4{,}3$ pp sobre S1, enquanto usar o \gls{TOPSIS} como \textit{prior} de decisão (\gls{SAC}-\gls{TOPSIS}) adiciona $+12{,}2$ pp sobre T1: a eficácia do \gls{TOPSIS} é quase três vezes maior quando ele assume o controle do destino do que quando fornece apenas informação semântica ao agente. Terceiro, o \gls{JCT} médio do \gls{SAC}-\gls{TOPSIS} ($6{,}6$ s) é $8{,}6\times$ menor que o do \gls{SAC}-Base ($57{,}1$ s), indicando que a combinação \gls{TOPSIS}$+$estado compacto$+$reward \textit{deadline}-aware produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores.
 
