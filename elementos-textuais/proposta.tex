@@ -2,9 +2,13 @@
 
 % Este capítulo apresenta a abordagem proposta para o descarregamento de tarefas em redes de Computação de Borda Veicular (\gls{VEC}). A solução consiste em um agente de Aprendizado por Reforço Profundo (\gls{DRL}) baseado no algoritmo \gls{PPO}, cujo espaço de observação é estruturado de forma invariante à escala por meio do método multicritério \gls{FUZZY-TOPSIS}.
 
-Este capítulo apresenta a proposta de solução para o problema de descarregamento de tarefas em ambientes veiculares, considerando a comunicação tanto com dispositivos de borda quanto diretamente entre os dispositivos instalados nos veículos. O desafio central abordado nesta modelagem é a não estacionariedade, um fenômeno comum aos sistemas multiagente resultante da interação e da coadaptação contínua entre os agentes~\cite{albrecht2024}, além disso, também são consideradas os comportamentos complexos e variáveis de incerteza, tais como a mobilidade veicular, cargas de trabalho baseadas em traços reais de uso, limitações de processamento (\textit{throttling}) e atrasos na propagação de informações. 
+% Este capítulo apresenta a proposta de solução para o problema de descarregamento de tarefas em ambientes veiculares, considerando a comunicação tanto com dispositivos de borda quanto diretamente entre os dispositivos instalados nos veículos. O desafio central abordado nesta modelagem é a não estacionariedade, um fenômeno comum aos sistemas multiagente resultante da interação e da coadaptação contínua entre os agentes~\cite{albrecht2024}, além disso, também são consideradas os comportamentos complexos e variáveis de incerteza, tais como a mobilidade veicular, cargas de trabalho baseadas em traços reais de uso, limitações de processamento (\textit{throttling}) e atrasos na propagação de informações. 
 
 % Consequentemente, a introdução desses elementos estabelece um ambiente de simulação rigoroso e estocástico, projetado para imitar as limitações operacionais e os ruídos de comunicação enfrentados em cenários reais~\cite{albrecht2024}.
+
+
+Para lidar com o problema de descarregamento de tarefas em ambiente veicular, neste capítulo serão apresentados os fundamentos desta proposta. De forma geral, nossa trabalho extende a solução desenvolvida em \cite{vieira2025} adicionando o \textit{framework} \gls{MDP}. Em \cite{vieira2025}, o \textit{Fuzzy}-\gls{TOPSIS} era o principal mecanismo decisor, ou seja, através de regras estáticas, o \gls{FOFF} era encarregado quando e como o descarregamento era realizado seguindo critérios de latência e consumo energético. Diferente disto, nossa  proposta utiliza o algoritmo \gls{SAC} para realizar tal decisão, mas com o diferencial de decidir apenas se o processamento será local ou remoto, no caso de remoto, quem escolhe o destino da tarefa é o \textit{Fuzzy}-TOPSIS. Além disso, em \cite{vieira2025}, o \gls{FOFF} ranqueava os candidados para seleção apenas, em nosso caso ele será responsável por 
+
 
 \section{Ambiente}
 
