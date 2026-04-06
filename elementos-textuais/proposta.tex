@@ -279,12 +279,12 @@ O problema de descarregamento de tarefas nesta proposta é modelado como um \gls
 onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a maior importância dada à taxa de sucesso. O custo normalizado é a média aritmética de dois termos, ambos obtidos por normalização \textit{min-max} com mínimo zero e máximo calculado dinamicamente no instante $t$. As Equações \ref{eq:jct_max} e \ref{eq:e_max} denotam o pior caso de latência e de energia, respectivamente, entre os modos de descarregamento viáveis para a tarefa $t$.
 
 \begin{equation}
-    \text{JCT}^{\max}_t = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_t,\; \widehat{\text{JCT}}^{\text{rsu}}_t \cdot \mathbf{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
+    \text{JCT}^{\max}_t = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_t,\; \widehat{\text{JCT}}^{\text{edge}}_t \cdot \mathbf{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
     \label{eq:jct_max}
 \end{equation}
 
 \begin{equation}
-    E^{\text{max}}_t = \max\!\bigl(E^{\ell}_t,\; E^{\text{rsu}}_t \cdot \mathbf{1}_{\text{viável}},\; E^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
+    E^{\text{max}}_t = \max\!\bigl(E^{\ell}_t,\; E^{\text{edge}}_t \cdot \mathbf{1}_{\text{viável}},\; E^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
     \label{eq:e_max}
 \end{equation}
 
@@ -425,16 +425,18 @@ Como a representação do estado desta proposta comprime qualquer conjunto de $N
 % \subsection{Engenharia de Recompensa (\textit{Reward Shaping})}
 \section*{Modelagem da Recompensa}
 
-A função de recompensa é formulada para alinhar o sinal de aprendizado diretamente com o objetivo da Equação~\ref{eq:obj_geral}, isto é, priorizar a taxa de sucesso e, secundariamente, minimizar o custo operacional. Para isso, a recompensa por tarefa é estruturada de duas maneiras conforme:
+A função de recompensa é formulada para alinhar o sinal de aprendizado diretamente com o objetivo da Equação~\ref{eq:obj_geral}, isto é, priorizar a taxa de sucesso e, secundariamente, minimizar o custo operacional. Para isso, a recompensa por tarefa é estruturada conforme a Equação~\ref{eq:reward}.
+
 \begin{equation}
-    r_i =
+    r_t =
     \begin{cases}
-        1{,}0 - \dfrac{1}{4}\!\left(\dfrac{\widehat{\text{JCT}}_i}{D_i} + \dfrac{E_i}{E^{\text{max}}_i}\right), & \text{se } \widehat{\text{JCT}}_i \leq D_i \quad (\in [0{,}5,\;1{,}0]) \\[8pt]
-        -1{,}0 - \min\!\left(1{,}0,\; \dfrac{\widehat{\text{JCT}}_i - D_i}{D_i}\right), & \text{se } \widehat{\text{JCT}}_i > D_i \quad (\in [-2{,}0,\;-1{,}0])
+        1{,}0 - \dfrac{1}{4}\!\left(\dfrac{\widehat{\text{JCT}}_t}{D_t} + \dfrac{E_t}{E^{\text{max}}_t}\right), & \text{se } \widehat{\text{JCT}}_t \leq D_t \quad (\in [0{,}5,\;1{,}0]) \\[8pt]
+        -1{,}0 - \min\!\left(1{,}0,\; \dfrac{\widehat{\text{JCT}}_t - D_t}{D_t}\right), & \text{se } \widehat{\text{JCT}}_t > D_t \quad (\in [-2{,}0,\;-1{,}0])
     \end{cases}
     \label{eq:reward}
 \end{equation}
-onde $E^{\text{max}}_i = \max\!\bigl(E^{\ell}_i,\; E^{\text{rsu}}_i \cdot \mathbf{1}_{\text{viável}},\; E^{\text{v2v}}_i \cdot \mathbf{1}_{\text{viável}}\bigr)$ é a energia máxima entre os modos viáveis para a tarefa $i$, calculada por tarefa e por instante --- não é uma constante global, pois depende de quais modos estão viáveis no momento da decisão. 
+
+onde $E^{\text{max}}_t$ (Equação~\ref{eq:e_max})  é a energia máxima entre os modos viáveis para a tarefa $i$, calculada por tarefa e por instante, não é uma constante global, pois depende de quais modos estão viáveis no momento da decisão. 
 
 % Quando $\widehat{\text{JCT}}_t \leq D_i$, condição que garante que a razão $\widehat{\text{JCT}}_t/D_i$ permaneça no intervalo $[1]$. Como o termo $E_t/E^{\text{max}}_i$ também pertence a $[1]$ por construção, a média de ambos assegura que a recompensa de sucesso $r_t$ varie estritamente entre $[0{,}5,\,1{,}0]$. Por outro lado, quando $\widehat{\text{JCT}}_t > D_i$, aplica-se exclusivamente o regime de falha.
 
