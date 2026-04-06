@@ -706,7 +706,14 @@ indicando que a compressão de estado e o \gls{TOPSIS} como extensor de decisão
 \section{Avaliação Comparativa de Políticas}
 \label{sec:ranking-completo}
 
-As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são: taxa de \textit{deadline} (\%), SWQ ($= \hat{\tau}\cdot\overline{(D_j - \text{JCT}_j)/D_j}_{\text{sucesso}}$), \gls{JCT} médio em segundos, energia média por tarefa em joules e o objetivo $J(\pi) = 0{,}60\cdot\hat{\tau} - 0{,}40\cdot\overline{\tfrac{1}{2}(\text{JCT}/\text{JCT}^{\max} + E/E^{\text{ref}})}$ (Equação~\ref{eq:obj_geral}), onde $\text{JCT}^{\max}$ e $E^{\text{ref}}$ são os piores casos entre os modos viáveis por tarefa.
+As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são a taxa de \textit{deadline} ($\hat{\tau}$), o \gls{SWQ} (Equação~\ref{eq:swq}), o \gls{JCT} médio, a energia média e a função objetivo agregada:
+\begin{equation}
+    \bar{J}(\pi) = \frac{1}{N} \sum_{j=1}^N \left[ w_s \cdot \mathbf{1}(\text{JCT}_j \leq D_j) - w_c \cdot \frac{1}{2}\!\left(\frac{\text{JCT}_j}{\text{JCT}^{\max}_j} + \frac{E_j}{E^{\text{max}}_j}\right) \right]
+    \label{eq:obj_agregado}
+\end{equation}
+\noindent onde $w_s=0{,}60$ e $w_c=0{,}40$, sendo $\text{JCT}^{\max}_j$ e $E^{\text{max}}_j$ os piores casos entre os modos viáveis para a tarefa $j$ (Equações~\ref{eq:jct_max} e~\ref{eq:e_max}).
+
+As políticas avaliadas são classificadas em três categorias. As \textbf{Heurísticas de Referência} englobam estratégias como \textit{Random} (aleatória), \textit{Round-Robin} (cíclica), \textit{VEC} (estática para o RSU), além de heurísticas gulosas (\textit{Greedy}, \textit{Greedy-Fair}) e baseadas em métricas de justiça (\textit{Gini}, \textit{Jain}). O \textit{Greedy-Unfair} destaca-se como um oráculo de curto prazo com conhecimento total das filas. As políticas \textbf{\gls{RL}-Base} aplicam os algoritmos \gls{SAC}, \gls{PPO}, \gls{TD3}, \gls{DQN} e \gls{A2C} sobre o estado bruto 11D e ação ternária, incluindo as variantes de ablação \gls{SAC}-A1, S1 e R1. Por fim, as políticas \textbf{\gls{RL}+\gls{TOPSIS}} utilizam o ranqueamento multicritério, abrangendo a proposta \gls{SAC}-\gls{TOPSIS}, a variante \gls{SAC}-T1, versões com outros algoritmos (ex: \gls{PPO}-\gls{TOPSIS}) e variações de hiperparâmetros como o uso de distância de Manhattan ou estado 9D.
 
 \begin{table}[htbp]
 \centering
