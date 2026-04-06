@@ -1,0 +1,221 @@
+\documentclass{beamer}
+\input{setup.tex}
+
+% Definir color verde
+% \definecolor{beamer_color}{RGB}{64, 145, 63}
+% \definecolor{backframe_color}{RGB}{228, 242, 232}
+
+% Definir color morado
+\definecolor{beamer_color}{RGB}{0,0,153} 
+\definecolor{backframe_color}{RGB}{235, 196, 245}
+
+
+\begin{document}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\begin{frame}{Agenda}
+    \tableofcontents
+\end{frame}
+
+%%\section{Agenda}
+
+\section{Introdução}
+
+%%################## Slide INTRODUÇÃO ###################
+\begin{frame}{Introdução}
+
+\textit{Texto cursivo.} \textbf{Texto  em negrito.} \texttt{Texto em letra de máquina de escrever.}
+
+\end{frame}
+
+\section{Fundamentação Teórica}
+
+%%################Slide Fundamentação Teórica #############
+\begin{frame}{Fundamentação Teórica}
+
+  \small{Texto ligeiramente menor que o normal.}
+\normalsize{Este texto tamanho normal.}
+\large{Texto maior.}
+
+\end{frame}
+
+\section{Lista Enumerada}
+%%################Seção Lista Enumerada #############
+\begin{frame}{Lista Enumerada}
+
+Lista enumerada
+\begin{enumerate}
+    \item Primeiro item.
+    \item Segundo item.
+    \item Terceiro item.
+\end{enumerate}
+
+Lista não enumerada
+\begin{itemize}
+     \item Primeiro item.
+    \item Segundo item.
+    \item Terceiro item.
+\end{itemize}
+    
+\end{frame}
+
+
+\section{Imagens}
+%%################ Imagens #############
+\begin{frame}{Imagens}
+    Carregar imagem na pasta \texttt{figuras}. 
+
+   A Figura \ref{fig:red_ramificada} mostra um exemplo de como inserir a imagem e referência.
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width = \textwidth]{figuras/BranchedScheme.pdf} % Usar a sua imagem
+        \caption{Rede com $k$ ramificações.} % Referência
+        \label{fig:red_ramificada} % Label
+    \end{figure}
+\end{frame}
+
+%%################ Imagens Slide 2 #############
+\begin{frame}{Imagens Slide 2}
+
+    A Figura \ref{fig:comparacion_redes} mostra como inserir figuras lado a lado.
+
+    \begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figuras/LSTM.pdf}
+        \caption{Red LSTM}
+        \label{fig:figura1a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figuras/TDNN.pdf}
+        \caption{Red TDNN}
+        \label{fig:figura1b}
+    \end{subfigure}
+    \caption[Comparação entre redes neurais]{Comparação entre redes neurais}
+    \label{fig:comparacion_redes}
+\end{figure}
+    
+\end{frame}
+
+
+\section{Equações}
+%%################ Equações #############
+\begin{frame}{Equações}
+
+    Exemplo de equação numerada:
+    \begin{equation}
+        \frac{\partial Q\left(z_k,t\right)}{\partial t}+gA_k\frac{\partial H\left(z_k,t\right)}{\partial z_k}+\mu_kQ\left(z_k,t\right)\left|Q\left(z_k,t\right)\right|+g\sin{a_k}=0,
+        \label{eq:momentum}
+    \end{equation}
+    Uma equação numerada se referencia no texto usando seu \textit{label}: A Equação \eqref{eq:momentum} é conhecida como a Equação de Momentum.
+    
+    Exemplo de uma equação sem numeração:
+    $$\frac{\partial H\left(z_k,t\right)}{\partial t}+\frac{b_k^2}{gA_k}\frac{\partial Q\left(z_k,t\right)}{\partial z_k}=0.$$
+
+    Exemplo da equação no texto: $\mu_k=\frac{fQ_k}{2D_kA_k}$  
+\end{frame}
+
+
+\section{Tabelas}
+%%################ Tabelas #############
+\begin{frame}{Tabelas}
+    A Tabela \ref{tab:ModelosPerdida} mostra uma tabela de uma coluna. 
+    
+    \begin{table}[htbp]
+        \centering
+         \caption{Fórmulas para o cálculo de perdas de carga em tubulações.\break}
+         \vspace{-\baselineskip}
+        \label{tab:ModelosPerdida}
+        \small
+        \begin{tabular}{ccc}
+            \toprule
+            \textbf{Perda} & \textbf{Coeficiente} $C$ & \textbf{Exponente} $\sigma$ \\
+            \midrule
+            Hazen-Williams & $4.727 \mathscr{H}^{-1.852}D^{-4.871}L$ & 1.852 \\
+            Darcy-Weisbach & $0.0252f(\varepsilon, D, Q)D^{-5}L$ & 2 \\
+            Chezy-Manning & $4.66n^2D^{-5.33}L$ & 2 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+\end{frame}
+
+
+%%################ Tabelas Slide 2#############
+\begin{frame}{Tabelas Slide 2}
+
+    A Tabela \ref{Tab:Accesorios} mostra um exemplo de duas colunas.
+    
+    \begin{table}[htbp]
+        \centering
+        \caption{Acessórios}
+        \vspace{-\baselineskip}
+        \label{Tab:Accesorios}
+        \null\hfill
+        \scriptsize
+        \begin{tabular}{cl}
+        % \multicolumn{2}{c}{a) Tuberías 1-8}\\[2pt]
+        \toprule
+        \textbf{Coluna 01} & \textbf{Coluna 02} \\
+        \midrule
+        $\text{N}_{1}-\text{N}_{2}$ & 2 Codos 90°\\
+        $\text{N}_{2}-\text{N}_{3}$ & 4 Codos 90° \\ 
+        
+        $\text{N}_{4}-\text{N}_{5}$ & 2 Codos 90° \\ 
+        $\text{N}_{5}-\text{N}_{6}$ & 4 Codos 90° \\ 
+        
+        $\text{N}_{7}-\text{N}_{8}$ & 2 Codos 90° \\
+        $\text{N}_{8}-\text{N}_{9}$ & 4 Codos 90° \\ 
+        \bottomrule
+        \end{tabular}
+        \hfill\hfill
+        \begin{tabular}{cl}
+        % \multicolumn{2}{c}{b) Tuberías 9-16}\\[2pt]
+        \toprule
+        \textbf{Coluna 01} & \textbf{Coluna 02} \\
+        \midrule
+        $\text{N}_{4}-\text{N}_{10}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
+        
+        $\text{N}_{11}-\text{N}_{12}$ & 4 Codos 90° \\ 
+        $\text{N}_{12}-\text{N}_{13}$ & 2 Codos 90° \\ 
+        $\text{N}_{6}-\text{N}_{14}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
+        
+        $\text{N}_{15}-\text{N}_{16}$ & 2 Codos 90° \\ 
+        $\text{N}_{16}-\text{N}_{17}$ & 4 Codos 90° \\ 
+        \bottomrule
+        \end{tabular}
+        \hfill\null
+    \end{table}
+    
+\end{frame}
+
+
+\section{Referências}
+%%################ Referências #############
+\begin{frame}{Referências}
+    Adicione as referêcnias no documento  \texttt{biblio.bib} no formato \texttt{BibTex}.
+
+    Exemplo de uma referência \cite{zhang2017digital}.
+    Exemplo de duas ou mais referências em uma citação, separado com vírgulas \cite{praks2018advanced,santos2018online}.
+    As referências são adiconadas automaticamente na Bibliografia.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliografia}
+\bibliographystyle{ieeetr}
+\bibliography{biblio}
+\end{frame}
+
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+
+\end{document}

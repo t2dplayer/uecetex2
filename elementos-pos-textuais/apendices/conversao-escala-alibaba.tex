@@ -1,0 +1,42 @@
+\apendice{Conversão de Escala de Tempo do \textit{Trace} Alibaba}
+\label{ap:conversao-alibaba}
+
+O \textit{trace} de carga de trabalho do Alibaba~\cite{cheng2018characterizing} registra os instantes de chegada das tarefas em segundos absolutos a partir do início da coleta, cujos valores são da ordem de $10^5$~s (equivalente a dezenas de horas corridas). Para utilizar esse \textit{trace} em uma simulação veicular com janela temporal de 600~s, foram realizadas três etapas de conversão.
+
+\textbf{Etapa~1 — Seleção de janela.} Uma janela contígua de 600~s é extraída do \textit{trace} a partir de um instante $t_{\text{início}}$ escolhido de modo que a taxa média de chegada de tarefas na janela corresponda à carga desejada (e.g., $\approx 30$~tarefas/s). A duração de 600~s alinha-se ao horizonte temporal da mobilidade gerada pelo \gls{SUMO}.
+
+\textbf{Etapa~2 — Normalização do instante de chegada.} O instante de chegada de cada tarefa $j$ no simulador é obtido subtraindo o início da janela:
+\begin{equation}
+    t_{\text{veicular},j} = t_{\text{Alibaba},j} - t_{\text{início}},
+    \label{eq:t-veicular}
+\end{equation}
+mapeando os instantes para o intervalo $[0, 599]$~s.
+
+\textbf{Etapa~3 — Derivação dos requisitos computacionais.} A quantidade de ciclos de \gls{CPU} necessários para executar a tarefa $j$ é calculada como:
+\begin{equation}
+    C_j = N_{\text{inst},j} \times \text{plan\_cpu}_j \times \alpha \cdot \Delta t_j \times F_{\text{ref}},
+    \label{eq:ciclos}
+\end{equation}
+onde $N_{\text{inst},j}$ é o número de instâncias paralelas, $\text{plan\_cpu}_j$ é a alocação de \gls{CPU} normalizada pelo \textit{trace}, $\Delta t_j = t_{\text{fim},j} - t_{\text{início},j}$ é a duração original no \textit{datacenter} (em segundos), $\alpha = 0{,}01$ é o fator de compressão temporal e $F_{\text{ref}} = 25\,\text{MHz}$ é a frequência de referência de normalização. O fator $\alpha$ comprime 100~vezes o tempo de execução original, de modo que tarefas que levavam segundos no \textit{cluster} Alibaba passam a demandar dezenas de milissegundos no \gls{VEC}, compatíveis com as restrições de latência do cenário veicular.
+
+\subsection*{Exemplo numérico}
+
+A Tabela~\ref{tab:exemplo-conversao} ilustra a conversão para uma tarefa extraída do cenário \texttt{cenario\_v2x\_30tps} (janela com $t_{\text{início}} = 205.200$~s).
+
+\begin{table}[htb]
+\centering
+\caption{Exemplo de conversão de escala de tempo para uma tarefa do \textit{trace} Alibaba.}
+\label{tab:exemplo-conversao}
+\begin{tabular}{lll}
+\toprule
+\textbf{Grandeza} & \textbf{Valor original} & \textbf{Valor convertido} \\
+\midrule
+Instante de chegada ($t_{\text{Alibaba}}$)          & $205.201$~s    & $t_{\text{veicular}} = 205.201 - 205.200 = 1{,}0$~s \\
+Duração no \textit{datacenter} ($\Delta t$)         & $5$~s          & $\text{proc\_time} = 5 \times 0{,}01 = 0{,}05$~s $= 50$~ms \\
+Instâncias / alocação de CPU ($N \times \text{plan\_cpu}$) & $1 \times 50$  & --- \\
+Ciclos computacionais ($C_j$)                       & ---            & $1 \times 50 \times 0{,}05 \times 25 \times 10^6 = 62{,}5 \times 10^6$~ciclos \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O valor de $C_j = 62{,}5 \times 10^6$~ciclos representa a demanda computacional que o \gls{VEC} (operando a $F_{\text{VEC}} = 1{,}2\,\text{GHz}$) processaria em aproximadamente $52$~ms, compatível com o prazo gerado para essa tarefa.

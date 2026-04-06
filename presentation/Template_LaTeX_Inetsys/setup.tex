@@ -1,0 +1,83 @@
+\usepackage{siunitx,booktabs,xcolor,xspace,multirow,graphicx,lipsum}
+\usepackage[spanish,mexico,es-noindentfirst]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage[charter]{mathdesign}
+\usetheme{Madrid}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+
+\usefonttheme{serif}
+
+
+\setbeamertemplate{frametitle}{
+  \begin{beamercolorbox}[wd=\paperwidth,ht=1cm, sep=0.25cm]{frametitle}
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[anchor=north east] at (current page.north east) {\includegraphics[height=0.75cm]{figuras/inetSys-fundo-azul-logo.png}};
+    \end{tikzpicture}
+    \usebeamerfont{frametitle}\bfseries\insertframetitle
+  \end{beamercolorbox}
+}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamercolor{frametitle}{bg=beamer_color,fg=white}
+\setbeamercolor{author in head/foot}{bg=beamer_color,fg=white}
+\setbeamercolor{title in head/foot}{bg=beamer_color,fg=white}
+\setbeamercolor{date in head/foot}{bg=beamer_color,fg=white}
+\setbeamercolor{titlelike}{parent=structure,bg=beamer_color,fg=white}
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+\setbeamerfont{section in toc}{series=\bfseries}
+\setbeamercolor{section in toc}{fg=black}
+\setbeamercolor{caption name}{fg=blue}
+\setbeamerfont{caption name}{series=\bfseries}
+\setbeamerfont{caption}{size=\small}
+\setbeamercolor{bibliography entry author}{fg=black}
+\setbeamercolor{bibliography entry title}{fg=black} 
+\setbeamertemplate{section in toc}{\inserttocsectionnumber.~\inserttocsection\par}
+\setbeamertemplate{subsection in toc}{\hspace{1.5em}\inserttocsectionnumber.\inserttocsubsectionnumber~\inserttocsubsection\par}
+
+
+
+\title[\textbf{Título do Trabalho (2)}]{\textbf{Título do Trabalho (1)}}
+\author[\textbf{Nome do Aluno (2)}]{\textbf{Nome do Aluno (1) \break contato@aluno.uece.gov.br}}
+\date{\textbf{05.01.2023}}
+
+\renewcommand{\maketitle}{
+\vspace{0.5\baselineskip}
+
+
+\begin{center}
+    \includegraphics[height=2cm]{figuras/uece_inetsys_desc_logo.png}\hfill
+    %%\includegraphics[height=1.25cm]{figuras/uece_logo.png}\hfill
+    %%includegraphics[height=1.25cm]{figuras/inetSys-logo.png}\hfill
+\end{center}
+
+\begin{center}
+    \textbf{DOUTORADO EM CIÊNCIA DA COMPUTAÇÃO}
+\end{center}
+
+\titlepage
+\vspace{\baselineskip}
+\begin{center}
+    \small
+    \vspace{-2.5\baselineskip}
+    Professor Orientador:  Dr. Joaquim Celestino Júnior \\
+    
+\end{center}
+}
+
+% \AtBeginSection[ ]
+% {
+% \begin{frame}{Contenido de la presentación}
+% \tableofcontents[currentsection,subsectionstyle = shaded]
+% \end{frame}
+% }
+
+% \AtBeginSubsection[ ]
+% {
+% \begin{frame}{Contenido de la presentación}
+% \tableofcontents[currentsection,currentsubsection]
+% \end{frame}
+% }
