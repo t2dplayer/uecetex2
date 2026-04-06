@@ -276,7 +276,7 @@ O problema de descarregamento de tarefas nesta proposta é modelado como um \gls
     \label{eq:obj_geral}
 \end{equation}
 
-onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a maior importância dada à taxa de sucesso. O custo normalizado é a média aritmética de dois termos, ambos obtidos por normalização \textit{min-max} com mínimo zero e máximo calculado dinamicamente no instante $t$. As Equações \ref{eq:jct_max} e \ref{eq:e_max} denotam o pior caso de latência e de energia, respectivamente, entre os modos de descarregamento viáveis para a tarefa $t$.
+\noindent onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a maior importância dada à taxa de sucesso. O custo normalizado é a média aritmética de dois termos, ambos obtidos por normalização \textit{min-max} com mínimo zero e máximo calculado dinamicamente no instante $t$. As Equações \ref{eq:jct_max} e \ref{eq:e_max} denotam o pior caso de latência e de energia, respectivamente, entre os modos de descarregamento viáveis para a tarefa $t$.
 
 \begin{equation}
     \text{JCT}^{\max}_t = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_t,\; \widehat{\text{JCT}}^{\text{vec}}_t \cdot \mathbf{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
@@ -436,7 +436,7 @@ A função de recompensa é formulada para alinhar o sinal de aprendizado direta
     \label{eq:reward}
 \end{equation}
 
-onde $E^{\text{max}}_t$ (Equação~\ref{eq:e_max})  é a energia máxima entre os modos viáveis para a tarefa $i$, calculada por tarefa e por instante, não é uma constante global, pois depende de quais modos estão viáveis no momento da decisão. 
+\noindent onde $E^{\text{max}}_t$ (Equação~\ref{eq:e_max})  é a energia máxima entre os modos viáveis para a tarefa $i$, calculada por tarefa e por instante, não é uma constante global, pois depende de quais modos estão viáveis no momento da decisão. 
 
 % Quando $\widehat{\text{JCT}}_t \leq D_i$, condição que garante que a razão $\widehat{\text{JCT}}_t/D_i$ permaneça no intervalo $[1]$. Como o termo $E_t/E^{\text{max}}_i$ também pertence a $[1]$ por construção, a média de ambos assegura que a recompensa de sucesso $r_t$ varie estritamente entre $[0{,}5,\,1{,}0]$. Por outro lado, quando $\widehat{\text{JCT}}_t > D_i$, aplica-se exclusivamente o regime de falha.
 
@@ -488,7 +488,8 @@ O \gls{SAC}-Base é o ponto de partida do estudo e serve de referência para med
     \right]
     \label{eq:estado-base}
 \end{equation}
-onde $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Embora possam existir múltiplos vizinhos \gls{V2V} no alcance, o estado expõe apenas um, o veículo com maior frequência de \textit{clock} dentro do raio \gls{V2V}, selecionado por uma varredura gulosa no pré-processamento do cenário. Quando nenhum vizinho está disponível, as três últimas componentes recebem o valor sentinela $-1$ para distinguir ausência de \gls{V2V} de \gls{V2V} com métrica zero.
+
+\noindent onde $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Embora possam existir múltiplos vizinhos \gls{V2V} no alcance, o estado expõe apenas um, o veículo com maior frequência de \textit{clock} dentro do raio \gls{V2V}, selecionado por uma varredura gulosa no pré-processamento do cenário. Quando nenhum vizinho está disponível, as três últimas componentes recebem o valor sentinela $-1$ para distinguir ausência de \gls{V2V} de \gls{V2V} com métrica zero.
 
 O espaço de ação é ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{vec},\, 2\!=\!\textsc{v2v}\}$, ou seja, o agente deve aprender simultaneamente a decisão de descarregar e a escolha do destino. A recompensa é calculada pelo \gls{WSM} com pesos iguais sobre três critérios de custo, \gls{JCT} estimado ($j=1$), energia total ($j=2$) e ocupação de fila do nó de computação escolhido ($j=3$):
 
@@ -499,7 +500,7 @@ O espaço de ação é ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\texts
     \label{eq:reward-wsm}
 \end{equation}
 
-onde $\tilde{x}_{aj} = x_{aj}/\max_{a'} x_{a'j} \in [0,1]$ normaliza o critério $j$ da alternativa $a$ pelo valor máximo desse critério entre todas as alternativas $a' \in \{\textsc{local},\,\textsc{vec},\,\textsc{v2v}\}$; $\bar{x}_a \in [0,1]$ é a média dos três custos normalizados da alternativa escolhida; e a recompensa é obtida pela transformação $2(1-\bar{x}_a)-1$, que inverte o custo e o remapeia linearmente para $[-1,1]$. Esse sinal de recompensa não distingue violações de \textit{deadline} de execuções lentas porém viáveis. Uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
+\noindent onde $\tilde{x}_{aj} = x_{aj}/\max_{a'} x_{a'j} \in [0,1]$ normaliza o critério $j$ da alternativa $a$ pelo valor máximo desse critério entre todas as alternativas $a' \in \{\textsc{local},\,\textsc{vec},\,\textsc{v2v}\}$; $\bar{x}_a \in [0,1]$ é a média dos três custos normalizados da alternativa escolhida; e a recompensa é obtida pela transformação $2(1-\bar{x}_a)-1$, que inverte o custo e o remapeia linearmente para $[-1,1]$. Esse sinal de recompensa não distingue violações de \textit{deadline} de execuções lentas porém viáveis. Uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
 
 %  --- custo mínimo ($\bar{x}_a=0$) produz $r=+1$ e custo máximo ($\bar{x}_a=1$) produz $r=-1$. 
  
@@ -695,101 +696,105 @@ indicando que a compressão de estado e o \gls{TOPSIS} como extensor de decisão
 % \begin{enumerate}
 %     \item \textbf{Divisão de responsabilidades}: O \gls{TOPSIS} resolve deterministicamente a pergunta \emph{``qual candidato de offload é melhor?''}; o \gls{SAC} aprende a resposta à pergunta complementar \emph{``vale a pena descarregar para esse candidato?''}. As duas perguntas são independentes e igualmente necessárias; nenhum dos dois módulos, isoladamente, as responde ambas.
 
-%     \item \textbf{Off-policy + replay buffer}: O \gls{SAC} recicla cada transição $\approx\!40$ vezes no treinamento com um único cenário, alcançando uma eficiência amostral inacessível ao \gls{PPO} on-policy. Essa reciclagem é segura porque o \gls{SAC} aprende uma função de valor $Q(s,a)$ que é off-policy por construção --- ao contrário do \gls{PPO}, cujo gradiente de política requer dados coletados pela política corrente.
-
-%     \item \textbf{Regularização entrópica intensa}: O \gls{SAC} mantém $\alpha_{\text{ent}} = 0{,}10$ com ajuste automático, dez vezes superior ao coeficiente fixo do \gls{PPO}. Essa entropia elevada é precisamente o que impede o colapso de política frente ao sinal claro fornecido por $\Delta_{\text{obj}}$ no estado 6D --- mantendo a exploração ativa mesmo quando o \gls{TOPSIS} sugere fortemente que \textit{offload} é melhor.
-% \end{enumerate}
-
-% Em contraste, o \gls{PPO}-\gls{TOPSIS} sofre das três falhas simétricas: aprende uma pergunta que o \gls{TOPSIS} já responde (redundância), colapsa para uma estratégia degenerada com entropia insuficiente para resistir ao sinal \gls{TOPSIS} (colapso), e sobreajusta ao único cenário de treino sem o mecanismo de reciclagem do \textit{replay buffer} (ineficiência amostral). O experimento controlado confirma inequivocamente este diagnóstico: ao trocar \emph{apenas} o algoritmo --- mantendo estado 6D, ação binária e recompensa idênticos --- o \gls{SAC}-\gls{TOPSIS} atinge $45{,}3\%$ enquanto o \gls{PPO}-\gls{TOPSIS} obtém $18{,}4\%$, um déficit de $26{,}9$ pontos percentuais atribuível exclusivamente à natureza on-policy do \gls{PPO} e à sua baixa temperatura entrópica. O \gls{TOPSIS}, portanto, não é neutro quando mal integrado: \emph{amplifica} as fraquezas do algoritmo hospedeiro.
-
-% ──────────────────────────────────────────────────────────────────────────────
 \section{Avaliação Comparativa de Políticas}
 \label{sec:ranking-completo}
 
-As Tabelas~\ref{tab:ranking-completo} e~\ref{tab:ganho-topsis} resumem os resultados de 25 políticas avaliadas em 658 cenários de teste comuns, abrangendo algoritmos de aprendizado por reforço (com e sem \gls{TOPSIS}) e heurísticas de referência. As métricas reportadas são a taxa de \textit{deadline} ($\hat{\tau}$), o \gls{SWQ} (Equação~\ref{eq:swq}), o \gls{JCT} médio, a energia média e a função objetivo agregada:
+A Tabela~\ref{tab:ranking-completo} resume os resultados de 21 políticas avaliadas em 658 cenários de teste comuns. As linhas da tabela estão ordenadas em forma decrescente com base na métrica \gls{SWQ}. Junto ao nome da política de descarregamento na coluna \textbf{Política}, o símbolo ($\star$) indica a integração do ranqueamento \gls{TOPSIS} para a tomada de decisão.
+
+A coluna \textbf{\% Sucesso} apresenta a taxa de tarefas que concluíram integralmente seu ciclo de processamento antes do esgotamento de seus respectivos prazos (\textit{deadlines}). A coluna \textbf{\gls{SWQ}}, definida na Equação~\ref{eq:swq}, mostra o quanto a política atende ao mesmo tempo à maximização da taxa de sucesso e à minimização dos custos complementares (latência e energia). As colunas subsequentes, \textbf{\gls{JCT}(s)} e \textbf{E(J)}, representam os dados de custos isolados: respectivamente, o tempo total médio de conclusão das tarefas (englobando transmissão e execução) e o consumo energético dissipado nos nós. A coluna \textbf{J($\pi$)} expressa o valor puramente numérico da função objetivo (\textit{fitness}) alcançado pela política no ambiente simulado, calculado sob a restrição dada a seguir:
+
 \begin{equation}
     \bar{J}(\pi) = \frac{1}{N} \sum_{j=1}^N \left[ w_s \cdot \mathbf{1}(\text{JCT}_j \leq D_j) - w_c \cdot \frac{1}{2}\!\left(\frac{\text{JCT}_j}{\text{JCT}^{\max}_j} + \frac{E_j}{E^{\text{max}}_j}\right) \right]
     \label{eq:obj_agregado}
 \end{equation}
+
 \noindent onde $w_s=0{,}60$ e $w_c=0{,}40$, sendo $\text{JCT}^{\max}_j$ e $E^{\text{max}}_j$ os piores casos entre os modos viáveis para a tarefa $j$ (Equações~\ref{eq:jct_max} e~\ref{eq:e_max}).
 
-As políticas avaliadas são classificadas em três categorias. As \textbf{Heurísticas de Referência} englobam estratégias como \textit{Random} (aleatória), \textit{Round-Robin} (cíclica), \textit{VEC} (estática para o RSU), além de heurísticas gulosas (\textit{Greedy}, \textit{Greedy-Fair}) e baseadas em métricas de justiça (\textit{Gini}, \textit{Jain}). O \textit{Greedy-Unfair} destaca-se como um oráculo de curto prazo com conhecimento total das filas. As políticas \textbf{\gls{RL}-Base} aplicam os algoritmos \gls{SAC}, \gls{PPO}, \gls{TD3}, \gls{DQN} e \gls{A2C} sobre o estado bruto 11D e ação ternária, incluindo as variantes de ablação \gls{SAC}-A1, S1 e R1. Por fim, as políticas \textbf{\gls{RL}+\gls{TOPSIS}} utilizam o ranqueamento multicritério, abrangendo a proposta \gls{SAC}-\gls{TOPSIS}, a variante \gls{SAC}-T1, versões com outros algoritmos (ex: \gls{PPO}-\gls{TOPSIS}) e variações de hiperparâmetros como o uso de distância de Manhattan ou estado 9D.
+As colunas \textbf{\%Loc} e \textbf{\%Rem} quantificam as decisões de descarregamento, reportando respectivamente a proporção de tarefas executadas localmente e aquelas descarregadas. Por fim, a coluna \textbf{Categoria} classifica as políticas em: \textit{DRL-BASE}, \textit{DRL+TOPSIS} e \textit{Heurística}.
+
+As heurísticas de referência englobam estratégias estáticas (\textit{VEC}, que descarrega incondicionalmente via \gls{V2I}), aleatória (\textit{Random}), cíclica (\textit{Round-Robin}), baseadas em métricas de justiça (\textit{Gini}, \textit{Jain}) e gulosas. Entre as gulosas, o \textit{Greedy-Fair} seleciona, para cada tarefa, o modo
+de execução que minimiza a função de custo
+$\alpha \cdot \mathrm{JCT} + \beta \cdot E + \gamma \cdot \mathbf{1}[\mathrm{JCT} > D_j]$, onde $\alpha = \beta = 0{,}35$ são os pesos de latência e energia, $\gamma = 0{,}30$ é a penalidade por violação de prazo e $\mathbf{1}[\mathrm{JCT} > D_j] \in \{0,1\}$ é o indicador binário que vale~$1$ quando o tempo de conclusão estimado excede o \textit{deadline} $D_j$ da tarefa. Os tempos de conclusão remotos são estimados assumindo os servidores livres na chegada, sem consultar o estado real das filas, tornando a heurística implementável em sistemas reais e adotada como \textit{baseline} principal.
+
+O \textit{Greedy-Unfair}, por sua vez, serve como teto teórico da abordagem gulosa pois usa as mesmas ponderações, mas com acesso privilegiado ao tempo real de liberação de cada servidor, configurando um oráculo de curto prazo impossível de replicar em produção. As políticas \gls{DRL}-Base aplicam os algoritmos \gls{SAC}, \gls{PPO}, \gls{TD3}, \gls{DQN} e \gls{A2C} sobre o estado bruto 11D com ação ternária (local/\gls{VEC}/\gls{V2V}), incluindo as variantes de ablação \gls{SAC}-A1 (ação binária), S1 (estado 6D manual) e R1 (\textit{reward} com consciência de \textit{deadline}). 
+
+Por fim, as políticas \gls{DRL}+\gls{TOPSIS} substituem a ação ternária pelo ranqueamento multicritério \gls{TOPSIS} sobre estado 6D, abrangendo a proposta principal \gls{SAC}-\gls{TOPSIS}, a variante de ablação \gls{SAC}-T1 (score \gls{TOPSIS} como \textit{feature} do estado, sem guiar a ação) e versões com outros algoritmos (\gls{PPO}-\gls{TOPSIS}, \gls{TD3}-\gls{TOPSIS}, \gls{DQN}-\gls{TOPSIS}, \gls{A2C}-\gls{TOPSIS}).
 
 \begin{table}[htbp]
 \centering
-\caption{\textit{Ranking} completo das 25 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa \gls{TOPSIS}.}
+\caption{\textit{Ranking} completo das 21 políticas avaliadas em 658 cenários comuns (ordenado por SWQ decrescente). $\star$~=~usa \gls{TOPSIS}.}
 \label{tab:ranking-completo}
 \makebox[\linewidth][c]{%
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{clrrrrrrrrr}
+\begin{tabular}{clrrrrrrrr}
 \toprule
-\textbf{\#} & \textbf{Política} & \textbf{Cn} & \textbf{Taxa\%} & \textbf{SWQ} & \textbf{\gls{JCT} (s)} & \textbf{E (J)} & \textbf{J($\pi$)} & \textbf{\%Loc} & \textbf{\%V2V} & \textbf{Categoria} \\
+\textbf{\#} & \textbf{Política} & \textbf{\% Sucesso} & \textbf{SWQ} & \textbf{\gls{JCT} (s)} & \textbf{E (J)} & \textbf{J($\pi$)} & \textbf{\%Loc} & \textbf{\%V2V} & \textbf{Categoria} \\
 \midrule
- 1 & sac-topsis $\star$       & 658 & 45,21 & 0,1484 &  6,547 & 25,828 & 0,2454 & 74,1 & 25,9 & \gls{RL}+\gls{TOPSIS} \\
- 2 & ppo-topsis $\star$                & 658 & 42,66 & 0,1426 &  5,895 & 21,333 & 0,2344 & 98,7 &  1,3 & \gls{RL}+\gls{TOPSIS} \\
- 3 & ppo-base                    & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{RL}-Base \\
- 4 & ppo-topsis-compact $\star$        & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{RL}+\gls{TOPSIS} \\
- 5 & td3-base                    & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{RL}-Base \\
- 6 & a2c-topsis $\star$                & 658 & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{RL}+\gls{TOPSIS} \\
- 7 & td3-topsis $\star$                & 658 & 43,91 & 0,1388 &  3,703 & 22,995 & 0,2424 & 76,5 & 23,5 & \gls{RL}+\gls{TOPSIS} \\
- 8 & sac-topsis-9d $\star$             & 658 & 42,82 & 0,1386 &  5,886 & 20,985 & 0,2348 & 94,7 &  5,3 & \gls{RL}+\gls{TOPSIS} \\
- 9 & sac-topsis-manhattan $\star$      & 658 & 41,66 & 0,1385 & 11,831 & 23,656 & 0,2211 & 51,1 & 48,9 & \gls{RL}+\gls{TOPSIS} \\
-10 & sac-t1 $\star$                    & 658 & 32,96 & 0,1270 & 11,487 & 26,126 & 0,1658 & 22,6 & 77,4 & \gls{RL}+\gls{TOPSIS} \\
-11 & greedy-unfair               & 658 & 41,29 & 0,1262 &  5,613 &  7,396 & 0,2370 & 67,3 & 32,7 & Heurística \\
-12 & sac-a1                      & 658 & 39,11 & 0,1256 & 13,722 & 21,118 & 0,2064 & 82,9 & 17,1 & \gls{RL}-Base \\
-13 & sac-r1                      & 658 & 38,26 & 0,1223 & 13,353 & 31,425 & 0,1914 & 58,8 & 41,2 & \gls{RL}-Base \\
-14 & sac-s1                      & 658 & 28,69 & 0,1122 & 39,298 & 20,305 & 0,1210 & 38,2 & 61,8 & \gls{RL}-Base \\
-15 & gini                        & 658 & 35,24 & 0,1057 &  3,456 & 39,395 & 0,1790 & 61,7 & 38,3 & Heurística \\
-16 & dqn-topsis $\star$                & 658 & 25,90 & 0,0997 & 21,722 & 23,979 & 0,1161 & 20,0 & 80,0 & \gls{RL}+\gls{TOPSIS} \\
-17 & jain                        & 658 & 32,54 & 0,0973 &  3,628 & 39,280 & 0,1627 & 58,6 & 41,4 & Heurística \\
-18 & random                      & 658 & 30,02 & 0,0950 & 17,853 & 27,330 & 0,1427 & 40,7 & 59,3 & Heurística \\
-19 & roundrobin                  & 658 & 28,50 & 0,0905 & 17,900 & 31,080 & 0,1315 & 34,9 & 65,1 & Heurística \\
-20 & greedy                      & 658 & 29,03 & 0,0823 & 29,265 &  6,168 & 0,1429 & 42,5 & 57,5 & Heurística \\
-21 & a2c-base                    & 658 & 21,74 & 0,0772 & 13,653 & 48,862 & 0,0785 & 20,3 & 79,7 & \gls{RL}-Base \\
-22 & dqn-base                    & 658 & 22,10 & 0,0686 & 13,599 & 44,445 & 0,0839 & 21,5 & 78,5 & \gls{RL}-Base \\
-23 & greedy-fair                 & 658 & 20,61 & 0,0528 & 40,754 &  5,634 & 0,0823 & 27,9 & 72,1 & Heurística \\
-24 & sac-base                    & 658 &  4,52 & 0,0119 & 57,075 & 24,230 & $-$0,042 &  5,1 & 94,9 & \gls{RL}-Base \\
-25 & vec                         & 658 &  1,86 & 0,0030 & 144,191 & 4,843 & $-$0,123 &  1,2 & 98,8 & Heurística \\
+ 1 & sac-topsis $\star$       & 45,21 & 0,1484 &  6,547 & 25,828 & 0,2454 & 74,1 & 25,9 & \gls{DRL}+\gls{TOPSIS} \\
+ 2 & ppo-topsis $\star$                & 42,66 & 0,1426 &  5,895 & 21,333 & 0,2344 & 98,7 &  1,3 & \gls{DRL}+\gls{TOPSIS} \\
+ 3 & ppo-base                    & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{DRL}-Base \\
+ 4 & td3-base                    & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{DRL}-Base \\
+ 5 & a2c-topsis $\star$                & 42,32 & 0,1418 &  6,045 & 24,414 & 0,2295 & 100,0 &  0,0 & \gls{DRL}+\gls{TOPSIS} \\
+ 6 & td3-topsis $\star$                & 43,91 & 0,1388 &  3,703 & 22,995 & 0,2424 & 76,5 & 23,5 & \gls{DRL}+\gls{TOPSIS} \\
+ 7 & sac-t1 $\star$                    & 32,96 & 0,1270 & 11,487 & 26,126 & 0,1658 & 22,6 & 77,4 & \gls{DRL}+\gls{TOPSIS} \\
+ 8 & greedy-unfair               & 41,29 & 0,1262 &  5,613 &  7,396 & 0,2370 & 67,3 & 32,7 & Heurística \\
+ 9 & sac-a1                      & 39,11 & 0,1256 & 13,722 & 21,118 & 0,2064 & 82,9 & 17,1 & \gls{DRL}-Base \\
+10 & sac-r1                      & 38,26 & 0,1223 & 13,353 & 31,425 & 0,1914 & 58,8 & 41,2 & \gls{DRL}-Base \\
+11 & sac-s1                      & 28,69 & 0,1122 & 39,298 & 20,305 & 0,1210 & 38,2 & 61,8 & \gls{DRL}-Base \\
+12 & gini                        & 35,24 & 0,1057 &  3,456 & 39,395 & 0,1790 & 61,7 & 38,3 & Heurística \\
+13 & dqn-topsis $\star$                & 25,90 & 0,0997 & 21,722 & 23,979 & 0,1161 & 20,0 & 80,0 & \gls{DRL}+\gls{TOPSIS} \\
+14 & jain                        & 32,54 & 0,0973 &  3,628 & 39,280 & 0,1627 & 58,6 & 41,4 & Heurística \\
+15 & random                      & 30,02 & 0,0950 & 17,853 & 27,330 & 0,1427 & 40,7 & 59,3 & Heurística \\
+16 & roundrobin                  & 28,50 & 0,0905 & 17,900 & 31,080 & 0,1315 & 34,9 & 65,1 & Heurística \\
+17 & a2c-base                    & 21,74 & 0,0772 & 13,653 & 48,862 & 0,0785 & 20,3 & 79,7 & \gls{DRL}-Base \\
+18 & dqn-base                    & 22,10 & 0,0686 & 13,599 & 44,445 & 0,0839 & 21,5 & 78,5 & \gls{DRL}-Base \\
+19 & greedy-fair                 & 20,61 & 0,0528 & 40,754 &  5,634 & 0,0823 & 27,9 & 72,1 & Heurística \\
+20 & sac-base                    &  4,52 & 0,0119 & 57,075 & 24,230 & $-$0,042 &  5,1 & 94,9 & \gls{DRL}-Base \\
+21 & vec                         &  1,86 & 0,0030 & 144,191 & 4,843 & $-$0,123 &  1,2 & 98,8 & Heurística \\
 \bottomrule
 \end{tabular}%
 }}
 \end{table}
 
-A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmo, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
+A análise da tabela demonstra que a integração do multicritério \gls{TOPSIS} garantiu as melhores colocações no \textit{ranking}. A principal abordagem proposta por este estudo, a política \gls{SAC}\gls{TOPSIS}, conseguiu a maior taxa de sucesso (45{,}21\%) e obteve o maior valor de \gls{SWQ} (0{,}1484) ao equilibrar ativamente o processamento local (74{,}1\%) e remoto (25{,}9\%). Em contraponto, a política \gls{SAC}-Base não objeteve sucesso, conseguindo apenas 4{,}52\%, pois optou por descarregar a maioria das tarefas (94{,}9\% em \gls{V2V}). 
 
-\begin{table}[htbp]
-\centering
-\caption{Ganho do \gls{TOPSIS} por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
-\label{tab:ganho-topsis}
-\small
-\makebox[\linewidth][c]{%
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{llrrrrrrr}
-\toprule
-\multirow{2}{*}{Algoritmo} & \multirow{2}{*}{Versão} & \multicolumn{2}{c}{Taxa\%} & \multicolumn{2}{c}{SWQ} & \multicolumn{2}{c}{J($\pi$)} & \multirow{2}{*}{Destaques} \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
- & & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & \\
-\midrule
-\multirow{2}{*}{\gls{SAC}}
- & base   & 4,52  & ---    & 0,0119 & ---    & $-$0,042 & --- & colapso total (94,9\% \gls{V2V}) \\
- & topsis & ---   & 45,21 & ---    & 0,1484 & --- & 0,2454 & $+$40,7 pp / $+$1147\% SWQ \\
-\midrule
-\multirow{2}{*}{\gls{PPO}}
- & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
- & topsis & ---   & 42,66  & ---    & 0,1426 & --- & 0,2344 & $+$0,3 pp / $+$0,6\% SWQ \\
-\midrule
-\multirow{2}{*}{\gls{TD3}}
- & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
- & topsis & ---   & 43,91  & ---    & 0,1388 & --- & 0,2424 & $+$1,6 pp taxa; \gls{JCT} $-44{,}5\%$ \\
-\midrule
-\multirow{2}{*}{\gls{DQN}}
- & base   & 22,10 & ---    & 0,0686 & ---    & 0,0839 & --- & 78,5\% \gls{V2V} sem critério \\
- & topsis & ---   & 25,90  & ---    & 0,0997 & --- & 0,1161 & $+$3,8 pp / $+$45\% SWQ \\
-\midrule
-\multirow{2}{*}{\gls{A2C}}
- & base   & 21,74 & ---    & 0,0772 & ---    & 0,0785 & --- & 79,7\% \gls{V2V}, energia alta \\
- & topsis & ---   & 42,32  & ---    & 0,1418 & --- & 0,2295 & $+$20,6 pp / $+$84\% SWQ \\
-\bottomrule
-\end{tabular}%
-}}
-\end{table}
+As variantes baseadas em \gls{PPO} e \gls{TD3} integradas ao \gls{TOPSIS} também ocuparam as primeiras posições da tabela, apresentando taxa de sucesso superior à heurística oráculo \texttt{greedy-unfair}. Os algoritmos de melhor desempenho no \textit{ranking} caracterizaram-se pela priorização do processamento local (\%Loc próximo a 100\%), indicando que a estratégia ótima para maximizar a utilidade consiste em evitar a latência da rede e descarregar tarefas apenas quando a janela temporal compensa os atrasos de transmissão.
+
+% A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmo, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
+
+% \begin{table}[htbp]
+% \centering
+% \caption{Ganho do \gls{TOPSIS} por família de algoritmo (médias sobre 658 cenários comuns). $\Delta$Taxa e $\Delta$SWQ representam diferença absoluta; $\Delta$J($\pi$) é a diferença na função objetivo.}
+% \label{tab:ganho-topsis}
+% \small
+% \makebox[\linewidth][c]{%
+% \resizebox{\linewidth}{!}{%
+% \begin{tabular}{llrrrrrrr}
+% \toprule
+% \multirow{2}{*}{Algoritmo} & \multirow{2}{*}{Versão} & \multicolumn{2}{c}{Taxa\%} & \multicolumn{2}{c}{SWQ} & \multicolumn{2}{c}{J($\pi$)} & \multirow{2}{*}{Destaques} \\
+% \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+%  & & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & Base & \gls{TOPSIS} & \\
+% \midrule
+% \multirow{2}{*}{\gls{SAC}}
+%  & base   & 4,52  & ---    & 0,0119 & ---    & $-$0,042 & --- & colapso total (94,9\% \gls{V2V}) \\
+%  & topsis & ---   & 45,21 & ---    & 0,1484 & --- & 0,2454 & $+$40,7 pp / $+$1147\% SWQ \\
+% \midrule
+% \multirow{2}{*}{\gls{PPO}}
+%  & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
+%  & topsis & ---   & 42,66  & ---    & 0,1426 & --- & 0,2344 & $+$0,3 pp / $+$0,6\% SWQ \\
+% \midrule
+% \multirow{2}{*}{\gls{TD3}}
+%  & base   & 42,32 & ---    & 0,1418 & ---    & 0,2295 & --- & 100\% local \\
+%  & topsis & ---   & 43,91  & ---    & 0,1388 & --- & 0,2424 & $+$1,6 pp taxa; \gls{JCT} $-44{,}5\%$ \\
+% \midrule
+% \multirow{2}{*}{\gls{DQN}}
+%  & base   & 22,10 & ---    & 0,0686 & ---    & 0,0839 & --- & 78,5\% \gls{V2V} sem critério \\
+%  & topsis & ---   & 25,90  & ---    & 0,0997 & --- & 0,1161 & $+$3,8 pp / $+$45\% SWQ \\
+% \midrule
+% \multirow{2}{*}{\gls{A2C}}
+%  & base   & 21,74 & ---    & 0,0772 & ---    & 0,0785 & --- & 79,7\% \gls{V2V}, energia alta \\
+%  & topsis & ---   & 42,32  & ---    & 0,1418 & --- & 0,2295 & $+$20,6 pp / $+$84\% SWQ \\
+% \bottomrule
+% \end{tabular}%
+% }}
+% \end{table}

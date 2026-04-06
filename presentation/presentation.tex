@@ -3113,18 +3113,18 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
 \hline
 \textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
 \hline
- 1 & \textbf{sac-topsis}$^\star$ & \textbf{45,29} & \textbf{0,1484} &  6,5 & 25,8 & RL+TOPSIS \\
- 2 & ppo-topsis$^\star$          & 42,75 & 0,1426 &  5,9 & 21,3 & RL+TOPSIS \\
- 3 & ppo-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
- 4 & ppo-topsis-compact$^\star$  & 42,42 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
- 5 & td3-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & RL-Base   \\
- 6 & a2c-topsis$^\star$          & 42,42 & 0,1418 &  6,0 & 24,4 & RL+TOPSIS \\
- 7 & td3-topsis$^\star$          & 44,00 & 0,1388 &  3,7 & 23,0 & RL+TOPSIS \\
- 8 & sac-topsis-9d$^\star$       & 42,91 & 0,1386 &  5,9 & 21,0 & RL+TOPSIS \\
- 9 & sac-topsis-manhattan$^\star$& 41,75 & 0,1385 & 11,8 & 23,7 & RL+TOPSIS \\
-10 & sac-t1$^\star$              & 33,06 & 0,1270 & 11,5 & 26,1 & RL+TOPSIS \\
+ 1 & \textbf{sac-topsis}$^\star$ & \textbf{45,29} & \textbf{0,1484} &  6,5 & 25,8 & DRL+TOPSIS \\
+ 2 & ppo-topsis$^\star$          & 42,75 & 0,1426 &  5,9 & 21,3 & DRL+TOPSIS \\
+ 3 & ppo-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & DRL-Base   \\
+ 4 & ppo-topsis-compact$^\star$  & 42,42 & 0,1418 &  6,0 & 24,4 & DRL+TOPSIS \\
+ 5 & td3-base                    & 42,42 & 0,1418 &  6,0 & 24,4 & DRL-Base   \\
+ 6 & a2c-topsis$^\star$          & 42,42 & 0,1418 &  6,0 & 24,4 & DRL+TOPSIS \\
+ 7 & td3-topsis$^\star$          & 44,00 & 0,1388 &  3,7 & 23,0 & DRL+TOPSIS \\
+ 8 & sac-topsis-9d$^\star$       & 42,91 & 0,1386 &  5,9 & 21,0 & DRL+TOPSIS \\
+ 9 & sac-topsis-manhattan$^\star$& 41,75 & 0,1385 & 11,8 & 23,7 & DRL+TOPSIS \\
+10 & sac-t1$^\star$              & 33,06 & 0,1270 & 11,5 & 26,1 & DRL+TOPSIS \\
 11 & greedy-unfair               & 41,38 & 0,1262 &  5,6 &  7,4 & Heurística\\
-12 & sac-a1                      & 39,21 & 0,1256 & 13,7 & 21,1 & RL-Base   \\
+12 & sac-a1                      & 39,21 & 0,1256 & 13,7 & 21,1 & DRL-Base   \\
 \hline
 \end{tabular}}
 
@@ -3158,18 +3158,18 @@ CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-TOPSIS (0,1262
 \hline
 \textbf{\#} & \textbf{POLÍTICA} & \textbf{TAXA\%} & \textbf{SWQ} & \textbf{JCT(s)} & \textbf{E(J)} & \textbf{CATEG.} \\
 \hline
-13 & sac-r1        & 38,36 & 0,1223 & 13,4 & 31,4 & RL-Base   \\
-14 & sac-s1        & 28,81 & 0,1122 & 39,3 & 20,3 & RL-Base   \\
+13 & sac-r1        & 38,36 & 0,1223 & 13,4 & 31,4 & DRL-Base   \\
+14 & sac-s1        & 28,81 & 0,1122 & 39,3 & 20,3 & DRL-Base   \\
 15 & gini          & 35,34 & 0,1057 &  3,5 & 39,4 & Heurística\\
-16 & dqn-topsis$^\star$ & 26,02 & 0,0997 & 21,7 & 24,0 & RL+TOPSIS \\
+16 & dqn-topsis$^\star$ & 26,02 & 0,0997 & 21,7 & 24,0 & DRL+TOPSIS \\
 17 & jain          & 32,64 & 0,0973 &  3,6 & 39,3 & Heurística\\
 18 & random        & 30,13 & 0,0950 & 17,9 & 27,3 & Heurística\\
 19 & roundrobin    & 28,61 & 0,0905 & 17,9 & 31,1 & Heurística\\
 20 & greedy        & 29,05 & 0,0823 & 29,3 &  6,2 & Heurística\\
-21 & a2c-base      & 21,85 & 0,0772 & 13,7 & 48,9 & RL-Base   \\
-22 & dqn-base      & 22,15 & 0,0686 & 13,6 & 44,4 & RL-Base   \\
+21 & a2c-base      & 21,85 & 0,0772 & 13,7 & 48,9 & DRL-Base   \\
+22 & dqn-base      & 22,15 & 0,0686 & 13,6 & 44,4 & DRL-Base   \\
 23 & greedy-fair   & 20,65 & 0,0528 & 40,8 &  5,6 & Heurística\\
-24 & sac-base      &  4,58 & 0,0119 & 57,1 & 24,2 & RL-Base   \\
+24 & sac-base      &  4,58 & 0,0119 & 57,1 & 24,2 & DRL-Base   \\
 25 & rsu           &  1,93 & 0,0030 &144,2 &  4,8 & Heurística\\
 \hline
 \end{tabular}}
