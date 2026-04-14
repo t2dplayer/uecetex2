@@ -1,19 +1,15 @@
 \chapter{Proposta de Solução} \label{chap:proposta}
 
-% Este capítulo apresenta a abordagem proposta para o descarregamento de tarefas em redes de Computação de Borda Veicular (\gls{VEC}). A solução consiste em um agente de Aprendizado por Reforço Profundo (\gls{DRL}) baseado no algoritmo \gls{PPO}, cujo espaço de observação é estruturado de forma invariante à escala por meio do método multicritério \gls{FUZZY-TOPSIS}.
+Para lidar com o problema de descarregamento de tarefas em ambiente veicular, este capítulo apresenta os fundamentos desta proposta. Inicialmente, a Seção~\ref{sec:ambiente} descreve o modelo do ambiente de rede veicular e os parâmetros de comunicação \gls{V2X} adotados. A Seção~\ref{sec:cenarios} estabelece os cenários de treinamento e teste, incluindo as configurações de densidade veicular e carga de trabalho. A Seção~\ref{sec:arquitetura} formula o problema de descarregamento e detalha a integração do módulo \gls{TOPSIS} para engenharia de estado compacto com o algoritmo \gls{SAC}. A Seção~\ref{sec:ablacao} apresenta o estudo de ablação que valida as escolhas de projeto por decomposição causal. Por fim, a Seção~\ref{sec:resultados} analisa os resultados experimentais e a Seção~\ref{sec:ranking-completo} detalha a avaliação comparativa da política proposta frente a cinco famílias de \gls{DRL} e sete heurísticas de referência.
 
-% Este capítulo apresenta a proposta de solução para o problema de descarregamento de tarefas em ambientes veiculares, considerando a comunicação tanto com dispositivos de borda quanto diretamente entre os dispositivos instalados nos veículos. O desafio central abordado nesta modelagem é a não estacionariedade, um fenômeno comum aos sistemas multiagente resultante da interação e da coadaptação contínua entre os agentes~\cite{albrecht2024}, além disso, também são consideradas os comportamentos complexos e variáveis de incerteza, tais como a mobilidade veicular, cargas de trabalho baseadas em traços reais de uso, limitações de processamento (\textit{throttling}) e atrasos na propagação de informações. 
+\section*{Visão Geral da Proposta}
 
-% Consequentemente, a introdução desses elementos estabelece um ambiente de simulação rigoroso e estocástico, projetado para imitar as limitações operacionais e os ruídos de comunicação enfrentados em cenários reais~\cite{albrecht2024}.
-
-
-Para lidar com o problema de descarregamento de tarefas em ambiente veicular, este capítulo apresenta os fundamentos desta proposta. De forma geral, nosso trabalho estende a solução desenvolvida em \cite{vieira2025}, adicionando a ela o \gls{DRL}. Em \cite{vieira2025}, o \textit{Fuzzy}-\gls{TOPSIS} era o principal mecanismo decisor de descarregamento; ou seja, por meio de regras estáticas, o \gls{FOFF} era encarregado de decidir quando e como o descarregamento era realizado, seguindo critérios de latência e consumo energético. Diferentemente disso, nossa proposta utiliza o algoritmo \gls{SAC} para lidar com a complexidade inerente de ambientes altamente dinâmicos e decidir apenas se o processamento será local ou remoto. O sistema atua em sinergia --- tanto na fase de treinamento quanto na de implantação --- com o \textit{Fuzzy}-\gls{TOPSIS}, que é responsável por escolher o destino da tarefa. Além disso, enquanto em \cite{vieira2025} o \gls{FOFF} apenas ranqueava os candidatos para seleção, em nosso caso ele também comprime a representação do estado em um vetor fixo de seis dimensões, adaptando-se a diferentes cenários quanto ao número de nós e cargas de trabalho. Por último, a proposta prioriza o atendimento dos requisitos de prazo em detrimento do consumo energético para buscar garantir a qualidade de serviço em ambientes críticos, como no caso de veículos autônomos.
+ De forma geral, este trabalho estende a solução desenvolvida em \cite{vieira2025}, adicionando a ela o \gls{DRL}. Em \cite{vieira2025}, o \textit{Fuzzy}-\gls{TOPSIS} era o principal mecanismo decisor de descarregamento; ou seja, por meio de regras estáticas, o \gls{FOFF} era encarregado de decidir quando e como o descarregamento era realizado, seguindo critérios de latência e consumo energético. Diferentemente disso, esta proposta utiliza o algoritmo \gls{SAC} para lidar com a complexidade inerente de ambientes altamente dinâmicos e decidir apenas se o processamento será local ou remoto. O sistema atua em sinergia com o \textit{Fuzzy}-\gls{TOPSIS}, que é responsável por escolher o destino da tarefa. Além disso, enquanto em \cite{vieira2025} o \gls{FOFF} apenas ranqueava os candidatos para seleção, em nosso caso ele também comprime a representação do estado em um vetor fixo de seis dimensões, adaptando-se a diferentes cenários quanto ao número de nós e cargas de trabalho. Por último, a proposta prioriza o atendimento dos requisitos de prazo em detrimento do consumo energético para buscar garantir a qualidade de serviço em ambientes críticos, como no caso de veículos autônomos.
 
 No desenvolvimento da proposta, o trabalho de \cite{miriyala2026} fundamentou a identificação de requisitos para uma solução de \gls{DRL} capaz de mitigar lacunas críticas em ecossistemas inteligentes. A arquitetura proposta utiliza o \textit{Fuzzy}-\gls{TOPSIS} para comprimir $N$ nós candidatos em um vetor de estado de seis dimensões invariante à escala, resolvendo a limitação de representações estáticas frente a topologias variáveis. Para lidar com a não estacionariedade e a alta mobilidade, o algoritmo \gls{SAC} provê adaptação contínua por meio da regularização por entropia máxima, que mantém a exploração ativa e previne o colapso prematuro da política \cite{haarnoja2018sac}. Adicionalmente, o uso do \textit{replay buffer} permite a reutilização de experiências passadas e a quebra de correlações temporais, mecanismo essencial para estabilizar a otimização e evitar o esquecimento catastrófico na rede neural \cite{mnih2015}. Além disso, a normalização do estado via lógica nebulosa reduz a sensibilidade a ruídos e perturbações adversariais. Por fim, a viabilidade em dispositivos de borda extrema é garantida por uma rede MLP leve.
 
-Nas seções seguintes, a proposta será detalhada. Inicialmente, é descrito o ambiente de rede veicular considerado e os cenários de treinamento e teste. Em seguida, formula-se o problema e apresenta-se a arquitetura que integra o método multicritério ao aprendizado profundo. Cabe ressaltar que a solução definitiva fará uso do \gls{FUZZY-TOPSIS}; contudo, como um passo intermediário, as formulações e os experimentos analisados neste capítulo empregam o \gls{TOPSIS} tradicional para validar a eficácia da abordagem. Por fim, os resultados experimentais demonstram a viabilidade da solução, incluindo um estudo detalhado de ablação que justifica o \textit{design} dos componentes.
-
 \section{Ambiente}
+\label{sec:ambiente}
 
 \begin{figure}[htb]
     \centering
@@ -189,6 +185,7 @@ O ambiente de treinamento e avaliação, nesta fase, é implementado como um \gl
 O servidor \gls{VEC} é modelado utilizando um processador com \gls{DVFS} e \textit{clock rate} de $F_{\text{VEC}} = 1{,}2\,\text{GHz}$, com fila compartilhada de capacidade $Q_{\max} = 100$ tarefas. Os veículos possuem frequências heterogêneas, amostradas no intervalo $[0{,}3;\,1{,}5]\,\text{GHz}$. A comunicação \gls{V2I} utiliza largura de banda $B = 20\,\text{MHz}$, potência de transmissão $P_{\text{tx}} = 0{,}2\,\text{W}$ (23 dBm) e modelo de atenuação de canal do \gls{3GPP} TR 38.901 (UMi Street Canyon), consistindo nestes os valores-padrão recomendados pelo \gls{3GPP} para avaliações de cenários veiculares urbanos \cite{3gpp38901}. Para redes \gls{V2V}, adotam-se as diretrizes do documento técnico TR 37.885 com parâmetros análogos de canal, além de altura de antena de $1{,}5\,\text{m}$ e fator de ruído de $9\,\text{dB}$ \cite{3gpp_tr37885}.
 
 \section{Cenários de Teste e Treinamento}
+\label{sec:cenarios}
 
 Os cenários de treinamento foram gerados utilizando o SUMO~\cite{lopez2018microscopic} para a mobilidade veicular e para carga de trabalho utilizou-se um \textit{trace} real de demandas computacionais do Alibaba~\cite{cheng2018characterizing}, realizando as conversões de escala de tempo para adequação ao cenário veicular (detalhadas no Apêndice~\ref{ap:conversao-alibaba}). Já para o cenário de testes, foi utilizada a mesma mobilidade e foram criados 658 cenários a partir do \textit{trace} original com carga de trabalho distribuídos conforme a Tabela~\ref{tab:cenarios}.
 
@@ -237,7 +234,7 @@ $Q_{\max}$            & Capacidade máxima das filas               & $100$ taref
 
 \section*{Protocolo de Treinamento e Hiperparâmetros}
 
-O treinamento de cada política \gls{DRL} é conduzido interagindo com o simulador, sem nenhum acesso aos cenários de teste. Um único cenário de 100 tarefas a 10~tps (tarefas por segundo) é utilizado durante a fase detreinamento. A generalização para outras cargas de trabalho é avaliada nas 658 instâncias de teste. Cada episódio corresponde a uma simulação completa do cenário (100 transições). O treinamento dura 400 episódios (40\,000 transições no total). A Tabela~\ref{tab:sac-hparams} lista os hiperparâmetros do \gls{SAC} utilizados em todos os experimentos.
+O treinamento de cada política \gls{DRL} é conduzido interagindo com o simulador, sem nenhum acesso aos cenários de teste. Um único cenário de 100 tarefas a 10~tps (tarefas por segundo) é utilizado durante a fase de treinamento. A generalização para outras cargas de trabalho é avaliada nas 658 instâncias de teste. Cada episódio corresponde a uma simulação completa do cenário (100 transições). O treinamento dura 400 episódios (40\,000 transições no total). A Tabela~\ref{tab:sac-hparams} lista os hiperparâmetros do \gls{SAC} utilizados em todos os experimentos.
 
 % A cada nova transição armazenada no \textit{replay buffer} (capacidade $= 50\,000$), o agente executa uma atualização dos pesos via mini-lote de $1\,024$ amostras, após um aquecimento de $1\,024$ transições. 
 
@@ -268,6 +265,7 @@ A configuração dos hiperparâmetros adotada baseia-se em padrões empíricos e
 
 % ============================================================
 \section{Visão Geral da Arquitetura e Formulação do Problema}
+\label{sec:arquitetura}
 % ============================================================
 O problema de descarregamento de tarefas nesta proposta é modelado como um \gls{MDP}, no qual o objetivo principal consiste em maximizar a taxa de sucesso dentro do prazo estipulado (\textit{deadline}), ponderada pelo custo normalizado de latência e energia. Dessa forma, busca-se atender aos rigorosos requisitos de \gls{QoS} inerentes às redes veiculares, estabelecendo a premissa fundamental de que a violação de prazos em aplicações críticas é estritamente mais severa do que o incremento no consumo energético operacional. Formalmente, o objetivo da política de decisão é formulado da seguinte maneira:
 
@@ -276,7 +274,7 @@ O problema de descarregamento de tarefas nesta proposta é modelado como um \gls
     \label{eq:obj_geral}
 \end{equation}
 
-\noindent onde $w_s = 0{,}60 > w_c = 0{,}40$ refletem a maior importância dada à taxa de sucesso. O custo normalizado é a média aritmética de dois termos, ambos obtidos por normalização \textit{min-max} com mínimo zero e máximo calculado dinamicamente no instante $t$. As Equações \ref{eq:jct_max} e \ref{eq:e_max} denotam o pior caso de latência e de energia, respectivamente, entre os modos de descarregamento viáveis para a tarefa $t$.
+\noindent em que $w_s = 0{,}60 > w_c = 0{,}40$ refletem a maior importância atribuída à taxa de sucesso. O custo normalizado é a média aritmética de dois termos, ambos obtidos por normalização \textit{min-max} com mínimo zero e máximo calculado dinamicamente no instante $t$. As Equações~\ref{eq:jct_max} e~\ref{eq:e_max} denotam o pior caso de latência e de energia, respectivamente, entre os modos de descarregamento viáveis para a tarefa $t$.
 
 \begin{equation}
     \text{JCT}^{\max}_t = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_t,\; \widehat{\text{JCT}}^{\text{vec}}_t \cdot \mathbf{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_t \cdot \mathbf{1}_{\text{viável}}\bigr) \in [0, 1]
@@ -296,7 +294,7 @@ Para resolver esse problema, a arquitetura proposta inicialmente combina \gls{TO
 \section*{Módulo \texorpdfstring{\gls{TOPSIS}}{\gls{TOPSIS}} e a Engenharia de Estado Compacto}
 % ============================================================
 
-Um dos desafios no desenvolvimento de soluções em cenários \gls{VEC} é a variabilidade do número de candidatos ao descarregamento ao longo do tempo. Abordagens baseadas em Grafos (\gls{GNN}) resolvem isso ao custo de alta complexidade computacional~\cite{miriyala2026}. Neste trabalho, para lidar com esse problema de forma menos custosa, propõe-se extrair as características invariantes à escala através do \gls{TOPSIS}, reduzindo os candidatos a um único vetor de estado de dimensão fixa. Isto é feito, avaliando os nós candidatos por meio de três critérios, conforme a Tabela~\ref{tab:topsis-criterios}.
+Um dos desafios no desenvolvimento de soluções em cenários \gls{VEC} é a variabilidade do número de candidatos ao descarregamento ao longo do tempo. Abordagens baseadas em Grafos (\gls{GNN}) resolvem isso ao custo de alta complexidade computacional~\cite{miriyala2026}. Neste trabalho, para lidar com esse problema de forma menos custosa, propõe-se extrair as características invariantes à escala por meio do \gls{TOPSIS}, reduzindo os candidatos a um único vetor de estado de dimensão fixa. Isso é feito avaliando os nós candidatos segundo três critérios, conforme a Tabela~\ref{tab:topsis-criterios}.
 
 \begin{table}[htb]
 \centering
@@ -313,7 +311,7 @@ $C_3$ & Distância estimada entre o veículo requisitor e o nó de computação 
 \end{tabular}
 \end{table}
 
-O procedimento segue os passos clássicos do \gls{TOPSIS}: (i)~normalização vetorial da matriz de decisão por norma $L_2$ de cada coluna; (ii)~ponderação por $w_j$; (iii)~identificação das soluções ideal positiva $A^+$ (mínimo de cada critério) e ideal negativa $A^-$ (máximo), ambas calculadas por minimização; (iv)~cálculo das distâncias de cada alternativa a $A^+$ e $A^-$; (v)~escore de proximidade. Independentemente de existirem $2$ ou $50$ candidatos, o estado entregue à rede neural é sempre um vetor fixo de 6 dimensões construído a partir do resultado do \gls{TOPSIS} (Equação \ref{eq:estado6d})
+O procedimento segue os passos clássicos do \gls{TOPSIS}: (i)~normalização vetorial da matriz de decisão por norma $L_2$ de cada coluna; (ii)~ponderação por $w_j$; (iii)~identificação das soluções ideal positiva $A^+$ (mínimo de cada critério) e ideal negativa $A^-$ (máximo), ambas calculadas por minimização; (iv)~cálculo das distâncias de cada alternativa a $A^+$ e $A^-$; (v)~escore de proximidade. Independentemente de existirem $2$ ou $50$ candidatos, o estado entregue à rede neural é sempre um vetor fixo de 6 dimensões construído a partir do resultado do \gls{TOPSIS} (Equação~\ref{eq:estado6d}).
 
 \begin{equation}
     \mathbf{S}_t = \left[\Delta_{\text{obj}},\; \frac{\widehat{\text{JCT}}^{\ell}_t}{D_t},\; \frac{\widehat{\text{JCT}}^{\text{rank}_1}_t}{D_t},\; \frac{|Q^{\text{rank}_1}_t|}{Q_{\max}},\; \frac{|Q^{\ell}_t|}{Q_{\max}},\; \frac{C_t}{C_{\max}}\right] \in \mathbb{R}^6
@@ -323,7 +321,7 @@ O procedimento segue os passos clássicos do \gls{TOPSIS}: (i)~normalização ve
 Cada dimensão carrega um valor semântico relativo para a decisão, de forma que $\Delta_{\text{obj}} = (\widehat{\text{JCT}}^{\ell}_t - \widehat{\text{JCT}}^{\text{rank}_1}_t) / D_t$ denota a diferença de latência normalizada entre a execução local e o candidato \textit{rank}$_1$. Um valor positivo ($\Delta_{\text{obj}} > 0$) indica que o \textit{offload} é mais rápido, enquanto um valor negativo ($\Delta_{\text{obj}} < 0$) indica que a execução local é mais rápida. A dimensão $\widehat{\text{JCT}}^{\ell}_t/D_t$ calcula a razão entre o tempo de conclusão estimado localmente e o prazo, de modo que valores $> 1{,}0$ sinalizam violação iminente e $\widehat{\text{JCT}}^{\text{rank}_1}_t/D_t$ é a razão análoga para o melhor candidato. Já $|Q^{\text{rank}_1}_t|/Q_{\max}$ representa a ocupação normalizada da fila do nó classificado em primeiro lugar pelo \gls{TOPSIS} e $|Q^{\ell}_t|/Q_{\max}$ informa a ocupação da fila local. Por fim, $C_t/C_{\max}$ normaliza o número de ciclos de \gls{CPU} da tarefa. Em conjunto, as seis dimensões fornecem ao agente os sinais necessários para avaliar, a cada instante, a vantagem relativa do \textit{offload} frente à execução local.
 
 \section*{Seleção da Ação de Descarregamento}
-O agente \gls{SAC} opera sobre um espaço de ação discreto binário $a_t \in \{0, 1\}$. O mapeamento entre ação e modo de execução é mediado pelo resultado do \gls{TOPSIS}. Quando $a_t = 1$, a tarefa é encaminhada ao candidato melhor ranqueado, que pode ser o servidor \gls{VEC} ou um veículo vizinho. Caso nenhum candidato de \textit{offload} seja viável ($N = 0$), $a_t = 1$ é tratado como \textsc{LOCAL} por padrão. Essa separação de responsabilidades, \gls{TOPSIS} decide para onde descarregar, \gls{SAC} decide quando descarregar, reduz o espaço de busca do agente de $N+1$ para $2$ ações, independente de $N$.
+O agente \gls{SAC} opera sobre um espaço de ação discreto binário $a_t \in \{0, 1\}$. O mapeamento entre ação e modo de execução é mediado pelo resultado do \gls{TOPSIS}. Quando $a_t = 1$, a tarefa é encaminhada ao candidato melhor ranqueado, que pode ser o servidor \gls{VEC} ou um veículo vizinho. Caso nenhum candidato de \textit{offload} seja viável ($N = 0$), $a_t = 1$ é tratado como \textsc{LOCAL} por padrão. Essa separação de responsabilidades, em que o \gls{TOPSIS} decide \textit{para onde} descarregar e o \gls{SAC} decide \textit{quando} descarregar, reduz o espaço de busca do agente de $N+1$ para $2$ ações, independentemente de $N$.
 
 % \begin{equation}
 %     \text{modo}_t =
@@ -436,7 +434,7 @@ A função de recompensa é formulada para alinhar o sinal de aprendizado direta
     \label{eq:reward}
 \end{equation}
 
-\noindent onde $E^{\text{max}}_t$ (Equação~\ref{eq:e_max})  é a energia máxima entre os modos viáveis para a tarefa $i$, calculada por tarefa e por instante, não é uma constante global, pois depende de quais modos estão viáveis no momento da decisão. 
+\noindent em que $E^{\text{max}}_t$ (Equação~\ref{eq:e_max}) denota a energia máxima entre os modos viáveis para a tarefa $t$, calculada individualmente a cada instante, não sendo uma constante global, pois depende de quais modos estão disponíveis no momento da decisão.
 
 % Quando $\widehat{\text{JCT}}_t \leq D_i$, condição que garante que a razão $\widehat{\text{JCT}}_t/D_i$ permaneça no intervalo $[1]$. Como o termo $E_t/E^{\text{max}}_i$ também pertence a $[1]$ por construção, a média de ambos assegura que a recompensa de sucesso $r_t$ varie estritamente entre $[0{,}5,\,1{,}0]$. Por outro lado, quando $\widehat{\text{JCT}}_t > D_i$, aplica-se exclusivamente o regime de falha.
 
@@ -451,6 +449,7 @@ A formulação da recompensa introduz intencionalmente uma lacuna mínima de 1,5
 
 % ============================================================
 \section{Complexidade Computacional}
+\label{sec:complexidade}
 % ============================================================
 Ao evitar o uso de \glspl{GNN} e optar pelo precondicionamento via \gls{TOPSIS}, a complexidade assintótica da tomada de decisão a cada instante é regida pelas operações de avaliação e ordenação. A avaliação dos $N$ candidatos sob os $M$ critérios possui complexidade $O(N \times M)$, enquanto a ordenação final das alternativas opera em $O(N \log N)$. Como o número de critérios $M$ é constante, a complexidade dominante do pré-processamento escalar cresce de forma log-linear com a densidade veicular. Em seguida, a inferência da \gls{MLP} (\textit{Actor network}), com duas camadas ocultas de $64$ neurônios e entrada compacta de 6 dimensões, opera com complexidade $O(1)$ em relação ao número de candidatos. Essa arquitetura de rede requer um custo paramétrico extremamente baixo. Dessa forma, a abordagem torna-se altamente escalável e compatível com os requisitos de latência e com as restrições de \textit{hardware} menos robustos.
 
@@ -489,7 +488,7 @@ O \gls{SAC}-Base é o ponto de partida do estudo e serve de referência para med
     \label{eq:estado-base}
 \end{equation}
 
-\noindent onde $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Embora possam existir múltiplos vizinhos \gls{V2V} no alcance, o estado expõe apenas um, o veículo com maior frequência de \textit{clock} dentro do raio \gls{V2V}, selecionado por uma varredura gulosa no pré-processamento do cenário. Quando nenhum vizinho está disponível, as três últimas componentes recebem o valor sentinela $-1$ para distinguir ausência de \gls{V2V} de \gls{V2V} com métrica zero.
+\noindent em que $d$ denota distância, $f$ frequência de processamento, $Q$ ocupação de fila e $T_{\text{cpu}}$ temperatura do processador. Embora possam existir múltiplos vizinhos \gls{V2V} no alcance, o estado expõe apenas um, o veículo com maior frequência de \textit{clock} dentro do raio \gls{V2V}, selecionado por varredura gulosa no pré-processamento do cenário. Quando nenhum vizinho está disponível, as três últimas componentes recebem o valor sentinela $-1$ para distinguir ausência de \gls{V2V} de \gls{V2V} com métrica zero.
 
 O espaço de ação é ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\textsc{vec},\, 2\!=\!\textsc{v2v}\}$, ou seja, o agente deve aprender simultaneamente a decisão de descarregar e a escolha do destino. A recompensa é calculada pelo \gls{WSM} com pesos iguais sobre três critérios de custo, \gls{JCT} estimado ($j=1$), energia total ($j=2$) e ocupação de fila do nó de computação escolhido ($j=3$):
 
@@ -500,7 +499,7 @@ O espaço de ação é ternário $a_t \in \{0\!=\!\textsc{local},\, 1\!=\!\texts
     \label{eq:reward-wsm}
 \end{equation}
 
-\noindent onde $\tilde{x}_{aj} = x_{aj}/\max_{a'} x_{a'j} \in [0,1]$ normaliza o critério $j$ da alternativa $a$ pelo valor máximo desse critério entre todas as alternativas $a' \in \{\textsc{local},\,\textsc{vec},\,\textsc{v2v}\}$; $\bar{x}_a \in [0,1]$ é a média dos três custos normalizados da alternativa escolhida; e a recompensa é obtida pela transformação $2(1-\bar{x}_a)-1$, que inverte o custo e o remapeia linearmente para $[-1,1]$. Esse sinal de recompensa não distingue violações de \textit{deadline} de execuções lentas porém viáveis. Uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
+\noindent em que $\tilde{x}_{aj} = x_{aj}/\max_{a'} x_{a'j} \in [0,1]$ normaliza o critério $j$ da alternativa $a$ pelo valor máximo desse critério entre todas as alternativas $a' \in \{\textsc{local},\,\textsc{vec},\,\textsc{v2v}\}$; $\bar{x}_a \in [0,1]$ é a média dos três custos normalizados da alternativa escolhida; e a recompensa é obtida pela transformação $2(1-\bar{x}_a)-1$, que inverte o custo e o remapeia linearmente para $[-1,1]$. Esse sinal de recompensa não distingue violações de \textit{deadline} de execuções lentas porém viáveis: uma ação que ultrapassa o prazo com custo moderado pode receber recompensa positiva, desorientando o aprendizado em ambientes com prazos rígidos.
 
 %  --- custo mínimo ($\bar{x}_a=0$) produz $r=+1$ e custo máximo ($\bar{x}_a=1$) produz $r=-1$. 
  
@@ -539,7 +538,7 @@ A variante S1 mantém o espaço de ação ternário e a recompensa \gls{WSM} do 
     \label{eq:estado-s1}
 \end{equation}
 
-O primeiro componente calcular o valor relativo dos ciclos da tarefa. O segunda componente, urgência relativa $\widehat{\text{JCT}}_{\text{local}}/D_i$, verifica se a execução local da tarefa vai estourar o prazo. Nessa formulação, não é incluída informações de \gls{V2V} (frequência, fila, distância do vizinho), forçando o agente a decidir entre o servidor \gls{VEC} e \gls{V2V} apenas obsevando o comportamento do ambiente veicular. 
+O primeiro componente computa o valor relativo dos ciclos da tarefa. O segundo componente, a urgência relativa $\widehat{\text{JCT}}_{\text{local}}/D_t$, sinaliza se a execução local excederá o prazo. Nessa formulação, não são incluídas informações de \gls{V2V} (frequência, fila, distância do vizinho), forçando o agente a decidir entre o servidor \gls{VEC} e \gls{V2V} apenas observando as condições do ambiente veicular.
 
 \subsubsection*{SAC-R1 — Recompensa Deadline-Aware sem Mudança de Estado ou Ação}
 
@@ -570,7 +569,7 @@ Para reunir ambas as dimensões em um único número interpretável, define-se o
     \label{eq:swq}
 \end{equation}
 
-\noindent onde $N$ representa o número total de tarefas geradas pela política $\pi$, $\mathcal{S}$ é o conjunto de tarefas que cumpriram o prazo e o termo entre parênteses é a folga normalizada da tarefa $j$. Note que a formulação é equivalente ao produto entre a taxa de sucesso $\hat{\tau}(\pi) = |\mathcal{S}|/N$ e a folga média das tarefas bem-sucedidas.
+\noindent em que $N$ representa o número total de tarefas geradas pela política $\pi$, $\mathcal{S}$ é o conjunto de tarefas que cumpriram o prazo e o termo entre parênteses é a folga normalizada da tarefa $j$. Observe que a formulação é equivalente ao produto entre a taxa de sucesso $\hat{\tau}(\pi) = |\mathcal{S}|/N$ e a folga média das tarefas bem-sucedidas.
 
 A folga normalizada vale $1$ quando a tarefa é concluída instantaneamente e decresce para $0$ quando o \gls{JCT} se aproxima do prazo. Uma política que jamais erra o prazo e conclui todas as tarefas com folga máxima teria $\mathrm{SWQ} = 1{,}0$; uma que sempre viola teria $\mathrm{SWQ} = 0$. O produto das duas componentes penaliza simultaneamente políticas com baixa taxa de sucesso \emph{e} políticas que cumprem o prazo por margem pequena, características indesejadas em contextos veiculares com prazos rígidos.
 
@@ -582,7 +581,7 @@ A folga normalizada vale $1$ quando a tarefa é concluída instantaneamente e de
 
 \begin{table}[htb]
 \centering
-\caption{Resultados das variantes do estudo de ablação avaliadas em 658 cenários de teste. A proposta completa é destacada em negrito.}
+\caption{Resultados das variantes do estudo de ablação avaliadas em 658 cenários de teste. A linha da proposta completa (\gls{SAC}-\gls{TOPSIS}) encontra-se separada das demais variantes.}
 \label{tab:ablacao-resultados}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{lllllrrr}
@@ -595,12 +594,12 @@ SAC-S1    & 6D   & Ternária & \gls{WSM}                & 28,69 & 0,1122 & 39,29
 SAC-R1    & 11D bruto   & Ternária & \textit{Deadline-aware} & 38,26 & 0,1223 & 13,353 \\
 SAC-T1    & 6D \gls{TOPSIS} & Ternária & \textit{Deadline-aware} & 32,96 & 0,1270 & 11,487 \\
 \midrule
-\textbf{SAC-TOPSIS} & \textbf{6D \gls{TOPSIS}} & \textbf{Binária} & \textbf{\textit{Deadline-aware}} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
+SAC-TOPSIS & 6D \gls{TOPSIS} & Binária & \textit{Deadline-aware} & 45,21 & 0,1484 & 6,547 \\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-A decomposição causal consiste em medir o impacto isolado de cada mudança no desempenho. A Equação~\ref{eq:decomposicao} sintetiza o caminho sequencial percorrido do \gls{SAC}-Base ao \gls{SAC}-\gls{TOPSIS}, onde cada seta quantifica a variação absoluta em pontos percentuais (pp) da taxa de sucesso devida àquela transição.
+A decomposição causal consiste em medir o impacto isolado de cada mudança no desempenho. A Equação~\ref{eq:decomposicao} sintetiza o caminho sequencial percorrido do \gls{SAC}-Base ao \gls{SAC}-\gls{TOPSIS}, em que cada seta quantifica a variação absoluta em pontos percentuais (pp) da taxa de sucesso devida àquela transição.
 
 \begin{equation}
     \underbrace{4{,}52\%}_{\text{SAC-Base}}
@@ -644,6 +643,7 @@ O caminho revela que as três modificações não contribuem de forma uniforme. 
 % Para isolar o efeito da recompensa \textit{deadline-aware} sem alterar o estado, a variante \gls{SAC}-R1 atinge $38{,}26\%$ ($+33{,}74$ pp sobre o \textit{baseline} com estado 11D e ação ternária). Esse valor é maior que o de S1 ($28{,}69\%$), evidenciando que o sinal de recompensa assimétrico é individualmente mais poderoso que a compressão de estado quando aplicados em isolamento. Entretanto, no caminho sequencial, a maior parte do ganho de R1 é compartilhada com S1: o estado 6D já codifica urgência temporal em $\widehat{\text{JCT}}/D_i$, de modo que acrescentar a recompensa \textit{deadline}-aware sobre S1 produz um incremento marginal de apenas $+4{,}27$ pp (transição S1$\to$T1, que combina as duas mudanças).
 
 \section{Análise dos Resultados}
+\label{sec:resultados}
 
 Três achados principais emergem do estudo. Primeiro, a variante \gls{SAC}-A1 ($39{,}2\%$) demonstra que binarizar a ação \emph{sem} critério de seleção de destino já supera o \textit{baseline} em $+34{,}6$ pp, a simples redução do espaço de busca tem efeito expressivo, mas não alcança a proposta ($45{,}3\%$) porque a regra estática \gls{VEC}$\succ$\gls{V2V} ignora condições dinâmicas de fila e distância no momento da decisão. Segundo, a variante \gls{SAC}-T1 ($33{,}1\%$) mostra que usar o \gls{TOPSIS} apenas como \textit{feature} de estado contribui com $+4{,}3$ pp sobre S1, enquanto usar o \gls{TOPSIS} como \textit{prior} de decisão (\gls{SAC}-\gls{TOPSIS}) adiciona $+12{,}2$ pp sobre T1. A eficácia do \gls{TOPSIS} é quase três vezes maior quando ele assume o controle do destino do que quando fornece apenas informação semântica ao agente. Terceiro, o \gls{JCT} médio do \gls{SAC}-\gls{TOPSIS} ($6{,}6$ s) é $8{,}6\times$ menor que o do \gls{SAC}-Base ($57{,}1$ s), indicando que a combinação \gls{TOPSIS}$+$estado compacto$+$reward \textit{deadline}-aware produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores. Em suma, a hierarquia de contribuição dos componentes é:
 
@@ -699,26 +699,26 @@ indicando que a compressão de estado e o \gls{TOPSIS} como extensor de decisão
 \section{Avaliação Comparativa de Políticas}
 \label{sec:ranking-completo}
 
-A Tabela~\ref{tab:ranking-completo} resume os resultados de 21 políticas avaliadas em 658 cenários de teste comuns. As linhas da tabela estão ordenadas em forma decrescente com base na métrica \gls{SWQ}. Junto ao nome da política de descarregamento na coluna \textbf{Política}, o símbolo ($\star$) indica a integração do ranqueamento \gls{TOPSIS} para a tomada de decisão.
+A Tabela~\ref{tab:ranking-completo} resume os resultados de 21 políticas avaliadas em 658 cenários de teste comuns. As linhas da tabela estão ordenadas de forma decrescente com base na métrica \gls{SWQ}. Junto ao nome da política de descarregamento na coluna \textit{Política}, o símbolo ($\star$) indica a integração do ranqueamento \gls{TOPSIS} para a tomada de decisão.
 
-A coluna \textbf{\% Sucesso} apresenta a taxa de tarefas que concluíram integralmente seu ciclo de processamento antes do esgotamento de seus respectivos prazos (\textit{deadlines}). A coluna \textbf{\gls{SWQ}}, definida na Equação~\ref{eq:swq}, mostra o quanto a política atende ao mesmo tempo à maximização da taxa de sucesso e à minimização dos custos complementares (latência e energia). As colunas subsequentes, \textbf{\gls{JCT}(s)} e \textbf{E(J)}, representam os dados de custos isolados: respectivamente, o tempo total médio de conclusão das tarefas (englobando transmissão e execução) e o consumo energético dissipado nos nós. A coluna \textbf{J($\pi$)} expressa o valor puramente numérico da função objetivo (\textit{fitness}) alcançado pela política no ambiente simulado, calculado sob a restrição dada a seguir:
+A coluna \textit{\% Sucesso} apresenta a taxa de tarefas que concluíram seu ciclo de processamento antes do esgotamento de seus respectivos prazos. A coluna \gls{SWQ}, definida na Equação~\ref{eq:swq}, mensura em que medida a política maximiza simultaneamente a taxa de sucesso e minimiza os custos complementares de latência e energia. As colunas \gls{JCT}(s) e E(J) representam, respectivamente, o tempo médio de conclusão das tarefas (englobando transmissão e execução) e o consumo energético total dissipado nos nós. A coluna $J(\pi)$ expressa o valor numérico da função objetivo alcançado pela política no ambiente simulado, calculado conforme a equação a seguir:
 
 \begin{equation}
     \bar{J}(\pi) = \frac{1}{N} \sum_{j=1}^N \left[ w_s \cdot \mathbf{1}(\text{JCT}_j \leq D_j) - w_c \cdot \frac{1}{2}\!\left(\frac{\text{JCT}_j}{\text{JCT}^{\max}_j} + \frac{E_j}{E^{\text{max}}_j}\right) \right]
     \label{eq:obj_agregado}
 \end{equation}
 
-\noindent onde $w_s=0{,}60$ e $w_c=0{,}40$, sendo $\text{JCT}^{\max}_j$ e $E^{\text{max}}_j$ os piores casos entre os modos viáveis para a tarefa $j$ (Equações~\ref{eq:jct_max} e~\ref{eq:e_max}).
+\noindent em que $w_s=0{,}60$ e $w_c=0{,}40$, sendo $\text{JCT}^{\max}_j$ e $E^{\text{max}}_j$ os piores casos entre os modos viáveis para a tarefa $j$ (Equações~\ref{eq:jct_max} e~\ref{eq:e_max}).
 
-As colunas \textbf{\%Loc} e \textbf{\%Rem} quantificam as decisões de descarregamento, reportando respectivamente a proporção de tarefas executadas localmente e aquelas descarregadas. Por fim, a coluna \textbf{Categoria} classifica as políticas em: \textit{DRL-BASE}, \textit{DRL+TOPSIS} e \textit{Heurística}.
+As colunas \%Loc e \%Rem quantificam as decisões de descarregamento, reportando respectivamente a proporção de tarefas executadas localmente e aquelas descarregadas. Por fim, a coluna \textit{Categoria} classifica as políticas em \textit{DRL-Base}, \textit{DRL+TOPSIS} e \textit{Heurística}.
 
-As heurísticas de referência englobam estratégias estáticas (\textit{VEC}, que descarrega incondicionalmente via \gls{V2I}), aleatória (\textit{Random}), cíclica (\textit{Round-Robin}), baseadas em métricas de justiça (\textit{Gini}, \textit{Jain}) e gulosas. Entre as gulosas, o \textit{Greedy-Fair} seleciona, para cada tarefa, o modo
-de execução que minimiza a função de custo
-$\alpha \cdot \mathrm{JCT} + \beta \cdot E + \gamma \cdot \mathbf{1}[\mathrm{JCT} > D_j]$, onde $\alpha = \beta = 0{,}35$ são os pesos de latência e energia, $\gamma = 0{,}30$ é a penalidade por violação de prazo e $\mathbf{1}[\mathrm{JCT} > D_j] \in \{0,1\}$ é o indicador binário que vale~$1$ quando o tempo de conclusão estimado excede o \textit{deadline} $D_j$ da tarefa. Os tempos de conclusão remotos são estimados assumindo os servidores livres na chegada, sem consultar o estado real das filas, tornando a heurística implementável em sistemas reais e adotada como \textit{baseline} principal.
+As heurísticas de referência englobam estratégias estáticas (\textit{VEC}, que descarrega incondicionalmente via \gls{V2V}), aleatória (\textit{Random}), cíclica (\textit{Round-Robin}), baseadas em métricas de equidade (\textit{Gini}, \textit{Jain}) e gulosas. Entre as gulosas, o \textit{Greedy-Fair} seleciona, para cada tarefa, o modo de execução que minimiza a função de custo
+$\alpha \cdot \mathrm{JCT} + \beta \cdot E + \gamma \cdot \mathbf{1}[\mathrm{JCT} > D_j]$,
+em que $\alpha = \beta = 0{,}35$ são os pesos de latência e energia, $\gamma = 0{,}30$ é a penalidade por violação de prazo e $\mathbf{1}[\mathrm{JCT} > D_j] \in \{0,1\}$ é o indicador binário que assume valor~$1$ quando o tempo de conclusão estimado excede o \textit{deadline} $D_j$ da tarefa. Os tempos de conclusão remotos são estimados assumindo os servidores livres na chegada, sem consultar o estado real das filas, o que torna a heurística implementável em sistemas reais e a consolida como \textit{baseline} principal.
 
-O \textit{Greedy-Unfair}, por sua vez, serve como teto teórico da abordagem gulosa pois usa as mesmas ponderações, mas com acesso privilegiado ao tempo real de liberação de cada servidor, configurando um oráculo de curto prazo impossível de replicar em produção. As políticas \gls{DRL}-Base aplicam os algoritmos \gls{SAC}, \gls{PPO}, \gls{TD3}, \gls{DQN} e \gls{A2C} sobre o estado bruto 11D com ação ternária (local/\gls{VEC}/\gls{V2V}), incluindo as variantes de ablação \gls{SAC}-A1 (ação binária), S1 (estado 6D manual) e R1 (\textit{reward} com consciência de \textit{deadline}). 
+O \textit{Greedy-Unfair}, por sua vez, serve como teto teórico da abordagem gulosa: emprega as mesmas ponderações, porém com acesso privilegiado ao tempo real de liberação de cada servidor, configurando um oráculo de curto prazo impossível de replicar em produção. As políticas de \gls{DRL}-Base aplicam os algoritmos \gls{SAC}, \gls{PPO}, \gls{TD3}, \gls{DQN} e \gls{A2C} sobre o estado bruto 11D com ação ternária (local/\gls{VEC}/\gls{V2V}), incluindo as variantes de ablação \gls{SAC}-A1 (ação binária), S1 (estado 6D manual) e R1 (recompensa com consciência de \textit{deadline}).
 
-Por fim, as políticas \gls{DRL}+\gls{TOPSIS} substituem a ação ternária pelo ranqueamento multicritério \gls{TOPSIS} sobre estado 6D, abrangendo a proposta principal \gls{SAC}-\gls{TOPSIS}, a variante de ablação \gls{SAC}-T1 (score \gls{TOPSIS} como \textit{feature} do estado, sem guiar a ação) e versões com outros algoritmos (\gls{PPO}-\gls{TOPSIS}, \gls{TD3}-\gls{TOPSIS}, \gls{DQN}-\gls{TOPSIS}, \gls{A2C}-\gls{TOPSIS}).
+Por fim, as políticas de \gls{DRL}+\gls{TOPSIS} substituem a ação ternária pelo ranqueamento multicritério \gls{TOPSIS} sobre estado 6D, abrangendo a proposta principal \gls{SAC}-\gls{TOPSIS}, a variante de ablação \gls{SAC}-T1 (escore \gls{TOPSIS} como \textit{feature} do estado, sem guiar a ação) e versões com outros algoritmos (\gls{PPO}-\gls{TOPSIS}, \gls{TD3}-\gls{TOPSIS}, \gls{DQN}-\gls{TOPSIS} e \gls{A2C}-\gls{TOPSIS}).
 
 \begin{table}[htbp]
 \centering
@@ -756,9 +756,9 @@ Por fim, as políticas \gls{DRL}+\gls{TOPSIS} substituem a ação ternária pelo
 }}
 \end{table}
 
-A análise da tabela demonstra que a integração do multicritério \gls{TOPSIS} garantiu as melhores colocações no \textit{ranking}. A principal abordagem proposta por este estudo, a política \gls{SAC}\gls{TOPSIS}, conseguiu a maior taxa de sucesso (45{,}21\%) e obteve o maior valor de \gls{SWQ} (0{,}1484) ao equilibrar ativamente o processamento local (74{,}1\%) e remoto (25{,}9\%). Em contraponto, a política \gls{SAC}-Base não objeteve sucesso, conseguindo apenas 4{,}52\%, pois optou por descarregar a maioria das tarefas (94{,}9\% em \gls{V2V}). 
+A análise da tabela demonstra que a integração do ranqueamento multicritério \gls{TOPSIS} garantiu as melhores colocações no \textit{ranking}. A principal abordagem proposta neste estudo, a política \gls{SAC}-\gls{TOPSIS}, alcançou a maior taxa de sucesso (45{,}21\%) e o maior valor de \gls{SWQ} (0{,}1484) ao equilibrar ativamente o processamento local (74{,}1\%) e o descarregamento remoto (25{,}9\%). Em contraponto, a política \gls{SAC}-Base obteve desempenho irrisório de apenas 4{,}52\%, em razão da tendência de descarregar indiscriminadamente a maioria das tarefas (94{,}9\% via \gls{V2V}).
 
-As variantes baseadas em \gls{PPO} e \gls{TD3} integradas ao \gls{TOPSIS} também ocuparam as primeiras posições da tabela, apresentando taxa de sucesso superior à heurística oráculo \texttt{greedy-unfair}. Os algoritmos de melhor desempenho no \textit{ranking} caracterizaram-se pela priorização do processamento local (\%Loc próximo a 100\%), indicando que a estratégia ótima para maximizar a utilidade consiste em evitar a latência da rede e descarregar tarefas apenas quando a janela temporal compensa os atrasos de transmissão.
+As variantes de \gls{PPO} e \gls{TD3} integradas ao \gls{TOPSIS} também ocuparam as primeiras posições da tabela, com taxa de sucesso superior à da heurística oráculo \textit{Greedy-Unfair}. Os algoritmos de melhor desempenho no \textit{ranking} caracterizaram-se pela priorização do processamento local (\%Loc próximo a 100\%), o que indica que a estratégia ótima para maximizar a utilidade consiste em evitar a latência da rede e descarregar tarefas apenas quando a janela temporal compensa os atrasos de transmissão.
 
 % A Tabela~\ref{tab:ganho-topsis} isola o efeito do \gls{TOPSIS} para cada família de algoritmo, comparando a versão base com a versão aumentada pelo ranqueamento multicritério.
 
