@@ -1,0 +1,57 @@
+
+\subsection{Modelo de Rede}
+
+Consideramos um ambiente \acrotip{VEC} heterogêneo com um veículo cliente $v_0$, um servidor Roadside Unit (\acrotip{RSU}) acessível via \acrotip{5G} \acrotip{CV2X} (largura de banda de uplink $B_{\mathrm{V2I}}$) e um conjunto variante no tempo $\mathcal{V}(t)$ de veículos vizinhos acessíveis via sidelink \acrotip{V2V} (largura de banda $B_{\mathrm{V2V}}$). O \acrotip{RSU} possui uma fila de serviço de capacidade $Q_{\mathrm{RSU}}$; cada veículo $v \in \mathcal{V}(t)$ possui uma fila local $Q_v$.
+
+\subsection{Modelo de Tarefa}
+
+Cada tarefa $\tau_j = (C_j, D_j, s_j)$ é caracterizada por sua complexidade
+de CPU $C_j$ (ciclos), prazo $D_j$ (segundos) e tamanho de dados de entrada
+$s_j$ (bits).
+Três modos de execução estão disponíveis:
+\begin{itemize}[nosep,leftmargin=*]
+  \item \textbf{Local ($m=0$):} executado em $v_0$ com frequência $f_{\mathrm{loc}}$.
+  \item \textbf{\acrotip{RSU} ($m=1$):} carregado ao \acrotip{RSU} e executado em $f_{\mathrm{RSU}}$.
+  \item \textbf{\acrotip{V2V} ($m=2$):} descarregado a um veículo vizinho $v^* \in \mathcal{V}(t)$.
+\end{itemize}
+Um modo $m$ é viável se o par correspondente estiver dentro do alcance
+de comunicação e sua fila não estiver cheia.
+
+\subsection{Modelo de Latência}
+
+O Tempo de Conclusão de Tarefa do modo $m$ para a tarefa $\tau_j$ é
+\begin{equation}
+  \mathrm{JCT}_j^{(m)} = t_j^{\mathrm{tx},(m)} + t_j^{\mathrm{fila},(m)}
+                         + \frac{C_j}{f^{(m)}},
+  \label{eq:jct}
+\end{equation}
+onde $t_j^{\mathrm{tx},(m)}$ é o tempo de transmissão (upload) e
+$t_j^{\mathrm{fila},(m)}$ é o tempo de espera residual na fila do destino,
+estimado como o tempo de execução restante das tarefas já na fila.
+
+\subsection{Modelo de Energia}
+
+A energia consumida pelo modo $m$ é
+\begin{equation}
+  E_j^{(m)} = \alpha_c^{(m)} \bigl[V^{(m)}\bigr]^2 C_j
+             + P_{\mathrm{TX}}^{(m)}\,t_j^{\mathrm{tx},(m)},
+  \label{eq:energy}
+\end{equation}
+onde $\alpha_c^{(m)}$ é a capacitância do chip, $V^{(m)}$ é a tensão de
+alimentação na frequência $f^{(m)}$ e $P_{\mathrm{TX}}^{(m)}$ é a potência
+de transmissão.
+Para o modo local, o termo de transmissão é nulo.
+
+\subsection{Objetivo de Otimização}
+
+A contribuição de \acrotip{QoS} por tarefa é
+\begin{equation}
+  \Phi_j = \alpha\,\mathrm{JCT}_j + \beta\,E_j
+            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j]\,\mathrm{JCT}_j,
+  \label{eq:obj}
+\end{equation}
+com $\alpha=\beta=0{,}5$ e coeficiente de penalidade por violação de prazo
+$\gamma=0{,}015$.
+O objetivo do sistema é minimizar $\sum_j \Phi_j$ maximizando a
+taxa de cumprimento de prazo
+$\hat{\tau} = |\{j : \mathrm{JCT}_j \le D_j\}|/N$.

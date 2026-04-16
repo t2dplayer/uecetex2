@@ -1,0 +1,20 @@
+Este artigo apresentou o \acrotip{SAC}-\acrotip{TOPSIS}, uma arquitetura híbrida para
+descarregamento de tarefas ciente de prazo em redes \acrotip{VEC}.
+A inovação central é usar o \acrotip{TOPSIS} não como tomador de decisão autônomo, mas
+como um módulo de engenharia de estado que converte um conjunto de
+candidatos de tamanho variável e multicritério em uma representação fixa 6D
+invariante à escala.
+Um agente \acrotip{SAC} de máxima entropia treinado sobre essa representação aprende uma
+política binária local/descarregamento que:
+(i) alcança uma taxa de cumprimento de prazo de $44{,}36\%$, a maior entre
+todas as políticas \acrotip{DRL} e heurísticas avaliadas em 601~cenários de teste;
+(ii) atinge um índice \acrotip{SWQ} de $0{,}1450$;
+(iii) generaliza zero-shot para densidades veiculares inéditas
+($10$–$\SI{30}{tasks\per\second}$) sem retreinamento;
+e
+(iv) evita os colapsos de modo do PPO-TOPSIS (always-local) e do SAC-Base
+(always-V2V).
+
+Um estudo de ablação cross-família confirma que a compressão de estado \acrotip{TOPSIS} é o principal motor de desempenho, pois melhora o cumprimento de prazo para todas as famílias \acrotip{DRL} testadas: \acrotip{SAC} ($+39{,}9$\,pp), \acrotip{TD3} ($+1{,}4$\,pp) e \acrotip{PPO} ($+0{,}3$\,pp), independentemente de seu algoritmo de aprendizado base. A vantagem residual do \acrotip{SAC} sobre o \acrotip{TD3} ($+1{,}35$\,pp) é um efeito secundário da exploração regularizada por entropia, que impede a política de colapsar para a estratégia conservadora always-local que afeta os métodos determinísticos off-policy em densidades mais altas.
+
+\paragraph{Trabalhos futuros.} Planejamos estender o módulo \acrotip{TOPSIS} para Fuzzy-TOPSIS, incorporando incerteza linguística nos pesos dos critérios para lidar com telemetria atrasada e estimativas ruidosas de canal. Também investigaremos extensões multi-agente nas quais cada veículo em $\mathcal{V}(t)$ executa seu próprio agente \acrotip{SAC}-\acrotip{TOPSIS} com coordenação descentralizada. Por fim, a avaliação hardware-in-the-loop com rádios sidelink \acrotip{5G} reais está planejada para validar o modelo de energia sob condições físicas de canal. 

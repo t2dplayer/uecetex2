@@ -1,0 +1,146 @@
+
+\documentclass[iicol]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{siunitx}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+\usepackage{adjustbox}%
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage[numbers]{natbib}
+\usepackage{enumitem}
+\usepackage[brazil]{babel}
+
+% Pacotes para gerenciamento de siglas com tooltip flutuante
+\usepackage{pdfcomment}
+\usepackage[nohyperlinks]{acronym}
+
+% Configuração para que os rótulos de sigla tenham ferramenta de tooltip
+\newcommand{\acrotip}[1]{\pdftooltip{\acs{#1}}{\acl{#1}}}
+% Exemplo de uso:
+% 1. Definir lista de siglas com \begin{acronym} \acro{Aprendizado por Reforço Profundo (\acrotip{DRL})}{Aprendizado por Reforço Profundo} \end{acronym}
+% 2. Usar no texto com \acrotip{DRL}
+
+\raggedbottom
+
+\input{br/acronyms.tex}
+
+\begin{document}
+
+
+\title{Representação de Estado Invariante à Escala e Aprendizado por Reforço
+       Profundo de Máxima Entropia para Descarregamento de Tarefas em Computação
+       de Borda Veicular}
+
+\author*[1,2]{\fnm{Antônio Sérgio de Sousa} \sur{Vieira}}
+              \email{sergio.vieira@ifce.edu.br}
+\author[1,3]{\fnm{Alisson Barbosa de} \sur{Souza}}
+             \email{alisson@ufc.br}
+\author[1]{\fnm{Joaquim} \sur{Celestino Júnior}}
+           \email{joaquim.celestino@uece.br}
+
+\affil*[1]{\orgdiv{Grupo de Redes e Sistemas Inteligentes (INETSYS)},
+           \orgname{Universidade Estadual do Ceará},
+           \orgaddress{\city{Fortaleza}, \country{Brasil}}}
+\affil[2]{\orgname{Instituto Federal de Educação, Ciência e Tecnologia},
+          \orgaddress{\city{Itapipoca}, \country{Brasil}}}
+\affil[3]{\orgname{Universidade Federal do Ceará},
+          \orgaddress{\city{Quixadá}, \country{Brasil}}}
+
+\abstract{%
+O descarregamento de tarefas em redes de Computação de Borda Veicular (\acrotip{VEC})
+é um mecanismo crítico para satisfazer as rigorosas restrições de latência e
+energia de aplicações autônomas avançadas.
+A alta mobilidade dos veículos cria um ambiente no qual o número de servidores
+de borda e vizinhos disponíveis muda continuamente, tornando o espaço de
+observação dimensionalmente variável.
+Essa variabilidade impede que agentes padrão de Aprendizado por Reforço
+Profundo (\acrotip{DRL}) generalizem entre diferentes densidades veiculares sem
+retreinamento custoso.
+Para enfrentar esse desafio, este artigo propõe o \textbf{\acrotip{SAC}-\acrotip{TOPSIS}}, uma
+arquitetura híbrida de tomada de decisão que integra a Técnica de Ordenação por
+Preferência à Similaridade com a Solução Ideal (Técnica de Ordenação por Preferência à Similaridade com a Solução Ideal (\acrotip{TOPSIS})) ao algoritmo
+Soft Actor-Critic (\acrotip{SAC}).
+O módulo \acrotip{TOPSIS} avalia cada nó candidato ao descarregamento, caracterizado por
+Tempo de Conclusão de Tarefa (\acrotip{JCT}), consumo de energia e distância física,
+usando distâncias $L_1$-Manhattan com pesos $[0{,}4;\, 0{,}3;\, 0{,}3]$, e
+comprime a observação de tamanho variável em um vetor de estado fixo de
+6~dimensões, invariante à escala.
+Um agente \acrotip{SAC} recebe essa representação compacta e aprende uma política binária:
+executar localmente ou descarregar para o candidato melhor ranqueado.
+A regularização por entropia impede que a política colapse em modos puramente
+locais ou puramente de descarregamento.
+Simulações extensivas em 601~cenários heterogêneos Vehicle-to-Everything (\acrotip{V2X})
+e 5G demonstram que a integração do \acrotip{TOPSIS} melhora consistentemente todas as
+famílias de \acrotip{DRL} testadas: \acrotip{SAC} melhora de $4{,}47\%$ para $44{,}36\%$
+($+39{,}9$\,pp), Twin Delayed DDPG (\acrotip{TD3}) de $41{,}62\%$ para $43{,}01\%$ ($+1{,}4$\,pp) e Proximal Policy Optimization (\acrotip{PPO})
+de $41{,}61\%$ para $41{,}95\%$ ($+0{,}3$\,pp) na taxa de cumprimento de
+prazo.
+Entre todas as políticas avaliadas, o \acrotip{SAC}-\acrotip{TOPSIS} alcança a maior taxa de
+cumprimento ($44{,}36\%$) e o maior índice de Qualidade Ponderada pelo Sucesso (\acrotip{SWQ}) ($0{,}1450$).
+Fundamentalmente, o modelo é treinado em um único regime de densidade e
+generaliza zero-shot para densidades veiculares inéditas de 10 a
+\SI{30}{tasks\per\second}.%
+}
+
+\keywords{Descarregamento de tarefas, Computação de Borda Veicular,
+          Soft Actor-Critic, \acrotip{TOPSIS}, Compressão de estado multicritério,
+          Generalização zero-shot}
+
+\maketitle
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Introdução}
+\label{sec:intro}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/intro.tex}
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Trabalhos Relacionados}
+\label{sec:related}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/related.tex}
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Modelo de Sistema e Formulação do Problema}
+\label{sec:model}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/model.tex}
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{A Arquitetura \acrotip{SAC}-\acrotip{TOPSIS}}
+\label{sec:arch}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/arch.tex}
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Avaliação de Desempenho}
+\label{sec:eval}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/eval.tex}
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Conclusão e Trabalhos Futuros}
+\label{sec:conclusion}
+%─────────────────────────────────────────────────────────────────────────────
+\input{br/conclusion.tex}
+
+\bibliographystyle{sn-mathphys-num}
+\bibliography{bib/refs}
+
+\end{document}

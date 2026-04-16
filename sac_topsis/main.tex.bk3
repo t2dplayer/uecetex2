@@ -1,0 +1,290 @@
+\documentclass[iicol]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{siunitx}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+\usepackage{adjustbox}%
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage[numbers]{natbib}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Article Title]{}
+
+\author*[1,2]{\fnm{Antônio Sérgio de Sousa} \sur{Vieira}}\email{sergio.vieira@ifce.edu.br}
+\author[1,3]{\fnm{Alisson Barbosa de} \sur{Souza}}\email{alisson@ufc.br}
+\author[1]{\fnm{Joaquim} \sur{Celestino Júnior}}\email{joaquim.celestino@uece.br}
+
+\affil*[1]{\orgdiv{Intelligent Networks and Systems Group (INETSYS)}, \orgname{State University of Ceará}, \orgaddress{\street{Av. Dr. Silas Munguba, 1700}, \city{Fortaleza}, \postcode{60714-903}, \state{CE}, \country{Brazil}}}
+\affil[2]{\orgname{Federal Institute of Education, Science and Technology}, \orgaddress{\street{Av. da Universidade, 102}, \city{Itapipoca}, \postcode{62500-000}, \state{CE}, \country{Brazil}}}
+\affil[3]{\orgname{Federal University of Ceará}, \orgaddress{\street{Av. José F. Queiroz, 5003}, \city{Quixadá}, \postcode{63902-580}, \state{CE}, \country{Brazil}}}
+
+
+\abstract{
+
+}
+
+\keywords{Task Offloading, Vehicular Edge Computing, Deep Reinforcement Learning, Fuzzy Logic, 5G NR}
+
+\maketitle
+
+\section{Introduction}\label{sec_introduction}
+The rapid and constant evolution of communication technologies, such as \textit{5G New Radio} (NR) and \textit{Vehicle-to-Everything} (V2X), has driven the sophistication of vehicular applications that demand high-performance real-time execution. Modern vehicles are equipped with multiple sensors, processing units, and communication interfaces in their \textit{On-Board Units} (OBUs), enabling the collection, sharing, and massive processing of data. However, the increasing complexity of these services frequently exceeds the intrinsic computational capacity of embedded devices.
+
+A straightforward approach to mitigate this limitation would consist of expanding the OBU hardware. Nevertheless, the current technological transition period leads to heterogeneous scenarios where devices with distinct computational capacities~\cite{luo2024} and diverse communication technologies~\cite{zheng2015} coexist. This diversity imposes a fundamental challenge to the scalability of vehicular applications in \textit{Smart Cities}~\cite{luo2024}, especially under highly dynamic conditions.
+
+In such a stochastic and time-varying environment, applications focused on autonomous driving in electric vehicles, for example, impose stringent latency requirements~\cite{chao2025}. Full processing execution at \textit{User Equipments} (UEs) to meet these requirements is often unfeasible due to the physical constraints related to energy consumption and the limited processing power of embedded chips~\cite{luo2024}. To address this challenge, the \textit{Vehicular Edge Computing} (VEC) paradigm emerges as an essential architecture, enabling \textit{task offloading} to robust infrastructure deployed along roadsides.
+
+The integration of vehicle mobility into cellular/wireless networks introduces a highly dynamic environment characterized by \textbf{non-stationary uncertainties}. Unlike static systems, the statistical properties of these networks evolve over time, leading to abrupt temporal variations in workload and channel conditions, often referred to as \textit{drifts}. Beyond these physical and environmental challenges, real-world scenarios must account for the decentralized nature of User Equipments (UEs). When multiple UEs compete for limited resources, their independent selfish policies may trigger a ``herd effect'', a phenomenon in which users simultaneously converge toward the same resources, causing severe congestion and significantly degrading the Quality of Service (QoS).
+
+
+To address these challenges, we model the system as a non-stationary and competitive \textit{Multi-Agent Reinforcement Learning} (MARL) environment. In this setting, edge servers possess limited computational capacity, and excessive request rates inevitably lead to increased queuing delays. To better reflect real-world demands, we consider a heterogeneous traffic model consisting of two distinct application profiles: \textit{delay-sensitive} tasks, requiring immediate processing, and \textit{delay-tolerant} tasks, which offer greater temporal flexibility.
+
+Within this framework, the contention strategy, specifically the use of a \textit{backoff} mechanism, emerges as a critical control variable. Unlike previous studies, where the RL agent's action space is often limited to a binary decision between local processing and offloading, our approach expands this domain to include the selection of an optimal waiting time before attempting to access shared resources. This introduces a complex decision-making trade-off, while immediate transmission risks inducing a ``herd effect'' and overloading the server, opting for an excessive backoff may lead to deadline violations for urgent applications. Balancing this trade-off is essential for maintaining system stability while satisfying diverse QoS requirements.
+
+Traditional Reinforcement Learning (RL) approaches often prove insufficient in such scenarios, as they typically rely on reactive strategies that cannot keep pace with the rapid obsolescence of learned policies caused by environmental drifts. To address these limitations, this work proposes a proactive decentralized mechanism that integrates time-series forecasting with \textit{Fuzzy} Logic and MARL. By employing an \textit{AutoRegressive Integrated Moving Average} (ARIMA) model as a drift sensor to predict workload trends, the system can dynamically tune meta-policies—such as the exploration rate and the aggressiveness of the backoff mechanism—through a Fuzzy-based controller.
+
+% Aqui eu comecei a vislumbrar melhor o que deve ser a solução do meu problema, quando eu uso ARIMA, eu consigo verificar se o sistema está entradando em um regime de alta carga, ou seja, se o sistema está entrando em um regime onde a fila de espera dos servidores de borda está aumentando, ou seja, o sistema está entrando em um regime onde os canais de comunicação estão ficando congestionados. Com isso, a IA pode agir proativamente, aumentando o tempo de backoff para evitar o ``herd effect'', ou seja, para evitar que muitos usuários tentem acessar os mesmos recursos ao mesmo tempo. Por outro lado, se o ARIMA indicar que o sistema está entrando em um regime de baixa carga, a IA pode reduzir o tempo de backoff para aproveitar os recursos disponíveis e reduzir a latência. O quanto que vai esperar é que pode ser definido por um sistema de regras fuzzy, onde as entradas são as previsões do ARIMA e o estado atual do sistema (por exemplo, a fila de espera atual, a taxa de chegada de tarefas, etc.) e a saída é o tempo de backoff recomendado. Dessa forma, a IA pode adaptar sua estratégia de acesso aos recursos de forma dinâmica e proativa, melhorando o desempenho geral do sistema em ambientes veiculares altamente dinâmicos e competitivos. Agora a duvida que resta é como o RL vai se encaixar nisso tudo, o RL pode ser responsável por aprender a melhor política de offloading (local vs edge) e também pode aprender a melhor política de backoff (quanto esperar antes de tentar acessar os recursos). O ARIMA e o sistema de regras fuzzy atuam como um mecanismo de ajuste fino, permitindo que o RL se adapte rapidamente às mudanças no ambiente sem precisar re-aprender do zero. Dessa forma, o RL pode focar em aprender as melhores ações para cada estado, enquanto o ARIMA e o fuzzy controlam a agressividade dessas ações com base nas condições atuais do sistema.
+
+\subsection{Hybrid-Adaptive Value Estimation}
+\label{subsec:hybrid_learning}
+
+To reconcile the stability of classic Temporal Difference (TD) learning with the responsiveness of time-series forecasting, we propose a hybrid update mechanism. Instead of relying solely on a single estimation target, the proposed agent computes a convex combination of reactive and predictive targets.
+
+Let $Y_{TD}$ be the standard bootstrapping target, which provides an unbiased but high-variance estimate of the return:
+\begin{equation}
+    Y_{TD} = R_{t+1} + \gamma V(S_{t+1})
+\end{equation}
+
+Simultaneously, let $Y_{ARIMA}$ be the trend-adjusted target derived from the ARIMA$(p,d,q)$ process, which acts as a low-variance, bias-introducing estimator:
+\begin{equation}
+    Y_{ARIMA} = R_{t+1} + \gamma \cdot \Phi_{\text{ARIMA}}(H_t)
+\end{equation}
+where $\Phi_{\text{ARIMA}}(H_t)$ represents the forecasted value of the next state based on the history of value estimates $H_t$.
+
+The final update rule for the value function $V(S_t)$ is defined as a weighted interpolation controlled by a dynamic mixing coefficient $\lambda_t \in [0, 1]$:
+\begin{equation}
+    V(S_t) \leftarrow V(S_t) + \alpha \left[ \left( (1 - \lambda_t) Y_{TD} + \lambda_t Y_{ARIMA} \right) - V(S_t) \right]
+\end{equation}
+
+The mixing coefficient $\lambda_t$ is dynamically adjusted based on the detected environmental drift magnitude via the ARIMA's integration term intensity. When the system is in a steady state (low drift), $\lambda_t \to 0$, recovering the convergence properties of standard Q-Learning. Conversely, during abrupt load variations (high drift), $\lambda_t \to 1$, allowing the agent to anticipate queue saturation.
+
+
+The primary objective is to optimize resource allocation and satisfy QoS requirements in competitive and non-stationary environments, ensuring load balancing as measured by \textit{Jain's Fairness Index}~\cite{jain1984quantitative}. As a decentralized solution, our approach is designed to provide the scalability and adaptability required for high-density vehicular networks.
+
+% % Aqui se deveria explicar como a solução irá funcionar em linhas gerais, mas isso será melhor detalhado na seção de metodologia. O importante é destacar que a solução é descentralizada, o que é crucial para a escalabilidade e adaptabilidade em ambientes veiculares dinâmicos.
+
+The main contributions of this work are detailed as follows:
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{Mathematical Modeling of Non-Stationary VEC Systems:} A formal characterization of the systemic impact and queuing delays when multiple agents converge toward identical policies in competitive vehicular environments;
+    \item \textbf{Proactive Drift-Aware Mechanism:} The integration of an ARIMA-based drift sensor with a Fuzzy Logic controller to dynamically tune MARL meta-policies, enabling the system to adapt to rapid environmental shifts and workload fluctuations;
+    \item \textbf{Scalable Adaptive Backoff Strategy:} A decentralized method for managing resource contention that utilizes Mean Field Learning to mitigate state-space explosion while ensuring global load balancing;
+    \item \textbf{Multi-Objective Performance Evaluation:} A comprehensive analysis of the trade-off between energy efficiency and latency requirements, validated through Jain's Fairness Index to ensure equitable resource distribution among heterogeneous applications.
+\end{enumerate}
+
+\section{Related Work}\label{sec_related_work}
+% Aqui eu tenho que pensar o seguinte. Eu preciso falar sobre o ambiente veicular em termos de problema de RL geral, eu não preciso falar de tecnologia no primeiro momento. Mas o cenário que eu vou usar possui características bem definidas. Então, como o ambiente é veicular, tenho a questão da mobilidade, isso gera o q? Com a mobilidade os canais de comunicação são influenciados por regimes diferentes de funcionamento, isso quer dizer que as vezes existem muitos dispositivos próximos, tentando acessar os canais de comunicação, também pode existgir situações onde esses canais estão livres. Em cada uma dessas situações, outro apsecto que pode sugir, é a questão de mudanças abruptas, ou seja, o carro se move e faz uma curva, derepente a LOS é bloqueada, e isso pode ocorrer em situações de alta densidade veicular ou de baixa densidade veicular. Então, a minha solução, deve buscar nunca ficar limitada a uma única situação, ela deve ter alternativas, tipo, tem que existir estratégias para lidar com a dualidade processamento local ou descarregamento das tarefas. É que nem nos jogos do stefan feld, nunca há apenas uma única ação a realizar. Tambem, tem o aspecto relacionado aos dispositivos locais e remotos, com isso qu quero dizer que um dispositivo remoto pode ficar enfileirando várias tarefas para processar e com isso perder desempenho. A fila de espera nos dispositivos de processamento podem crescer e isso vai influenciar negativamente no desempenhos global do sistema. Outra coisa importante, é que a mobilidade também influencia no regime de congestionamento dos servidores de borda, e essa mobilidade também está relacionada a horários. Então uma IA, deveria lidar com essas questões. Já falamos da mobilidade e como isso influencia tanto o canal de comunicação quanto o processamento dos servidores de borda. Ainda falta colocar nisso tudo, a questão do consumo energético, então a lógica de regime de consumo energético tem que ser levada em conta. será que um dispositivo sobrecarregado gasta a mesma quantidade de energia que um não tão carregado?. E o balanceamento de carga, como uma IA pod elidar com o dilema, descarregar para uma tarefa mais distante, mas que tenha menos carga, ou decarregar para um servidor mais próximo. Ela tem que lidar com esses dilemas, e isso é que torna esse sistema tão complexo. Então a minha solução tem que ser capaz de dar uma resposta as essas questões. E aqui é que tenho que mostrar que os trabalhos relacionas não lidam bem com tais questões, ou mesmo lidam com parte dessas questões.
+Recent literature has focused extensively on the use of Deep Reinforcement Learning (DRL) to optimize task offloading in vehicular environments~\cite{fan2024deep, toopchinezhad2024deep, fofana2024intelligent, li2024deep, farimani2024deadline}. However, as detailed by Uddin et al.~\cite{uddin2024intelligent}, most current solutions still face difficulties in balancing multiple conflicting objectives in non-stationary scenarios.
+
+Many RL approaches treat the edge server as a fixed-capacity resource but ignore the stochastic dynamics of queues. As observed in~\cite{uddin2024intelligent}, algorithms such as DDPG and DQN are frequently applied to minimize latency but fail when the ``herd effect'' occurs: multiple vehicles decide to offload tasks simultaneously to the same edge node, causing a buffer overflow. Unlike these approaches, our solution proposes a backoff mechanism based on fuzzy logic. While the works reviewed by Uddin et al. rely on global rewards to mitigate congestion, our decentralized approach coordinates resource access even before the task is transmitted, reducing the formation of excessive queues at the source.
+
+Energy consumption is often treated as a static term in the reward function. However, in vehicular environments, consumption is non-linear and highly dependent on the operational regime. Padakandla~\cite{3459991.pdf} argues that most RL algorithms assume the environment is stationary (classical MDP), which does not hold in V2X networks where Line-of-Sight (LoS) blockage and mobility abruptly alter the required transmission power. The advantage of our approach lies in the integration of a regime-switching model ($Z(t)$). Rather than a single policy, the agent utilizes fuzzy logic to handle the imprecision of these energy drifts, allowing the system to switch between local processing and offloading more resiliently than the traditional RL methods discussed in~\cite{3459991.pdf}.
+
+A critical point identified in the survey by~\cite{uddin2024intelligent} is the lack of fairness in resource allocation. Most studies focus on an egoistic policy of ``minimum individual latency.'' Our proposal differs by treating the system as a complex ecosystem—similar to the mechanics of modern strategy games—where no single correct action exists. We introduce Jain's Fairness Index as a central metric, ensuring that load balancing is not merely a byproduct but an explicit objective. While recent distributed RL solutions suffer from state-space explosion when attempting to observe all neighbors, our use of \textit{Mean Field Learning} enables a scalable estimation of system pressure.
+
+To better illustrate the limitations of current DRL-based offloading schemes and how our proposed approach addresses them, Table~\ref{tab:comparison} summarizes the key differences between our work and the state-of-the-art architectures reviewed in~\cite{3459991.pdf, uddin2024intelligent}. While most existing solutions focus on stationary environments or single-objective optimizations, our method uniquely integrates fuzzy logic and mean-field learning to handle systemic non-stationarity.
+
+\begin{table*}[ht!]
+    \centering
+    \caption{Comparison of Proposed Solution with State-of-the-Art DRL Offloading Approaches}\label{tab:comparison}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{lccccc}
+        \toprule
+        \bfseries Feature & \bfseries DDPG/DQN~\cite{uddin2024intelligent} & \bfseries Multi-Agent RL~\cite{uddin2024intelligent} & \bfseries Robust RL~\cite{3459991.pdf} & \bfseries Our Approach \\
+        \midrule
+        Non-Stationary Regimes ($Z(t)$) & No & No & Partial & \bfseries Yes \\
+        Systemic Queue Awareness & Low & Medium & Low & \bfseries High \\
+        Energy-Load Correlation & Static & Static & Dynamic & \bfseries Dynamic \\
+        Coordination Mechanism & Centralized & Distributed & None & \bfseries Fuzzy Backoff \\
+        Scalability (Density) & Low & Low & Medium & \bfseries High (Mean Field) \\
+        Fairness Index Integration & No & Partial & No & \bfseries Yes \\
+        \bottomrule
+    \end{tabular}
+    }
+\end{table*}
+\section{System Model}\label{sec_system_model}
+
+We consider a VEC system operating in a 5G NR environment, consisting of a set of vehicles $\mathcal{V} = \{1, 2, \dots, V\}$ and a set of Roadside Units (RSUs) $\mathcal{R}$. The system evolves over discrete time slots $t \in \{0, 1, \dots, T\}$.
+
+\begin{table}[!ht]
+    \caption{Table of Notations}\label{tab_notations}
+    \begin{tabular}{ll}
+        \toprule
+        \bfseries Notation & \bfseries Description\\
+        \midrule
+        $T_i$ & Task $i$, defined as $(d_i, c_i)$ \\
+        $d_i$ & Data size of task $i$ (bits) \\
+        $c_i$ & Computational density (cycles/bit) \\
+        $f^l, f^e$ & CPU frequency of vehicle and edge server \\
+        $L_i^l, L_i^e$ & Local and Edge computation latency \\
+        $R_{i,j}$ & Transmission rate from vehicle $i$ to node $j$ \\
+        $E_i$ & Total energy consumption for task $i$ \\
+        $Q_j(t)$ & Processing queue waiting time at node $j$ \\
+        $\kappa$ & Energy efficiency coefficient \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Task and Communication Model}
+Each vehicle $i$ generates a task $T_i$ at time $t$, characterized by the tuple $(d_i, c_i)$, where $d_i$ denotes the input data size and $c_i$ denotes the computational workload in CPU cycles per bit.
+The transmission rate $R_{i,j}$ between vehicle $i$ and node $j$ is modeled using the Shannon-Hartley theorem for 5G NR channels:
+\begin{equation}
+    R_{i,j} = B \log_2\left(1 + \frac{P_{tx} |h_{i,j}|^2}{N_0 + I_{i,j}}\right)
+\end{equation}
+where $B$ is the bandwidth, $P_{tx}$ is the transmission power, $h_{i,j}$ is the channel gain, $N_0$ is the noise spectral density, and $I_{i,j}$ represents interference.
+
+\subsection{Latency Model}
+For local execution, the latency $L_i^l$ is determined by the vehicle's CPU frequency $f_i^l$:
+\begin{equation}
+    L_i^l = \frac{d_i c_i}{f_i^l}
+\end{equation}
+
+For offloading to an edge server $j$, the total latency $L_i^e$ includes transmission time, queueing delay $Q_j(t)$, and processing time:
+\begin{equation}
+    L_i^e = \frac{d_i}{R_{i,j}} + Q_{j}(t) + \frac{d_i c_i}{f_j^e}
+\end{equation}
+
+\subsection{Energy Model}
+The local energy consumption is modeled as:
+\begin{equation}
+    E_i^l = \kappa (f_i^l)^2 d_i c_i
+\end{equation}
+where $\kappa$ is the effective switched capacitance coefficient.
+
+For offloading, the energy consumption considers the transmission power:
+\begin{equation}
+    E_i^{off} = P_{tx} \frac{d_i}{R_{i,j}} + E_{tail}
+\end{equation}
+
+\subsection{Non-Stationary Workload Model}
+Standard simulation models often assume stationary arrival processes (e.g., Poisson) and constant environmental parameters. However, real-world vehicular networks exhibit non-stationary behaviors, such as traffic bursts and sudden changes in channel quality due to mobility \cite{leland1994self, paxson1995wide}.
+To evaluate our solution under realistic conditions, we model the environment using a regime-switching process $Z(t)$, where system parameters (e.g., task arrival rate $\lambda$, CPU load) evolve through distinct phases (regimes).
+
+Figure \ref{fig:regime_step_sem_inercia} illustrates a trajectory of regimes over time. This approach allows us to test the adaptability of the offloading policy to abrupt changes in the environment.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+          width=0.92\linewidth,
+          height=5.5cm,
+          xmin=0, xmax=100,
+          ymin=-0.5, ymax=2.5,
+          xlabel={Time (s)},
+          ylabel={Regime $Z(t)$},
+          ytick={0,1,2},
+          yticklabels={Low, Medium, High},
+          grid=both,
+          major grid style={line width=.2pt, draw=gray!35},
+          minor grid style={line width=.1pt, draw=gray!20},
+          minor tick num=1,
+          ticklabel style={font=\footnotesize},
+          label style={font=\footnotesize},
+        ]
+        \addplot[const plot, line width=1.2pt] coordinates {
+          (0,1)   (12,1) (12,2)  (28,2) (28,0)  (44,0)
+          (44,1)  (67,1) (67,2)  (83,2) (83,1)  (100,1)
+        };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Example of a regime-switching trajectory $Z(t)$ representing non-stationary environmental changes (e.g., traffic load levels).}
+    \label{fig:regime_step_sem_inercia}
+\end{figure}
+
+Furthermore, to model the physical inertia of system responses (e.g., queue buildup or thermal throttling), we map the discrete regime target $u(t)$ to an observable variable $y(t)$ using a first-order dynamic equation:
+\begin{equation}
+    y_{k+1} = \alpha y_k + (1-\alpha)u_k
+\end{equation}
+where $\alpha \in [0,1)$ is the inertia factor. Figure \ref{fig:regime_com_inercia} shows how this results in smooth transitions, mimicking realistic metrics.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+          width=0.92\linewidth,
+          height=5.5cm,
+          xmin=0, xmax=100,
+          ymin=0, ymax=1.25,
+          xlabel={Time (s)},
+          ylabel={Normalized Value},
+          grid=both,
+          major grid style={line width=.2pt, draw=gray!35},
+          minor grid style={line width=.1pt, draw=gray!20},
+          legend style={at={(0.5,1.15)}, anchor=south, legend columns=2, draw=none, fill=none, font=\footnotesize},
+          ticklabel style={font=\footnotesize},
+          label style={font=\footnotesize},
+        ]
+        \addplot[const plot, line width=1.1pt, dashed] coordinates {
+          (0,0.60)  (12,0.60) (12,1.10) (28,1.10) (28,0.25) (44,0.25)
+          (44,0.60) (67,0.60) (67,1.10) (83,1.10) (83,0.60) (100,0.60)
+        };
+        \addlegendentry{Target $u(t)$}
+        \addplot[line width=1.1pt] coordinates {
+          (0,0.60) (12,0.60) (16,0.73) (20,0.86) (24,0.97) (28,1.03)
+          (34,0.72) (38,0.55) (44,0.34) (54,0.48) (67,0.58) (74,0.83) (83,1.02) (100,0.64)
+        };
+        \addlegendentry{Observed $y(t)$}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{System response $y(t)$ with inertia tracking the regime target $u(t)$, avoiding unrealistic instantaneous jumps.}
+    \label{fig:regime_com_inercia}
+\end{figure}
+
+\section{Proposed Solution}\label{sec_methodology}
+
+
+\subsection{Fuzzy Logic}
+
+\subsubsection{Fuzzification}
+
+\subsubsection{Fuzzy Rules and Inference}
+
+\subsection{Deep Reinforcement Learning Agent}
+
+\subsubsection{State Space ($S_t$)}
+
+\subsubsection{Action Space ($A_t$)}
+
+\subsubsection{Reward Function ($R_t$)}
+
+\section{Experimental Evaluation}\label{sec_experiments}
+
+\subsection{Simulation Setup}
+
+
+\section{Conclusion}\label{sec_conclusion}
+
+\bibliographystyle{sn-mathphys-num}
+\bibliography{bib/refs}
+
+\end{document}

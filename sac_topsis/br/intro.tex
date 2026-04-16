@@ -1,0 +1,92 @@
+% \paragraph{Contexto e motivação.}
+As redes de comunicação veicular passaram por algumas transições tecnológicas importantes. Inicialmente, o foco estava nas Redes Veiculares Ad hoc (\acrotip{VANET}s), que priorizavam a conectividade direta entre veículos, mas enfrentavam desafios relacionados à latência e à conectividade devido à alta mobilidade dos nós~\cite{kandali2025}. Com o amadurecimento da Internet das Coisas (\acrotip{IoT}) e a expansão de sensores embarcados na infraestrutura urbana, desenvolveu-se um paradigma de rede de grande escala que integra veículos, infraestrutura, pedestres e a nuvem, conhecido como ecossistema da Internet dos Veículos (\acrotip{IoV})~\cite{kandali2025}. Tal ecossistema foi idealizado para viabilizar os Sistemas de Transporte Inteligentes (\acrotip{ITS}) verdadeiramente autônomos e conectados, possibilitando às aplicações veiculares atender simultaneamente a requisitos de eficiência, confiabilidade e segurança~\cite{uddin2024intelligent}.
+
+No entanto, a \acrotip{IoV} depende da capacidade de atendimento aos requisitos de baixa latência e alta vazão das tecnologias de rádio. Dessa forma, a comunicação veicular passou por algumas evoluções, partindo inicialmente da alocação de \SI{75}{\mega\hertz} na banda de \SI{5{,}9}{\giga\hertz} para o padrão Dedicated Short-Range Communications (\acrotip{DSRC}), que definiu os parâmetros para comunicação Vehicle-to-Vehicle (\acrotip{V2V}) e Vehicle-to-Infrastructure (\acrotip{V2I}) nas primeiras \acrotip{VANET}s~\cite{zheng2015}. A partir desse legado, desenvolveram-se dois eixos tecnológicos de comunicação. O primeiro, o \acrotip{IEEE}~802.11bd (Next-Generation \acrotip{V2X}), estendeu o \acrotip{IEEE}~802.11p incorporando robustez contra desvanecimento rápido e suporte a velocidades de até \SI{250}{\kilo\meter\per\hour}~\cite{naik2019}. Já o segundo direciona-se à superação das limitações do \acrotip{DSRC} em escalabilidade e custo de implantação, o que impulsionou o desenvolvimento do Cellular \acrotip{V2X} (\acrotip{CV2X}) pelo \acrotip{3GPP}~\cite{chen2017}. Sob a perspectiva regulatória, a disputa para adesão dessas tecnologias foi resolvida pela Federal Communications Commission (\acrotip{FCC}), que estabeleceu o \acrotip{CV2X} como padrão obrigatório para a comunicação de \acrotip{ITS}, com a descontinuação oficial do \acrotip{DSRC} marcada para dezembro de 2026~\cite{fcc2024_59ghz}.
+ 
+A evolução das tecnologias de comunicação suportou uma parte dos requisitos dos \acrotip{ITS}. No entanto, as limitações em relação à capacidade computacional dos dispositivos embarcados ainda precisam ser superadas. Nesse contexto, a Computação de Borda Móvel (\acrotip{MEC}) e sua especialização veicular, a Computação de Borda Veicular (\acrotip{VEC}), viabilizam o funcionamento de aplicações sensíveis à latência ao posicionarem recursos computacionais próximos à rede de acesso por rádio~\cite{mao2017}. Os veículos podem descarregar tarefas computacionalmente intensivas para o servidor de borda (\acrotip{VEC}) via \acrotip{5G} \acrotip{CV2X} ou para veículos vizinhos por enlace direto \acrotip{V2V}, reduzindo drasticamente o tempo de resposta e o consumo de energia a bordo~\cite{liu2019,fang2021mec_iot}.
+
+Em ambientes veiculares, as capacidades computacionais das Unidades de Bordo Interconectadas (\acrotip{OBUI}s) são inerentemente heterogêneas~\cite{luo2024}. Essa diversidade de hardware, se bem aproveitada, possibilita a formação de ambientes de execução cooperativos, nos quais veículos equipados com unidades de processamento de alto desempenho disponibilizam sua capacidade ociosa temporária para auxiliar nós vizinhos com restrições computacionais e e energéticas. O compartilhamento direto desses recursos melhora consideravelmente a Qualidade de Serviço (\acrotip{QoS}) global dos \acrotip{ITS}~\cite{he2019d2d_mec_twc}. Dessa forma, a integração da alta capacidade do servidor de borda com a disponibilização de processamento ocioso das \acrotip{OBUI}s fecha o ciclo de melhorias necessário para viabilizar a execução de aplicações veiculares computacionalmente intensivas e estritamente sensíveis à latência e ao consumo energético.
+
+Entretanto, a operacionalização desse potencial colaborativo tem como mecanismo central o descarregamento de tarefas. Essa estratégia consiste em transferir a responsabilidade de computar tarefas complexas de dispositivos com recursos limitados para nós de processamento remoto mais poderosos, como o servidor de borda ou veículos vizinhos com maior capacidade de processamento~\cite{wang2022}. O objetivo é contornar as restrições locais de bateria, armazenamento e processamento com o intuito de reduzir o consumo de energia, minimizar a latência e melhorar a \acrotip{QoS}. O grande desafio, contudo, reside em decidir dinamicamente quando e para onde descarregar essas tarefas. Explorar plenamente esse potencial exige o desenvolvimento de políticas de alocação capazes de se adaptar à topologia altamente dinâmica da rede e de avaliar múltiplos critérios de decisão de forma simultânea e em tempo real.
+
+O descarregamento de tarefas em redes veiculares configura-se fundamentalmente como um problema de otimização multiobjetivo. Nesse contexto, diversas políticas têm sido propostas para solucionar a alocação de recursos. As heurísticas baseadas em regras lógicas e os métodos de Tomada de Decisão Multicritério (\acrotip{MCDM}), a exemplo das estratégias gulosas, são amplamente utilizados devido à sua simplicidade computacional e facilidade de implementação~\cite{ahmed2022survey}. No entanto, essas abordagens avaliam apenas a situação instantânea da rede, mostrando-se incapazes de antecipar as dinâmicas de tráfego e os estados futuros do ambiente. Por outro lado, as meta-heurísticas, tais como algoritmos genéticos, otimização por enxame de partículas e colônia de formigas, oferecem garantias mais sólidas de busca global e têm sido aplicadas com sucesso ao descarregamento em cenários estáticos~\cite{li2020genetic,you2021efficient,kishor2022task}. Contudo, esses métodos mostram-se inadequados para os ambientes veiculares, visto que a busca baseada em população exige dezenas a centenas de avaliações de aptidão iterativas a cada instante de decisão, causando atrasos inaceitáveis~\cite{wu2024,cao2024survey}. Essa característica de convergência lenta é estritamente incompatível com os rigorosos prazos de execução na escala de milissegundos inerentes às aplicações de mobilidade~\cite{miriyala2026dl_offload_review,uddin2025}. Adicionalmente, esses algoritmos precisam ser reiniciados a cada alteração topológica do ambiente, e a sua complexidade de inicialização e convergência cresce significativamente com o aumento do tamanho da rede, resultando em um desempenho amplamente degradado em larga escala~\cite{wang2020survey,long2025}.
+
+Cenários de avaliação simplificados, com número fixo de veículos, distribuições de tarefas uniformes e modelos de canal idealizados, não capturam o alto dinamismo das redes veiculares reais~\cite{miriyala2026dl_offload_review}. Políticas avaliadas nesses ambientes tendem a degradar acentuadamente quando a densidade veicular ou o regime de tráfego muda~\cite{miriyala2026dl_offload_review}, revelando uma lacuna crítica entre benchmarks sintéticos e ambientes operacionais reais.
+
+
+O \acrotip{DRL} é uma solução natural para o descarregamento de tarefas porque aprende uma política, um mapeamento de observações a ações, que considera implicitamente consequências futuras, não apenas o estado atual~\cite{huang2020,shi2023}. Diferentemente de heurísticas e meta-heurísticas, um agente \acrotip{DRL} pode explorar correlações temporais nos padrões de tráfego e na dinâmica das filas aprendidas a partir da experiência. Não obstante, arquiteturas \acrotip{DRL} padrão compartilham uma fraqueza crítica, pois exigem retreinamento sempre que o cenário operacional muda~\cite{miriyala2026dl_offload_review}, que identifica como desafio aberto a robustez a ambientes não-estacionários. Como a entrada da rede neural é um vetor de tamanho fixo, qualquer alteração no número de nós candidatos ao descarregamento, causada por veículos entrando ou saindo do alcance de comunicação, invalida o modelo treinado~\cite{uddin2024intelligent}. O preenchimento com zeros de candidatos ausentes é um contorno comum, mas introduz entradas espúrias que desestabilizam o aprendizado e reduzem a capacidade de generalização da política~\cite{miriyala2026dl_offload_review}.
+
+Em trabalho anterior, propusemos o FOFF~\cite{vieira2025foff}, um framework Fuzzy-TOPSIS que ranqueia o servidor de borda e veículos vizinhos em cenários \acrotip{VEC} estáticos usando pesos linguísticos de critérios para tratar incertezas. O FOFF demonstrou que métodos multicritério podem alcançar forte eficiência energética e \acrotip{QoS} sem qualquer fase de treinamento. Sua limitação é precisamente a falta de adaptação, visto que o Fuzzy-TOPSIS seleciona o melhor candidato por uma regra de pontuação fixa e não pode melhorar com a experiência ou ajustar-se a tráfego não estacionário. Com base nesses aprendizados, propomos o \acrotip{SAC}-\acrotip{TOPSIS}, uma arquitetura híbrida que delega a avaliação multicritério de candidatos ao \acrotip{TOPSIS} e a otimização de política de longo prazo ao algoritmo \acrotip{SAC}, combinando a otimalidade local do \acrotip{MCDM} com a capacidade prospectiva do \acrotip{DRL}.
+
+As principais contribuições deste artigo são:
+\begin{enumerate}[leftmargin=*,nosep]
+  \item \textbf{Cenário de avaliação desafiador e realista.}
+        Avaliamos todas as políticas em 601~cenários \acrotip{VEC} heterogêneos
+        cobrindo cinco regimes de densidade veicular
+        ($10$–$\SI{30}{tasks\per\second}$), com modelos de canal \acrotip{5G} e \acrotip{V2V}
+        realistas, frequências de On-Board Unit (\acrotip{OBU}) heterogêneas e prazos por tarefa
+        extraídos de uma distribuição contínua, abordando diretamente a lacuna
+        de cenários simplificados apontada
+        por~\cite{miriyala2026dl_offload_review}.
+
+  \item \textbf{Representação de estado invariante à escala.}
+        O \acrotip{TOPSIS} comprime o conjunto de candidatos de tamanho variável em um
+        vetor fixo de 6D cujos componentes são razões normalizadas e diferenças
+        relativas, tornando-o válido independentemente do número de candidatos
+        disponíveis.
+        Essa representação permite generalização zero-shot, um modelo
+        treinado em um regime de densidade transfere-se diretamente para regimes
+        inéditos sem retreinamento.
+
+  \item \textbf{Arquitetura de decisão de baixa complexidade.}
+        Ao reduzir o espaço de ações a um único bit (local vs.\ melhor
+        descarregamento), o agente evita crescimento exponencial do espaço de
+        ações e executa inferência em $O(1)$ passagens diretas de rede neural
+        por tarefa, adequado para implantação embarcada em tempo real.
+
+  \item \textbf{Modelagem de recompensa fundamentada.}
+        A função de recompensa ciente do prazo fornece um sinal de gradiente
+        contínuo em ambos os regimes de sucesso e falha, evitando esparsidade
+        de recompensa e ensinando o agente a minimizar o atraso em vez de
+        meramente evitá-lo.
+
+  \item \textbf{Horizontes de decisão complementares.}
+        O \acrotip{TOPSIS} fornece a melhor solução local dadas as condições atuais
+        da rede; o \acrotip{SAC} aprende a melhor política de longo prazo por meio
+        da experiência acumulada.
+        A combinação produz resultados que nenhum componente isolado consegue
+        alcançar.
+\end{enumerate}
+
+Avaliado em 601~cenários, o \acrotip{SAC}-\acrotip{TOPSIS} alcança taxa de cumprimento de prazo de
+$44{,}36\%$ e \acrotip{SWQ} de $0{,}1450$, o melhor entre todas as linhas de base \acrotip{DRL} e
+heurísticas, enquanto o SAC-Base com estado bruto alcança apenas $4{,}47\%$
+com o mesmo orçamento de treinamento.
+
+O restante do artigo está estruturado da seguinte forma. A Seção~\ref{sec:related} revisa trabalhos relacionados. A Seção~\ref{sec:model} formaliza o modelo de sistema e o objetivo de otimização. A Seção~\ref{sec:arch} descreve em detalhe a arquitetura \acrotip{SAC}-\acrotip{TOPSIS}. A Seção~\ref{sec:eval} apresenta a avaliação experimental. A Seção~\ref{sec:conclusion} conclui o artigo.
+
+\begin{table*}[t]
+\caption{Lista de Acrônimos -- Resumo das principais siglas utilizadas ao longo deste artigo.}
+\label{tab:acronyms}
+{\scriptsize
+\begin{tabularx}{\textwidth}{l X l X}
+\toprule
+\textbf{Sigla} & \textbf{Definição} & \textbf{Sigla} & \textbf{Definição} \\
+\midrule
+\acrotip{3GPP}   & 3rd Generation Partnership Project & \acrotip{NIS}    & Solução Ideal Negativa \\
+\acrotip{5G}     & 5th Generation                      & \acrotip{NRV2X}  & New Radio Vehicle-to-Everything \\
+\acrotip{CV2X}   & Cellular Vehicle-to-Everything      & \acrotip{OBUI}   & Unidades de Bordo Interconectadas \\
+\acrotip{D3QN}   & Dueling Double Deep Q-Network       & \acrotip{PIS}    & Solução Ideal Positiva \\
+\acrotip{DRL}    & Aprendizado por Reforço Profundo    & \acrotip{QoS}    & Qualidade de Serviço \\
+\acrotip{DSRC}   & Dedicated Short-Range Comm.         & \acrotip{RSU}    & Roadside Unit \\
+\acrotip{IEEE}   & Inst. of Elect. and Electr. Eng.    & \acrotip{SAC}    & Soft Actor-Critic \\
+\acrotip{IoT}    & Internet of Things                  & \acrotip{TOPSIS} & Tech. Order Pref. Sim. Ideal Sol. \\
+\acrotip{IoV}    & Internet de Veículos                & \acrotip{V2I}    & Vehicle-to-Infrastructure \\
+\acrotip{ITS}    & Sistemas Transporte Inteligentes    & \acrotip{V2N}    & Vehicle-to-Network \\
+\acrotip{JCT}    & Tempo de Conclusão de Tarefa        & \acrotip{V2P}    & Vehicle-to-Pedestrian \\
+\acrotip{MCDM}   & Tomada de Decisão Multicritério     & \acrotip{V2V}    & Vehicle-to-Vehicle \\
+\acrotip{MEC}    & Computação de Borda Móvel           & \acrotip{VEC}    & Computação de Borda Veicular \\
+\bottomrule
+\end{tabularx}}
+\end{table*}
+
