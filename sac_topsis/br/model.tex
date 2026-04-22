@@ -1,7 +1,53 @@
+Nessa seção são apresentados os principais modelos matemáticos utilizados para representar o ambiente simulado e os aspectos relacionados ao descarregamento de tarefas, englobando modelos de comunicação celular, consumo energético e função objetivo. Para facilitar a leitura e entendimento é apresentada a Tabela \ref{tab:notations} com um resumo das principais notações utilizadas.
+
+\begin{table}[ht]
+\centering
+\caption{Resumo das Notações Utilizadas}
+\label{tab:notations}
+{\scriptsize
+\begin{tabularx}{\columnwidth}{l X}
+\toprule
+\textbf{Símbolo} & \textbf{Descrição} \\
+\midrule
+\multicolumn{2}{l}{\textit{Modelo de Rede e Sistema}} \\
+$v_0$ & Veículo cliente (gerador de tarefas) \\
+$\mathcal{V}(t)$ & Conjunto de veículos vizinhos no tempo $t$ \\
+$B_{\mathrm{V2I}}, B_{\mathrm{V2V}}$ & Largura de banda de uplink (V2I) e sidelink (V2V) \\
+$Q_{\mathrm{RSU}}, Q_v$ & Capacidade da fila no RSU e no veículo $v$ \\
+\midrule
+\multicolumn{2}{l}{\textit{Modelo de Tarefa}} \\
+$\tau_j$ & Tarefa $j$ definida por $(C_j, D_j, s_j)$ \\
+$C_j$ & Complexidade de CPU da tarefa $j$ (ciclos) \\
+$D_j$ & Prazo (deadline) da tarefa $j$ (segundos) \\
+$s_j$ & Tamanho dos dados de entrada da tarefa $j$ (bits) \\
+$m$ & Modo de execução ($0$: local, $1$: RSU, $2$: V2V) \\
+$f^{(m)}$ & Frequência de CPU no modo $m$ \\
+\midrule
+\multicolumn{2}{l}{\textit{Métricas de Desempenho}} \\
+$\mathrm{JCT}_j^{(m)}$ & Tempo de conclusão (Job Completion Time) no modo $m$ \\
+$t_j^{\mathrm{tx},(m)}$ & Tempo de transmissão (upload) dos dados \\
+$t_j^{\mathrm{fila},(m)}$ & Tempo de espera na fila do destino \\
+$E_j^{(m)}$ & Energia consumida pela tarefa $j$ no modo $m$ \\
+$\alpha_c, V, P_{\mathrm{TX}}$ & Parâmetros físicos (capacitância, tensão, potência TX) \\
+\midrule
+\multicolumn{2}{l}{\textit{Objetivo de Otimização}} \\
+$\Phi_j$ & Contribuição de QoS da tarefa $j$ (função de custo) \\
+$\alpha, \beta, \gamma$ & Pesos de latência, energia e penalidade de prazo \\
+$\hat{\tau}$ & Taxa de cumprimento de prazos (Success Rate) \\
+\bottomrule
+\end{tabularx}}
+\end{table}
 
 \subsection{Modelo de Rede}
 
-Consideramos um ambiente \acrotip{VEC} heterogêneo com um veículo cliente $v_0$, um servidor Roadside Unit (\acrotip{RSU}) acessível via \acrotip{5G} \acrotip{CV2X} (largura de banda de uplink $B_{\mathrm{V2I}}$) e um conjunto variante no tempo $\mathcal{V}(t)$ de veículos vizinhos acessíveis via sidelink \acrotip{V2V} (largura de banda $B_{\mathrm{V2V}}$). O \acrotip{RSU} possui uma fila de serviço de capacidade $Q_{\mathrm{RSU}}$; cada veículo $v \in \mathcal{V}(t)$ possui uma fila local $Q_v$.
+Consideramos um ambiente \acrotip{VEC} heterogêneo em um cenário urbano, composto por uma \acrotip{RSU} fixa e um conjunto de veículos vizinhos $\mathcal{V}(t)$ que se deslocam segundo um modelo de mobilidade urbana. O veículo cliente $v_0$ dispõe de duas interfaces de comunicação para descarregamento:
+
+\begin{itemize}[nosep,leftmargin=*]
+    \item \textbf{V2I (Vehicle-to-Infrastructure):} Utiliza tecnologia \acrotip{5G} NR (banda n78) com frequência portadora de \SI{3{,}5}{\giga\hertz} e largura de banda $B_{\mathrm{V2I}} = \SI{20}{\mega\hertz}$. O modelo de perda de percurso segue a norma 3GPP TR 38.901 UMa LoS, considerando a altura da \acrotip{RSU} ($h_{\mathrm{BS}}=\SI{10}{\meter}$) e dos veículos ($h_{\mathrm{UT}}=\SI{1{,}5}{\meter}$).
+    \item \textbf{V2V (Vehicle-to-Vehicle):} Utiliza sidelink PC5 (NR-V2X) operando em \SI{5{,}9}{\giga\hertz} com largura de banda $B_{\mathrm{V2V}} = \SI{20}{\mega\hertz}$. A propagação é modelada conforme a norma 3GPP TR 37.885 Urban LoS.
+\end{itemize}
+
+A taxa de transmissão instantânea para ambos os links é obtida pela capacidade de Shannon, $R = B \log_2(1 + \mathrm{SNR})$, onde a relação sinal-ruído ($\mathrm{SNR}$) integra a potência de transmissão ($P_{\mathrm{TX}} = \SI{0{,}2}{\watt}$), o ganho do canal e o ruído térmico AWGN calculado com base na temperatura de ruído (\SI{290}{\kelvin}) e na figura de ruído do receptor (\SI{5}{\decibel} para V2I e \SI{9}{\decibel} para V2V). A \acrotip{RSU} e cada veículo $v \in \mathcal{V}(t)$ gerenciam filas de serviço com capacidade $Q_{\max} = 25$ para o processamento de tarefas pendentes.
 
 \subsection{Modelo de Tarefa}
 
@@ -14,8 +60,7 @@ Três modos de execução estão disponíveis:
   \item \textbf{\acrotip{RSU} ($m=1$):} carregado ao \acrotip{RSU} e executado em $f_{\mathrm{RSU}}$.
   \item \textbf{\acrotip{V2V} ($m=2$):} descarregado a um veículo vizinho $v^* \in \mathcal{V}(t)$.
 \end{itemize}
-Um modo $m$ é viável se o par correspondente estiver dentro do alcance
-de comunicação e sua fila não estiver cheia.
+Um modo $m$ de descarregamento é viável se o tempo de contato com o destino for suficiente para a transmissão dos dados de entrada e recepção dos resultados.
 
 \subsection{Modelo de Latência}
 
@@ -47,11 +92,10 @@ Para o modo local, o termo de transmissão é nulo.
 A contribuição de \acrotip{QoS} por tarefa é
 \begin{equation}
   \Phi_j = \alpha\,\mathrm{JCT}_j + \beta\,E_j
-            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j]\,\mathrm{JCT}_j,
+            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j],
   \label{eq:obj}
 \end{equation}
-com $\alpha=\beta=0{,}5$ e coeficiente de penalidade por violação de prazo
-$\gamma=0{,}015$.
+com parâmetros configuráveis de peso (por padrão $\alpha=\beta=0{,}35$) e uma constante de penalidade por violação de prazo $\gamma=0{,}015$.
 O objetivo do sistema é minimizar $\sum_j \Phi_j$ maximizando a
 taxa de cumprimento de prazo
 $\hat{\tau} = |\{j : \mathrm{JCT}_j \le D_j\}|/N$.
