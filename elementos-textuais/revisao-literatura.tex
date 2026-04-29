@@ -91,7 +91,7 @@ Para classificar e relacionar o estado da arte das soluções de descarregamento
   ]
 \end{forest}
 }
-\Caption{\label{fig:taxonomia_adaptada} Taxonomia adaptada para classificação dos trabalhos relacionados em descarregamento computacional veicular, com ênfase na modelagem de Aprendizado por Reforço Profundo (\gls{DRL}) e ambiente de simulação.}
+\Caption{\label{fig:taxonomia_adaptada} Taxonomia adaptada para classificação dos trabalhos relacionados em descarregamento computacional veicular, com ênfase na modelagem de \gls{DRL} e ambiente de simulação.}
 \Fonte{Adaptado de~\citeonline{de2020computation}.}
 \end{figure}
 
@@ -112,7 +112,7 @@ Servidores \gls{MEC} contribuem significativamente para atender exigências de \
 
 Nesse contexto, esses servidores frequentemente estão conectados a \gls{RSU} e estações base para oferecer suporte computacional de baixa latência aos veículos. Aproveitando essa infraestrutura de borda, o estudo de~\cite{zhao2025} propõe o esquema \gls{PDQKM} para otimizar o descarregamento de múltiplas tarefas, permitindo reduzir a latência total do sistema. Por outro lado, o trabalho de~\cite{wu2025} utiliza \gls{GAN} para expandir amostras de tarefas evitando o desequilíbrio de dados, criando um modelo de \gls{FL} para realizar o descarregamento de tarefas de forma energeticamente eficiente em servidores \gls{MEC}. O estudo de~\cite{mohammad2025} apresenta o \textit{framework} EMEC-IoVTOF, que integra \gls{DRL} com a técnica de \gls{PSO} para otimizar a alocação de recursos em sistemas \gls{IoV}. A solução calcula custos de descarregamento para evitar a convergência para ótimos locais, conseguindo reduções significativas de latência e consumo de energia, além de contornar restrições de largura de banda em cenários veiculares dinâmicos. Por sua vez, o estudo de~\cite{liu2025} utiliza o método de aproximação de Bernstein para converter restrições probabilísticas de interferência em formato tratável, minimizando uma função de utilidade que equilibra atrasos na transmissão e na computação para o \gls{C-MEC}.
 
-Nessa mesma direção, o trabalho de~\cite{vieira2025} propõe o \textit{framework} FOFF (\textit{Fuzzy Offloading For Five-G}), voltado ao descarregamento de tarefas em redes \gls{VEC} habilitadas por \gls{5G} via comunicação \gls{V2I}. Em vez de recorrer a técnicas iterativas de aprendizado, o FOFF emprega o método de Tomada de Decisão Multicritério (\gls{MCDM}) \textit{Fuzzy}-\gls{TOPSIS} com Números Fuzzy Triangulares (TFNs) para capturar a incerteza e a variabilidade dos recursos dos servidores \gls{MEC} em tempo de decisão, sem a necessidade de uma fase de treinamento prévio. A política resultante determina, para cada tarefa gerada pelo veículo, se o processamento deve ocorrer localmente na unidade de bordo (\gls{OBU}) ou ser descarregado para o servidor de borda fixo, com base na pontuação de proximidade relativa calculada pelo \textit{Fuzzy}-\gls{TOPSIS} em função do tempo de resposta e do consumo energético. Avaliado em um simulador com heterogeneidade computacional, o FOFF demonstrou superioridade sobre métodos gulosos (GTT), heurísticas particionadas (FP-Sched) e abordagens baseadas em algoritmos genéticos (HOFF), alcançando reduções no consumo energético de até 72,11\%.
+Nessa mesma direção, o trabalho de~\cite{vieira2025} propõe a política de descarregamento de tarefas \gls{FOFF}, voltada para redes \gls{VEC} habilitadas por \gls{5G} via comunicação \gls{V2I}. Em vez de recorrer a técnicas iterativas de aprendizado, o FOFF emprega o método de \gls{MCDM} \textit{Fuzzy}-\gls{TOPSIS} com Números Fuzzy Triangulares (TFNs) para capturar a incerteza e a variabilidade dos recursos dos servidores \gls{MEC} em tempo de decisão, sem a necessidade de uma fase de treinamento prévio. A política resultante determina, para cada tarefa gerada pelo veículo, se o processamento deve ocorrer localmente na \gls{OBU} ou ser descarregado para o servidor de borda fixo, com base na pontuação de proximidade relativa calculada pelo \textit{Fuzzy}-\gls{TOPSIS} em função do tempo de resposta e do consumo energético. Avaliado em um simulador com heterogeneidade computacional, o \gls{FOFF} demonstrou superioridade sobre métodos gulosos (GTT), heurísticas particionadas (FP-Sched) e abordagens baseadas em algoritmos genéticos (HOFF), alcançando reduções no consumo energético de até 72,11\%.
 
 \section*{Nuvens Veiculares}
 
@@ -123,11 +123,12 @@ As Nuvens Veiculares constituem o ambiente de execução cooperativo do paradigm
     \centering
     \Caption{\label{tab:padrao_comunicacao}Resumo dos aspectos de Padrão de Comunicação, Servidor e Condições de Ambiente dos trabalhos relacionados}
     \renewcommand{\arraystretch}{1.2}
-    \resizebox{\textwidth}{!}{
-    \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+    \small
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|c|c|c|c|c|c|c|c|}
         \hline
-        \multirow{2}{*}{Referência} & \multicolumn{2}{c|}{Tecnologia} & \multicolumn{3}{c|}{Servidor} & Observabilidade Parcial & \multirow{2}{*}{Canal Perfeito} & Carga de Trabalho \\ 
-                                             & \gls{V2I} & \textit{Sidelink} (\gls{V2V}) & \gls{MEC} & Nuvens Veiculares & Nuvem & (Incerteza de Estado) & & (Diferentes regimes) \\ \hline
+        \multirow{2}{*}{Referência} & \multicolumn{2}{c|}{Tecnologia} & \multicolumn{3}{c|}{Servidor} & \shortstack{Observabilidade\\Parcial} & \multirow{2}{*}{\shortstack{Canal\\Perfeito}} & \shortstack{Carga de\\Trabalho} \\ \cline{2-6}
+                                             & \gls{V2I} & \shortstack{\textit{Sidelink}\\(\gls{V2V})} & \gls{MEC} & \shortstack{Nuvens\\Veiculares} & Nuvem & \shortstack{(Incerteza\\de Estado)} & & \shortstack{(Diferentes\\regimes)} \\ \hline
        ~\cite{Moghaddasi2023} & \checkmark & & \checkmark & & & & \checkmark & \checkmark \\ \hline
        ~\cite{sidwini}           & \checkmark & & \checkmark & & \checkmark & & \checkmark & \\ \hline
        ~\cite{li2025}                 & & \checkmark & \checkmark & & & & \checkmark & \\ \hline
@@ -141,14 +142,13 @@ As Nuvens Veiculares constituem o ambiente de execução cooperativo do paradigm
        ~\cite{long2025}             & \checkmark & \checkmark & & \checkmark & \checkmark & & \checkmark & \\ \hline
        ~\cite{abbas2025}           & \checkmark & & & \checkmark & & & \checkmark & \\ \hline
        ~\cite{vieira2025}      & \checkmark & & \checkmark & & & \checkmark & \checkmark & \\ \hline
-    \end{tabular}
-    }
+    \end{tabularx}
     \Fonte{Elaborado pelo autor}
 \end{table}
 
 Analisando a Tabela~\ref{tab:padrao_comunicacao}, constata-se forte tendência de padronização de tecnologias celulares avançadas para comunicação veicular. Grande parte dos trabalhos recentes analisados concentra-se na utilização de conectividade \gls{V2I} via redes \gls{5G} e \gls{6G}. Em relação à comunicação entre os nós, embora o padrão \gls{C-V2X} englobe diferentes interfaces, diversos trabalhos referem-se estritamente à utilização das interfaces \textit{Sidelink} destas comunicações para troca direta de dados (\gls{V2V}). Já em relação à infraestrutura, a adoção de servidores \gls{MEC} centralizados em unidades \gls{RSU} ainda é predominante, mas observa-se tendência crescente de pesquisas que exploram o ambiente de Nuvens Veiculares, constituinte do paradigma \gls{VEC}, tratando os próprios veículos como provedores de recursos. Trabalhos como os de~\cite{liu2025} e~\cite{long2025} adotam arquiteturas colaborativas integrando \gls{MEC} com nuvem e Nuvens Veiculares com nuvem, respectivamente.
 
-Outro aspecto identificado refere-se ao tratamento da observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Com exceção de~\cite{vieira2025}, em que Números Fuzzy Triangulares (TFNs) são empregados para modelar explicitamente a imprecisão dos recursos disponíveis nos servidores \gls{MEC}, os demais trabalhos identificados modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de \gls{CPU} dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos demais trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
+Outro aspecto identificado refere-se ao tratamento da observabilidade parcial, caracterizada na tabela pela coluna "Incerteza de Estado". Com exceção de~\citeonline{vieira2025}, em que Números Fuzzy Triangulares (TFNs) são empregados para modelar explicitamente a imprecisão dos recursos disponíveis nos servidores \gls{MEC}, os demais trabalhos identificados modelam o ambiente assumindo conhecimento perfeito do cenário, como a disponibilidade de \gls{CPU} dos servidores no exato momento da tomada de decisão. Dessa forma, agentes independentes podem decidir descarregar tarefas para um mesmo servidor simultaneamente com base em informações desatualizadas. Além disso, não há menção nos demais trabalhos sobre imperfeições do canal de comunicação. Portanto, assumir tais características cria políticas de decisão pouco robustas frente à dinâmica real.
 
 Outra limitação identificada diz respeito à modelagem de cargas de trabalho. Com exceção do estudo de~\cite{Moghaddasi2023}, os demais trabalhos avaliam seus algoritmos sob regimes de tráfego constantes ou com taxa de chegada fixa por episódio. Em cenários de tráfego reais, eventos imprevisíveis podem causar rajadas instantâneas (\textit{bursts}) no envio de pacotes críticos, alterando a distribuição de chegada das tarefas. Modelos \gls{DRL} treinados exclusivamente sem variação dinâmica de carga tendem a sofrer degradação de desempenho com tais mudanças de regime.
 
@@ -163,7 +163,7 @@ A modelagem de um cenário realista precisa lidar fundamentalmente com incerteza
 \subsection{Estratégia}
 Para contornar grande parte dos vieses supracitados, a literatura contemporânea aponta uma considerável substituição do uso de heurísticas e meta-heurísticas por soluções mais sofisticadas e adaptativas. A respeito desta transformação, destaca-se a utilização de \gls{DRL}, por conta de sua capacidade de aprimorar sequências de ações de longo prazo extraídas através de intensas interações com ambiente simulado.
 
-Antes da consolidação do \gls{DRL} como paradigma predominante, abordagens de Tomada de Decisão Multicritério (\gls{MCDM}) foram investigadas como alternativa para lidar com a natureza multiobjetivo e incerta do problema de descarregamento. O trabalho de~\cite{vieira2025} demonstrou a viabilidade do método \textit{Fuzzy}-\gls{TOPSIS} operando com Números Fuzzy Triangulares (TFNs) como mecanismo de decisão eficiente: sem incorrer em fase de treinamento, a solução computa pontuações de proximidade relativa para cada alternativa de execução --- local (\gls{OBU}) ou remota (\gls{MEC}) --- e seleciona a que melhor atende ao compromisso entre latência e consumo energético sob condições de incerteza. Os pesos dos critérios de decisão pertencem ao intervalo \(\left[0, 1\right]\) e refletem a importância relativa de cada métrica de desempenho, enquanto os TFNs capturam a imprecisão inerente às medições dos recursos dos servidores de borda. Contudo, essa classe de soluções apresenta uma limitação estrutural relevante: tanto os pesos dos critérios quanto os conjuntos fuzzy associados são pré-configurados antes da implantação e permanecem inalterados durante toda a execução. Quando o regime de tráfego sofre uma mudança abrupta --- por exemplo, devida a rajadas (\textit{bursts}) de requisições críticas ou à degradação súbita da disponibilidade de servidores --- a política \textit{Fuzzy}-\gls{TOPSIS} não dispõe de mecanismo autônomo para recalibrar seus parâmetros, o que compromete a qualidade das decisões nesses cenários imprevistos. Essa rigidez constitui a motivação central da evolução metodológica proposta neste trabalho: ao integrar o raciocínio \textit{fuzzy}, responsável pela quantificação da incerteza pontual, com a capacidade de exploração contínua e atualização de política proporcionada pelo algoritmo \gls{SAC} de \gls{DRL}, obtém-se um agente capaz de se adaptar a novos regimes de tráfego sem re-parametrização manual, combinando a eficiência multicritério de um com a plasticidade adaptativa do outro.
+Antes da consolidação do \gls{DRL} como paradigma predominante, abordagens de \gls{MCDM} foram investigadas como alternativa para lidar com a natureza multiobjetivo e incerta do problema de descarregamento. O trabalho de~\cite{vieira2025} demonstrou a viabilidade do método \textit{Fuzzy}-\gls{TOPSIS} operando com Números Fuzzy Triangulares (TFNs) como mecanismo de decisão eficiente: sem incorrer em fase de treinamento, a solução computa pontuações de proximidade relativa para cada alternativa de execução --- local (\gls{OBU}) ou remota (\gls{MEC}) --- e seleciona a que melhor atende ao compromisso entre latência e consumo energético sob condições de incerteza. Os pesos dos critérios de decisão pertencem ao intervalo \(\left[0, 1\right]\) e refletem a importância relativa de cada métrica de desempenho, enquanto os TFNs capturam a imprecisão inerente às medições dos recursos dos servidores de borda. Contudo, essa classe de soluções apresenta uma limitação estrutural relevante: tanto os pesos dos critérios quanto os conjuntos fuzzy associados são pré-configurados antes da implantação e permanecem inalterados durante toda a execução. Quando o regime de tráfego sofre uma mudança abrupta --- por exemplo, devida a rajadas (\textit{bursts}) de requisições críticas ou à degradação súbita da disponibilidade de servidores --- a política \textit{Fuzzy}-\gls{TOPSIS} não dispõe de mecanismo autônomo para recalibrar seus parâmetros, o que compromete a qualidade das decisões nesses cenários imprevistos. Essa rigidez constitui a motivação central da evolução metodológica proposta neste trabalho: ao integrar o raciocínio \textit{fuzzy}, responsável pela quantificação da incerteza pontual, com a capacidade de exploração contínua e atualização de política proporcionada pelo algoritmo \gls{SAC} de \gls{DRL}, obtém-se um agente capaz de se adaptar a novos regimes de tráfego sem re-parametrização manual, combinando a eficiência multicritério de um com a plasticidade adaptativa do outro.
 
 De fato, o escopo científico atual tem explorado ativamente o uso de diversas estratégias  integradas ao \gls{DRL}. Uma delas é a integração com aprendizado \gls{FL}, que permite o treinamento colaborativo de modelos \gls{DRL} entre múltiplos agentes, preservando a privacidade dos dados locais~\cite{chen2025}. Outra frente mescla esquemas \gls{DRL} com tecnologia \gls{DT}, possibilitando que soluções sejam testadas e simuladas virtualmente antes da execução no ambiente físico~\cite{wei2024}. Para lidar com o vasto espaço de estados e com cenários altamente variáveis, pesquisas recentes fundem arquiteturas \gls{DRL} com redes \gls{GNN} para capturar de forma eficiente as relações e as dependências espaciais entre os nós veiculares~\cite{wang2024, tang2024}. Adicionalmente, métodos \gls{TL} têm sido utilizados para acelerar a adaptação de veículos recém-conectados em infraestruturas baseadas em \gls{SDN}, em que a separação entre os planos de controle e de dados facilita a gerência global~\cite{baker2024}. Por fim, destaca-se a incorporação da teoria de otimização de Lyapunov acoplada a métodos \gls{DRL} para garantir matematicamente a estabilidade contínua das filas de tarefas a longo prazo~\cite{kumar2023}.
 
@@ -182,8 +182,8 @@ No que tange aos modelos, existem diversos trabalhos focados em otimizar a forma
     \centering
     \Caption{\label{tab:drl_action_spaces}Classificação dos algoritmos clássicos de \gls{DRL} quanto à adequação ao espaço de ação}
     \renewcommand{\arraystretch}{1.3}
-    \resizebox{\textwidth}{!}{
-    \begin{tabular}{|l|c|l|}
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|c|>{\raggedright\arraybackslash}X|}
         \hline
         Algoritmo \gls{DRL} & Espaço de Ação & Referência Base \\ \hline
         \gls{DQN} (\textit{Deep Q-Network}) & Discreto &~\cite{uddin2025, farimani2024} \\ \hline
@@ -194,8 +194,7 @@ No que tange aos modelos, existem diversos trabalhos focados em otimizar a forma
         \gls{PPO} (\textit{Proximal Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
         TRPO (\textit{Trust Region Policy Optimization}) & Discreto e Contínuo &~\cite{uddin2025} \\ \hline
         \gls{SAC} (Soft \textit{Actor}-\textit{Critic}) & Contínuo &~\cite{uddin2025, farimani2024} \\ \hline
-    \end{tabular}
-    }
+    \end{tabularx}
     \Fonte{Elaborado pelo autor}
 \end{table}
 
@@ -293,12 +292,12 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 %     \end{tabular} 
 % \end{table}
 
-% O estudo de~\cite{mondal2025} aborda o desafio de utilizar Aprendizado por Reforço Profundo (\gls{DRL}), especificamente um controlador DDQN, para orquestrar de forma inteligente o \textit{handover} e a seleção entre as interfaces \gls{Uu} (celular) e \gls{PC5} (sidelink). 
+% O estudo de~\cite{mondal2025} aborda o desafio de utilizar \gls{DRL}, especificamente um controlador DDQN, para orquestrar de forma inteligente o \textit{handover} e a seleção entre as interfaces \gls{Uu} (celular) e \gls{PC5} (sidelink). 
 
 % Por sua vez,~\cite{heo2026} foca no \textit{streaming} de vídeo interveicular, propondo um framework híbrido que utiliza a via \gls{V2V} como primária e a via \gls{V2N2V} (apoiada por \gls{MEC}) para retransmissões seletivas, garantindo uma latência sob o limite crítico de 50 ms. 
 
 
-% apresenta o framework \gls{3M}, que integra o Gerenciamento de Mobilidade, tecnologia Multi-RAT e Aprendizado de Máquina (\gls{ML}), buscando garantir um suporte hiper-rápido e ultraconfiável para redes veiculares \gls{6G}, com a projeção de latências que podem chegar a $< 1$ ms para comunicações críticas.
+% apresenta o framework \gls{3M}, que integra o Gerenciamento de Mobilidade, tecnologia Multi-RAT e \gls{ML}, buscando garantir um suporte hiper-rápido e ultraconfiável para redes veiculares \gls{6G}, com a projeção de latências que podem chegar a $< 1$ ms para comunicações críticas.
 % \begin{table}[h]
 % \centering
 % \caption{Comparativa das Abordagens de \textit{Descarregamento de Tarefas} Assistidas por MEC}
@@ -310,7 +309,7 @@ Conforme discutido ao longo deste capítulo, as abordagens baseadas em \gls{DRL}
 
 % Zhao et al.~\cite{zhao2025} & \gls{VEC} (\gls{MEC} em \gls{RSU}) & \gls{DQN} + Algoritmo \gls{KM} + \gls{LSTM} & Otimiza o descarregamento de múltiplas tarefas na borda. Utiliza detecção de distância (via predição) para evitar falhas por \textit{handover} frequente entre \gls{RSU}s, focando em minimizar a latência total. \\ \hline
 
-% Wu et al.~\cite{wu2025} & \gls{MEC} (5G/6G) & \gls{GAN} + Aprendizado Federado (\gls{FL}) & Foca em implantação leve e eficiência energética. Usa o \gls{MEC} para gerenciar \gls{FL} e \gls{GAN} na expansão de amostras, resolvendo o desequilíbrio de dados sem sobrecarregar a rede. \\ \hline
+% Wu et al.~\cite{wu2025} & \gls{MEC} (5G/6G) & \gls{GAN} + \gls{FL} & Foca em implantação leve e eficiência energética. Usa o \gls{MEC} para gerenciar \gls{FL} e \gls{GAN} na expansão de amostras, resolvendo o desequilíbrio de dados sem sobrecarregar a rede. \\ \hline
 
 % Mohammad et al.~\cite{mohammad2025} & EMEC (\gls{MEC} para \gls{IoV}) & \gls{DRL} + \gls{PSO} & Apresenta framework EMEC-IoVTOF que delega tarefas para a borda visando reduzir latência e energia. O uso do \gls{PSO} ajuda as decisões de \gls{DRL} a fugirem de armadilhas de ótimos locais. \\ \hline
 
