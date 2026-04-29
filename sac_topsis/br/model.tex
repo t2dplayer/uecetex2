@@ -1,5 +1,3 @@
-Nessa seção são apresentados os principais modelos matemáticos utilizados para representar o ambiente simulado e os aspectos relacionados ao descarregamento de tarefas, englobando modelos de comunicação celular, consumo energético e função objetivo. Para facilitar a leitura e entendimento é apresentada a Tabela \ref{tab:notations} com um resumo das principais notações utilizadas.
-
 \begin{table}[ht]
 \centering
 \caption{Resumo das Notações Utilizadas}
@@ -9,93 +7,112 @@ Nessa seção são apresentados os principais modelos matemáticos utilizados pa
 \toprule
 \textbf{Símbolo} & \textbf{Descrição} \\
 \midrule
-\multicolumn{2}{l}{\textit{Modelo de Rede e Sistema}} \\
-$v_0$ & Veículo cliente (gerador de tarefas) \\
-$\mathcal{V}(t)$ & Conjunto de veículos vizinhos no tempo $t$ \\
-$B_{\mathrm{V2I}}, B_{\mathrm{V2V}}$ & Largura de banda de uplink (V2I) e sidelink (V2V) \\
-$Q_{\mathrm{RSU}}, Q_v$ & Capacidade da fila no RSU e no veículo $v$ \\
-\midrule
 \multicolumn{2}{l}{\textit{Modelo de Tarefa}} \\
-$\tau_j$ & Tarefa $j$ definida por $(C_j, D_j, s_j)$ \\
-$C_j$ & Complexidade de CPU da tarefa $j$ (ciclos) \\
-$D_j$ & Prazo (deadline) da tarefa $j$ (segundos) \\
-$s_j$ & Tamanho dos dados de entrada da tarefa $j$ (bits) \\
-$m$ & Modo de execução ($0$: local, $1$: RSU, $2$: V2V) \\
-$f^{(m)}$ & Frequência de CPU no modo $m$ \\
+$\mathcal{T}_i$ & Tarefa $i$ definida por $(c_i, d_i)$ \\
+$c_i$ & Complexidade computacional da tarefa $i$ (em ciclos) \\
+$d_i$ & Prazo máximo (\textit{deadline}) da tarefa $i$ (em \unit{\second}) \\
+$m$ & Modo de execução ($l$: local, $r$: remoto) \\
+$f^m$ & Frequência de operação da \acrotip{CPU} no modo $m$ (em \unit{\hertz}) \\
 \midrule
-\multicolumn{2}{l}{\textit{Métricas de Desempenho}} \\
-$\mathrm{JCT}_j^{(m)}$ & Tempo de conclusão (Job Completion Time) no modo $m$ \\
-$t_j^{\mathrm{tx},(m)}$ & Tempo de transmissão (upload) dos dados \\
-$t_j^{\mathrm{fila},(m)}$ & Tempo de espera na fila do destino \\
-$E_j^{(m)}$ & Energia consumida pela tarefa $j$ no modo $m$ \\
-$\alpha_c, V, P_{\mathrm{TX}}$ & Parâmetros físicos (capacitância, tensão, potência TX) \\
+\multicolumn{2}{l}{\textit{Dinâmica Térmica e Energia}} \\
+$P_{\mathrm{cpu}}^m$ & Potência elétrica consumida pela \acrotip{CPU} (em \unit{\watt}) \\
+$k_1, k_2, k_3$ & Coeficientes de potência (dinâmica, fuga e estática) \\
+$T_p(t)$ & Temperatura do \textit{chip} no instante $t$ (em \unit{\celsius}) \\
+$T_{\mathrm{amb}}$ & Temperatura ambiente externa (em \unit{\celsius}) \\
+$T_{p,max}$ & Limite de temperatura crítico (\textit{throttling}) (em \unit{\celsius}) \\
+$R'_p, C_p$ & Resistência (\unit{\celsius\per\watt}) e capacitância (\unit{\joule\per\celsius}) térmicas \\
 \midrule
-\multicolumn{2}{l}{\textit{Objetivo de Otimização}} \\
-$\Phi_j$ & Contribuição de QoS da tarefa $j$ (função de custo) \\
+\multicolumn{2}{l}{\textit{Métricas e Otimização}} \\
+$L_i^m$ & Tempo de processamento da tarefa no modo $m$ (em \unit{\second}) \\
+$\mathrm{JCT}_i$ & Tempo total de conclusão da tarefa (em \unit{\second}) \\
+$E_i^m$ & Energia total consumida para processar a tarefa $i$ (em \unit{\joule}) \\
+$\Phi_i$ & Contribuição de \acrotip{QoS} da tarefa $i$ \\
 $\alpha, \beta, \gamma$ & Pesos de latência, energia e penalidade de prazo \\
-$\hat{\tau}$ & Taxa de cumprimento de prazos (Success Rate) \\
 \bottomrule
 \end{tabularx}}
 \end{table}
 
-\subsection{Modelo de Rede}
+Nesta seção, são apresentados os principais modelos matemáticos que fundamentam a solução proposta, englobando as dinâmicas de descarregamento de tarefas e latência, a dinâmica térmica (\textit{thermal throttling} e resfriamento), o consumo energético, a comunicação celular e veicular, e a definição da função objetivo. Para facilitar a leitura e a compreensão formal, a Tabela~\ref{tab:notations} sumariza as principais notações empregadas.
 
-Consideramos um ambiente \acrotip{VEC} heterogêneo em um cenário urbano, composto por uma \acrotip{RSU} fixa e um conjunto de veículos vizinhos $\mathcal{V}(t)$ que se deslocam segundo um modelo de mobilidade urbana. O veículo cliente $v_0$ dispõe de duas interfaces de comunicação para descarregamento:
+\subsection{Modelo de Tarefa, Latência e Dinâmica Térmica}
 
-\begin{itemize}[nosep,leftmargin=*]
-    \item \textbf{V2I (Vehicle-to-Infrastructure):} Utiliza tecnologia \acrotip{5G} NR (banda n78) com frequência portadora de \SI{3{,}5}{\giga\hertz} e largura de banda $B_{\mathrm{V2I}} = \SI{20}{\mega\hertz}$. O modelo de perda de percurso segue a norma 3GPP TR 38.901 UMa LoS, considerando a altura da \acrotip{RSU} ($h_{\mathrm{BS}}=\SI{10}{\meter}$) e dos veículos ($h_{\mathrm{UT}}=\SI{1{,}5}{\meter}$).
-    \item \textbf{V2V (Vehicle-to-Vehicle):} Utiliza sidelink PC5 (NR-V2X) operando em \SI{5{,}9}{\giga\hertz} com largura de banda $B_{\mathrm{V2V}} = \SI{20}{\mega\hertz}$. A propagação é modelada conforme a norma 3GPP TR 37.885 Urban LoS.
-\end{itemize}
+Cada tarefa é caracterizada pelo par $\mathcal{T}_i=(c_i, d_i)$, onde $c_i$ representa a complexidade da tarefa (em ciclos de \acrotip{CPU}) e $d_i$ denota o prazo aceitável para sua conclusão~\cite{liu2019, uddin2025, guo2024deep, cao2024survey}. A decisão de descarregamento de tarefas é binária (processamento local ou remoto) com o objetivo de reduzir a complexidade computacional da política de controle, o que favorece a sua aplicabilidade em sistemas de tempo real~\cite{liu2019, fofana2024}.
 
-A taxa de transmissão instantânea para ambos os links é obtida pela capacidade de Shannon, $R = B \log_2(1 + \mathrm{SNR})$, onde a relação sinal-ruído ($\mathrm{SNR}$) integra a potência de transmissão ($P_{\mathrm{TX}} = \SI{0{,}2}{\watt}$), o ganho do canal e o ruído térmico AWGN calculado com base na temperatura de ruído (\SI{290}{\kelvin}) e na figura de ruído do receptor (\SI{5}{\decibel} para V2I e \SI{9}{\decibel} para V2V). A \acrotip{RSU} e cada veículo $v \in \mathcal{V}(t)$ gerenciam filas de serviço com capacidade $Q_{\max} = 25$ para o processamento de tarefas pendentes.
+A latência de execução é modelada pela proporção entre a carga de trabalho total ($c_i$) e a capacidade de processamento do dispositivo ($f^m$). Consequentemente, o tempo de resposta para o processamento da tarefa $i$ no modo selecionado $m \in \{local, remoto\}$ é expresso pela Equação~\ref{eq:latency} e o tempo total para a conclusão da tarefa (\acrotip{JCT}) é dado pela Equação~\ref{eq:jct}:
 
-\subsection{Modelo de Tarefa}
-
-Cada tarefa $\tau_j = (C_j, D_j, s_j)$ é caracterizada por sua complexidade
-de CPU $C_j$ (ciclos), prazo $D_j$ (segundos) e tamanho de dados de entrada
-$s_j$ (bits).
-Três modos de execução estão disponíveis:
-\begin{itemize}[nosep,leftmargin=*]
-  \item \textbf{Local ($m=0$):} executado em $v_0$ com frequência $f_{\mathrm{loc}}$.
-  \item \textbf{\acrotip{RSU} ($m=1$):} carregado ao \acrotip{RSU} e executado em $f_{\mathrm{RSU}}$.
-  \item \textbf{\acrotip{V2V} ($m=2$):} descarregado a um veículo vizinho $v^* \in \mathcal{V}(t)$.
-\end{itemize}
-Um modo $m$ de descarregamento é viável se o tempo de contato com o destino for suficiente para a transmissão dos dados de entrada e recepção dos resultados.
-
-\subsection{Modelo de Latência}
-
-O Tempo de Conclusão de Tarefa do modo $m$ para a tarefa $\tau_j$ é
 \begin{equation}
-  \mathrm{JCT}_j^{(m)} = t_j^{\mathrm{tx},(m)} + t_j^{\mathrm{fila},(m)}
-                         + \frac{C_j}{f^{(m)}},
-  \label{eq:jct}
+\label{eq:latency}
+L_i^m = \frac{c_i}{f^m}
 \end{equation}
-onde $t_j^{\mathrm{tx},(m)}$ é o tempo de transmissão (upload) e
-$t_j^{\mathrm{fila},(m)}$ é o tempo de espera residual na fila do destino,
-estimado como o tempo de execução restante das tarefas já na fila.
+
+\begin{equation}
+\mathrm{JCT}_i = t_i^{\mathrm{upload}} + t_i^{\mathrm{fila}} + L_i^m + t_i^{\mathrm{download}},
+\label{eq:jct}
+\end{equation}
+
+em que $t_i^{\mathrm{upload}}$ é o tempo de transmissão da tarefa $i$, $t_i^{\mathrm{fila}}$ é o tempo de espera residual na fila de processamento (estimado como o tempo de execução restante das tarefas já agendadas), $L_i^m$ é o tempo de execução da tarefa no modo selecionado $m$ e $t_i^{\mathrm{download}}$ é o tempo necessário para o download dos resultados. Para o modo de processamento local, os tempos de transmissão de \textit{upload} e \textit{download} são nulos.
+
+Para que o cálculo do \acrotip{JCT} seja mais realista, é necessário considerar o impacto do mecanismo de segurança térmica do dispositivo. A execução contínua de tarefas eleva a temperatura do processador, o que pode forçar o sistema a reduzir a frequência operacional $f^m$ para evitar o superaquecimento físico do dispositivo.
+
+Nesse contexto, a potência elétrica dissipada pela \acrotip{CPU} ($P_{\mathrm{cpu}}(f^m)$) é calculada pelo modelo polinomial de frequência proposto por Silva et al.~\cite{silva2022analytical}, dada pela Equação~\ref{eq:power_cpu}:
+
+\begin{equation}
+\label{eq:power_cpu}
+P_{\mathrm{cpu}}(f^m) = k_1 (f^m)^3 + k_2 f^m + k_3
+\end{equation}
+em que $k_1$ e $k_2$ representam as constantes de potência dinâmica e de fuga de corrente (\textit{leakage}), respectivamente. A constante $k_3$ indica o consumo estático mínimo da arquitetura. 
+
+A temperatura instantânea do processador $T_p(t)$, após um intervalo de tempo sob uma dissipação de potência constante $P_{\mathrm{cpu}}(f^m)$, segue o modelo de circuito térmico \acrotip{RC} de Rao e Vrudhula~\cite{rao2007performance}, expresso pela Equação~\ref{eq:temp_evolution}:
+
+\begin{equation}
+\label{eq:temp_evolution}
+\begin{split}
+T_p(t) &= P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}} \\
+&\quad + (T_{p0} - (P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}})) e^{-\frac{t}{R'_p C_p}}
+\end{split}
+\end{equation}
+em que $T_{p0}$ é a temperatura no instante inicial, $T_{\mathrm{amb}}$ é a temperatura ambiente, e $R'_p$ e $C_p$ são parâmetros que representam a resistência e a capacitância térmicas do \acrotip{CPU}, respectivamente.
+
+Essa modelagem permite representar de forma mais realista os ciclos de aquecimento e resfriamento do processador. No estado de aquecimento, a potência exigida ($P_{\mathrm{cpu}} = P_{max}'$) é alta, gerando um aumento exponencial na temperatura. Para proteger o processador, o modelo projeta matematicamente o instante exato $t_m$ em que a temperatura atingirá o limite crítico ($T_{p,max}$). Derivando a Equação~\ref{eq:temp_evolution}, obtém-se a restrição de segurança (Equação~\ref{eq:thermal_throttling}):
+
+\begin{equation}
+\label{eq:thermal_throttling}
+t_m = R'_p C_p \ln\left(\frac{P_{max}' R'_p + T_{\mathrm{amb}} - T_{p0}}{P_{max}' R'_p + T_{\mathrm{amb}} - T_{p,max}}\right)
+\end{equation}
+
+Se o tempo de processamento exceder $t_m$, a temperatura fatalmente alcançará a fronteira máxima $T_{p,max}$. Nesse limiar, o mecanismo de contenção térmica (\textit{thermal throttling}) é acionado, forçando a redução da frequência $f^m$ de pico para uma frequência de estabilização térmica segura, freando a curva de dissipação de calor, ao custo de estender significativamente a latência $L_i^m$.
+
+Quando a fila de processamento esvazia, a \acrotip{CPU} cessa a atividade computacional e $f^m$ zera de forma virtual. Nesse estado, a potência dissipada cai de $P_{max}'$ para $P_{\mathrm{cpu}} = k_3$, que representa unicamente o consumo estático da arquitetura. Inserindo essa potência mínima subtrativa na Equação~\ref{eq:temp_evolution}, a temperatura assintótica cai drasticamente, tornando o diferencial de resfriamento $(T_{p0} - (k_3 \cdot R'_p + T_{\mathrm{amb}}))$ fortemente positivo. Portanto, o decaimento exponencial age como amortecedor, reduzindo continuamente a temperatura $T_p(t)$ em direção ao novo limiar basal seguro de repouso durante todo o tempo do \textit{intervalo idle}.
+
 
 \subsection{Modelo de Energia}
 
-A energia consumida pelo modo $m$ é
+
+Dessa forma, a energia total consumida $E_i^m$ durante todo o ciclo de vida da tarefa $i$ no modo $m \in \{l, r\}$ engloba de forma coerente a potência instantânea do processamento e o custo das interfaces de rede, conforme a Equação~\ref{eq:energy}:
+
 \begin{equation}
-  E_j^{(m)} = \alpha_c^{(m)} \bigl[V^{(m)}\bigr]^2 C_j
-             + P_{\mathrm{TX}}^{(m)}\,t_j^{\mathrm{tx},(m)},
-  \label{eq:energy}
+\label{eq:energy}
+E_i^m = P_{\mathrm{cpu}}^m(f^m) \cdot L_i^m + P_{\mathrm{tx}}^m \cdot t_i^{\mathrm{trans},m}
 \end{equation}
-onde $\alpha_c^{(m)}$ é a capacitância do chip, $V^{(m)}$ é a tensão de
-alimentação na frequência $f^{(m)}$ e $P_{\mathrm{TX}}^{(m)}$ é a potência
-de transmissão.
-Para o modo local, o termo de transmissão é nulo.
+onde $P_{\mathrm{tx}}^m$ denota a potência de transmissão constante e $t_i^{\mathrm{trans},m}$ representa o tempo total de transmissão da tarefa (englobando \textit{upload} e \textit{download}). Para o modo de processamento local ($m=l$), a interface de rede não é acionada, tornando o termo de transmissão estritamente nulo ($P_{\mathrm{tx}}^l = 0$).
+
+
+\subsection{Modelo de Comunicação \acrotip{V2I} e \acrotip{V2V}}
+
+A modelagem da comunicação \acrotip{V2I} e \acrotip{V2X} segue as definições de~\cite{3gpp38901, yan2024towards}. O enlace \acrotip{V2I} opera na frequência de \SI{3.5}{\giga\hertz} com largura de banda de \SI{50}{\mega\hertz}, potência de transmissão de \SI{23}{dBm} e antenas assimétricas (\SI{1,5}{\meter} nos veículos e \SI{25}{\meter} na estação rádio base). O valor de desvanecimento adotado é de \SI{4}{dBm} com um atraso de processamento (\textit{jitter}) de \SI{0,1}{\milli\second}. Para a interface \acrotip{V2X} (\textit{Sidelink}), a frequência central é de \SI{5.9}{\giga\hertz}, com largura de banda de \SI{10}{\mega\hertz}, desvanecimento de \SI{3}{dBm} e atraso de processamento de \SI{0,25}{\milli\second}. Ambas as interfaces adotam o modelo urbano sem linha de visada (Urban NLOS) do 3GPP~\cite{3gpp38901}, no qual a perda de percurso (\acrotip{PL}, do inglês \textit{Path Loss}) expressa em dB é determinada pela Equação~\ref{eq:pathloss}:
+
+\begin{equation}
+\label{eq:pathloss}
+PL(d, f) = 35{,}3 \log_{10}(d) + 21{,}3 \log_{10}(f) + 22{,}4
+\end{equation}
+onde $d$ representa a distância tridimensional entre o transmissor e o receptor em metros, e $f$ é a frequência de operação em \unit{\giga\hertz}. Esses parâmetros garantem uma representação realista da atenuação de sinal durante a troca de dados entre os nós candidatos ao descarregamento, como o servidor de borda (\acrotip{VEC}) e veículos vizinhos.
 
 \subsection{Objetivo de Otimização}
 
-A contribuição de \acrotip{QoS} por tarefa é
+A formulação da contribuição de \acrotip{QoS} para a tarefa $i$ é expressa pela Equação~\ref{eq:obj}:
+
 \begin{equation}
-  \Phi_j = \alpha\,\mathrm{JCT}_j + \beta\,E_j
-            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j],
-  \label{eq:obj}
+\label{eq:obj}
+\Phi_i = \alpha \cdot \mathrm{JCT}_i + \beta \cdot E_i + \gamma \cdot \mathbf{1}[\mathrm{JCT}_i > d_i],
 \end{equation}
-com parâmetros configuráveis de peso (por padrão $\alpha=\beta=0{,}35$) e uma constante de penalidade por violação de prazo $\gamma=0{,}015$.
-O objetivo do sistema é minimizar $\sum_j \Phi_j$ maximizando a
-taxa de cumprimento de prazo
-$\hat{\tau} = |\{j : \mathrm{JCT}_j \le D_j\}|/N$.
+que incorpora parâmetros configuráveis de peso (por padrão, $\alpha = \beta = 0{,}35$) e uma constante de penalidade rigorosa por violação de prazo ($\gamma = 0{,}015$). O objetivo global do sistema é minimizar o custo agregado $\sum_i \Phi_i$ enquanto maximiza ativamente a taxa de cumprimento de prazo, definida como $\hat{\tau} = |\{i : \mathrm{JCT}_i \le d_i\}| / N$.
