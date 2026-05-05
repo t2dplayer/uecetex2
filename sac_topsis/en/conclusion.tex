@@ -1,0 +1,10 @@
+This article presented \acrotip{SAC}-\acrotip{TOPSIS}, a hybrid architecture for deadline-aware task offloading in \acrotip{VEC} networks. The central innovation is using \acrotip{TOPSIS} not as an autonomous decision-maker, but as a state engineering module that converts a variable-sized, multi-criteria set of candidates into a fixed, scale-invariant 6D representation. A maximum entropy \acrotip{SAC} agent trained on this representation learns a binary local/offloading policy that:
+(i) achieves a deadline fulfillment rate of $44.36\%$, the highest among all \acrotip{DRL} policies and heuristics evaluated across 601 test scenarios;
+(ii) reaches an \acrotip{SWQ} index of $0.1450$;
+(iii) generalizes zero-shot to unseen vehicular densities ($10$–$\SI{30}{tasks\per\second}$) without retraining;
+and
+(iv) avoids the mode collapses of PPO-TOPSIS (always-local) and SAC-Base (always-V2V).
+
+A cross-family ablation study confirms that \acrotip{TOPSIS} state compression is the primary driver of performance, as it improves deadline fulfillment for all tested \acrotip{DRL} families: \acrotip{SAC} ($+39.9$\,pp), \acrotip{TD3} ($+1.4$\,pp), and \acrotip{PPO} ($+0.3$\,pp), regardless of their base learning algorithm. The residual advantage of \acrotip{SAC} over \acrotip{TD3} ($+1.35$\,pp) is a side effect of entropy-regularized exploration, which prevents the policy from collapsing into the conservative always-local strategy that affects off-policy deterministic methods at higher densities.
+
+\paragraph{Future work.} We plan to extend the \acrotip{TOPSIS} module to Fuzzy-TOPSIS, incorporating linguistic uncertainty into the criteria weights to handle delayed telemetry and noisy channel estimates. We will also investigate multi-agent extensions where each vehicle in $\mathcal{V}(t)$ runs its own \acrotip{SAC}-\acrotip{TOPSIS} agent with decentralized coordination. Finally, hardware-in-the-loop evaluation with real \acrotip{5G} sidelink radios is planned to validate the energy model under physical channel conditions.

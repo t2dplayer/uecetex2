@@ -1,0 +1,264 @@
+\documentclass{beamer}
+\input{setup.tex}
+
+% Definir color verde
+% \definecolor{beamer_color}{RGB}{64, 145, 63}
+% \definecolor{backframe_color}{RGB}{228, 242, 232}
+
+% Definir color morado
+\definecolor{beamer_color}{RGB}{0,0,153} 
+\definecolor{backframe_color}{RGB}{235, 196, 245}
+
+
+\begin{document}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\begin{frame}{Agenda}
+    \tableofcontents
+\end{frame}
+
+\section{O Desafio}
+
+\begin{frame}{O Desafio}
+    \vspace{0.8cm}
+    \centering
+    \LARGE \bfseries
+    Como decidir o descarregamento se a\\[0.4cm]
+    \tikz[baseline=(box.base)] \node[fill=blue!15, rounded corners=2pt, inner sep=5pt] (box) {topologia da rede}; muda\\[0.4cm]
+    na mesma hora?
+\end{frame}
+
+%%\section{Agenda}
+
+\section{Introdução}
+
+%%################## Slide INTRODUÇÃO ###################
+\begin{frame}{Computação Cooperativa e Offloading}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Heterogeneidade e Cooperação, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+                \scriptsize 
+                \textbf{Capacidades}: OBUIs possuem hardware e níveis de bateria distintos.\\
+                \textbf{Compartilhamento}: Veículos vizinhos podem ceder recursos ociosos.
+            \end{tcolorbox}
+            
+            \vspace{-0.1cm}
+            
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=A Estratégia de Offloading, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+                \scriptsize Essencial para superar gargalos locais de processamento em tarefas complexas e sensíveis ao atraso.
+            \end{tcolorbox}
+            
+            \vspace{-0.1cm}
+            
+            \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=O Desafio Crítico, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+                \scriptsize \textbf{Decisão}: Como e onde descarregar em topologias altamente dinâmicas e imprevisíveis?
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.2cm}
+            \includegraphics[width=\textwidth]{figuras/cenario.png}
+            
+            \vspace{0.1cm}
+            \begin{beamercolorbox}[wd=\textwidth, sep=4pt, center, rounded=true]{block body}
+                \scriptsize \textit{"O offloading não é apenas uma opção, mas uma necessidade em cenários de alta demanda."}
+            \end{beamercolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Limitações das Abordagens Tradicionais}
+    \begin{block}{Heurísticas e MCDM}
+        \begin{itemize}
+            \item Simplicidade computacional.
+            \item \textbf{Falha}: Avaliam apenas o estado instantâneo (sem visão de futuro).
+        \end{itemize}
+    \end{block}
+    
+    \begin{block}{Meta-heurísticas (Algoritmos Genéticos, PSO, etc.)}
+        \begin{itemize}
+            \item Busca global sólida em cenários estáticos.
+            \item \textbf{Falha}: Convergência lenta (incompatível com prazos de milissegundos).
+            \item \textbf{Inflexibilidade}: Precisam ser reiniciadas a cada mudança na topologia.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{O Desafio da Generalização}
+    \begin{itemize}
+        \item \textbf{Modelos Simplificados}: Cenários com número fixo de veículos não capturam a realidade.
+        \item \textbf{Degradação de Desempenho}: Mudanças súbitas na densidade invalidam políticas rígidas.
+        \item \textbf{Necessidade de Robustez}: Representações de estado que garantam a generalização sem necessidade de retreinamento constante.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Aprendizado por Reforço Profundo (DRL)}
+    \begin{itemize}
+        \item \textbf{Solução Natural}: Aprende políticas de controle mapeando observações em ações de longo prazo.
+        \item \textbf{Exploração Temporal}: Identifica padrões em tráfego, filas e mobilidade.
+        \item \alert{Fraqueza Estrutural}: Dependência de camadas de entrada com tamanho fixo.
+        \item \alert{Gargalo}: Exige retreinamento sempre que a quantidade de nós candidatos muda.
+    \end{itemize}
+\end{frame}
+
+
+% \section{Imagens}
+% %%################ Imagens #############
+% \begin{frame}{Imagens}
+%     Carregar imagem na pasta \texttt{figuras}. 
+
+%    A Figura \ref{fig:red_ramificada} mostra um exemplo de como inserir a imagem e referência.
+
+%     \begin{figure}[htbp]
+%         \centering
+%         \includegraphics[width = \textwidth]{figuras/BranchedScheme.pdf} % Usar a sua imagem
+%         \caption{Rede com $k$ ramificações.} % Referência
+%         \label{fig:red_ramificada} % Label
+%     \end{figure}
+% \end{frame}
+
+% %%################ Imagens Slide 2 #############
+% \begin{frame}{Imagens Slide 2}
+
+%     A Figura \ref{fig:comparacion_redes} mostra como inserir figuras lado a lado.
+
+%     \begin{figure}[htbp]
+%     \centering
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figuras/LSTM.pdf}
+%         \caption{Red LSTM}
+%         \label{fig:figura1a}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figuras/TDNN.pdf}
+%         \caption{Red TDNN}
+%         \label{fig:figura1b}
+%     \end{subfigure}
+%     \caption[Comparação entre redes neurais]{Comparação entre redes neurais}
+%     \label{fig:comparacion_redes}
+% \end{figure}
+    
+% \end{frame}
+
+
+% \section{Equações}
+% %%################ Equações #############
+% \begin{frame}{Equações}
+
+%     Exemplo de equação numerada:
+%     \begin{equation}
+%         \frac{\partial Q\left(z_k,t\right)}{\partial t}+gA_k\frac{\partial H\left(z_k,t\right)}{\partial z_k}+\mu_kQ\left(z_k,t\right)\left|Q\left(z_k,t\right)\right|+g\sin{a_k}=0,
+%         \label{eq:momentum}
+%     \end{equation}
+%     Uma equação numerada se referencia no texto usando seu \textit{label}: A Equação \eqref{eq:momentum} é conhecida como a Equação de Momentum.
+    
+%     Exemplo de uma equação sem numeração:
+%     $$\frac{\partial H\left(z_k,t\right)}{\partial t}+\frac{b_k^2}{gA_k}\frac{\partial Q\left(z_k,t\right)}{\partial z_k}=0.$$
+
+%     Exemplo da equação no texto: $\mu_k=\frac{fQ_k}{2D_kA_k}$  
+% \end{frame}
+
+
+% \section{Tabelas}
+% %%################ Tabelas #############
+% \begin{frame}{Tabelas}
+%     A Tabela \ref{tab:ModelosPerdida} mostra uma tabela de uma coluna. 
+    
+%     \begin{table}[htbp]
+%         \centering
+%          \caption{Fórmulas para o cálculo de perdas de carga em tubulações.\break}
+%          \vspace{-\baselineskip}
+%         \label{tab:ModelosPerdida}
+%         \small
+%         \begin{tabular}{ccc}
+%             \toprule
+%             \textbf{Perda} & \textbf{Coeficiente} $C$ & \textbf{Exponente} $\sigma$ \\
+%             \midrule
+%             Hazen-Williams & $4.727 \mathscr{H}^{-1.852}D^{-4.871}L$ & 1.852 \\
+%             Darcy-Weisbach & $0.0252f(\varepsilon, D, Q)D^{-5}L$ & 2 \\
+%             Chezy-Manning & $4.66n^2D^{-5.33}L$ & 2 \\
+%             \bottomrule
+%         \end{tabular}
+%     \end{table}
+    
+% \end{frame}
+
+
+% %%################ Tabelas Slide 2#############
+% \begin{frame}{Tabelas Slide 2}
+
+%     A Tabela \ref{Tab:Accesorios} mostra um exemplo de duas colunas.
+    
+%     \begin{table}[htbp]
+%         \centering
+%         \caption{Acessórios}
+%         \vspace{-\baselineskip}
+%         \label{Tab:Accesorios}
+%         \null\hfill
+%         \scriptsize
+%         \begin{tabular}{cl}
+%         % \multicolumn{2}{c}{a) Tuberías 1-8}\\[2pt]
+%         \toprule
+%         \textbf{Coluna 01} & \textbf{Coluna 02} \\
+%         \midrule
+%         $\text{N}_{1}-\text{N}_{2}$ & 2 Codos 90°\\
+%         $\text{N}_{2}-\text{N}_{3}$ & 4 Codos 90° \\ 
+        
+%         $\text{N}_{4}-\text{N}_{5}$ & 2 Codos 90° \\ 
+%         $\text{N}_{5}-\text{N}_{6}$ & 4 Codos 90° \\ 
+        
+%         $\text{N}_{7}-\text{N}_{8}$ & 2 Codos 90° \\
+%         $\text{N}_{8}-\text{N}_{9}$ & 4 Codos 90° \\ 
+%         \bottomrule
+%         \end{tabular}
+%         \hfill\hfill
+%         \begin{tabular}{cl}
+%         % \multicolumn{2}{c}{b) Tuberías 9-16}\\[2pt]
+%         \toprule
+%         \textbf{Coluna 01} & \textbf{Coluna 02} \\
+%         \midrule
+%         $\text{N}_{4}-\text{N}_{10}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
+        
+%         $\text{N}_{11}-\text{N}_{12}$ & 4 Codos 90° \\ 
+%         $\text{N}_{12}-\text{N}_{13}$ & 2 Codos 90° \\ 
+%         $\text{N}_{6}-\text{N}_{14}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
+        
+%         $\text{N}_{15}-\text{N}_{16}$ & 2 Codos 90° \\ 
+%         $\text{N}_{16}-\text{N}_{17}$ & 4 Codos 90° \\ 
+%         \bottomrule
+%         \end{tabular}
+%         \hfill\null
+%     \end{table}
+    
+% \end{frame}
+
+
+\section{Referências}
+%%################ Referências #############
+\begin{frame}{Referências}
+    Adicione as referêcnias no documento  \texttt{biblio.bib} no formato \texttt{BibTex}.
+
+    Exemplo de uma referência \cite{zhang2017digital}.
+    Exemplo de duas ou mais referências em uma citação, separado com vírgulas \cite{praks2018advanced,santos2018online}.
+    As referências são adiconadas automaticamente na Bibliografia.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliografia}
+\bibliographystyle{ieeetr}
+\bibliography{biblio}
+\end{frame}
+
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+
+\end{document}

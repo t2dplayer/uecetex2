@@ -1,0 +1,115 @@
+\begin{table}[ht]
+\centering
+\caption{Summary of Used Notations}
+\label{tab:notations}
+{\scriptsize
+\begin{tabularx}{\columnwidth}{l X}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+\multicolumn{2}{l}{\textit{Task Model}} \\
+$\mathcal{T}_i$ & Task $i$ defined by $(c_i, d_i)$ \\
+$c_i$ & Computational complexity of task $i$ (in cycles) \\
+$d_i$ & Maximum deadline of task $i$ (in \unit{\second}) \\
+$m$ & Execution mode ($l$: local, $r$: remote) \\
+$f^m$ & \acrotip{CPU} operating frequency in mode $m$ (in \unit{\hertz}) \\
+\midrule
+\multicolumn{2}{l}{\textit{Thermal Dynamics and Energy}} \\
+$P_{\mathrm{cpu}}^m$ & Electrical power consumed by the \acrotip{CPU} (in \unit{\watt}) \\
+$k_1, k_2, k_3$ & Power coefficients (dynamic, leakage, and static) \\
+$T_p(t)$ & Chip temperature at time $t$ (in \unit{\celsius}) \\
+$T_{\mathrm{amb}}$ & External ambient temperature (in \unit{\celsius}) \\
+$T_{p,\max}$ & Critical temperature limit (throttling) (in \unit{\celsius}) \\
+$R'_p, C_p$ & Thermal resistance (\unit{\celsius\per\watt}) and capacitance (\unit{\joule\per\celsius}) \\
+\midrule
+\multicolumn{2}{l}{\textit{Metrics and Optimization}} \\
+$L_i^m$ & Task processing time in mode $m$ (in \unit{\second}) \\
+$\mathrm{JCT}_i$ & Total job completion time (in \unit{\second}) \\
+$E_i^m$ & Total energy consumed to process task $i$ (in \unit{\joule}) \\
+$\Phi_i$ & \acrotip{QoS} contribution of task $i$ \\
+$\alpha, \beta, \gamma$ & Weights for latency, energy, and deadline penalty \\
+\bottomrule
+\end{tabularx}}
+\end{table}
+
+This section presents the main mathematical models that support the proposed solution, encompassing task offloading and latency dynamics, thermal dynamics (thermal throttling and cooling), energy consumption, cellular and vehicular communication, and the definition of the objective function. To facilitate reading and formal understanding, Table~\ref{tab:notations} summarizes the main notations used.
+
+\subsection{Task Model, Latency, and Thermal Dynamics}
+
+Each task is characterized by the pair $\mathcal{T}_i=(c_i, d_i)$, where $c_i$ represents the task complexity (in \acrotip{CPU} cycles) and $d_i$ denotes the acceptable deadline for its completion~\cite{liu2019, uddin2025, guo2024deep, cao2024survey}. The task offloading decision is binary (local or remote processing) with the goal of reducing the computational complexity of the control policy, which favors its applicability in real-time systems~\cite{liu2019, fofana2024}.
+
+The execution latency is modeled by the ratio between the total workload ($c_i$) and the processing capacity of the device ($f^m$). Consequently, the response time for processing task $i$ in the selected mode $m \in \{local, remote\}$ is expressed by Equation~\ref{eq:latency}, and the total job completion time (\acrotip{JCT}) is given by Equation~\ref{eq:jct}:
+
+\begin{equation}
+\label{eq:latency}
+L_i^m = \frac{c_i}{f^m}
+\end{equation}
+
+\begin{equation}
+\mathrm{JCT}_i = t_i^{\mathrm{upload}} + t_i^{\mathrm{queue}} + L_i^m + t_i^{\mathrm{download}},
+\label{eq:jct}
+\end{equation}
+
+where $t_i^{\mathrm{upload}}$ is the transmission time of task $i$, $t_i^{\mathrm{queue}}$ is the residual waiting time in the processing queue (estimated as the remaining execution time of already scheduled tasks), $L_i^m$ is the execution time of the task in the selected mode $m$, and $t_i^{\mathrm{download}}$ is the time required to download the results. For the local processing mode, the upload and download transmission times are zero.
+
+To make the \acrotip{JCT} calculation more realistic, it is necessary to consider the impact of the device's thermal security mechanism. The continuous execution of tasks raises the processor temperature, which may force the system to reduce the operating frequency $f^m$ to avoid physical overheating of the device.
+
+In this context, the electrical power dissipated by the \acrotip{CPU} ($P_{\mathrm{cpu}}(f^m)$) is calculated using the frequency polynomial model proposed by Silva et al.~\cite{silva2022analytical}, given by Equation~\ref{eq:power_cpu}:
+
+\begin{equation}
+\label{eq:power_cpu}
+P_{\mathrm{cpu}}(f^m) = k_1 (f^m)^3 + k_2 f^m + k_3
+\end{equation}
+where $k_1$ and $k_2$ represent the dynamic and leakage power constants, respectively. The constant $k_3$ indicates the minimum static consumption of the architecture.
+
+The instantaneous processor temperature $T_p(t)$, after a time interval under a constant power dissipation $P_{\mathrm{cpu}}(f^m)$, follows the \acrotip{RC} thermal circuit model by Rao and Vrudhula~\cite{rao2007performance}, expressed by Equation~\ref{eq:temp_evolution}:
+
+\begin{equation}
+\label{eq:temp_evolution}
+\begin{split}
+T_p(t) &= P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}} \\
+&\quad + (T_{p0} - (P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}})) e^{-\frac{t}{R'_p C_p}}
+\end{split}
+\end{equation}
+where $T_{p0}$ is the initial temperature, $T_{\mathrm{amb}}$ is the ambient temperature, and $R'_p$ and $C_p$ are parameters representing the thermal resistance and capacitance of the \acrotip{CPU}, respectively.
+
+This modeling allows for a more realistic representation of the processor's heating and cooling cycles. In the heating state, the required power ($P_{\mathrm{cpu}} = P_{\max}'$) is high, generating an exponential increase in temperature. To protect the processor, the model mathematically projects the exact instant $t_m$ when the temperature will reach the critical limit ($T_{p,\max}$). Deriving Equation~\ref{eq:temp_evolution}, the safety constraint is obtained (Equation~\ref{eq:thermal_throttling}):
+
+\begin{equation}
+\label{eq:thermal_throttling}
+t_m = R'_p C_p \ln\left(\frac{P_{\max}' R'_p + T_{\mathrm{amb}} - T_{p0}}{P_{\max}' R'_p + T_{\mathrm{amb}} - T_{p,\max}}\right)
+\end{equation}
+
+If the processing time exceeds $t_m$, the temperature will inevitably reach the maximum boundary $T_{p,\max}$. At this threshold, the thermal containment mechanism (thermal throttling) is triggered, forcing the reduction of the peak frequency $f^m$ to a safe thermal stabilization frequency, slowing down the heat dissipation curve at the cost of significantly extending the latency $L_i^m$.
+
+When the processing queue is empty, the \acrotip{CPU} ceases computational activity and $f^m$ becomes virtually zero. In this state, the dissipated power drops from $P_{\max}'$ to $P_{\mathrm{cpu}} = k_3$, which represents only the static consumption of the architecture. Inserting this minimum subtractive power into Equation~\ref{eq:temp_evolution}, the asymptotic temperature drops drastically, making the cooling differential $(T_{p0} - (k_3 \cdot R'_p + T_{\mathrm{amb}}))$ strongly positive. Therefore, the exponential decay acts as a buffer, continuously reducing the temperature $T_p(t)$ toward the new safe basal rest threshold throughout the idle interval time.
+
+\subsection{Energy Model}
+
+Thus, the total energy consumed $E_i^m$ during the entire life cycle of task $i$ in mode $m \in \{l, r\}$ coherently encompasses the instantaneous processing power and the cost of network interfaces, according to Equation~\ref{eq:energy}:
+
+\begin{equation}
+\label{eq:energy}
+E_i^m = P_{\mathrm{cpu}}^m(f^m) \cdot L_i^m + P_{\mathrm{tx}}^m \cdot t_i^{\mathrm{trans},m}
+\end{equation}
+where $P_{\mathrm{tx}}^m$ denotes the constant transmission power and $t_i^{\mathrm{trans},m}$ represents the total transmission time of the task (encompassing upload and download). For the local processing mode ($m=l$), the network interface is not activated, making the transmission term strictly zero ($P_{\mathrm{tx}}^l = 0$).
+
+\subsection{Communication Model (\acrotip{V2I} and \acrotip{V2V})}
+
+The modeling of \acrotip{V2I} and \acrotip{V2X} communication follows the definitions from~\cite{3gpp38901, yan2024towards}. The \acrotip{V2I} link operates at a frequency of \SI{3.5}{\giga\hertz} with a bandwidth of \SI{50}{\mega\hertz}, a transmission power of \SI{23}{dBm}, and asymmetric antennas (\SI{1.5}{\meter} on vehicles and \SI{25}{\meter} at the base station). The fading value adopted is \SI{4}{dBm} with a processing delay (jitter) of \SI{0.1}{\milli\second}. For the \acrotip{V2X} interface (Sidelink), the center frequency is \SI{5.9}{\giga\hertz}, with a bandwidth of \SI{10}{\mega\hertz}, fading of \SI{3}{dBm}, and a processing delay of \SI{0.25}{\milli\second}. Both interfaces adopt the 3GPP Urban Non-Line-of-Sight (Urban NLOS) model~\cite{3gpp38901}, where the path loss (\acrotip{PL}) expressed in dB is determined by Equation~\ref{eq:pathloss}:
+
+\begin{equation}
+\label{eq:pathloss}
+PL(d, f) = 35.3 \log_{10}(d) + 21.3 \log_{10}(f) + 22.4
+\end{equation}
+where $d$ represents the three-dimensional distance between the transmitter and receiver in meters, and $f$ is the operating frequency in \unit{\giga\hertz}. These parameters ensure a realistic representation of signal attenuation during data exchange between candidate offloading nodes, such as the edge server (\acrotip{VEC}) and neighboring vehicles.
+
+\subsection{Optimization Objective}
+
+The formulation of the \acrotip{QoS} contribution for task $i$ is expressed by Equation~\ref{eq:obj}:
+
+\begin{equation}
+\label{eq:obj}
+\Phi_i = \alpha \cdot \mathrm{JCT}_i + \beta \cdot E_i + \gamma \cdot \mathbf{1}[\mathrm{JCT}_i > d_i],
+\end{equation}
+which incorporates configurable weight parameters (by default, $\alpha = \beta = 0.35$) and a strict penalty constant for deadline violation ($\gamma = 0.015$). The global goal of the system is to minimize the aggregate cost $\sum_i \Phi_i$ while actively maximizing the deadline fulfillment rate, defined as $\hat{\tau} = |\{i : \mathrm{JCT}_i \le d_i\}| / N$.

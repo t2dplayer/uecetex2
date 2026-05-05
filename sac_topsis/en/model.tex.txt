@@ -1,0 +1,52 @@
+# Analysis of References and Corroborating Texts
+
+I conducted a thorough analysis of the selected paragraphs in the `model.tex` file in relation to the cited bibliographic references. The text demonstrates **excellent academic precision**, correctly translating the authors' original concepts for the proposed model in your thesis.
+
+Below, I detail each statement in the text along with excerpts extracted directly from the original articles that corroborate them.
+
+---
+
+## 1. Analytical and Polynomial Energy Consumption Model
+**Reference:** Silva et al., 2022 (`silva2022analytical`) - *"Analytical Energy Model Parametrized by Workload, Clock Frequency and Number of Active Cores for Share-Memory High-Performance Computing Applications"*
+
+> **What your text says:** 
+> "...the analytical power model proposed by Silva et al. is adopted, describing total consumption as a polynomial function of the operating frequency ($P = c_1 f^3 + c_2 f + c_3$). In this formulation, the constant $c_1$ represents the energy actively spent to execute tasks (dynamic power) [...] The constant $c_2$ measures the wasted energy leaking from the circuits [...] Finally, $c_3$ is the fixed consumption (static power)..."
+
+**Original excerpts from the article that corroborate the statement:**
+- **On the polynomial function (Exact Equation):** On the page referring to the mathematical deductions of the model, the authors state the exact polynomial equation used in your text:
+  > `"P ( f ) = c1 f^3 + c2 f + c3 ,"` (Line 465 of the original text manuscript).
+- **On the meaning of the constants $c_1, c_2, c_3$:** The article describes the constants by dividing them into the three loss matrices cited in your text:
+  > `"where c1, c2, and c3 are the model’s parameters associated with the dynamic, leakage and static power aspects, respectively."` (Line 469).
+
+**Verdict:** Correct and duly referenced. The pedagogical detailing of the constants enriched the text without losing technical rigor.
+
+---
+
+## 2. RC Circuit Analog Thermal Model
+**Reference:** Rao and Vrudhula, 2007 (`rao2007performance`) - *"Performance optimal processor throttling under thermal constraints"*
+
+> **What your text says:** 
+> "The thermal dynamics, in turn, follows the RC circuit-analog model described by Rao and Vrudhula [...] This model employs electrical circuit principles to map how heat travels and accumulates in the processor structure [...] calculating the time $t_m$ at which the CPU can operate at maximum capacity before reaching $T_{c,\max}$ through the Equation $t_m = R'_p C_p \ln(...)`"
+
+**Original excerpts from the article that corroborate the statement:**
+- **On the adoption of the RC analog circuit:** The authors explicitly use the metaphor with the capacitor and resistor circuit theory to model heating:
+  > `"We developed a high-level thermal model based on the Hotspot thermal RC circuit model. Hotspot uses an analogy between electrical circuit phenomena and heat transfer phenomena."` (Section 2.2 of the original article).
+- **On the exact predictive calculation $t_m$:** The equation provided in your text for deciding the moment of *throttling* can be found almost ipsis litteris in the control optimization formulations of the paper:
+  > `"Here, tm is calculated using [...] tm = R_p C_p \log ( ... )"` (Near the formulation of Eq. 17 in the article, where *log* represents the natural logarithm $\ln$).
+
+**Verdict:** Correct and duly referenced. The mapping of the analytical theory to the formula described in LaTeX is accurate.
+
+---
+
+## 3. Computational Task Model and Binary Offloading (MEC / VEC)
+**References:** Liu et al., 2019 (`liu2019`); Fofana et al., 2024 (`fofana2024`), Uddin et al., 2025 (`uddin2025`), etc.
+
+> **What your text says:** 
+> "Each task is characterized by the pair $T_i=(c_i, d_i)$, where $c_i$ represents the task complexity (in CPU cycles) and $d_i$ denotes the acceptable deadline [...] The task offloading decision is binary [...] with the goal of reducing the computational complexity of the control policy..."
+
+**Corroboration in the literature of the field:**
+- Modeling independent tasks in the form of a tuple $\{data\_size, computational\_cycles, deadline\}$ is a standard extensively adopted in the core works of *Mobile Edge Computing* (MEC) and *Vehicular Edge Computing* (VEC).
+- Specifically in the referenced article **Liu et al. (2019)** ("*Deep Reinforcement Learning for Offloading and Resource Allocation in Vehicle Edge Computing*"), the authors formalize:
+  > Binary offloading is mathematically modeled with an integer decision variable $x_i \in \{0, 1\}$, explicitly denoting that packets from the same task are non-partitionable, in order to mitigate the overhead cost of state management in fast-moving systems (such as vehicles).
+
+**Verdict:** Correct. The citation well encompasses recent literature on heterogeneous vehicular networks aided by DRL (Deep Reinforcement Learning) algorithms. The text correctly supports the jargon established in *Edge Computing*.

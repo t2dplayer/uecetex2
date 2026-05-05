@@ -1,0 +1,84 @@
+\begin{table}[ht]
+\centering
+\caption{Summary of Used Notations}
+\label{tab:notations}
+{\scriptsize
+\begin{tabularx}{\columnwidth}{l X}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+
+\end{tabularx}}
+\end{table}
+
+In this section, the main mathematical models used are presented, encompassing task offloading, cellular communication, non-stationarity, energy consumption, thermal throttling, and the objective function. To facilitate reading and understanding, Table \ref{tab:notations} is presented with a summary of the main notations used.
+
+\subsection{Task Model, Latency, and Thermal Containment}
+
+Each task is characterized by the pair $T_i=(c_i, d_i)$, where $c_i$ represents the task complexity (in \acrotip{CPU} cycles) and $d_i$ denotes the acceptable deadline for its completion~\cite{liu2019, uddin2025, guo2024deep, cao2024survey}. The task offloading decision is binary (local processing or offloading to the best among the candidate nodes for offloading) with the goal of reducing the computational complexity of the control policy, which favors its applicability in real-time systems~\cite{liu2019, fofana2024}.
+
+The execution latency is modeled by the ratio between the total workload and the processing capacity of the device. Consequently, the response time for local processing of task $i$ is given by Equation \ref{eq:latency_local} and for remote processing by Equation \ref{eq:latency_remote}.
+
+\begin{equation}
+\label{eq:latency_local}
+  L_i^l = \frac{c_i}{f^l}
+\end{equation}
+
+\begin{equation}
+  \label{eq:latency_remote}
+L_i^r = \frac{c_i}{f^r}
+\end{equation}
+
+The total time for the completion of task $T_i$ is given by Equation \ref{eq:jct}.
+
+\begin{equation}
+  \mathrm{JCT}_i = t_i^{\mathrm{upload}} + t_i^{\mathrm{queue}}
+                         + L_i + t_i^{\mathrm{download}},
+  \label{eq:jct}
+\end{equation}
+
+where $t_i^{\mathrm{upload}}$ is the upload time, $t_i^{\mathrm{queue}}$ is the residual waiting time in the destination queue, estimated as the remaining execution time of tasks already in the queue, $L_i$ is the execution time, and $t_i^{\mathrm{download}}$ is the time to download the results.
+
+In Equations \ref{eq:latency_local} and \ref{eq:latency_remote}, the processing frequencies $f^l$ and $f^r$ vary dynamically as devices trigger thermal throttling mechanisms to reduce \acrotip{CPU} temperature using the Dynamic Voltage and Frequency Scaling (\acrotip{DVFS}) technique.
+
+To model energy consumption, the analytical power model proposed by Silva et al.~\cite{silva2022analytical} is adopted, which describes total consumption as a polynomial function of the operating frequency ($P = c_i f^3 + c_1 f + c_2$). In which $c_i$ represents the energy spent in executing task $i$. The constant $c_1$ measures the wasted energy (leakage). Finally, $c_2$ is the fixed consumption, representing the minimum energy needed just to keep the \acrotip{CPU} on.
+
+The definition of the exact moment of throttling activation follows the algorithm proposed by Rao and Vrudhula~\cite{rao2007performance}. In this model, electrical circuit principles are used to map how heat propagates and accumulates in the processor structure, defining a maximum critical temperature limit on the chip ($T_{p,\max}$). The algorithm calculates the time the \acrotip{CPU} can operate at maximum capacity before reaching $T_{p,\max}$ through Equation \ref{eq:thermal_throttling}:
+
+\begin{equation}
+\label{eq:thermal_throttling}
+t_m = R'_p C_p \ln\left(\frac{P'_{max} R'_p - T_{p0}}{P'_{max} R'_p - T_{p,max}}\right).
+\end{equation}
+
+In this formulation, the exact instant for containment is decided based on thermal resistance ($R'_p$) and capacitance ($C_p$), the maximum power generated ($P'_{\max}$), and the heating from the initial temperature ($T_{p0}$) to the maximum allowed temperature ($T_{p,\max}$). Only after exactly this time $t_m$ has elapsed, the mechanism triggers the optimal deceleration curve to avoid damage without prematurely affecting performance.
+
+\subsection{Energy Model}
+
+The energy consumed by mode $m$ is
+\begin{equation}
+  E_j^{(m)} = \alpha_c^{(m)} \bigl[V^{(m)}\bigr]^2 C_j
+             + P_{\mathrm{TX}}^{(m)}\,t_j^{\mathrm{tx},(m)},
+  \label{eq:energy}
+\end{equation}
+where $\alpha_c^{(m)}$ is the chip capacitance, $V^{(m)}$ is the supply voltage at frequency $f^{(m)}$, and $P_{\mathrm{TX}}^{(m)}$ is the transmission power. For the local mode, the transmission term is zero.
+
+\subsection{Communication Model (\acrotip{V2I} and \acrotip{V2V})}
+
+The modeling of \acrotip{V2I} and \acrotip{V2X} communication follows the definitions specified in~\cite{3gpp38901, yan2024towards}. In this sense, the \acrotip{V2I} link considered in the simulations operates at a frequency of \SI{3.5}{\giga\hertz} with a bandwidth of \SI{50}{\mega\hertz}, a transmission power of \SI{23}{dBm}, and asymmetric antennas (\SI{1.5}{\meter} in vehicles and \SI{25}{\meter} at the base station). Furthermore, the fading value is \SI{4}{dBm} and the processing delay is \SI{0.1}{\milli\second}. For \acrotip{V2X}, the center frequency is \SI{5.9}{\giga\hertz}, the bandwidth is \SI{10}{\mega\hertz}, the fading value is \SI{3}{dBm}, and the processing delay is \SI{0.25}{\milli\second}. Both interfaces adopt the Urban Non-Line-of-Sight (Urban NLOS) model~\cite{3gpp38901}, where the path loss ($PL$) in \unit{dB} is specified by Equation~\ref{eq:pathloss}:
+
+\begin{equation}
+\label{eq:pathloss}
+PL(d, f) = 35.3 \log_{10}(d) + 21.3 \log_{10}(f) + 22.4
+\end{equation}
+
+where $d$ represents the distance between the transmitter and receiver in meters and $f$ is the operating frequency in \unit{\giga\hertz}.
+
+\subsection{Optimization Objective}
+
+The \acrotip{QoS} contribution per task is
+\begin{equation}
+  \Phi_j = \alpha\,\mathrm{JCT}_j + \beta\,E_j
+            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j],
+  \label{eq:obj}
+\end{equation}
+with configurable weight parameters (by default $\alpha=\beta=0.35$) and a deadline violation penalty constant $\gamma=0.015$. The system's objective is to minimize $\sum_j \Phi_j$ while maximizing the deadline fulfillment rate $\hat{\tau} = |\{j : \mathrm{JCT}_j \le D_j\}|/N$.

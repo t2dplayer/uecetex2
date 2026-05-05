@@ -2,11 +2,11 @@ TEX=pdflatex
 BIB=bibtex
 OUTDIR=output
 
-PROJECTS=main main-br
+PROJECTS=main main-br main-en
 
 .PHONY: all clean
 
-all: $(OUTDIR)/main.pdf $(OUTDIR)/main-br.pdf
+all: $(OUTDIR)/main.pdf $(OUTDIR)/main-br.pdf $(OUTDIR)/main-en.pdf
 
 $(OUTDIR):
 	mkdir -p $(OUTDIR)
@@ -24,6 +24,9 @@ $(OUTDIR)/main.pdf: main.tex | $(OUTDIR)
 
 $(OUTDIR)/main-br.pdf: main-br.tex | $(OUTDIR)
 	$(call build_pdf,main-br)
+
+$(OUTDIR)/main-en.pdf: main-en.tex | $(OUTDIR)
+	$(call build_pdf,main-en)
 
 clean:
 	rm -rf $(OUTDIR)
