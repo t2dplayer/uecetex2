@@ -34,27 +34,93 @@
 %%\section{Agenda}
 
 \section{Introdução}
-
-%%################## Slide ITS E GARGALO LOCAL ##################
+%%################## Slide ITS E GARGALO LOCAL - PARTE 1 ##################
 \begin{frame}{Evolução do ITS e os Desafios Computacionais}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
+            \vspace*{1.0cm}
             \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Sistemas Inteligentes de Transporte (ITS), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
                 \scriptsize 
                 \textbf{Objetivo}: Uso inteligente e coordenado da infraestrutura de rede V2X.\\
                 \textbf{Benefícios}: Trânsito mais seguro, usuários bem informados e economia de tempo, dinheiro e combustível.
             \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.3cm}
+            % Imagem conceitual do fluxo usando TikZ nativo
+            \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
+                % Nós da imagem
+                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
+                
+                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
+                
+                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
+                
+                % Setas
+                \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
+                \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
+                
+                % Ícones/Símbolos de Alerta
+                \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
+                \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
+            \end{tikzpicture}
             
-            \vspace{-0.45cm}
-            
+            \vspace{0.4cm}
+            \begin{beamercolorbox}[wd=\textwidth, sep=4pt, center, rounded=true]{block body}
+                \scriptsize \textit{"A viabilização do ITS de próxima geração depende da superação das limitações computacionais locais."}
+            \end{beamercolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%################## Slide ITS E GARGALO LOCAL - PARTE 2 ##################
+\begin{frame}{Evolução do ITS e os Desafios Computacionais}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.8cm}
             \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Demandas e Perfis de Aplicação, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize 
                 \textbf{Exemplos}: Direção autônoma, Realidade Aumentada (AR) e visão computacional.\\
                 \textbf{Perfil Crítico}: Tarefas com \textbf{poucos bytes} de entrada, mas com \textbf{altíssima complexidade} de cálculo, exigindo muitos ciclos de CPU e alto gasto energético.
             \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.3cm}
+            % Imagem conceitual do fluxo usando TikZ nativo
+            \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
+                % Nós da imagem
+                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
+                
+                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
+                
+                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
+                
+                % Setas
+                \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
+                \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
+                
+                % Ícones/Símbolos de Alerta
+                \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
+                \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
+            \end{tikzpicture}
             
-            \vspace{-0.45cm}
-            
+            \vspace{0.4cm}
+            \begin{beamercolorbox}[wd=\textwidth, sep=4pt, center, rounded=true]{block body}
+                \scriptsize \textit{"A viabilização do ITS de próxima geração depende da superação das limitações computacionais locais."}
+            \end{beamercolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%################## Slide ITS E GARGALO LOCAL - PARTE 3 ##################
+\begin{frame}{Evolução do ITS e os Desafios Computacionais}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.8cm}
             \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=O Gargalo da Computação Local, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize 
                 \textbf{Restrições}: As Unidades de Bordo (OBUs) possuem restrições físicas severas (bateria, dissipação térmica e CPU).\\
