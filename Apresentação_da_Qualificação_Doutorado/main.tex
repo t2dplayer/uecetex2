@@ -49,22 +49,22 @@
         \begin{column}{0.52\textwidth}
             \centering
             \vspace{0.3cm}
-            % Imagem conceitual do fluxo usando TikZ nativo
+            % Imagem conceitual do fluxo usando TikZ nativo - Destaque ITS
             \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
                 % Nós da imagem
                 \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
                 
-                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
+                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm, opacity=0.15, text opacity=0.15] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
                 
-                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
+                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm, opacity=0.15, text opacity=0.15] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
                 
                 % Setas
-                \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
-                \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
+                \draw[->, thick, color=blue!70!black, opacity=0.15] (its) -- node[right, opacity=0.15]{\scriptsize Habilita} (apps);
+                \draw[->, thick, color=red!70!black, opacity=0.15] (apps) -- node[right, opacity=0.15]{\scriptsize Sobrecarga} (local);
                 
                 % Ícones/Símbolos de Alerta
-                \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
-                \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
+                \node[left of=local, node distance=2.8cm, text=red!80!black, opacity=0.15] {\Huge \textbf{!}};
+                \node[left of=apps, node distance=2.8cm, text=orange!80!black, opacity=0.15] {\Huge \textbf{$\circlearrowright$}};
             \end{tikzpicture}
             
             \vspace{0.4cm}
@@ -90,21 +90,21 @@
         \begin{column}{0.52\textwidth}
             \centering
             \vspace{0.3cm}
-            % Imagem conceitual do fluxo usando TikZ nativo
+            % Imagem conceitual do fluxo usando TikZ nativo - Destaque Aplicações
             \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
                 % Nós da imagem
-                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
+                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, opacity=0.15, text opacity=0.15] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
                 
                 \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
                 
-                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
+                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm, opacity=0.15, text opacity=0.15] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
                 
                 % Setas
                 \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
-                \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
+                \draw[->, thick, color=red!70!black, opacity=0.15] (apps) -- node[right, opacity=0.15]{\scriptsize Sobrecarga} (local);
                 
                 % Ícones/Símbolos de Alerta
-                \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
+                \node[left of=local, node distance=2.8cm, text=red!80!black, opacity=0.15] {\Huge \textbf{!}};
                 \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
             \end{tikzpicture}
             
@@ -131,22 +131,22 @@
         \begin{column}{0.52\textwidth}
             \centering
             \vspace{0.3cm}
-            % Imagem conceitual do fluxo usando TikZ nativo
+            % Imagem conceitual do fluxo usando TikZ nativo - Destaque Computação Local
             \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
                 % Nós da imagem
-                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
+                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, opacity=0.15, text opacity=0.15] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
                 
-                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
+                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm, opacity=0.15, text opacity=0.15] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
                 
                 \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
                 
                 % Setas
-                \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
+                \draw[->, thick, color=blue!70!black, opacity=0.15] (its) -- node[right, opacity=0.15]{\scriptsize Habilita} (apps);
                 \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
                 
                 % Ícones/Símbolos de Alerta
                 \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
-                \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
+                \node[left of=apps, node distance=2.8cm, text=orange!80!black, opacity=0.15] {\Huge \textbf{$\circlearrowright$}};
             \end{tikzpicture}
             
             \vspace{0.4cm}
