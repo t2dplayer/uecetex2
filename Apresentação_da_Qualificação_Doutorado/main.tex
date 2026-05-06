@@ -35,111 +35,55 @@
 
 \section{Introdução}
 
-%%################## Slide PERFIS DE APLICAÇÃO ##################
-\begin{frame}{Perfis de Aplicação e Desafios de ITS}
+%%################## Slide ITS E GARGALO LOCAL ##################
+\begin{frame}{Evolução do ITS e os Desafios Computacionais}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
-            \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Cenário V2X (Cruzamento), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+            \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Sistemas Inteligentes de Transporte (ITS), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
                 \scriptsize 
-                \textbf{Elementos (Fig.)}: Veículo cliente ($v_0$), vizinhos cooperativos ($v_1, v_2$) e infraestrutura (RSU).\\
-                \textbf{Conectividade}: Links ativos V2I (via 5G) e V2V (Sidelink).
+                \textbf{Objetivo}: Uso inteligente e coordenado da infraestrutura de rede V2X.\\
+                \textbf{Benefícios}: Trânsito mais seguro, usuários bem informados e economia de tempo, dinheiro e combustível.
             \end{tcolorbox}
             
             \vspace{-0.45cm}
             
-            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Perfis de Tarefa Gerados, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Demandas e Perfis de Aplicação, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize 
-                \textbf{Segurança (Vermelho)}: Alertas críticos com prazo rígido ($\le 100$ms).\\
-                \textbf{Visão/Fusão (Laranja)}: Percepção cooperativa de alta complexidade ($>250$k ciclos/byte).
+                \textbf{Exemplos}: Direção autônoma, Realidade Aumentada (AR) e visão computacional.\\
+                \textbf{Perfil Crítico}: Tarefas com \textbf{poucos bytes} de entrada, mas com \textbf{altíssima complexidade} de cálculo, exigindo muitos ciclos de CPU e alto gasto energético.
             \end{tcolorbox}
             
             \vspace{-0.45cm}
             
-            \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=Gargalo Local e Decisão, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+            \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=O Gargalo da Computação Local, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize 
-                \textbf{Gargalo Local}: Limites térmicos/bateria no OBUI de $v_0$ (alerta \textbf{!} em vermelho na Fig.).\\
-                \textbf{Problema}: Escolher o destino (Local, RSU ou Vizinhos) que maximiza o cumprimento de prazos.
+                \textbf{Restrições}: As Unidades de Bordo (OBUs) possuem restrições físicas severas (bateria, dissipação térmica e CPU).\\
+                \textbf{Consequência}: A computação puramente local não consegue atender aos rigorosos requisitos de tempo, gerando falhas.
             \end{tcolorbox}
         \end{column}
         
         \begin{column}{0.52\textwidth}
             \centering
-            \vspace{0.1cm}
-            \begin{tikzpicture}[
-                scale=0.45,
-                transform shape,
-                every node/.style={inner sep=2pt},
-                vehicle/.style={draw=orange!80!black, fill=orange!10, minimum width=1.4cm, minimum height=0.65cm, rounded corners=2pt, font=\bfseries\tiny, align=center, thick},
-                client/.style={draw=beamer_color, fill=beamer_color!15, minimum width=1.4cm, minimum height=0.65cm, rounded corners=2pt, font=\bfseries\tiny, align=center, thick},
-                rsu/.style={draw=purple, fill=purple!5, minimum width=1.3cm, minimum height=1.3cm, rounded corners=3pt, font=\bfseries\tiny, align=center, thick},
-                task_s/.style={draw=red, fill=red!5, rounded corners=2pt, font=\fontsize{5}{6}\selectfont, align=center},
-                task_c/.style={draw=orange, fill=orange!5, rounded corners=2pt, font=\fontsize{5}{6}\selectfont, align=center},
-                link_v2i/.style={purple, dashed, ultra thick, <->},
-                link_v2v/.style={orange!80!black, dotted, ultra thick, <->}
-            ]
-                % Draw Roads (gray intersection)
-                \fill[gray!20] (-5,-2) rectangle (5,2);
-                \fill[gray!20] (-2,-5) rectangle (2,5);
+            \vspace{0.3cm}
+            % Imagem conceitual do fluxo usando TikZ nativo
+            \begin{tikzpicture}[>=stealth, auto, node distance=2.2cm, scale=0.85, transform shape, font=\sffamily]
+                % Nós da imagem
+                \node[rectangle, rounded corners, draw=blue!60, fill=blue!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center] (its) {\textbf{Infraestrutura ITS} \\ \scriptsize Redes, V2X, Coordenação};
                 
-                % Road borders (dark gray)
-                \draw[gray!50, thick] (-5,2) -- (-2,2) -- (-2,5);
-                \draw[gray!50, thick] (5,2) -- (2,2) -- (2,5);
-                \draw[gray!50, thick] (-5,-2) -- (-2,-2) -- (-2,-5);
-                \draw[gray!50, thick] (5,-2) -- (2,-2) -- (2,-5);
+                \node[rectangle, rounded corners, draw=orange!80!black, fill=orange!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=its, yshift=-0.1cm] (apps) {\textbf{Aplicações Complexas} \\ \scriptsize Poucos bytes, Alto processamento};
                 
-                % Lane dividers (white dashed)
-                \draw[white, dashed, thick] (-5,0) -- (-2,0);
-                \draw[white, dashed, thick] (2,0) -- (5,0);
-                \draw[white, dashed, thick] (0,-5) -- (0,-2);
-                \draw[white, dashed, thick] (0,2) -- (0,5);
+                \node[rectangle, rounded corners, draw=red!70!black, fill=red!5, thick, minimum width=4.5cm, minimum height=1.2cm, align=center, below of=apps, yshift=-0.1cm] (local) {\textbf{Computação Local} \\ \scriptsize Gargalo de CPU e Energia};
                 
-                % Pedestrian crossings (zebra lines)
-                \foreach \x in {-1.6,-1.2,-0.8,-0.4,0,0.4,0.8,1.2,1.6} {
-                    \draw[white, line width=1.5pt] (\x, 2.1) -- (\x, 2.4);
-                    \draw[white, line width=1.5pt] (\x, -2.1) -- (\x, -2.4);
-                    \draw[white, line width=1.5pt] (2.1, \x) -- (2.4, \x);
-                    \draw[white, line width=1.5pt] (-2.1, \x) -- (-2.4, \x);
-                }
+                % Setas
+                \draw[->, thick, color=blue!70!black] (its) -- node[right]{\scriptsize Habilita} (apps);
+                \draw[->, thick, color=red!70!black] (apps) -- node[right]{\scriptsize Sobrecarga} (local);
                 
-                % Elements placing
-                % Client Vehicle v0
-                \node[client] (v0) at (-0.8, -1.0) {$v_0$ \\ \textbf{Cliente}};
-                
-                % Neighboring Vehicles (v1 and v2)
-                \node[vehicle] (v1) at (0.8, 3.2) {$v_1$ \\ \textbf{Vizinho}};
-                \node[vehicle] (v2) at (-3.5, 0.8) {$v_2$ \\ \textbf{Vizinho}};
-                
-                % RSU Tower (MEC Server) at Top-Right
-                \node[rsu] (rsu) at (3.5, 3.5) {RSU / MEC \\ \textbf{Server}};
-                % Signal waves at RSU
-                \draw[purple, thin] ([yshift=1mm]rsu.north) arc (90:45:5mm);
-                \draw[purple, thin] ([yshift=1mm]rsu.north) arc (90:135:5mm);
-                \draw[purple, thin] ([yshift=3mm]rsu.north) arc (90:45:8mm);
-                \draw[purple, thin] ([yshift=3mm]rsu.north) arc (90:135:8mm);
-                
-                % Communication links
-                % V2I from v0 to RSU
-                \draw[link_v2i] (v0) to[bend right=15] node[midway, right=1pt, font=\fontsize{5}{6}\selectfont, text=purple] {V2I (5G)} (rsu);
-                
-                % V2V from v0 to v1, v2
-                \draw[link_v2v] (v0) -- node[midway, right=1pt, font=\fontsize{5}{6}\selectfont, text=orange!80!black] {V2V Sidelink} (v1);
-                \draw[link_v2v] (v0) -- node[midway, below=1pt, font=\fontsize{5}{6}\selectfont, text=orange!80!black] {V2V Sidelink} (v2);
-                
-                % Task bubble generating from v0
-                \node[task_s] (t_safety) at (-3.6, -3.2) {\textbf{Alerta (Segurança)} \\ $\le 100$ms Deadline};
-                \node[task_c] (t_compute) at (0.0, -3.5) {\textbf{Fusão (Visão)} \\ $>250$k ciclos/B};
-                
-                % Arrows from tasks to v0
-                \draw[-{Stealth[scale=0.8]}, thick, red] (t_safety) to[bend left=10] (v0);
-                \draw[-{Stealth[scale=0.8]}, thick, orange] (t_compute) to[bend right=10] (v0);
-                
-                % Local bottleneck indicator at v0
-                \node[draw=red, circle, fill=red!20, inner sep=1pt, font=\tiny\bfseries] (warn) at (-1.8, -1.0) {!};
-                \node[text=red, font=\fontsize{5}{6}\selectfont, anchor=east, align=center] at (warn.west) {OBUI \\ Sobregregado};
-                \draw[red, thin] (warn) -- (v0);
+                % Ícones/Símbolos de Alerta
+                \node[left of=local, node distance=2.8cm, text=red!80!black] {\Huge \textbf{!}};
+                \node[left of=apps, node distance=2.8cm, text=orange!80!black] {\Huge \textbf{$\circlearrowright$}};
             \end{tikzpicture}
             
-            \vspace{0.1cm}
+            \vspace{0.4cm}
             \begin{beamercolorbox}[wd=\textwidth, sep=4pt, center, rounded=true]{block body}
                 \scriptsize \textit{"A viabilização do ITS de próxima geração depende da superação das limitações computacionais locais."}
             \end{beamercolorbox}
