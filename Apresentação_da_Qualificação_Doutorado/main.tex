@@ -188,7 +188,7 @@
     \begin{table}[H]
         \centering
         \scriptsize
-        \renewcommand{\arraystretch}{1.35}
+        \renewcommand{\arraystretch}{1.05}
         \begin{tabular}{p{2.6cm} p{4.1cm} p{4.1cm}}
             \toprule
             \textbf{Característica} & \textbf{Descarregamento Total} & \textbf{Descarregamento em Lote} \\
@@ -198,11 +198,12 @@
             \textbf{Complexidade} & Baixa (decisão simples de descarregamento). & Alta (requer algoritmos de fatiamento de código e coordenação). \\
             \textbf{Sobrecarga (\textit{Overhead})} & Nula na remontagem; sensível ao tamanho de pacotes na rede. & Alta sobrecarga de sincronização, transmissão e remontagem dos resultados. \\
             \textbf{Tolerância a Falhas} & Baixa (falha na conexão invalida todo o processamento). & Alta (subtarefas individuais podem falhar ou ser reexecutadas separadamente). \\
+            \textbf{Perfil de Aplicação} & Tarefas monolíticas ou de rápida tomada de decisão (ex: compressão simples, criptografia de dados). & Processamento de fluxos de dados ou tarefas modulares (ex: análise de vídeo por frames, processamento paralelo). \\
             \bottomrule
         \end{tabular}
     \end{table}
     
-    \vspace{-0.2cm}
+    \vspace{-0.35cm}
     \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
         \scriptsize \textit{O descarregamento em lote oferece maior flexibilidade de agendamento, mas impõe desafios severos de coordenação em redes veiculares.}
     \end{beamercolorbox}
