@@ -183,66 +183,320 @@
     \end{columns}
 \end{frame}
 
-%%################## Slide COMPARAÇÃO DESCARREGAMENTO ##################
-\begin{frame}{Estratégias de Descarregamento Remoto}
-    \begin{table}[H]
-        \centering
-        \scriptsize
-        \renewcommand{\arraystretch}{1.05}
-        \begin{tabular}{p{2.6cm} p{4.1cm} p{4.1cm}}
-            \toprule
-            \textbf{Característica} & \textbf{Descarregamento Total} & \textbf{Descarregamento em Lote} \\
-            \midrule
-            \textbf{Definição} & Envio integral de uma única tarefa indivisível para o servidor remoto. & Divisão de uma tarefa em subtarefas ou agrupamento de múltiplas tarefas. \\
-            \textbf{Granularidade} & Binária (Tudo ou nada: 0 ou 1). & Parcial (divisível em subtarefas independentes ou dependentes). \\
-            \textbf{Complexidade} & Baixa (decisão simples de descarregamento). & Alta (requer algoritmos de fatiamento de código e coordenação). \\
-            \textbf{Sobrecarga (\textit{Overhead})} & Nula na remontagem; sensível ao tamanho de pacotes na rede. & Alta sobrecarga de sincronização, transmissão e remontagem dos resultados. \\
-            \textbf{Tolerância a Falhas} & Baixa (falha na conexão invalida todo o processamento). & Alta (subtarefas individuais podem falhar ou ser reexecutadas separadamente). \\
-            \textbf{Perfil de Aplicação} & Tarefas monolíticas ou de rápida tomada de decisão (ex: compressão simples, criptografia de dados). & Processamento de fluxos de dados ou tarefas modulares (ex: análise de vídeo por frames, processamento paralelo). \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-    
-    \vspace{-0.35cm}
-    \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
-        \scriptsize \textit{O descarregamento em lote oferece maior flexibilidade de agendamento, mas impõe desafios severos de coordenação em redes veiculares.}
-    \end{beamercolorbox}
+%%################## SLIDE 1: DEFINIÇÃO ##################
+\begin{frame}{Estratégias de Descarregamento: Definição}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.5cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Descarregamento Total (\textit{Full}), fonttitle=\bfseries\footnotesize]
+                \footnotesize Envio integral de uma única tarefa indivisível (monolítica) para o servidor remoto.
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Descarregamento Parcial / Lote, fonttitle=\bfseries\footnotesize]
+                \footnotesize Divisão de uma única tarefa em múltiplas subtarefas, ou o agrupamento de várias tarefas menores.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.8, transform shape]
+                % Dispositivo e Servidor
+                \node[draw, rounded corners, fill=gray!20, minimum height=4cm, minimum width=1.5cm] (dev) at (0,0) {\rotatebox{90}{\textbf{Veículo}}};
+                \node[draw, rounded corners, fill=gray!20, minimum height=4cm, minimum width=1.5cm] (srv) at (5,0) {\rotatebox{90}{\textbf{Servidor Edge}}};
+                
+                % Total
+                \node[draw=blue!80!black, fill=blue!10, minimum width=1.2cm, minimum height=0.8cm] (t_full) at (2.5, 1.2) {Tarefa};
+                \draw[->, thick, blue!80!black] (dev.east |- t_full) -- (t_full.west);
+                \draw[->, thick, blue!80!black] (t_full.east) -- (srv.west |- t_full);
+                \node[above=0.1cm of t_full, text=blue!80!black] {\textbf{Total}};
+
+                % Parcial
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.6cm, minimum height=0.6cm] (p1) at (2.0, -1.2) {$T_1$};
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.6cm, minimum height=0.6cm] (p2) at (3.0, -1.2) {$T_2$};
+                \draw[->, thick, orange!80!black] (dev.east |- p1) -- (p1.west);
+                \draw[->, thick, orange!80!black] (p2.east) -- (srv.west |- p2);
+                \draw[->, thick, orange!80!black, dashed] (p1.east) -- (p2.west);
+                \node[above=0.1cm of p1, xshift=0.5cm, text=orange!80!black] {\textbf{Parcial (Subtarefas)}};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
 \end{frame}
 
-\begin{frame}{Limitações das Abordagens Tradicionais}
-    \begin{block}{Heurísticas e MCDM}
-        \begin{itemize}
-            \item Simplicidade computacional.
-            \item \textbf{Falha}: Avaliam apenas o estado instantâneo (sem visão de futuro).
-        \end{itemize}
-    \end{block}
-    
-    \begin{block}{Meta-heurísticas (Algoritmos Genéticos, PSO, etc.)}
-        \begin{itemize}
-            \item Busca global sólida em cenários estáticos.
-            \item \textbf{Falha}: Convergência lenta (incompatível com prazos de milissegundos).
-            \item \textbf{Inflexibilidade}: Precisam ser reiniciadas a cada mudança na topologia.
-        \end{itemize}
-    \end{block}
+%%################## SLIDE 2: GRANULARIDADE ##################
+\begin{frame}{Estratégias de Descarregamento: Granularidade}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.5cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Descarregamento Total (\textit{Full}), fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Binária:} Tudo ou nada (0 ou 1). A tarefa roda 100\% localmente ou 100\% na borda.
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Descarregamento Parcial / Lote, fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Contínua/Fracionada:} Permite que $X\%$ rode localmente e $Y\%$ remotamente (independentes ou dependentes).
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.2cm}
+            \begin{tikzpicture}[>=stealth, scale=0.8, transform shape]
+                % Binário
+                \node[text=blue!80!black] at (2.5, 3) {\textbf{Granularidade Binária}};
+                \draw[thick, fill=blue!10] (1,2) rectangle (2,2.5);
+                \node at (1.5, 2.25) {0};
+                \draw[thick, fill=blue!40] (3,2) rectangle (4,2.5);
+                \node at (3.5, 2.25) {1};
+                \draw[->, thick, blue!80!black] (2, 2.25) -- (3, 2.25);
+                \node at (2.5, 1.7) {\scriptsize (Local ou Remoto)};
+
+                % Linha divisória
+                \draw[dashed, gray] (0, 1) -- (5, 1);
+
+                % Contínuo
+                \node[text=orange!80!black] at (2.5, 0.5) {\textbf{Granularidade Parcial}};
+                \draw[thick, fill=gray!20] (0.5, -0.5) rectangle (4.5, 0);
+                \draw[thick, fill=orange!50] (0.5, -0.5) rectangle (2.5, 0); % 50%
+                \node at (1.5, -0.25) {\scriptsize 50\% Local};
+                \node at (3.5, -0.25) {\scriptsize 50\% Remoto};
+                
+                % Slider knob
+                \draw[thick, fill=white] (2.4, -0.7) rectangle (2.6, 0.2);
+                \draw[<->, thick, orange!80!black] (1, -1.2) -- (4, -1.2) node[midway, below] {\scriptsize Ajuste Dinâmico};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
 \end{frame}
 
-\begin{frame}{O Desafio da Generalização}
-    \begin{itemize}
-        \item \textbf{Modelos Simplificados}: Cenários com número fixo de veículos não capturam a realidade.
-        \item \textbf{Degradação de Desempenho}: Mudanças súbitas na densidade invalidam políticas rígidas.
-        \item \textbf{Necessidade de Robustez}: Representações de estado que garantam a generalização sem necessidade de retreinamento constante.
-    \end{itemize}
+%%################## SLIDE 3: COMPLEXIDADE ##################
+\begin{frame}{Estratégias de Descarregamento: Complexidade}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.5cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Descarregamento Total (\textit{Full}), fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Baixa Complexidade:} Requer apenas uma decisão simples de roteamento (descarregar sim/não).
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Descarregamento Parcial / Lote, fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Alta Complexidade:} Exige algoritmos robustos de fatiamento de código (gráfos de dependência) e coordenação entre múltiplos nós.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.8, transform shape]
+                % Baixa complexidade
+                \node[circle, draw=blue!80!black, fill=blue!10, thick] (n1) at (2.5, 2.5) {Decisão};
+                \node[rectangle, draw=gray, fill=gray!10] (s1) at (0.5, 2.5) {Local};
+                \node[rectangle, draw=gray, fill=gray!10] (s2) at (4.5, 2.5) {Edge};
+                \draw[->, thick, blue] (n1) -- (s2) node[midway, above] {\scriptsize Simples};
+                
+                \draw[dashed, gray] (0, 1.2) -- (5, 1.2);
+
+                % Alta complexidade
+                \node[circle, draw=orange!80!black, fill=orange!10, thick] (n2) at (2.5, 0) {Fatiamento};
+                \node[rectangle, draw=gray, fill=gray!10] (e1) at (0.5, -1) {Edge 1};
+                \node[rectangle, draw=gray, fill=gray!10] (e2) at (2.5, -1.5) {Edge 2};
+                \node[rectangle, draw=gray, fill=gray!10] (e3) at (4.5, -1) {Local};
+                
+                \draw[->, thick, orange] (n2) -- (e1) node[midway, left] {\scriptsize Sub 1};
+                \draw[->, thick, orange] (n2) -- (e2) node[midway, right] {\scriptsize Sub 2};
+                \draw[->, thick, orange] (n2) -- (e3) node[midway, right] {\scriptsize Sub 3};
+                
+                \draw[<->, dashed, red!70!black] (e1) -- (e2) node[midway, below] {\scriptsize Sincronia};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
 \end{frame}
 
-\begin{frame}{Aprendizado por Reforço Profundo (DRL)}
-    \begin{itemize}
-        \item \textbf{Solução Natural}: Aprende políticas de controle mapeando observações em ações de longo prazo.
-        \item \textbf{Exploração Temporal}: Identifica padrões em tráfego, filas e mobilidade.
-        \item \alert{Fraqueza Estrutural}: Dependência de camadas de entrada com tamanho fixo.
-        \item \alert{Gargalo}: Exige retreinamento sempre que a quantidade de nós candidatos muda.
-    \end{itemize}
+%%################## SLIDE 4: SOBRECARGA (OVERHEAD) ##################
+\begin{frame}{Estratégias de Descarregamento: Sobrecarga (\textit{Overhead})}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.5cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Descarregamento Total (\textit{Full}), fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Nula na remontagem:} O resultado volta pronto. O overhead é sensível apenas ao tamanho do pacote de dados na rede.
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Descarregamento Parcial / Lote, fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Alta Sobrecarga:} Gera overhead adicional de comunicação para sincronização, além do custo de CPU para remontagem dos resultados.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.8, transform shape]
+                % Total
+                \node[draw=blue!80!black, fill=blue!10, minimum width=2cm, minimum height=0.6cm] (r_full) at (2.5, 2.5) {Resultado Único};
+                \node[below=0.2cm of r_full, text=green!60!black] {\scriptsize Pronto para uso};
+
+                \draw[dashed, gray] (0, 1.2) -- (5, 1.2);
+
+                % Parcial
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (r1) at (1, 0) {$R_1$};
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (r2) at (2.5, 0) {$R_2$};
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (r3) at (4, 0) {$R_3$};
+                
+                \node[draw=red!70!black, fill=red!10, thick, rounded corners] (merge) at (2.5, -1.2) {Remontagem (Merge)};
+                
+                \draw[->, thick, orange] (r1) -- (merge.north west);
+                \draw[->, thick, orange] (r2) -- (merge.north);
+                \draw[->, thick, orange] (r3) -- (merge.north east);
+                
+                \node[below=0.1cm of merge, text=red!80!black] {\scriptsize Overhead de Sincronização};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
 \end{frame}
 
+%%################## SLIDE 5: TOLERÂNCIA A FALHAS ##################
+\begin{frame}{Estratégias de Descarregamento: Tolerância a Falhas}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.5cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Descarregamento Total (\textit{Full}), fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Baixa Tolerância:} Uma única falha na conexão ou no processamento invalida toda a execução da tarefa.
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Descarregamento Parcial / Lote, fonttitle=\bfseries\footnotesize]
+                \footnotesize \textbf{Alta Tolerância:} Subtarefas individuais podem falhar e ser reexecutadas separadamente, salvando o progresso do restante.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.8, transform shape]
+                % Total
+                \node[draw=blue!80!black, fill=blue!10, minimum width=2.5cm, minimum height=0.8cm] (tf) at (2.5, 2.5) {Tarefa Total};
+                \draw[ultra thick, red] (1.5, 2) -- (3.5, 3);
+                \draw[ultra thick, red] (1.5, 3) -- (3.5, 2);
+                \node[right=0.2cm of tf, text=red] {\textbf{Perda Total}};
+
+                \draw[dashed, gray] (0, 1.2) -- (5, 1.2);
+
+                % Parcial
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (tp1) at (1, 0) {$T_1$};
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (tp2) at (2.5, 0) {$T_2$};
+                \node[draw=orange!80!black, fill=orange!10, minimum width=0.8cm, minimum height=0.6cm] (tp3) at (4, 0) {$T_3$};
+                
+                % Falha apenas na T2
+                \draw[ultra thick, red] (2.1, -0.4) -- (2.9, 0.4);
+                \draw[ultra thick, red] (2.1, 0.4) -- (2.9, -0.4);
+                
+                % Sucesso nas outras
+                \node[below=0.1cm of tp1, text=green!60!black] {\checkmark OK};
+                \node[below=0.1cm of tp3, text=green!60!black] {\checkmark OK};
+                \node[below=0.1cm of tp2, text=red] {\scriptsize Reexecutar};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%################## SLIDE 6: PERFIL DE APLICAÇÃO (TOTAL) ##################
+\begin{frame}{Perfil de Aplicação: Descarregamento Total}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.4cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Aplicações Monolíticas, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \textbf{Natureza}: Tarefas rígidas, indivisíveis e altamente acopladas.
+                
+                \vspace{0.15cm}
+                \textbf{Carga}: Transferência integral (100\% dos dados brutos).
+                
+                \vspace{0.15cm}
+                \textbf{Prazos}: Vulnerável a atrasos de rede (regime ``tudo ou nada'').
+                
+                \vspace{0.15cm}
+                \textbf{Energia}: Consumo elevado na transmissão contínua de grandes volumes.
+                
+                \vspace{0.15cm}
+                \textbf{Exemplos}: Algoritmos de criptografia e compressão de dados monolíticos.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.85, transform shape, font=\sffamily]
+                % Fundo
+                \fill[blue!3, rounded corners=6pt, draw=blue!20, thick] (-0.6, -2.1) rectangle (5.4, 1.8);
+                \node[blue!80!black, font=\bfseries\footnotesize] at (2.4, 1.4) {Fluxo de Descarregamento Total};
+                
+                % Nós Veículo e Servidor
+                \node[draw=blue!80!black, fill=white, rounded corners=4pt, thick, minimum height=1.1cm, text width=2.1cm, align=center] (app) at (0.6, 0) {\scriptsize Criptografia /\\ \scriptsize Compressão};
+                \node[draw=gray!80, fill=gray!10, rounded corners=4pt, thick, minimum height=1.1cm, text width=1.5cm, align=center] (srv) at (4.2, 0) {\scriptsize Servidor\\ \scriptsize Edge};
+                
+                % Setas
+                \draw[->, thick, blue!80!black] (app) -- (srv) node[midway, above, font=\tiny] {100\% dos Dados} node[midway, below, font=\tiny] {Bloco Único};
+                
+                % Indicação de não particionável
+                \node[draw, circle, dashed, red!80, line width=1.2pt, minimum size=2.4cm] at (0.6,0) {};
+                \node[red!80!black, font=\bfseries\tiny, fill=white, rounded corners=2pt, draw=red!20, inner sep=2pt] at (0.6, -1.4) {Indivisível};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%################## SLIDE 7: PERFIL DE APLICAÇÃO (PARCIAL) ##################
+\begin{frame}{Perfil de Aplicação: Descarregamento Parcial}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.4cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Aplicações Modulares (Visão / IA), fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize 
+                \textbf{Natureza}: Tarefas paralelizáveis estruturadas em \textit{pipelines}.
+                
+                \vspace{0.15cm}
+                \textbf{Carga}: Triagem local avançada, transmitindo apenas dados intermediários e leves.
+                
+                \vspace{0.15cm}
+                \textbf{Prazos}: Excelente adaptabilidade para prazos críticos de tempo real.
+                
+                \vspace{0.15cm}
+                \textbf{Energia}: Consumo altamente otimizado por fatiamento de processamento.
+                
+                \vspace{0.15cm}
+                \textbf{Exemplos}: Reconhecimento de placas (ALPR) e IA distribuída.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.5cm}
+            \begin{tikzpicture}[>=stealth, scale=0.85, transform shape, font=\sffamily]
+                % Fundo
+                \fill[orange!3, rounded corners=6pt, draw=orange!20, thick] (-0.6, -2.3) rectangle (5.4, 1.8);
+                \node[orange!80!black, font=\bfseries\footnotesize] at (2.4, 1.4) {Pipeline Modular (ALPR)};
+                
+                % Divisão de Domínios
+                \draw[dashed, red!80!black, line width=1pt] (3.1, 1.0) -- (3.1, -2.1);
+                \node[text=red!80!black, font=\bfseries\tiny, rotate=90, anchor=south] at (3.1, -0.6) {Limite do Veículo};
+                
+                % Nós do Pipeline
+                \node[draw=orange!80!black, fill=white, rounded corners=4pt, thick, align=center, inner sep=4pt] (cam) at (0, 0) {\scriptsize Câmera};
+                \node[draw=orange!80!black, fill=white, rounded corners=4pt, thick, align=center, text width=1.3cm, inner sep=3pt] (det) at (1.8, 0) {\scriptsize Detecção \\ \tiny (Veículo)};
+                \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, align=center, text width=1.3cm, inner sep=3pt] (ocr) at (4.3, 0) {\scriptsize OCR \\ \tiny (Servidor)};
+                
+                % Setas de Fluxo
+                \draw[->, thick, orange!80!black] (cam) -- (det) node[midway, above, font=\tiny] {Vídeo};
+                \draw[->, thick, orange!80!black] (det) -- (ocr) node[midway, above, font=\tiny] {Imagem} node[midway, below, font=\tiny] {Recortada};
+                
+                % Retorno do resultado
+                \draw[->, thick, blue!80!black, dashed] (ocr.south) .. controls (4.3, -1.6) and (0, -1.6) .. (cam.south)
+                    node[midway, above, font=\tiny\bfseries, text=blue!80!black] {Resultado: ABC-1234};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
 
 % \section{Imagens}
 % %%################ Imagens #############
