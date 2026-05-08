@@ -46,7 +46,7 @@
 \setbeamercolor{bibliography entry title}{fg=black}
 
 % ── Metadados ────────────────────────────────────────────────────────────────
-\title[\textbf{SAC-TOPSIS para Redes Veiculares}]{%
+\title[\textbf{SAC-FTOPSIS para Redes Veiculares}]{%
   \textbf{Modelo de Decisão Baseado em Lógica \textit{Fuzzy}-TOPSIS e\\
   Aprendizado por Reforço Profundo\\
   para o \textit{Offloading} de Tarefas\\
@@ -2773,14 +2773,14 @@ $C^*_i = d^-_i\,/\,(d^+_i + d^-_i) \in [0,1]$ CAPTURA AMBAS AS CONDIÇÕES SIMUL
 \end{frame}
 }
 
-% 26. A PROPOSTA: PIPELINE SAC-TOPSIS (MELHORADO)
+% 26. A PROPOSTA: PIPELINE SAC-FTOPSIS (MELHORADO)
 {
 \setbeamercolor{background canvas}{bg=white}
 \begin{frame}[plain, t]
 \color{black}
 
 \vspace{0.35cm}
-\hspace{0.3cm}{\Large\bfseries\ttfamily PRIMEIRO PASSO DA PROPOSTA: PIPELINE SAC-TOPSIS}
+\hspace{0.3cm}{\Large\bfseries\ttfamily PRIMEIRO PASSO DA PROPOSTA: PIPELINE SAC-FTOPSIS}
 
 \vspace{0.20cm}
 \hspace{0.3cm}
@@ -2865,14 +2865,14 @@ DIVISÃO DE RESPONSABILIDADES: O TOPSIS RESPONDE \emph{``QUAL CANDIDATO?''}
 \end{frame}
 }
 
-% 26e. ALGORITMO 2: SAC-TOPSIS (INFERÊNCIA)
+% 26e. ALGORITMO 2: SAC-FTOPSIS (INFERÊNCIA)
 {
 \setbeamercolor{background canvas}{bg=white}
 \begin{frame}[plain, t]
 \color{black}
 
 \vspace{0.15cm}
-\hspace{0.3cm}{\large\bfseries\ttfamily ALGORITMO 2 — SAC-TOPSIS (INFERÊNCIA)}
+\hspace{0.3cm}{\large\bfseries\ttfamily ALGORITMO 2 — SAC-FTOPSIS (INFERÊNCIA)}
 
 \vspace{0.05cm}
 \centering
@@ -2944,7 +2944,7 @@ SAC-A1     & 11D (bruto)   & binária   & WSM            & ---      \\
 SAC-S1     & 6D (manual)   & 3 classes & WSM            & ---      \\
 SAC-R1     & 11D (bruto)   & 3 classes & Deadline-aware & ---      \\
 SAC-T1     & 6D (TOPSIS)   & 3 classes & Deadline-aware & Feature  \\
-\textbf{SAC-TOPSIS} & \textbf{6D (TOPSIS)} & \textbf{binária} & \textbf{Deadline-aware} & \textbf{Decisão} \\
+\textbf{SAC-FTOPSIS} & \textbf{6D (TOPSIS)} & \textbf{binária} & \textbf{Deadline-aware} & \textbf{Decisão} \\
 \hline
 \end{tabular}}
 
@@ -2986,7 +2986,7 @@ SAC-A1      & 39,2 & 13,7 & 2106 & $+34,6$ \\
 SAC-S1      & 28,8 & 39,3 & 2028 & $+24,2$ \\
 SAC-R1      & 38,4 & 13,4 & 3153 & $+33,8$ \\
 SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
-\textbf{SAC-TOPSIS} & \textbf{45,29} & \textbf{6,6} & 2582 & $\mathbf{+40,7}$ \\
+\textbf{SAC-FTOPSIS} & \textbf{45,29} & \textbf{6,6} & 2582 & $\mathbf{+40,7}$ \\
 \hline
 \end{tabular}}
 
@@ -3013,7 +3013,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
   \node[draw=black, line width=1.8pt, fill=black!18, rounded corners=3pt,
         font=\tiny\bfseries\ttfamily, align=center,
         minimum width=1.6cm, minimum height=0.62cm] (b3) at (3.0, 0)
-    {SAC-TOPSIS\\45,29\%};
+    {SAC-FTOPSIS\\45,29\%};
 
   \draw[black,->,line width=1.2pt] (b0.east) -- (b1.west)
     node[midway, above, font=\tiny\ttfamily] {$+24{,}2$ pp};
@@ -3060,7 +3060,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
     {\scriptsize\ttfamily
     SAC-A1 (11D, binária, regra VEC$\succ$V2V): \textbf{39,2\%} $\to$ $+34,6$ pp sobre SAC-Base (4,6\%).\\
     SIMPLES REDUÇÃO DO ESPAÇO DE BUSCA TEM EFEITO EXPRESSIVO.\\
-    PORÉM NÃO ALCANÇA SAC-TOPSIS (45,29\%): A REGRA ESTÁTICA IGNORA\\
+    PORÉM NÃO ALCANÇA SAC-FTOPSIS (45,29\%): A REGRA ESTÁTICA IGNORA\\
     CONDIÇÕES DINÂMICAS DE FILA E DISTÂNCIA NO MOMENTO DA DECISÃO.}
   };
 
@@ -3071,7 +3071,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
     \textbf{\ttfamily ACHADO 2 — TOPSIS COMO DECISÃO VALE 3$\times$ MAIS QUE COMO FEATURE}\\[3pt]
     {\scriptsize\ttfamily
     SAC-T1 (TOPSIS como feature): $+4,3$ pp sobre SAC-S1.\\
-    SAC-TOPSIS (TOPSIS como prior de destino): $+12,2$ pp sobre SAC-T1.\\
+    SAC-FTOPSIS (TOPSIS como prior de destino): $+12,2$ pp sobre SAC-T1.\\
     EFICÁCIA DO TOPSIS É QUASE 3$\times$ MAIOR QUANDO ELE ASSUME O CONTROLE\\
     DO DESTINO DO QUE QUANDO APENAS INFORMA O ESTADO DO AGENTE.}
   };
@@ -3082,7 +3082,7 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
         below=0.25cm of a2] (a3) {
     \textbf{\ttfamily ACHADO 3 — GANHO EM LATÊNCIA: 8,6$\times$ MENOR}\\[3pt]
     {\scriptsize\ttfamily
-    JCT MÉDIO SAC-TOPSIS: \textbf{6,6 s} $\times$ SAC-BASE: \textbf{57,1 s}.\\
+    JCT MÉDIO SAC-FTOPSIS: \textbf{6,6 s} $\times$ SAC-BASE: \textbf{57,1 s}.\\
     A COMBINAÇÃO TOPSIS + ESTADO COMPACTO + REWARD DEADLINE-AWARE\\
     PRODUZ NÃO SÓ MAIS TAREFAS NO PRAZO, MAS LATÊNCIAS SUBSTANCIALMENTE MENORES.\\[3pt]
     HIERARQUIA: $\Delta_{\text{estado}} > \Delta_{\text{TOPSIS-decisão}} > \Delta_{\text{reward+feature}} \gg \Delta_{\text{ação-binária-estática}}$}
@@ -3132,9 +3132,9 @@ SAC-T1      & 33,1 & 11,5 & 2612 & $+28,5$ \\
 \hspace{0.3cm}
 \begin{minipage}{0.92\textwidth}
 {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
-O SAC-TOPSIS LIDERA COM SWQ 0,1484. OS ALGORITMOS PPO, TD3 E A2C
+O SAC-FTOPSIS LIDERA COM SWQ 0,1484. OS ALGORITMOS PPO, TD3 E A2C
 CONVERGEM PARA 100\% LOCAL (SWQ $\approx$ 0,1418). O GREEDY-UNFAIR COM
-CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-TOPSIS (0,1262).
+CONHECIMENTO PERFEITO DO ESTADO DA SIMULAÇÃO FICA ABAIXO DO SAC-FTOPSIS (0,1262).
 }
 \end{minipage}
 
@@ -3204,7 +3204,7 @@ MENOR ESCALA QUE COM O SAC.
 % O PROBLEMA FOI FORMULADO COMO POMDP COM FUNÇÃO OBJETIVO QUE ESTABELECE
 % UM TRADE-OFF RÍGIDO: $w_s{=}0{,}60$ PARA TAXA DE SUCESSO DE DEADLINE
 % E $w_c{=}0{,}40$ PARA CUSTO NORMALIZADO (MIN-MAX) DE LATÊNCIA E ENERGIA.
-% AVALIADO EM 658 CENÁRIOS V2X, O SAC-TOPSIS ATINGIU $J(\pi){=}0{,}2454$.
+% AVALIADO EM 658 CENÁRIOS V2X, O SAC-FTOPSIS ATINGIU $J(\pi){=}0{,}2454$.
 % }
 % \end{minipage}
 
@@ -3233,7 +3233,7 @@ MENOR ESCALA QUE COM O SAC.
 %   \node[draw=black, line width=1.6pt, fill=black!16, rounded corners=3pt,
 %         font=\scriptsize\bfseries\ttfamily, align=center,
 %         minimum width=3.2cm, minimum height=0.60cm] at (-4.2,-2.90)
-%     {1º SAC-TOPSIS\\$J{=}0{,}2454$};
+%     {1º SAC-FTOPSIS\\$J{=}0{,}2454$};
 
 %   \node[draw=black, line width=0.9pt, fill=black!08, rounded corners=3pt,
 %         font=\scriptsize\ttfamily, align=center,
@@ -3250,7 +3250,7 @@ MENOR ESCALA QUE COM O SAC.
 %   \fill[black!80] (-6.5,-4.00) rectangle (-6.5+7.36,-3.70);
 %   \fill[black!35] (-6.5,-4.32) rectangle (-6.5+7.03,-4.02);
 %   \fill[black!20] (-6.5,-4.64) rectangle (-6.5+6.89,-4.34);
-%   \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-3.85) {SAC-TOPSIS 0,2454};
+%   \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-3.85) {SAC-FTOPSIS 0,2454};
 %   \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-4.17) {PPO-TOPSIS 0,2344};
 %   \node[font=\scriptsize\ttfamily, anchor=west] at (0.90,-4.49) {PPO-Base 0,2295};
 %   \node[font=\scriptsize\ttfamily] at (-2.5,-4.90) {$J(\pi)$ (FUNÇÃO OBJETIVO)};
@@ -3277,7 +3277,7 @@ O TOPSIS ATUA COMO PRECONDICIONADOR AGNÓSTICO AO ALGORITMO.
 ACOPLADO AO A2C: $+$84\% EM SWQ. AO DQN: $+$45\%. AO TD3: JCT
 REDUZIDO EM 44,5\%. AO SAC: $+$1147\% (4,58\% $\to$ 45,29\%).\\
 COMPARAÇÃO MAIS JUSTA: SAC-T1 (TOPSIS COMO FEATURE, 3 CLASSES) $\to$
-SAC-TOPSIS (TOPSIS COMO DECISÃO, BINÁRIA): $+$12,3 PP, $+$16,8\% SWQ.
+SAC-FTOPSIS (TOPSIS COMO DECISÃO, BINÁRIA): $+$12,3 PP, $+$16,8\% SWQ.
 ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
 }
 \end{minipage}
@@ -3289,21 +3289,21 @@ ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
 ]
 
   % Escala: 45.21% = 7.2 cm
-  % SAC-Base=0.72, SAC-TOPSIS=7.22
+  % SAC-Base=0.72, SAC-FTOPSIS=7.22
   % A2C-Base=3.48, A2C-TOPSIS=6.76
   % DQN-Base=3.54, DQN-TOPSIS=4.14
   % TD3-Base=6.76, TD3-TOPSIS=7.02 (43.91%)
 
-  % SAC-BASE → SAC-TOPSIS
+  % SAC-BASE → SAC-FTOPSIS
   \node[font=\tiny\bfseries\ttfamily, anchor=east] at (-0.25, 0.22)  {SAC};
   \fill[black!22] (0, -0.05) rectangle (0.72, 0.40);
   \fill[black!72] (0.76,-0.05) rectangle (7.22, 0.40);
   \node[font=\tiny\ttfamily, anchor=west] at (7.26, 0.22) {$+$40,7 pp ($+$1147\% SWQ)};
 
-  % SAC-T1 → SAC-TOPSIS (comparação justa: mesmo TOPSIS, só muda ação)
+  % SAC-T1 → SAC-FTOPSIS (comparação justa: mesmo TOPSIS, só muda ação)
   \node[font=\tiny\ttfamily, anchor=east] at (-0.25,-0.65) {\textit{SAC-T1}};
   \fill[black!30] (0,-0.92) rectangle (5.27,-0.48);   % SAC-T1: 32.96%
-  \fill[black!72] (5.31,-0.92) rectangle (7.22,-0.48); % SAC-TOPSIS: 45.21%
+  \fill[black!72] (5.31,-0.92) rectangle (7.22,-0.48); % SAC-FTOPSIS: 45.21%
   \draw[black!60, dashed, line width=0.5pt] (5.27,-1.05) -- (5.27, 0.52);
   \node[font=\tiny\ttfamily, anchor=west] at (7.26,-0.65)
     {$+$12,3 pp ($+$16,8\% SWQ) \textit{← comparação justa}};
@@ -3358,7 +3358,7 @@ ISOLANDO O EFEITO DE DELEGAR O DESTINO AO TOPSIS.
 % \hspace{0.3cm}
 % \begin{minipage}{0.92\textwidth}
 % {\scriptsize\ttfamily\setlength{\baselineskip}{1.5\baselineskip}
-% EXPERIMENTO CONTROLADO: PPO COM ESTADO 6D, AÇÃO BINÁRIA E MESMA RECOMPENSA DO SAC-TOPSIS.
+% EXPERIMENTO CONTROLADO: PPO COM ESTADO 6D, AÇÃO BINÁRIA E MESMA RECOMPENSA DO SAC-FTOPSIS.
 % RESULTADO: PPO-TOPSIS-COMPACT COLAPSA PARA LOCAL (42,42\% = BASELINE LOCAL = PPO-BASE).
 % O TOPSIS NÃO AGREGA VALOR AO PPO: O AGENTE ON-POLICY APRENDE A IGNORAR O ESTADO E ESCOLHER
 % SEMPRE LOCAL. A DIFERENÇA SAC $-$ PPO (45,29\% $-$ 42,42\% $=$ 2,87\,pp) É ATRIBUÍVEL
@@ -3458,7 +3458,7 @@ FIDELIDADE FÍSICA AOS PADRÕES 3GPP.
               text=white, font=\tiny\bfseries, inner sep=2pt}
 ]
   \node[etapa, fill=black!12] (b1) at (-4.2, 0)
-    {SAC-TOPSIS\\(QUALIFICAÇÃO)\\{\tiny $\checkmark$ 658 CENÁRIOS}};
+    {SAC-FTOPSIS\\(QUALIFICAÇÃO)\\{\tiny $\checkmark$ 658 CENÁRIOS}};
   \node[num] at (-4.2, 0.75) {1};
   \draw[black, ->, line width=1.4pt] (b1.east) -- (-1.55, 0);
   \node[etapa, fill=black!09] (b2) at (0.0, 0)

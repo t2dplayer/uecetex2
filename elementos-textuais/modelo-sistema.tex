@@ -1,2 +1,122 @@
 \chapter{Modelo do Sistema e Formulação do Problema}
 \label{chap:modelo-do-sistema-e-formulacao-do-problema}
+
+Nesta seção, são apresentados os principais modelos matemáticos que fundamentam a solução proposta, englobando as dinâmicas de descarregamento de tarefas e latência, a dinâmica térmica (\textit{thermal throttling} e resfriamento), o consumo energético, a comunicação celular e veicular, e a definição da função objetivo. Para facilitar a leitura e a compreensão formal, a Tabela~\ref{tab:notations} sumariza as principais notações empregadas.
+
+\begin{table}[ht]
+\centering
+\caption{Resumo das Notações Utilizadas}
+\label{tab:notations}
+{\scriptsize
+\begin{tabularx}{\columnwidth}{l X}
+\toprule
+\textbf{Símbolo} & \textbf{Descrição} \\
+\midrule
+\multicolumn{2}{l}{\textit{Modelo de Tarefa}} \\
+$\mathcal{T}_i$ & Tarefa $i$ definida por $(c_i, d_i)$ \\
+$c_i$ & Complexidade computacional da tarefa $i$ (em ciclos) \\
+$d_i$ & Prazo máximo (\textit{deadline}) da tarefa $i$ (em \unit{\second}) \\
+$m$ & Modo de execução ($l$: local, $r$: remoto) \\
+$f^m$ & Frequência de operação da \gls{CPU} no modo $m$ (em \unit{\hertz}) \\
+\midrule
+\multicolumn{2}{l}{\textit{Dinâmica Térmica e Energia}} \\
+$P_{\mathrm{cpu}}^m$ & Potência elétrica consumida pela \gls{CPU} (em \unit{\watt}) \\
+$k_1, k_2, k_3$ & Coeficientes de potência (dinâmica, fuga e estática) \\
+$T_p(t)$ & Temperatura do \textit{chip} no instante $t$ (em \unit{\celsius}) \\
+$T_{\mathrm{amb}}$ & Temperatura ambiente externa (em \unit{\celsius}) \\
+$T_{p,max}$ & Limite de temperatura crítico (\textit{throttling}) (em \unit{\celsius}) \\
+$R'_p, C_p$ & Resistência (\unit{\celsius\per\watt}) e capacitância (\unit{\joule\per\celsius}) térmicas \\
+\midrule
+\multicolumn{2}{l}{\textit{Métricas e Otimização}} \\
+$L_i^m$ & Tempo de processamento da tarefa no modo $m$ (em \unit{\second}) \\
+$\mathrm{JCT}_i$ & Tempo total de conclusão da tarefa (em \unit{\second}) \\
+$E_i^m$ & Energia total consumida para processar a tarefa $i$ (em \unit{\joule}) \\
+$J(\pi)$ & Função objetivo (esperança do retorno acumulado) \\
+$w_s, w_c$ & Pesos de sucesso e custo na função objetivo \\
+\bottomrule
+\end{tabularx}}
+\end{table}
+
+\section{Modelo de Tarefa, Latência e Dinâmica Térmica}
+
+Cada tarefa é caracterizada pelo par $\mathcal{T}_i=(c_i, d_i)$, em que $c_i$ representa a complexidade da tarefa (em ciclos de \gls{CPU}) e $d_i$ denota o prazo aceitável para sua conclusão~\cite{liu2019, uddin2025, guo2024deep, cao2024survey}. A decisão de descarregamento de tarefas é binária (processamento local ou remoto) com o objetivo de reduzir a complexidade computacional da política de controle, o que favorece a sua aplicabilidade em sistemas de tempo real~\cite{liu2019, fofana2024}.
+
+A latência de execução é modelada pela proporção entre a carga de trabalho total ($c_i$) e a capacidade de processamento do dispositivo ($f^m$). Consequentemente, o tempo de resposta para o processamento da tarefa $i$ no modo selecionado $m \in \{local, remoto\}$ é expresso pela Equação~\ref{eq:latency} e o tempo total para a conclusão da tarefa (\gls{JCT}) é dado pela Equação~\ref{eq:jct}:
+
+\begin{equation}
+\label{eq:latency}
+L_i^m = \frac{c_i}{f^m}
+\end{equation}
+
+\begin{equation}
+\mathrm{JCT}_i = t_i^{\mathrm{upload}} + t_i^{\mathrm{fila}} + L_i^m + t_i^{\mathrm{download}},
+\label{eq:jct}
+\end{equation}
+
+em que $t_i^{\mathrm{upload}}$ é o tempo de transmissão da tarefa $i$, $t_i^{\mathrm{fila}}$ é o tempo de espera residual na fila de processamento (estimado como o tempo de execução restante das tarefas já agendadas), $L_i^m$ é o tempo de execução da tarefa no modo selecionado $m$ e $t_i^{\mathrm{download}}$ é o tempo necessário para o download dos resultados. Para o modo de processamento local, os tempos de transmissão de \textit{upload} e \textit{download} são nulos.
+
+Para que o cálculo do \gls{JCT} seja mais realista, é necessário considerar o impacto do mecanismo de segurança térmica do dispositivo. A execução contínua de tarefas eleva a temperatura do processador, o que pode forçar o sistema a reduzir a frequência operacional $f^m$ para evitar o superaquecimento físico do dispositivo.
+
+Nesse contexto, a potência elétrica dissipada pela \gls{CPU} ($P_{\mathrm{cpu}}(f^m)$) é calculada pelo modelo polinomial de frequência proposto por Silva et al.~\cite{silva2022analytical}, dada pela Equação~\ref{eq:power_cpu}:
+
+\begin{equation}
+\label{eq:power_cpu}
+P_{\mathrm{cpu}}(f^m) = k_1 (f^m)^3 + k_2 f^m + k_3
+\end{equation}
+em que $k_1$ e $k_2$ representam as constantes de potência dinâmica e de fuga de corrente (\textit{leakage}), respectivamente. A constante $k_3$ indica o consumo estático mínimo da arquitetura. 
+
+A temperatura instantânea do processador $T_p(t)$, após um intervalo de tempo sob uma dissipação de potência constante $P_{\mathrm{cpu}}(f^m)$, segue o modelo de circuito térmico \gls{RC} de Rao e Vrudhula~\cite{rao2007performance}, expresso pela Equação~\ref{eq:temp_evolution}:
+
+\begin{equation}
+\label{eq:temp_evolution}
+\begin{split}
+T_p(t) &= P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}} \\
+&\quad + (T_{p0} - (P_{\mathrm{cpu}} \cdot R'_p + T_{\mathrm{amb}})) e^{-\frac{t}{R'_p C_p}}
+\end{split}
+\end{equation}
+em que $T_{p0}$ é a temperatura no instante inicial, $T_{\mathrm{amb}}$ é a temperatura ambiente, e $R'_p$ e $C_p$ são parâmetros que representam a resistência e a capacitância térmicas do \gls{CPU}, respectivamente.
+
+Essa modelagem permite representar de forma mais realista os ciclos de aquecimento e resfriamento do processador. No estado de aquecimento, a potência exigida ($P_{\mathrm{cpu}} = P_{max}'$) é alta, gerando um aumento exponencial na temperatura. Para proteger o processador, o modelo projeta matematicamente o instante exato $t_m$ em que a temperatura atingirá o limite crítico ($T_{p,max}$). Derivando a Equação~\ref{eq:temp_evolution}, obtém-se a restrição de segurança (Equação~\ref{eq:thermal_throttling}):
+
+\begin{equation}
+\label{eq:thermal_throttling}
+t_m = R'_p C_p \ln\left(\frac{P_{max}' R'_p + T_{\mathrm{amb}} - T_{p0}}{P_{max}' R'_p + T_{\mathrm{amb}} - T_{p,max}}\right)
+\end{equation}
+
+Se o tempo de processamento exceder $t_m$, a temperatura fatalmente alcançará a fronteira máxima $T_{p,max}$. Nesse limiar, o mecanismo de contenção térmica (\textit{thermal throttling}) é acionado, forçando a redução da frequência $f^m$ de pico para uma frequência de estabilização térmica segura, freando a curva de dissipação de calor, ao custo de estender significativamente a latência $L_i^m$.
+
+Quando a fila de processamento esvazia, a \gls{CPU} cessa a atividade computacional e $f^m$ zera de forma virtual. Nesse estado, a potência dissipada cai de $P_{max}'$ para $P_{\mathrm{cpu}} = k_3$, que representa unicamente o consumo estático da arquitetura. Inserindo essa potência mínima subtrativa na Equação~\ref{eq:temp_evolution}, a temperatura assintótica cai drasticamente, tornando o diferencial de resfriamento $(T_{p0} - (k_3 \cdot R'_p + T_{\mathrm{amb}}))$ fortemente positivo. Portanto, o decaimento exponencial age como amortecedor, reduzindo continuamente a temperatura $T_p(t)$ em direção ao novo limiar basal seguro de repouso durante todo o tempo do \textit{intervalo idle}.
+
+
+\section{Modelo de Energia}
+
+
+Dessa forma, a energia total consumida $E_i^m$ durante todo o ciclo de vida da tarefa $i$ no modo $m \in \{l, r\}$ engloba de forma coerente a potência instantânea do processamento e o custo das interfaces de rede, conforme a Equação~\ref{eq:energy}:
+
+\begin{equation}
+\label{eq:energy}
+E_i^m = P_{\mathrm{cpu}}^m(f^m) \cdot L_i^m + P_{\mathrm{tx}}^m \cdot t_i^{\mathrm{trans},m}
+\end{equation}
+em que $P_{\mathrm{tx}}^m$ denota a potência de transmissão constante e $t_i^{\mathrm{trans},m}$ representa o tempo total de transmissão da tarefa (englobando \textit{upload} e \textit{download}). Para o modo de processamento local ($m=l$), a interface de rede não é acionada, tornando o termo de transmissão estritamente nulo ($P_{\mathrm{tx}}^l = 0$).
+
+
+\section{Modelo de Comunicação \gls{V2I} e \gls{V2V}}
+
+A modelagem da comunicação \gls{V2I} e \gls{V2X} segue as definições de~\cite{3gpp38901, yan2024towards}. O enlace \gls{V2I} opera na frequência de \SI{3.5}{\giga\hertz} com largura de banda de \SI{50}{\mega\hertz}, potência de transmissão de \SI{23}{dBm} e antenas assimétricas (\SI{1,5}{\meter} nos veículos e \SI{25}{\meter} na estação rádio base). O valor de desvanecimento adotado é de \SI{4}{dBm} com um atraso de processamento (\textit{jitter}) de \SI{0,1}{\milli\second}. Para a interface \gls{V2X} (\textit{Sidelink}), a frequência central é de \SI{5.9}{\giga\hertz}, com largura de banda de \SI{10}{\mega\hertz}, desvanecimento de \SI{3}{dBm} e atraso de processamento de \SI{0,25}{\milli\second}. Ambas as interfaces adotam o modelo urbano sem linha de visada (Urban NLOS) do 3GPP~\cite{3gpp38901}, no qual a \gls{PL} expressa em dB é determinada pela Equação~\ref{eq:pathloss}:
+
+\begin{equation}
+\label{eq:pathloss}
+PL(d, f) = 35{,}3 \log_{10}(d) + 21{,}3 \log_{10}(f) + 22{,}4
+\end{equation}
+em que $d$ representa a distância tridimensional entre o transmissor e o receptor em metros, e $f$ é a frequência de operação em \unit{\giga\hertz}.
+
+\section{Formulação do Problema e Função Objetivo}
+
+O problema de descarregamento de tarefas é formulado como um Processo de Decisão de Markov Parcialmente Observável (POMDP). O objetivo central é encontrar uma política $\pi$ que maximize a taxa de tarefas concluídas dentro do prazo (\textit{success rate}), ponderada com o custo normalizado de latência e energia. Formalmente, o objetivo do agente é maximizar a esperança do retorno acumulado $J(\pi)$, definido pela Equação~\ref{eq:obj_function}:
+
+\begin{equation}
+\label{eq:obj_function}
+\max_{\pi}\; J(\pi) \;=\; w_s \cdot \mathbb{E}_\pi\!\left[\mathbf{1}(\text{JCT}_i \leq d_i)\right] \;-\; w_c \cdot \mathbb{E}_\pi\!\left[\frac{1}{2}\!\left(\frac{\text{JCT}_i}{\text{JCT}^{\max}_i} + \frac{E_i}{E^{\text{ref}}_i}\right)\right]
+\end{equation}
+
+em que $w_s$ e $w_c$ são os pesos atribuídos ao sucesso e ao custo computacional, respectivamente. Por padrão, adota-se $w_s = 0{,}60$ e $w_c = 0{,}40$ para priorizar o cumprimento de prazos. O termo $\mathbf{1}(\text{JCT}_i \leq d_i)$ é uma função indicadora que assume valor 1 se a tarefa $i$ for concluída antes do seu \textit{deadline} $d_i$, e 0 caso contrário. O segundo termo da equação representa o custo normalizado, composto pela média entre a latência relativa (proporção do \gls{JCT} frente ao pior caso estimado $\text{JCT}^{\max}_i$) e o consumo de energia relativo frente a um valor de referência $E^{\text{ref}}_i$. Essa formulação garante que a função objetivo varie em um intervalo bem definido, o que favorece a estabilidade do aprendizado por reforço profundo~\cite{haarnoja2018sac, uddin2025}.

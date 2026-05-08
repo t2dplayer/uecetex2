@@ -1,0 +1,119 @@
+\begin{table}[ht]
+\centering
+\caption{Resumo das Notações Utilizadas}
+\label{tab:notations}
+{\scriptsize
+\begin{tabularx}{\columnwidth}{l X}
+\toprule
+\textbf{Símbolo} & \textbf{Descrição} \\
+\midrule
+
+\end{tabularx}}
+\end{table}
+
+Nessa seção são apresentados os principais modelos matemáticos utilizados, englobando os de descarregamento de tarefas, comunicação celular, não-estacionariedade, consumo energético, \textit{thermal-throttling} e a função objetivo. Para facilitar a leitura e entendimento é apresentada a Tabela \ref{tab:notations} com um resumo das principais notações utilizadas.
+
+\subsection{Modelo de Tarefa, Latência e Contenção Térmica}
+
+Cada tarefa é caracterizada pelo par $T_i=(c_i, d_i)$, onde $c_i$ representa a complexidade da tarefa (em ciclos de \acrotip{CPU}) e $d_i$ denota o prazo aceitável para sua conclusão~\cite{liu2019, uddin2025, guo2024deep, cao2024survey}. A decisão de descarregamento de tarefas é binária (processamento local ou descarregamento para o melhor dentre os nós candidatos ao descarregamento) com o objetivo de reduzir a complexidade computacional da política de controle, o que favorece a sua aplicabilidade em sistemas de tempo real~\cite{liu2019, fofana2024}.
+
+A latência de execução é modelada pela proporção entre a carga de trabalho total e a capacidade de processamento do dispositivo. Consequentemente, o tempo de resposta para o processamento local da tarefa $i$ é dado pela Equação \ref{eq:latency_local} e para o remoto pela Equação \ref{eq:latency_remote}.
+
+\begin{equation}
+\label{eq:latency_local}
+  L_i^l = \frac{c_i}{f^l}
+\end{equation}
+
+\begin{equation}
+  \label{eq:latency_remote}
+L_i^r = \frac{c_i}{f^r}
+\end{equation}
+
+O tempo total para a conclusão da tarefa $T_i$ é dado pela Equação \ref{eq:jct}.
+
+\begin{equation}
+  \mathrm{JCT}_i = t_i^{\mathrm{upload}} + t_i^{\mathrm{fila}}
+                         + L_i + t_i^{\mathrm{download}},
+  \label{eq:jct}
+\end{equation}
+
+no qual $t_i^{\mathrm{upload}}$ é o tempo de transmissão (upload), $t_i^{\mathrm{fila}}$ é o tempo de espera residual na fila do destino, estimado como o tempo de execução restante das tarefas já na fila, $L_i$ é o tempo de execução e $t_i^{\mathrm{download}}$ é o tempo de download dos resultados.
+
+Nas Equações \ref{eq:latency_local} e \ref{eq:latency_remote}, as frequências de processamento $f^l$ e $f^r$ variam dinamicamente à medida que os dispositivos acionam mecanismos de contenção térmica (\textit{thermal throttling}) para reduzir a temperatura da \acrotip{CPU} por meio da técnica de Escalonamento Dinâmico de Tensão e Frequência (\acrotip{DVFS}).
+
+Para modelar o consumo de energia, é adotado o modelo de potência analítico proposto por Silva et al.~\cite{silva2022analytical}, que descreve o consumo total como uma função polinomial da frequência de operação ($P = c_i f^3 + c_1 f + c_2$). Na qual  $c_i$ representa a energia gasta na execução da tarefa $i$. A constante $c_1$ mede a energia desperdiçada (fuga de corrente ou \textit{leakage}). Por fim, $c_2$ é o consumo fixo, representando a energia mínima necessária apenas para manter a \acrotip{CPU} ligada. 
+
+A definição sobre o momento exato da ativação do \textit{throttling} segue o algoritmo proposto por Rao e Vrudhula~\cite{rao2007performance}. Neste modelo, empregam-se princípios de circuitos elétricos para mapear como o calor se propaga e se acumula na estrutura do processador, definindo um limite crítico máximo de temperatura no \textit{chip} ($T_{p,max}$). O algoritmo calcula o tempo que a \acrotip{CPU} pode operar em capacidade máxima antes de atingir $T_{p,max}$ através da Equação \ref{eq:thermal_throttling}:
+
+\begin{equation}
+\label{eq:thermal_throttling}
+t_m = R'_p C_p \ln\left(\frac{P'_{max} R'_p - T_{p0}}{P'_{max} R'_p - T_{p,max}}\right).
+\end{equation}
+
+Nesta formulação, o instante exato para a contenção é decidido com base na resistência ($R'_p$) e capacitância ($C_p$) térmicas, na potência máxima gerada ($P'_{max}$) e no aquecimento que vai da temperatura inicial ($T_{p0}$) até a temperatura máxima permitida ($T_{p,max}$). Somente após transcorrido exatamente esse tempo $t_m$, o mecanismo aciona a curva ótima de desaceleração para evitar danos, sem prejudicar o desempenho de forma prematura.
+
+\subsection{Modelo de Energia}
+
+A energia consumida pelo modo $m$ é
+\begin{equation}
+  E_j^{(m)} = \alpha_c^{(m)} \bigl[V^{(m)}\bigr]^2 C_j
+             + P_{\mathrm{TX}}^{(m)}\,t_j^{\mathrm{tx},(m)},
+  \label{eq:energy}
+\end{equation}
+onde $\alpha_c^{(m)}$ é a capacitância do chip, $V^{(m)}$ é a tensão de
+alimentação na frequência $f^{(m)}$ e $P_{\mathrm{TX}}^{(m)}$ é a potência
+de transmissão.
+Para o modo local, o termo de transmissão é nulo.
+
+\subsection{Modelo de Comunicação \acrotip{V2I} e \acrotip{V2V}}
+
+A modelagem da comunicação \acrotip{V2I} e \acrotip{V2X} segue as definições especificadas em~\cite{3gpp38901, yan2024towards}. Neste sentido, o enlace \acrotip{V2I} considerado nas simulações opera na frequência de \SI{3.5}{\giga\hertz} com largura de banda de \SI{50}{\mega\hertz}, potência de transmissão de \SI{23}{dBm} e antenas assimétricas (\SI{1,5}{\meter} nos veículos e \SI{25}{\meter} na estação rádio base). Além disso, o valor de desvanecimento vale \SI{4}{dBm} e o atraso de processamento é de \SI{0.1}{\milli\second}. Já para o \acrotip{V2X}, a frequência central vale \SI{5.9}{\giga\hertz}, a largura de banda é de \SI{10}{\mega\hertz}, o valor de desvanecimento é igual a \SI{3}{dBm} e o atraso de processamento é de \SI{0.25}{\milli\second}. Ambas as interfaces adotam o modelo urbano sem linha de visada (\textit{Urban NLOS})~\cite{3gpp38901}, no qual a perda de percurso (\textit{Path Loss} --- $PL$) em \unit{dB} é especificada pela Equação~\ref{eq:pathloss}:
+
+\begin{equation}
+\label{eq:pathloss}
+PL(d, f) = 35{,}3 \log_{10}(d) + 21{,}3 \log_{10}(f) + 22{,}4
+\end{equation}
+
+onde $d$ representa a distância entre o transmissor e o receptor em metros e $f$ é a frequência de operação em \unit{\giga\hertz}. 
+
+% Os principais parâmetros de rede e rádio utilizados são detalhados na Tabela~\ref{tab:3gpp_params}.
+
+% \begin{table*}[ht]
+% \centering
+% \caption{Resumo dos Parâmetros de Comunicação baseados em \acrotip{3GPP} \textit{TR} 37.885 e \textit{TR} 38.901}
+% \label{tab:3gpp_params}
+% \begin{tabularx}{\textwidth}{l X X l}
+% \toprule
+% \textbf{Parâmetro} & \textbf{\textit{V2I} (Interface \acrotip{Uu})} & \textbf{\textit{V2V} (\textit{Sidelink} \acrotip{PC5})} & \textbf{Referência \acrotip{3GPP}} \\
+% \midrule
+% \textit{Tecnologia} & \textit{5G} \acrotip{NR} (\textit{Band} \textit{n78}) & \textit{\acrotip{NRV2X}} (\textit{Sidelink Mode} 2) & \textit{TR} 38.901 / 37.885 \\
+% \textit{Frequência Central} & \SI{3,5}{\giga\hertz} & \SI{5,9}{\giga\hertz} (\textit{Banda} \acrotip{ITS}) & \textit{TR} 38.901 \\
+% \textit{Largura de Banda} & \SI{50}{\mega\hertz} & \SI{10}{\mega\hertz} & \textit{TR} 37.885 \\
+% \textit{Cenário de Percurso} & \textit{UMi} (\textit{Urban Micro}) & \textit{Urban} / \textit{Highway} & \textit{TR} 38.901 / 37.885 \\
+% \textit{Modelo de Perda (\textit{PL})} & $35,3 \log_{10}(d) + 21,3 \log_{10}(f_c) + 22,4$ & $32,4 + 20 \log_{10}(d) + 20 \log_{10}(f_c)$ & \textit{TR} 38.901 (\textit{NLOS}) / 37.885 (\textit{LOS}) \\
+% \textit{Desvanecimento (\textit{Shadowing})} & $\sigma = 4$ \acrotip{dB} & $\sigma = 3$ \acrotip{dB} a $4$ \acrotip{dB} & \textit{TR} 38.901 \\
+% \textit{Altura da Antena (\acrotip{BS})} & \SI{25}{\meter} (\acrotip{gNB}) & \textit{N/A} & \textit{TR} 38.901 \\
+% \textit{Altura da Antena (Veículo)} & \SI{1,5}{\meter} & \SI{1,5}{\meter} & \textit{TR} 37.885 \\
+% \textit{Potência de Transmissão} & \SI{23}{\decibel\meter} & \SI{23}{\decibel\meter} & \textit{TR} 37.885 \\
+% \textit{Ruído Térmico (\textit{No})} & \SI{-174}{\decibel\meter/\hertz} & \SI{-174}{\decibel\meter/\hertz} & Padrão \acrotip{AWGN} \\
+% \textit{Sensibilidade} & \SI{-94}{\decibel\meter} & \SI{-94}{\decibel\meter} & \textit{TR} 37.885 \\
+% \textit{Atraso de Processamento} & $\approx \SI{0,1}{\milli\second}$ & $\approx \SI{0,25}{\milli\second}$ (\textit{Slot Jitter}) & \textit{TR} 37.885 \\
+% \bottomrule
+% \end{tabularx}
+% \end{table*}
+
+% Essa escolha metodológica combinada garante uma representação realista das condições de canal, da alocação de recursos na camada física e das restrições estritas de latência durante a troca de dados entre os nós candidatos ao descarregamento, como o servidor de borda (\acrotip{VEC}) e veículos vizinhos.
+
+
+\subsection{Objetivo de Otimização}
+
+A contribuição de \acrotip{QoS} por tarefa é
+\begin{equation}
+  \Phi_j = \alpha\,\mathrm{JCT}_j + \beta\,E_j
+            + \gamma\,\mathbf{1}[\mathrm{JCT}_j > D_j],
+  \label{eq:obj}
+\end{equation}
+com parâmetros configuráveis de peso (por padrão $\alpha=\beta=0{,}35$) e uma constante de penalidade por violação de prazo $\gamma=0{,}015$.
+O objetivo do sistema é minimizar $\sum_j \Phi_j$ maximizando a
+taxa de cumprimento de prazo
+$\hat{\tau} = |\{j : \mathrm{JCT}_j \le D_j\}|/N$.

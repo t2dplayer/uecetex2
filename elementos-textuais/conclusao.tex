@@ -16,20 +16,20 @@ Igualmente relevante é a engenharia da função de recompensa \textit{deadline-
 
 Por fim, a proposição da métrica \gls{SWQ} (Equação~\ref{eq:swq}) ajuda a medir a qualidade da política como o produto da taxa de sucesso pelo valor esperado da folga normalizada das tarefas concluídas no prazo, a métrica supera as limitações da taxa de sucesso simples, em que as tarefas bem-sucedidas e as falhas se mesclam sem discriminação. O \gls{SWQ} contribui de maneira mais adequada na comparação de políticas em ambientes com prazos heterogêneos e alta variância de carga.
 
-\section{Síntese dos Resultados Experimentais}
+\section{Síntese dos Resultados Experimentais Preliminares}
 \label{sec:sintese-resultados}
 
-A avaliação comparativa envolvendo 21 políticas sobre 658 cenários de teste comuns confirma a superioridade da arquitetura proposta. O \gls{SAC}-\gls{TOPSIS} alcançou a maior taxa de sucesso (45,21\%) e o maior \gls{SWQ} (0,1484) entre todos os métodos avaliados, incluindo heurísticas gulosas com acesso privilegiado ao estado real das filas (\textit{Greedy-Unfair}, \gls{SWQ} = 0,1262). O \gls{JCT} médio da proposta (6,547~s) é 8,6 vezes inferior ao do \gls{SAC}-Base (57,075~s), indicando que a combinação entre compressão de estado via \gls{TOPSIS}, recompensa sensível ao prazo e ação binária produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores.
+A avaliação comparativa envolvendo 21 políticas sobre 658 cenários de teste comuns confirma a superioridade da arquitetura proposta. O \gls{SAC}-FTOPSIS alcançou a maior taxa de sucesso (45,21\%) e o maior \gls{SWQ} (0,1484) entre todos os métodos avaliados, incluindo heurísticas gulosas com acesso privilegiado ao estado real das filas (\textit{Greedy-Unfair}, \gls{SWQ} = 0,1262). O \gls{JCT} médio da proposta (6,547~s) é 8,6 vezes inferior ao do \gls{SAC}-Base (57,075~s), indicando que a combinação entre compressão de estado via \gls{TOPSIS}, recompensa sensível ao prazo e ação binária produz não apenas mais tarefas concluídas no prazo, mas também latências substancialmente menores.
 
-O estudo de ablação controlado com cinco variantes (Base, A1, S1, R1 e T1) decompose causalmente o ganho total de $+40{,}69$ pontos percentuais (\textit{pp}) sobre o \gls{SAC}-Base, conforme sintetizado na Equação~\ref{eq:decomposicao}. A maior parcela do ganho provém da compressão de estado de 11D para 6D (Base $\to$ S1: $+24{,}17$~pp), evidenciando que a redução da dimensionalidade e a estruturação semântica da entrada são os fatores mais determinantes para a convergência do agente. A adoção do \gls{TOPSIS} como responsável pela decisão de destino (T1 $\to$ \gls{SAC}-\gls{TOPSIS}: $+12{,}25$~pp) é o segundo maior contribuinte, indicando que eliminar a ambiguidade \gls{VEC}/\gls{V2V} do espaço de ação do agente aumenta significativamente a eficácia do aprendizado. A incorporação do escore \gls{TOPSIS} como \textit{feature} de estado combinada com a recompensa \textit{deadline-aware} (S1 $\to$ T1: $+4{,}27$~pp) apresenta contribuição marginal mais modesta.
+O estudo de ablação controlado com cinco variantes (Base, A1, S1, R1 e T1) decompose causalmente o ganho total de $+40{,}69$ pontos percentuais (\textit{pp}) sobre o \gls{SAC}-Base, conforme sintetizado na Equação~\ref{eq:decomposicao}. A maior parcela do ganho provém da compressão de estado de 11D para 6D (Base $\to$ S1: $+24{,}17$~pp), evidenciando que a redução da dimensionalidade e a estruturação semântica da entrada são os fatores mais determinantes para a convergência do agente. A adoção do \gls{TOPSIS} como responsável pela decisão de destino (T1 $\to$ \gls{SAC}-FTOPSIS: $+12{,}25$~pp) é o segundo maior contribuinte, indicando que eliminar a ambiguidade \gls{VEC}/\gls{V2V} do espaço de ação do agente aumenta significativamente a eficácia do aprendizado. A incorporação do escore \gls{TOPSIS} como \textit{feature} de estado combinada com a recompensa \textit{deadline-aware} (S1 $\to$ T1: $+4{,}27$~pp) apresenta contribuição marginal mais modesta.
 
 % A hierarquia de contribuição dos componentes, sintetizada na expressão
 % \[
 %     \Delta_{\text{estado}} > \Delta_{\text{TOPSIS-decisão}} > \Delta_{\text{reward+feature}} \gg \Delta_{\text{ação-binária-estática}},
 % \]
-% indica que a arquitetura \gls{SAC}-\gls{TOPSIS} é fundamentalmente uma solução de \textit{divisão de responsabilidades}: o \gls{TOPSIS} resolve deterministicamente a pergunta \textit{``para qual candidato descarregar?''}, enquanto o \gls{SAC} aprende a resposta à pergunta complementar \textit{``vale a pena descarregar para esse candidato dado o estado atual das filas, o prazo e a vantagem relativa?''} --- uma pergunta que o \gls{TOPSIS} isoladamente não é capaz de responder.
+% indica que a arquitetura \gls{SAC}-FTOPSIS é fundamentalmente uma solução de \textit{divisão de responsabilidades}: o \gls{TOPSIS} resolve deterministicamente a pergunta \textit{``para qual candidato descarregar?''}, enquanto o \gls{SAC} aprende a resposta à pergunta complementar \textit{``vale a pena descarregar para esse candidato dado o estado atual das filas, o prazo e a vantagem relativa?''} --- uma pergunta que o \gls{TOPSIS} isoladamente não é capaz de responder.
 
-% Adicionalmente, os resultados revelam que a estratégia ótima de descarregamento, em termos de maximização do \gls{SWQ}, passa pela priorização do processamento local: as melhores políticas do \textit{ranking} exibem taxas de execução local elevadas (\%Loc próximo a 100\% no \gls{PPO} e \gls{TD3}, e 74,1\% no \gls{SAC}-\gls{TOPSIS}), indicando que o descarregamento remoto só agrega valor quando a janela temporal disponível compensa os atrasos de transmissão e de fila. Essa constatação corrobora a premissa do modelo de recompensa adotado, em que a penalidade por violação de prazo é estruturalmente dominante sobre qualquer ganho de eficiência energética.
+% Adicionalmente, os resultados revelam que a estratégia ótima de descarregamento, em termos de maximização do \gls{SWQ}, passa pela priorização do processamento local: as melhores políticas do \textit{ranking} exibem taxas de execução local elevadas (\%Loc próximo a 100\% no \gls{PPO} e \gls{TD3}, e 74,1\% no \gls{SAC}-FTOPSIS), indicando que o descarregamento remoto só agrega valor quando a janela temporal disponível compensa os atrasos de transmissão e de fila. Essa constatação corrobora a premissa do modelo de recompensa adotado, em que a penalidade por violação de prazo é estruturalmente dominante sobre qualquer ganho de eficiência energética.
 
 \section{Limitações e Questões em Aberto}
 \label{sec:limitacoes}
@@ -40,24 +40,89 @@ Embora os resultados sejam promissores, uma análise rigorosa impõe o reconheci
 
 % A formulação atual restringe o descarregamento ao modo binário (\textit{full offloading}): a tarefa é executada integralmente no nó local ou integralmente no candidato de maior pontuação pelo \gls{TOPSIS}. Cenários com tarefas de alta demanda computacional poderiam se beneficiar de mecanismos de particionamento (\textit{partial offloading}), em que uma fração da tarefa é enviada ao servidor enquanto o restante é processado localmente em paralelo. Essa extensão amplia o espaço de ação para um domínio contínuo, o que demanda ajustes tanto na formulação do \gls{MDP} quanto na arquitetura do agente.
 
-Por fim, o simulador atual opera sob a premissa de canal de comunicação idealizado, sem modelagem explícita de desvanecimento rápido (\textit{fast fading}), interferência entre enlaces ou condições de não-visada (\textit{NLoS}) para bloqueio dinâmico de sinal. A integração com o simulador de rede ns-3, prevista no cronograma da pesquisa, viabilizará a avaliação sob condições de propagação mais próximas do padrão \gls{3GPP} TR~38.901, incluindo os efeitos de mobilidade sobre a qualidade do enlace \gls{V2I} e \gls{V2V}.
+Por fim, o simulador atual opera sob a premissa de canal de comunicação simplificado, sem modelagem mais detalhada de desvanecimento rápido, interferência entre enlaces ou bloqueio de sinal. A integração com o simulador de rede ns-3 viabilizará a avaliação sob condições de propagação mais próximas do padrão \gls{3GPP} TR~38.901, incluindo os efeitos de mobilidade sobre a qualidade do enlace \gls{V2I} e \gls{V2V}.
 
-\section{Trabalhos Futuros}
-\label{sec:trabalhos-futuros}
+\section{Proposta Final}
+\label{sec:proposta-final}
 
 A evolução planejada para a tese consiste na substituição do módulo \gls{TOPSIS} pelo \textit{Fuzzy}-\gls{TOPSIS}~\cite{chen2000}. A incorporação de \glspl{TFN} aos critérios de avaliação dos candidatos permitirá que a incerteza e a imprecisão das medições do ambiente veicular sejam formalmente representadas no processo de ranqueamento, em vez de serem ignoradas ou absorvidas imperfeitamente pela rede neural. Essa mudança não altera a interface entre os dois módulos (o vetor 6D continua sendo o contrato entre o \gls{TOPSIS} e o \gls{SAC}), mas enriquece semanticamente o conteúdo do estado entregue ao agente.
 
-A integração com o co-simulador ns-3/SUMO constitui o segundo eixo de desenvolvimento. Essa integração viabilizará a avaliação do \gls{SAC}-\gls{TOPSIS} em um ambiente de simulação de rede de eventos discretos completo, com modelagem realista das camadas \gls{PHY} e \gls{MAC} do \gls{5G} \gls{NR} e dos canais \gls{V2X} \textit{Sidelink}, superando a simplificação do canal perfeito adotada nesta fase.
+Por fim, planeja-se avaliar a proposta com o par ns-3/SUMO. Essa integração viabilizará a avaliação do \gls{SAC}-FTOPSIS em um ambiente de simulação de rede de eventos discretos completo, com modelagem realista das camadas \gls{PHY} e \gls{MAC} do \gls{5G} \gls{NR} e dos canais \gls{V2X} \textit{Sidelink}, superando a simplificação do canal perfeito adotada nesta fase.
 
-Por fim, planeja-se a avaliação de mecanismos de aprendizado contínuo (\textit{online learning}) que permitam ao agente atualizar incrementalmente sua política durante a operação em produção, sem a necessidade de retreinamento completo. Essa capacidade é fundamental para lidar com mudanças de distribuição de carga (\textit{distribution shifts}) causadas por eventos imprevistos sem degradação de desempenho.
+% Por fim, planeja-se a avaliação de mecanismos de aprendizado contínuo (\textit{online learning}) que permitam ao agente atualizar incrementalmente sua política durante a operação em produção, sem a necessidade de retreinamento completo. Essa capacidade é fundamental para lidar com mudanças de distribuição de carga (\textit{distribution shifts}) causadas por eventos imprevistos sem degradação de desempenho.
 
 % Por fim, a extensão para cenários multiagente, em que múltiplos veículos operam simultaneamente sobre uma infraestrutura de borda compartilhada, introduz o problema de não-estacionariedade competitiva: as decisões concorrentes de agentes independentes alteram dinamicamente o estado das filas, potencialmente invalidando as estimativas locais de \gls{JCT}. A modelagem dessa interação --- seja por \gls{MARL} ou por mecanismos de coordenação explícita --- representa uma fronteira científica relevante para a fase final da tese.
 
 \section{Considerações Finais}
 \label{sec:consideracoes-finais}
 
-Este documento de qualificação demonstra a viabilidade científica e experimental da arquitetura \gls{SAC}-\gls{TOPSIS} para o descarregamento adaptativo de tarefas em redes \gls{VEC}. O conjunto de contribuições alcançadas estabelece uma base teórica e metodológica sólida sobre a qual a tese final será construída.
+Este documento de qualificação demonstra a viabilidade científica e experimental da arquitetura \gls{SAC}-FTOPSIS para o descarregamento adaptativo de tarefas em redes \gls{VEC}. O conjunto de contribuições alcançadas estabelece uma base teórica e metodológica sólida sobre a qual a tese final será construída.
 
-A proposta responde diretamente às lacunas identificadas na revisão de literatura: a ausência de representações de estado escaláveis ao número variável de candidatos~\cite{miriyala2026, uddin2025}, a predominância de modelagens com observabilidade perfeita~\cite{liu2025} e a falta de políticas avaliadas sob diferentes regimes de carga~\cite{Moghaddasi2023}. Os resultados obtidos com o \gls{SAC}-\gls{TOPSIS} constituem evidência empírica de que a divisão de responsabilidades entre ranqueamento multicritério e aprendizado por reforço profundo é uma estratégia eficaz para o domínio veicular.
+A proposta responde diretamente às lacunas identificadas na revisão de literatura, conforme sintetizado na Tabela~\ref{tab:lacunas-atendidas}. Em particular, a arquitetura resolve a ausência de representações de estado escaláveis ao número variável de candidatos~\cite{miriyala2026, uddin2025}, a predominância de modelagens com observabilidade perfeita~\cite{liu2025} e a falta de políticas avaliadas sob diferentes regimes de carga~\cite{Moghaddasi2023}. Os resultados obtidos com o \gls{SAC}-FTOPSIS constituem evidência empírica de que a divisão de responsabilidades entre ranqueamento multicritério e aprendizado por reforço profundo é uma estratégia eficaz para o domínio veicular.
+
+\begin{table}[ht!]
+    \centering
+    \Caption{\label{tab:lacunas-atendidas} Lacunas de pesquisa atendidas pela proposta (baseado em~\citeonline{miriyala2026}).}
+    \UECEtab{}{% 
+        \begin{tabular}{|c|p{4.5cm}|p{6.5cm}|c|}
+            \hline
+            \textbf{\#} & \textbf{Lacuna Identificada} & \textbf{Resposta da Proposta} & \textbf{Status} \\ \hline
+            1 & \textit{Flat vectors} ignoram topologia variável ($N$ nós) & \gls{TOPSIS} comprime $N$ candidatos em vetor 6D fixo (invariante à escala). & Sim \\ \hline
+            2 & Políticas estáticas colapsam sob alta mobilidade & \gls{SAC} com entropia máxima e \textit{replay buffer} para adaptação contínua. & Sim \\ \hline
+            3 & Vulnerabilidade a ruído nas observações de estado & Estado 6D normalizado via \textit{Fuzzy}-\gls{TOPSIS} atenua sensibilidade a \textit{outliers}. & Parcial \\ \hline
+            4 & Modelos leves para borda extrema (\textless 50 MB) & MLP $6{\to}64{\to}64{\to}2$ ($\approx$ 8 KB); inferência em microssegundos. & Sim \\ \hline
+            5 & \textit{Continual learning} sem \textit{catastrophic forgetting} & Treinamento \textit{off-policy} com memória de experiência para atualização incremental. & Sim \\ \hline
+        \end{tabular} 
+    }{% 
+        \Fonte{Adaptado de~\citeonline{miriyala2026}.}
+    }
+\end{table}
 
 Os próximos passos, detalhados no cronograma da Tabela~\ref{tab:cronograma}, contemplam a integração com o \textit{Fuzzy}-\gls{TOPSIS}, a co-simulação com ns-3/SUMO, o refinamento do agente e a análise comparativa estendida. Espera-se que a tese final contribua de forma original e significativa para o campo de gerenciamento de recursos em sistemas de transporte inteligentes de próxima geração, com resultados a serem submetidos a periódicos de alto impacto, como o IEEE Transactions on Intelligent Transportation Systems e o IEEE Transactions on Vehicular Technology.
+
+\section{Cronograma de Pesquisa}
+\label{sec:cronograma}
+
+A Tabela~\ref{tab:cronograma} apresenta as atividades de pesquisa e o cronograma de conclusão, detalhado por semestre (S1, S2) e trimestre (Q1).
+
+\begin{table}[ht!]
+    \centering
+    \Caption{\label{tab:cronograma} Atividades de pesquisa e cronograma de conclusão (2026--2028).}
+    \UECEtab{}{% 
+        \begin{tabular}{|l|c|c|c|c|c|} 
+            \hline
+            \textbf{Atividade / Ano} & \multicolumn{2}{c|}{\textbf{2026}} & \multicolumn{2}{c|}{\textbf{2027}} & \textbf{2028} \\ \cline{2-6}
+            & S1 & S2 & S1 & S2 & Q1 \\ \hline
+            1. Exame de Qualificação            & X &   &   &   &   \\ \hline
+            2. Integração com Simulador (NS-3/SUMO) & X & X &   &   &   \\ \hline
+            3. Refinamento de Algoritmos        & X & X & X &   &   \\ \hline
+            4. Avaliação de Desempenho e Coleta de Dados &   & X & X &   &   \\ \hline
+            5. Análise dos Resultados           &   &   & X & X &   \\ \hline
+            6. Escrita da Tese Final            &   &   &   & X & X \\ \hline
+            7. Defesa Final                     &   &   &   &   & X \\ \hline
+        \end{tabular} 
+    }{% 
+        \Fonte{Elaborado pelo autor. S1: 1\textordmasculine{} semestre (jan.--jun.); S2: 2\textordmasculine{} semestre (jul.--dez.); Q1: 1\textordmasculine{} trimestre de 2028 (jan.--mar.).}
+    }
+\end{table}
+\section{Plano de Publicação}
+\label{sec:plano-publicacao}
+
+A disseminação das descobertas focará em periódicos e conferências especializadas em redes veiculares, computação de borda e sistemas inteligentes. Os locais planejados priorizados para submissão incluem:
+
+\begin{itemize}
+    \item \textbf{Periódicos de Alto Impacto:}
+    \begin{itemize}
+        \item IEEE Transactions on Intelligent Transportation Systems (T-\gls{ITS});
+        \item IEEE Transactions on Vehicular Technology (TVT);
+        \item IEEE Transactions on Intelligent Vehicles (TIV);
+        \item IEEE Transactions on Mobile Computing (TMC);
+        \item IEEE Internet of Things Journal.
+    \end{itemize}
+    \item \textbf{Conferências Relevantes:}
+    \begin{itemize}
+        \item IEEE Vehicular Technology Conference (VTC);
+        \item IEEE Global Communications Conference (GLOBECOM);
+        \item IEEE International Conference on Communications (ICC).
+    \end{itemize}
+\end{itemize}
