@@ -1,4 +1,4 @@
-\usepackage{siunitx,booktabs,xcolor,xspace,multirow,graphicx,lipsum}
+\usepackage{siunitx,booktabs,xcolor,colortbl,xspace,multirow,graphicx,lipsum}
 \usepackage[spanish,mexico,es-noindentfirst]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz}
@@ -8,6 +8,7 @@
 \usetheme{Madrid}
 \usepackage{tcolorbox}
 \usepackage{hyperref}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 
 \usefonttheme{serif}
 
@@ -42,13 +43,13 @@
 
 
 \title[\textbf{}]{\textbf{SAC-FTOPSIS: Um Modelo de Decisão para o Descarregamento de Tarefas em Redes Veiculares}}
-\author[\textbf{Antônio Sérgio de Sousa Vieira}]{\textbf{Antônio Sérgio de Sousa Vieira \break sergio.vieira@ifce.edu.br}}
+\author[\textbf{Antônio Sérgio de Sousa Vieira}]{\textbf{Antônio Sérgio de Sousa Vieira \break sergio.vieira@ifce.edu.br \break sergio.vieira@aluno.uece.br}}
 \date{}
 
 \renewcommand{\maketitle}{
 \begin{center}
-    \includegraphics[height=0.8cm]{figuras/ifce.pdf}\hspace{0.5cm}
-    \includegraphics[height=0.8cm]{figuras/uece_inetsys_desc_logo.png}
+    \includegraphics[height=1.0cm]{figuras/ifce.pdf}\hspace{0.5cm}
+    \includegraphics[height=1.0cm]{figuras/uece_inetsys_desc_logo.png}
     \\[0.1cm]
     \textbf{\scriptsize DOUTORADO EM CIÊNCIA DA COMPUTAÇÃO}
 \end{center}
@@ -58,19 +59,20 @@
 \vspace{-3.2\baselineskip}
 
 \begin{center}
-    \tiny
+
+    \scriptsize
     \begin{tabular}{rl}
-        \textbf{Orientador:} & Dr. Joaquim Celestino Júnior (UECE) \\
+        \textbf{Orientador:} & Prof. Dr. Joaquim Celestino Júnior (UECE) \\
         \textbf{Coorientador:} & Prof. Dr. Alisson Barbosa de Souza (UFC) \\
     \end{tabular}
 
-    \vspace{0.1cm}
-    \textbf{Banca Examinadora:} \\
-    \begin{tabular}{c}
-        Prof. Dr. Luís Manuel De Jesus Sousa Correia (ULisboa) \\
-        Prof. Dr. Gustavo Augusto Lima de Campos (UECE) \\
-        Prof. Dr. Eduardo de Olivindo Cavalcante (IFCE)
-    \end{tabular}
+    % \vspace{0.1cm}
+    % \textbf{Banca Examinadora:} \\
+    % \begin{tabular}{c}
+    %     Prof. Dr. Luís Manuel De Jesus Sousa Correia (ULisboa) \\
+    %     Prof. Dr. Gustavo Augusto Lima de Campos (UECE) \\
+    %     Prof. Dr. Eduardo de Olivindo Cavalcante (IFCE)
+    % \end{tabular}
     
     \vspace{0.2cm}
     \textbf{29 de maio de 2026}

@@ -1,10 +1,6 @@
 \documentclass{beamer}
 \input{setup.tex}
 
-% Definir color verde
-% \definecolor{beamer_color}{RGB}{64, 145, 63}
-% \definecolor{backframe_color}{RGB}{228, 242, 232}
-
 % Definir color morado
 \definecolor{beamer_color}{RGB}{0,0,153} 
 \definecolor{backframe_color}{RGB}{235, 196, 245}
@@ -20,20 +16,7 @@
     \tableofcontents
 \end{frame}
 
-% \section{O Desafio}
-
-% \begin{frame}{O Desafio}
-%     \vspace{0.8cm}
-%     \centering
-%     \LARGE \bfseries
-%     Como decidir o descarregamento se a\\[0.4cm]
-%     \tikz[baseline=(box.base)] \node[fill=blue!15, rounded corners=2pt, inner sep=5pt] (box) {topologia da rede}; muda\\[0.4cm]
-%     na mesma hora?
-% \end{frame}
-
-%%\section{Agenda}
-
-\section{Introdução}
+\section{Introdução e Motivação}
 %%################## Slide ITS E GARGALO LOCAL - PARTE 1 ##################
 \begin{frame}{ITS e seus Desafios}
     \begin{columns}[T]
@@ -153,7 +136,7 @@
         \begin{column}{0.48\textwidth}
             \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Heterogeneidade e Cooperação, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize 
-                \textbf{Capacidades}: OBUIs possuem hardware e níveis de bateria distintos.\\
+                \textbf{Capacidades}: As \textbf{OBUs} possuem hardware e níveis de bateria distintos.\\
                 \textbf{Compartilhamento}: Veículos vizinhos podem ceder recursos ociosos.
             \end{tcolorbox}
             
@@ -165,7 +148,7 @@
             
             \vspace{-0.4cm}
             
-            \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=O Desafio da não estacionariedade, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
+            \begin{tcolorbox}[colback=red!5, colframe=red!70!black, title=O Desafio da Não-estacionariedade, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.3pt, bottomrule=0.3pt]
                 \scriptsize \textbf{Decisão}: Como e onde descarregar em topologias altamente dinâmicas e imprevisíveis (cargas e recursos variáveis)?
             \end{tcolorbox}
         \end{column}
@@ -395,6 +378,7 @@
         \end{column}
     \end{columns}
 \end{frame}
+
 %%################## SLIDE 6: PERFIL TOTAL ##################
 \begin{frame}{Perfil: Descarregamento Total}
     \begin{columns}[T]
@@ -495,18 +479,18 @@
                 
                 % Seta de iteração (Loop) sem sobreposição usando Curva de Bezier controlada
                 \draw[->, thick, red!80!black] (algo.north east) .. controls +(1.2, 0.2) and +(1.2, -0.2) .. node[right, font=\tiny, text=red!80!black, xshift=2pt] {Iterações} (algo.south east);
+                \node[red!80!black, font=\bfseries\tiny, fill=red!3, rounded corners=2pt, draw=red!20, inner sep=2pt] at (2.4, -1.35) {Desconexão};
                 
-                % Linha do tempo (Atraso) apontando para o evento de desconexão, sem colidir com outros textos
+                % Linha do tempo (Atraso)
                 \draw[->, thick, gray, dashed] (2.4, -0.1) -- (2.4, -1.05) node[midway, right, font=\tiny, text=red!80!black, xshift=2pt] {Tempo de Cálculo ($> T_{max}$)};
                 
                 % Veículo e RSU
                 \node[draw=gray!80, fill=gray!10, rounded corners=4pt, thick, minimum height=0.6cm, text width=1.5cm, align=center] (rsu) at (0.6, -1.8) {\scriptsize RSU / Edge};
                 \node[draw=orange!80!black, fill=white, rounded corners=4pt, thick, minimum height=0.6cm, text width=1.5cm, align=center] (veh) at (4.2, -1.8) {\scriptsize Veículo};
                 
-                % Sinalização de Falha (Conexão interrompida com X vermelho) sem sobreposição
+                % Sinalização de Falha
                 \draw[ultra thick, red!80!black] (rsu.east) -- (veh.west);
                 \node[draw=red!80!black, fill=white, circle, inner sep=1pt, font=\bfseries\tiny, text=red!80!black] at (2.4, -1.8) {$\times$};
-                \node[red!80!black, font=\bfseries\tiny, fill=red!3, rounded corners=2pt, draw=red!20, inner sep=2pt] at (2.4, -1.35) {Desconexão};
                 
                 % Etiqueta de Ótimo Local sem sobrepor o bloco principal
                 \node[draw, circle, dashed, red!60, line width=1pt, minimum size=1.0cm] at (0.4, 0.4) {};
@@ -587,203 +571,788 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 \end{frame}
 
 
-% %%################## SLIDE 7: PERFIL PARCIAL ##################
-% \begin{frame}{Perfil: Descarregamento Parcial}
+\section{Trabalhos Relacionados e Lacunas}
+%%################## SLIDE: ARTIGO DE REFERÊNCIA (FOFF) ##################
+\begin{frame}{Artigo de Referência}
+\vspace{-0.5cm}
+\begin{center}
+\includegraphics[page=1, width=1.0\textwidth, keepaspectratio, trim={0 9.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/foff_paper.pdf}
+\end{center}
+\end{frame}
+
+
+%%################## SLIDE: FOFF vs DRL PURO ##################
+\begin{frame}{Vantagens e Desvantagens: FOFF vs. DRL Padrão}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace{0.1cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fuzzy Offloading (FOFF), fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \textcolor{green!60!black}{\textbf{Vantagens}}:\\
+                \textbf{1. Zero Treinamento}: Decisão instantânea (\textit{one-shot}) baseada em regras lógicas, sem exigir iterações longas para convergir.\\
+                \textbf{2. Eficiência}: Baixa complexidade computacional e menor consumo de energia.
+                
+                % \vspace{0.3cm}
+                \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
+                \textbf{1. Miopia Temporal}: Não possui aprendizado sequencial. Toma decisões sem antecipar o estado futuro da rede.\\
+\textbf{2. Adaptação a \textit{Drifts}} : Embora ajuste variáveis dinamicamente, carece de mecanismos de aprendizado sequencial para manter a eficácia sob mudanças abruptas de carga de trabalho sem exigir reconfiguração.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \vspace{0.1cm}
+            \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title={DRL Padrão (Ex: DQN, DDPG)}, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \textcolor{green!60!black}{\textbf{Vantagens}}:\\
+                \textbf{1. Visão de Longo Prazo}: Aprende políticas sequenciais, antecipando estados futuros para maximizar o ganho cumulativo.\\
+                \textbf{2. Model-Free}: Adapta-se à dinâmica do ambiente interagindo via tentativa e erro.
+                
+                % \vspace{0.3cm}
+                \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
+                \textbf{1. Engenharia de Recompensa}: Exige ajuste manual de pesos para combinar múltiplos objetivos (latência, energia).\\
+                \textbf{2. Rigidez Dimensional}: Vulnerável a mudanças na topologia da rede ou na demanda de tráfego, pois exige entradas/saídas de tamanho fixo.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    
+    % \vspace{0.4cm}
+    % \begin{beamercolorbox}[wd=0.98\textwidth, sep=3pt, center, rounded=true]{block body}
+    %     \scriptsize \textit{Enquanto o FOFF sofre com a incapacidade de planejamento a longo prazo, o DRL puro esbarra na fragilidade do design de sua função de recompensa sob ambientes dinâmicos.}
+    % \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{Artigo de Referência}
+\vspace{-0.5cm}
+\begin{center}
+\includegraphics[page=1, width=1.\textwidth, keepaspectratio, trim={0 11.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/section-related-works/literature-review/Deep learning approaches for computation offloading in edge.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Fraquezas na Literatura (DRL em VEC)}
+    \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Como a Nossa Proposta (Fuzzy-TOPSIS+DRL) Preenche as Lacunas de {[Miriyala \& Chirra, 2026]}, fonttitle=\bfseries\footnotesize, arc=4pt, left=2pt, right=2pt, top=2pt, bottom=2pt]
+        \scriptsize
+        \renewcommand{\arraystretch}{1.2}
+        \centering
+        \begin{tabular}{@{}p{5.2cm}|p{5.2cm}@{}}
+            \textbf{Limitações Mapeadas na Literatura} & \textbf{Respostas da Nossa Proposta} \\
+            \hline
+            \textbf{1. Topologia Variável}: Vetores fixos de estados são inadequados para topologias dinâmicas. & \textbf{Invariância à Escala}: O Fuzzy-TOPSIS processa os candidatos e gera um vetor fixo representativo. \\
+            \textbf{2. Não-Estacionariedade}: Políticas entram em colapso sob alta mobilidade (\textit{drifts}). & \textbf{Adaptação Contínua}: O uso do agente SAC (Model-Free) lida naturalmente com as mudanças do ambiente. \\
+            \textbf{3. Perturbações}: Sensibilidade a ruído ou falhas nas observações. & \textbf{Atenuação de Ruído}: Normalização via Fuzzy-TOPSIS amortece o impacto de \textit{outliers}. \\
+            \textbf{4. Complexidade do Modelo}: Faltam modelos leves para hardware restrito. & \textbf{Leve e Enxuta}: Arquitetura com baixa latência de inferência. \\
+            \textbf{5. \textit{Continual Learning}}: Falha ao tentar aprender de forma incremental e online. & \textbf{Atualização \textit{Off-Policy}}: O \textit{Replay Buffer} dinâmico evita o esquecimento catastrófico. \\
+        \end{tabular}
+    \end{tcolorbox}
+    
+    \vspace{-0.2cm}
+    \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
+        \scriptsize \textit{Miriyala \& Chirra (2026) mapearam os principais gargalos do DRL no Edge Computing. Nossa abordagem híbrida ataca diretamente essas vulnerabilidades estruturais.}
+    \end{beamercolorbox}
+\end{frame}
+
+
+\section{Metodologia e Proposta}
+\begin{frame}{Formulação do Problema}
+    \footnotesize
+    O objetivo do agente é \textbf{maximizar a taxa de tarefas concluídas dentro do prazo}, minimizando latência e energia.
+        
+    \begin{equation}
+        \max_{\pi}\; J(\pi) = \mathbb{E}_{\pi}\!\left[ w_s \cdot \underbrace{\mathbb{1}(\widehat{\text{JCT}}_t \leq D_t)}_{\text{taxa de sucesso}} - w_c \cdot \underbrace{\frac{1}{2}\!\left(\frac{\widehat{\text{JCT}}_t}{\text{JCT}^{\max}_t} + \frac{E_t}{E^{\max}_t}\right)}_{\text{custo normalizado}\;\in\,[0, 1]} \right]
+        \label{eq:obj_geral}
+    \end{equation}
+
+    \begin{equation}
+        \text{JCT}^{\max}_t = \max\!\bigl(\widehat{\text{JCT}}^{\ell}_t,\; \widehat{\text{JCT}}^{\text{vec}}_t \cdot \mathbb{1}_{\text{viável}},\; \widehat{\text{JCT}}^{\text{v2v}}_t \cdot \mathbb{1}_{\text{viável}}\bigr)
+        \label{eq:jct_max}
+    \end{equation}
+
+    \begin{equation}
+        E^{\text{max}}_t = \max\!\bigl(E^{\ell}_t,\; E^{\text{vec}}_t \cdot \mathbb{1}_{\text{viável}},\; E^{\text{v2v}}_t \cdot \mathbb{1}_{\text{viável}}\bigr)
+        \label{eq:e_max}
+    \end{equation}
+
+\end{frame}
+
+% \section{Proposta e Resultados}
+
+%%################## SLIDES: DETALHAMENTO DAS RESPOSTAS ##################
+
+%%################## SLIDE: RESPOSTA 1 ##################
+\begin{frame}{Limitação 1: Topologia Variável}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.2cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=4pt, left=4pt, right=4pt, top=4pt, bottom=4pt] 
+                \scriptsize
+                $\bullet$ O número de nós candidatos para descarregamento de tarefas pode variar, exigindo \textbf{retreinamento} em abordagens clássicas de DRL.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.2cm}
+            \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Invariância à Escala, fonttitle=\bfseries\footnotesize, arc=4pt, left=4pt, right=4pt, top=4pt, bottom=4pt]
+                \scriptsize
+                $\bullet$ Propõe-se montar uma representação de dimensão fixa do estado atual percebido pelo agente por meio do ranqueamento (TOPSIS\footnotemark[1]/Fuzzy-TOPSIS\footnotemark[2]), independentemente do número de candidatos.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \footnotetext[1]{Versão intermediária.}
+    \footnotetext[2]{Versão final.}
+\end{frame}
+
+%%################## SLIDE: FLUXO DE COMPACTING E DECISÃO NEURAL ##################
+\begin{frame}{Limitação 1: Topologia Variável}
+    \centering
+    \begin{tikzpicture}[>=stealth, scale=1.0, transform shape, font=\sffamily]
+        % Candidates box (Neighbor Table)
+        \node[draw=orange!80!black, fill=orange!5, rounded corners=3pt, thick, align=left, font=\tiny, inner sep=4pt] (cand) at (1.1, 4.3) {
+            \textbf{Tabela de Vizinhança} \\
+            Nó 1 (Tipo: Veículo, Freq: 1.0 GHz, Dist: 50m, Fila: 3) \\
+            Nó 2 (Tipo: Edge, Freq: 4.0 GHz, Dist: 10m, Fila: 1) \\
+            \ \ \ $\vdots$ \\
+            Nó $n$ (Tipo, Freq, Dist, Fila)
+        };
+        
+        % Fuzzy-TOPSIS Ranking Block
+        \node[draw=orange!80!black, fill=orange!15, rounded corners=3pt, thick, align=center, font=\tiny, inner sep=3.5pt] (topsis) at (1.1, 2.8) {
+            \textbf{Ranqueamento - TOPSIS/Fuzzy-TOPSIS}
+        };
+        
+        % Unified Information Side Panel (Table Dynamics + Ranking Criteria)
+        \node[draw=orange!60!black, fill=orange!2!white, rounded corners=3pt, dashed, thick, align=left, font=\tiny, text width=4.5cm, inner sep=5pt] (panel) at (6.4, 3.55) {
+            \textbf{Dinâmica da Tabela de Vizinhança:} \\
+            $\bullet$ Montada periodicamente via recepção de características dos dispositivos vizinhos. \\
+            $\bullet$ Cada nó possui um \textbf{TTL} (\textit{Time-to-Live}). \\
+            $\bullet$ Sem \textit{refresh} (ex: Nó 1) dentro do limite, o dispositivo é removido.
+            
+            \vspace{5pt}
+            \textbf{Funcionamento do Ranqueamento:} \\
+            $\bullet$ Realizado em função da \textbf{tarefa} a ser processada (requisitos de CPU, latência, etc.). \\
+            $\bullet$ Baseia-se nas \textbf{características (multicritério)} dos nós candidatos da vizinhança.
+        };
+        
+        % Connections to the Sidebar Panel
+        \draw[<->, dashed, orange!80!black, thick] (cand.east) -- ([yshift=20pt]panel.west);
+        \draw[<->, dashed, orange!80!black, thick] (topsis.east) -- ([yshift=-20pt]panel.west);
+        
+        % Arrow from candidates to Fuzzy-TOPSIS
+        \draw[->, orange!80!black, thick] (cand.south) -- (topsis.north);
+        
+        % State Vector label S_t =
+        \node[anchor=east, font=\scriptsize\bfseries] at (-0.4, 1.0) {$\mathbf{S}_t = $};
+        \node[anchor=east, font=\Huge, text=blue!80!black] at (-0.2, 1.0) {$[$};
+        \node[anchor=west, font=\Huge, text=blue!80!black] at (5.2, 1.0) {$]$};
+        
+        % State Vector Elements as Boxes (Enlarged and Lowered)
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s1) at (0.0, 1.0) {$\Delta_{\text{obj}}$};
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s2) at (1.0, 1.0) {$\frac{\widehat{\text{JCT}}^{\ell}}{D}$};
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s3) at (2.0, 1.0) {$\frac{\widehat{\text{JCT}}^{\text{r1}}}{D}$};
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s4) at (3.0, 1.0) {$\frac{|Q^{\text{r1}}|}{Q_{\max}}$};
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s5) at (4.0, 1.0) {$\frac{|Q^{\ell}|}{Q_{\max}}$};
+        \node[draw=blue!80, fill=blue!5, rounded corners=1.5pt, minimum width=0.8cm, minimum height=0.8cm, inner sep=1pt, font=\scriptsize, align=center] (s6) at (5.0, 1.0) {$\frac{C}{C_{\max}}$};
+        
+        % Arrows from Fuzzy-TOPSIS to Rank 1 elements of S_t
+        \draw[->, orange!80!black, thick, dashed] (topsis.south) -- (s3.north);
+        \draw[->, orange!80!black, thick, dashed] (topsis.south) -- (s4.north);
+        \node[right, font=\tiny\bfseries, orange!80!black] at (1.9, 1.9) {\textit{Rank 1}};
+        
+        % Neural Network (MLP) - Lowered and Spaced
+        % Input Layer
+        \foreach \i in {1,...,6} {
+            \node[circle, draw=blue!80!black, fill=blue!20, minimum size=0.32cm, inner sep=0pt] (in\i) at ({(\i-1)*1.0}, -0.2) {};
+        }
+        
+        % Connection lines from state vector to input layer
+        \foreach \i in {1,...,6} {
+            \draw[->, black!60, thin] (s\i.south) -- (in\i.north);
+        }
+        \node[anchor=west, font=\tiny\itshape, gray] at (5.5, -0.2) {Camada de Entrada};
+        
+        % Hidden Layer
+        \foreach \h in {1,...,5} {
+            \node[circle, draw=gray!80, fill=gray!15, minimum size=0.25cm, inner sep=0pt] (hid\h) at ({(\h-1)*1.0 + 0.5}, -1.1) {};
+        }
+        
+        % Connections Input to Hidden
+        \foreach \i in {1,...,6} {
+            \foreach \h in {1,...,5} {
+                \draw[gray!40, ultra thin] (in\i.south) -- (hid\h.north);
+            }
+        }
+        
+        % Output Layer
+        \node[circle, draw=green!80!black, fill=green!20, minimum size=0.32cm, inner sep=0pt] (out1) at (1.5, -1.9) {};
+        \node[circle, draw=purple!80!black, fill=purple!20, minimum size=0.32cm, inner sep=0pt] (out2) at (3.5, -1.9) {};
+        
+        % Connections Hidden to Output
+        \foreach \h in {1,...,5} {
+            \draw[gray!40, ultra thin] (hid\h.south) -- (out1.north);
+            \draw[gray!40, ultra thin] (hid\h.south) -- (out2.north);
+        }
+        
+        % Action Labels
+        \node[anchor=east, font=\tiny\bfseries, green!40!black] at (1.1, -1.9) {OFFLOAD (Rank 1)};
+        \node[anchor=west, font=\tiny\bfseries, purple!60!black] at (3.9, -1.9) {LOCAL};
+    \end{tikzpicture}
+\end{frame}
+
+%%################## SLIDE: RESPOSTA 2 ##################
+\begin{frame}{Limitação 2: Não-Estacionariedade}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.2cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize 
+                $\bullet$ Em redes veiculares, a carga de tarefas, tempo de processamento, tempo de transmissão e a qualidade do canal podem sofrer variações dinâmicas, gerando colapsos em políticas rígidas.\\
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Solução: Adaptação Contínua (SAC), fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \textbf{Maximização da Recompensa e da Entropia}:
+                \begin{equation*}
+                    J(\pi) = \mathbb{E} \left[ \sum_{t} r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t)) \right]
+                \end{equation*}
+                \vspace{2pt}
+                $\bullet$ Incentiva o agente a manter alternativas ativas, impedindo a convergência prematura para ótimos locais.\\
+                $\bullet$ A política estocástica se reajusta autonomamente a flutuações rápidas de carga sem regras estáticas rígidas.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%################## SLIDE: RESPOSTA 3 ##################
+\begin{frame}{Limitação 3: Perturbações}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.2cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                A alta mobilidade e atenuações do canal causam oscilações nas estimativas de estado (latência, distância, filas etc).\\
+                
+                \vspace{0.15cm}
+                Avaliar candidatos usando métricas brutas e instáveis pode provocar inversões na ordem de preferência dos nós candidatos, dificultando o aprendizado do agente.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \centering
+            \vspace{0.2cm}
+            \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title=Solução: Atenuação de Ruído, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                Valores numéricos ruidosos são mapeados em Números Fuzzy Triangulares (ex: "Baixo", "Médio")~\cite{vieira2025foff}, absorvendo pequenas flutuações e incertezas do ambiente deixando o ranqueamento estável.\\
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    % Diagrama visual ilustrando o ranqueamento
+    \begin{center}
+    \begin{tikzpicture}[>=stealth, scale=0.85, transform shape, font=\sffamily]
+        % Sinal Ruidoso
+        \node[draw=purple!80!black, fill=white, rounded corners=4pt, thick, align=center, text width=2.4cm] (raw) at (0, 0) {\scriptsize \textbf{Métricas Brutas}\\ \tiny (Com Ruído/Outliers)};
+
+        % Bloco Fuzzy (Suavização)
+        \node[draw=cyan!80!black, fill=cyan!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (fuzzy) at (3.5, 0) {\scriptsize \textbf{Lógica Fuzzy}\\ \tiny (Suaviza métricas para TFNs)};
+
+        % Bloco TOPSIS (Ranqueamento)
+        \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (topsis) at (7.0, 0) {\scriptsize \textbf{TOPSIS}\\ \tiny (Ranqueia Candidatos)};
+
+        % Setas
+        \draw[->, thick, purple!80!black] (raw.east) -- (fuzzy.west) node[midway, above, font=\tiny] {Instável};
+        \draw[->, thick, cyan!80!black] (fuzzy.east) -- (topsis.west) node[midway, above, font=\tiny] {Suavizado};
+        \draw[->, thick, blue!80!black, line width=1pt] (topsis.east) -- (9.2, 0) node[right, font=\bfseries\tiny, align=left, text=blue!80!black] {Percepção\\Estável do Ambiente};
+        
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+%%################## SLIDE: LIMITAÇÃO 4 (COMPLEXIDADE) ##################
+\begin{frame}{Limitação 4: Complexidade do Modelo}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                $\bullet$ OBU's com restrições severas de CPU e energia~\cite{xue2025}.\\
+                $\bullet$ Mudanças na topologia exigem arquitetura flexível como GNN, necessitando de mais recursos computacionais.\\
+                $\bullet$ Baixo poder computacional pode inviabilizar decisões em tempo real~\cite{miriyala2026}.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title=Solução: Arquitetura Leve e Enxuta, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize 
+                $\bullet$ \textbf{Treino Offline}: Fase pesada ocorre isolada do veículo (simulador), poupando a OBU.\\
+                $\bullet$ \textbf{Fuzzy-TOPSIS}: Ranqueamento com baixa complexidade computacional $O(n \log n)$~\cite{vieira2025foff}.\\
+                $\bullet$ \textbf{Leveza}: Inferência ultrarrápida (complexidade $O(1)$) em microssegundos~\cite{miriyala2026}.
+                $\bullet$ \textbf{Compactação}: Representação do ambiente e ações compactadas, diminuindo o custo de treinamento do agente.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    \begin{center}
+    \begin{tikzpicture}[>=stealth, scale=0.82, transform shape, font=\sffamily]
+        % Bloco Treinamento (Pesado/Offline)
+        \node[draw=red!80!black, fill=red!5, rounded corners=4pt, thick, align=center, text width=2.4cm] (train) at (0, 0) {\scriptsize \textbf{Treinamento SAC}\\ \tiny (Pesado / Offline)};
+
+        % Bloco TOPSIS (Leve/Online)
+        \node[draw=cyan!80!black, fill=cyan!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (topsis) at (4.5, 0) {\scriptsize \textbf{Fuzzy-TOPSIS}\\ \tiny (Custo Linear)};
+
+        % Bloco Inferência (Leve/Online)
+        \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (actor) at (8.5, 0) {\scriptsize \textbf{Rede Actor}\\ \tiny (Inferência $O(1)$)};
+
+        % Setas
+        \draw[->, thick, red!80!black, dashed] (train.east) -- (topsis.west) node[midway, above, font=\tiny, yshift=2pt] {Pesos Otimizados};
+        \draw[->, thick, cyan!80!black] (topsis.east) -- (actor.west) node[midway, above, font=\tiny, yshift=2pt] {Estado 6D};
+        \draw[->, thick, blue!80!black, line width=1pt] (actor.east) -- (10.5, 0) node[right, font=\bfseries\tiny, align=center, text=blue!80!black] {Decisão\\em $\mu$s};
+
+        % Caixa agrupadora para a OBU
+        \draw[thick, green!60!black, dotted, rounded corners=4pt] (3.0, -0.85) rectangle (9.8, 0.85);
+        \node[green!60!black, font=\bfseries\tiny] at (6.4, 0.65) {Execução Online na OBU (Baixo Custo)};
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+%%################## SLIDE: RESPOSTA 5 (CONTINUAL LEARNING) ##################
+\begin{frame}{Limitação 5: Continual Learning}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema: Esquecimento, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize 
+                $\bullet$ \textbf{Vício Temporal}: Experiências sequenciais fortemente correlacionadas~\cite{mnih2016}.\\
+                $\bullet$ \textbf{Instabilidade}: Focar em dados recentes causa o esquecimento catastrófico~\cite{miriyala2026}.\\
+                $\bullet$ \textbf{Divergência}: Inviabiliza o aprendizado contínuo em ambientes dinâmicos.
+            \end{tcolorbox}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Replay Buffer (SAC), fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                $\bullet$ \textbf{Memória}: Armazena transições $(s_t, a_t, r, s_{t+1})$ para reuso \textit{off-policy}~\cite{mnih2016}.\\
+                $\bullet$ \textbf{Amostragem}: Sorteio de mini-lotes aleatórios quebra a correlação temporal~\cite{mnih2016}.\\
+                $\bullet$ \textbf{Estabilidade}: Garante que estados raros permaneçam representados no gradiente~\cite{miriyala2026}.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.1cm}
+    \begin{center}
+        \includegraphics[width=0.95\textwidth]{figuras/replay_buffer.pdf}
+    \end{center}
+\end{frame}
+
+%%################## SLIDE: RECOMPENSA ##################
+\begin{frame}{Design da Função de Recompensa}
+    \vspace*{0.2cm}
+    \begin{center}
+        \begin{equation*}
+            r_{t} =
+            \begin{cases}
+                1{,}0 - \frac{1}{4} \left( \frac{\text{JCT}_t}{D_t} + \frac{E_t}{E^{\max}_t} \right), & \text{se } \text{JCT}_t \leq D_t \text{ \scriptsize (Sucesso)} \\[8pt]
+                -1{,}0 - \min \left( 1{,}0, \frac{\text{JCT}_t - D_t}{D_t} \right), & \text{se } \text{JCT}_t > D_t \text{ \scriptsize (Falha)}
+            \end{cases}
+        \end{equation*}        
+    \end{center}
+
+    \vspace{0.1cm}
+    \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fundamentação do Design, fonttitle=\bfseries\footnotesize, arc=4pt]
+        \footnotesize
+        \begin{itemize}\setlength\itemsep{0.3em}
+            \item \textbf{Penalidade QoS (Falha):} Incorpora restrições críticas aplicando multas severas e progressivas caso a tarefa viole o tempo limite estipulado~\cite{miriyala2026}.
+            \item \textbf{Otimização Multiobjetivo (Sucesso):} Uma vez garantido o prazo, a função foca em equilibrar de forma adaptativa a minimização da latência e do consumo de energia~\cite{xue2025}.
+            \item \textbf{Estabilidade de Gradiente (Normalização):} A divisão pelos limites máximos ($D_t$ e $E^{\max}_t$) evita que variáveis com grandezas distintas (Segundos vs. Joules) afetem desproporcionalmente a otimização da rede neural~\cite{xue2025}.
+        \end{itemize}
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Design da Função de Recompensa}
+    \vspace{-0.4cm}
+    \begin{center}
+        \includegraphics[height=0.85\textheight]{notebook/reward.pdf}
+    \end{center}
+\end{frame}
+
+
+%%################## SLIDE: ARQUITETURA INTEGRADA (COMPACTA) ##################
+\begin{frame}{Arquitetura Proposta Integrada: SAC-FTOPSIS}
+    \vspace{-0.4cm}
+    \begin{center}
+        \includegraphics[height=0.8\textheight]{figuras/treinamento.pdf}
+    \end{center}
+\end{frame}
+
+
+%%################## SLIDE: ARQUITETURA INTEGRADA (COMPACTA) ##################
+\begin{frame}{Arquitetura Proposta Integrada: SAC-FTOPSIS}
+    \vspace{-0.4cm}
+    \begin{center}
+        \includegraphics[height=0.8\textheight]{figuras/inferencia.pdf}
+    \end{center}
+\end{frame}
+
+\section{Resultados e Análise}
+\begin{frame}
+    \centering
+    \vfill
+    \begin{beamercolorbox}[sep=12pt,center,rounded=true,shadow=true]{title}
+        \usebeamerfont{title}Resultados Preliminares\par
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+
+%%################## SLIDE: CENÁRIOS DE TESTE E SIMULAÇÃO ##################
+% \begin{frame}{Cenários de Teste e Simulação Preliminar}
 %     \begin{columns}[T]
 %         \begin{column}{0.48\textwidth}
-%             \vspace{0.3cm}
-%             \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Contraponto (Modular), fonttitle=\bfseries\footnotesize, arc=4pt, left=2pt, right=2pt, top=2pt, bottom=2pt]
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Carga de Trabalho e Mobilidade, fonttitle=\bfseries\footnotesize, arc=4pt]
 %                 \scriptsize
-%                 \textbf{Natureza}: Tarefas paralelizáveis ou divididas em grafos de dependência.
-                
-%                 \vspace{0.1cm}
-%                 \textbf{Carga}: Alto volume de dados (ex: vídeos). Exige triagem local para reduzir tráfego.
-                
-%                 \vspace{0.1cm}
-%                 \textbf{Prazos}: Flexíveis. Divisão estratégica para evitar congestionamento.
-                
-%                 \vspace{0.1cm}
-%                 \textbf{Energia}: Equilibrada. Pré-processamento local vs. economia na transmissão.
-                
-%                 \vspace{0.1cm}
-%                 \textbf{Exemplos}: ALPR (Placas) e processamento de vídeo.
+%                 \begin{itemize}\setlength\itemsep{0.4em}
+%                     \item \textbf{Motor de Teste:} Simulação de Eventos Discretos (DES) implementada em C++20.
+%                     \item \textbf{Carga (Traços Reais):} Demandas estocásticas extraídas do \textit{cluster} Alibaba e escalonadas para o contexto veicular.
+%                     \item \textbf{Escalabilidade:} 658 cenários de teste gerados, variando de regimes leves a severos (10 a 45 tarefas/s).
+%                     \item \textbf{Mobilidade:} Trajetórias microscópicas dinâmicas geradas no simulador SUMO.
+%                 \end{itemize}
 %             \end{tcolorbox}
 %         \end{column}
-        
+
 %         \begin{column}{0.52\textwidth}
-%             \centering
-%             \vspace{0.5cm}
-%             \begin{tikzpicture}[>=stealth, scale=0.75, transform shape, font=\sffamily]
-%                 % Fundo Nano
-%                 \fill[orange!3, rounded corners=10pt, draw=orange!20, thick, drop shadow] (-0.6, -2.1) rectangle (5.4, 1.8);
-%                 \node[orange!80!black, font=\tiny\bfseries] at (2.4, 1.4) {PIPELINE MODULAR (ALPR)};
-                
-%                 % Pipeline
-%                 \node[draw=orange!80!black, fill=white, rounded corners=4pt, thick, minimum height=0.8cm, text width=1.1cm, align=center, drop shadow] (cam) at (0.2, 0) {\tiny CÂMERA};
-%                 \node[draw=orange!80!black, fill=white, rounded corners=4pt, thick, minimum height=0.8cm, text width=1.3cm, align=center, drop shadow] (det) at (2.0, 0) {\tiny DETECÇÃO};
-%                 \node[draw=gray!80, fill=gray!10, rounded corners=4pt, thick, minimum height=0.8cm, text width=1.0cm, align=center, drop shadow] (ocr) at (4.5, 0) {\tiny OCR};
-                
-%                 % Setas
-%                 \draw[->, thick, orange!80!black] (cam) -- (det);
-%                 \draw[->, thick, orange!80!black] (det) -- (ocr);
-                
-%                 % Limite
-%                 \draw[dashed, red!60, thick] (3.4, 0.9) -- (3.4, -1.2);
-%                 \node[red!80!black, font=\tiny\bfseries, fill=white, inner sep=1pt] at (3.4, -1.4) {BORDA DO VEÍCULO};
-                
-%                 % Feedback
-%                 \draw[->, thick, orange!80!black, dashed] (ocr.south) -- (4.5, -0.8) -- (0.2, -0.8) -- (cam.south);
-%                 \node[below=0.1cm of det, yshift=-0.5cm, text=orange!80!black, font=\tiny\bfseries] {PROCESSAMENTO DISTRIBUÍDO};
-%             \end{tikzpicture}
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Hardware e Comunicação (V2X), fonttitle=\bfseries\footnotesize, arc=4pt]
+%                 \scriptsize
+%                 \begin{itemize}\setlength\itemsep{0.4em}
+%                     \item \textbf{Heterogeneidade CPU:} O Servidor de Borda (VEC) opera a 1,2 GHz (Fila: 100). Os veículos possuem OBUs variando de 0,3 a 1,5 GHz.
+%                     \item \textbf{Canais V2I e V2V:} Largura de banda de 20 MHz e potência de transmissão de 0,2 W (23 dBm).
+%                     \item \textbf{Atenuação Realista:} Alcance máximo de comunicação de 300 m, utilizando o modelo de propagação \textit{Urban NLOS} (3GPP).
+%                 \end{itemize}
+%             \end{tcolorbox}
 %         \end{column}
 %     \end{columns}
 % \end{frame}
 
-% \section{Imagens}
-% %%################ Imagens #############
-% \begin{frame}{Imagens}
-%     Carregar imagem na pasta \texttt{figuras}. 
+%%################## SLIDE: CENÁRIOS DE TESTE E SIMULAÇÃO ##################
+\begin{frame}{Cenários de Teste e Simulação Preliminar}
+    \begin{center}
+    \resizebox{!}{0.75\textheight}{
+\begin{tikzpicture}[
+        font=\sffamily,
+        >=Stealth,
+        % --- Pic: carro visto de cima indo para a direita ---
+        car right/.pic={
+            \begin{scope}[scale=0.6]
+                \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                    (-1.8,-0.75) rectangle (1.8,0.75);
+                \filldraw[fill=black!60, draw=black, thick]
+                    (-0.55,-0.55) -- (-1.05,-0.45) -- (-1.05,0.45) -- (-0.55,0.55) -- cycle;
+                \filldraw[fill=black!60, draw=black, thick]
+                    (0.45,-0.55) -- (0.95,-0.45) -- (0.95,0.45) -- (0.45,0.55) -- cycle;
+                \filldraw[fill=black!25, draw=black, thick]
+                    (-0.55,-0.55) rectangle (0.45,0.55);
+                \filldraw[fill=yellow!80, draw=none]
+                    (1.55,-0.65) rectangle (1.75,-0.35);
+                \filldraw[fill=yellow!80, draw=none]
+                    (1.55,0.35) rectangle (1.75,0.65);
+            \end{scope}
+        },
+        % --- Pic: carro visto de cima indo para cima ---
+        car up/.pic={
+            \begin{scope}[scale=0.6]
+                \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                    (-0.75,-1.8) rectangle (0.75,1.8);
+                \filldraw[fill=black!60, draw=black, thick]
+                    (-0.55,-0.45) -- (-0.45,-0.95) -- (0.45,-0.95) -- (0.55,-0.45) -- cycle;
+                \filldraw[fill=black!60, draw=black, thick]
+                    (-0.55,0.55) -- (-0.45,1.05) -- (0.45,1.05) -- (0.55,0.55) -- cycle;
+                \filldraw[fill=black!25, draw=black, thick]
+                    (-0.55,-0.45) rectangle (0.55,0.55);
+                \filldraw[fill=yellow!80, draw=none]
+                    (-0.65,1.55) rectangle (-0.35,1.75);
+                \filldraw[fill=yellow!80, draw=none]
+                    (0.35,1.55) rectangle (0.65,1.75);
+            \end{scope}
+        },
+        % --- Pic: semaforo ---
+        semaforo/.pic={
+            \begin{scope}[scale=0.45]
+                \filldraw[fill=gray!70, draw=black, thick, rounded corners=3pt]
+                    (-0.55,-1.6) rectangle (0.55,1.6);
+                \fill[red!90] (0, 1.0) circle (0.38);
+                \fill[yellow!90] (0, 0) circle (0.38);
+                \fill[green!70!black] (0,-1.0) circle (0.38);
+                \draw[gray!60, line width=4pt] (0,-1.6) -- (0,-2.5);
+            \end{scope}
+        },
+        label text/.style={font=\scriptsize\bfseries, align=center, fill=white, draw=black!50, rounded corners=1pt, inner sep=2pt}
+    ]
+        % ---- Canvas: (0,0) a (20,18) ----
+        \clip (0,0) rectangle (20,18);
 
-%    A Figura \ref{fig:red_ramificada} mostra um exemplo de como inserir a imagem e referência.
+        % ---- Fundo (gramado) ----
+        \fill[green!18] (0,0) rectangle (20,18);
 
-%     \begin{figure}[htbp]
-%         \centering
-%         \includegraphics[width = \textwidth]{figuras/BranchedScheme.pdf} % Usar a sua imagem
-%         \caption{Rede com $k$ ramificações.} % Referência
-%         \label{fig:red_ramificada} % Label
-%     \end{figure}
-% \end{frame}
+        % ---- Ruas (2 faixas cada) ----
+        % Horizontal: y = 6 a 10
+        \fill[black!45] (0,6) rectangle (20,10);
+        % Vertical: x = 8 a 12
+        \fill[black!45] (8,0) rectangle (12,18);
+        % Cruzamento
+        \fill[black!45] (8,6) rectangle (12,10);
 
-% %%################ Imagens Slide 2 #############
-% \begin{frame}{Imagens Slide 2}
+        % ---- Marcações de faixa ----
+        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,0)  -- (10,6);
+        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,10) -- (10,18);
+        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (0,8)   -- (8,8);
+        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (12,8)  -- (20,8);
 
-%     A Figura \ref{fig:comparacion_redes} mostra como inserir figuras lado a lado.
+        % ---- V1: Agente (indo para a direita, faixa inferior) ----
+        \pic at (3.5,7) {car right};
+        \node[fill=blue!15, draw=blue!70, rounded corners=2pt, thick,
+              font=\small\bfseries, align=center, inner sep=3pt]
+            (lagente) at (3.5,4.5) {Agente (V1)};
+        \draw[blue!70, thick] (lagente.north) -- (3.5,6.4);
+        % seta mobilidade
+        \draw[->, very thick, orange!90!black] (5.3,7.0) -- (7.4,7.0);
+        \node[fill=white, draw=orange!80, rounded corners=2pt,
+              font=\scriptsize\bfseries, inner sep=2pt]
+            at (6.3,5.6) {Mobilidade Din\^amica};
+        \draw[orange!70, thin] (6.3,5.88) -- (6.3,6.55);
 
-%     \begin{figure}[htbp]
-%     \centering
-%     \begin{subfigure}[b]{0.48\textwidth}
-%         \centering
-%         \includegraphics[width=\textwidth]{figuras/LSTM.pdf}
-%         \caption{Red LSTM}
-%         \label{fig:figura1a}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[b]{0.48\textwidth}
-%         \centering
-%         \includegraphics[width=\textwidth]{figuras/TDNN.pdf}
-%         \caption{Red TDNN}
-%         \label{fig:figura1b}
-%     \end{subfigure}
-%     \caption[Comparação entre redes neurais]{Comparação entre redes neurais}
-%     \label{fig:comparacion_redes}
-% \end{figure}
+        % ---- V2 (indo para a esquerda, faixa superior) ----
+        \pic[rotate=180] at (16.5,9) {car right};
+        \draw[->, very thick, orange!90!black] (14.7,9.0) -- (12.6,9.0);
+        \node[fill=white, draw=gray!60, rounded corners=2pt,
+              font=\scriptsize\bfseries, inner sep=2pt]
+            at (16.5,11.5) {V2};
+        \draw[gray!60, thin] (16.5,11.2) -- (16.5,9.7);
+
+        % ---- V3 (indo para cima, faixa direita da via vertical) ----
+        \pic at (11,2.5) {car up};
+        \draw[->, very thick, orange!90!black] (11,4.3) -- (11,5.6);
+        \node[fill=white, draw=gray!60, rounded corners=2pt,
+              font=\scriptsize\bfseries, inner sep=2pt]
+            at (13.8,2.5) {V3};
+        \draw[gray!60, thin] (13.1,2.5) -- (11.7,2.5);
+
+        % ---- Semáforo + Edge Server ----
+        \pic at (7.3,11.2) {semaforo};
+        \node[draw=black, fill=red!8, thick, rounded corners=4pt,
+              align=center, font=\small\bfseries, inner sep=5pt]
+            (edge) at (4.0,14.2) {Edge Server\\(Dispositivo de Borda)};
+        \draw[thick, gray!70] (7.3,11.8) -- (edge.south east);
+
+        % ---- Carga de Trabalho (canto inferior esquerdo) ----
+        \node[draw=blue!70, fill=blue!5, thick, rounded corners=4pt,
+              align=center, font=\scriptsize\bfseries, inner sep=5pt]
+            (workload) at (2.5,2.0) {Carga de Trabalho\\(Tra\c{c}os Reais / Estoc\'astico)};
+        \draw[->, dotted, thick, blue!70] (workload.north east) -- (3.0,6.2);
+
+        % ---- \gls{V2I} / V2E ----
+        \draw[<->, dashed, line width=1.5pt, red!70!black]
+            (3.5,7.8) -- (edge.south);
+        \node[fill=white, draw=red!60, rounded corners=2pt,
+              font=\scriptsize\bfseries, text=red!80!black, inner sep=2pt]
+            at (2.2,11.5) {V2I / V2E};
+        \node[fill=white, font=\scriptsize, text=red!70!black, inner sep=1pt]
+            at (2.2,10.8) {Atraso de Propaga\c{c}\~ao};
+
+        % ---- Throttling ----
+        \node[draw=red!70, fill=white, dashed, thick, rounded corners=3pt,
+              align=center, font=\scriptsize\bfseries]
+            (throttle) at (4.5,16.8) {\textit{Throttling}\\Limita\c{c}\~oes de Processamento};
+        \draw[->, dotted, thick, red!70] (throttle.south) -- (edge.north);
+
+        % ---- \gls{V2V}: Agente <-> V3 ----
+        \draw[<->, dashed, line width=1.5pt, purple!80]
+            (4.8,6.4) -- (10.3,3.5);
+        \node[fill=white, draw=purple!70, rounded corners=2pt,
+              font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+            at (7.3,4.3) {V2V};
+
+        % ---- \gls{V2V}: Agente <-> V2 ----
+        \draw[<->, dashed, line width=1.5pt, purple!80]
+            (5.2,7.6) -- (14.6,8.5);
+        \node[fill=white, draw=purple!70, rounded corners=2pt,
+              font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+            at (10.0,9.0) {V2V};
+
+        % ---- Não-Estacionariedade (canto inferior direito) ----
+        \node[fill=white, draw=purple!70, thick, rounded corners=3pt,
+              align=center, font=\scriptsize\bfseries, text=purple!80, inner sep=4pt]
+            at (15.5,4.0) {Intera\c{c}\~ao Multiagente\\N\~ao-Estacionariedade};
+
+        % ---- Legenda (canto superior direito) ----
+        \node[draw=black!50, fill=gray!5, very thick, dashed, rounded corners=4pt,
+              align=left, font=\footnotesize, inner sep=7pt, anchor=north east]
+            at (19.5,17.8) {
+            \textbf{Restri\c{c}\~oes do Ambiente Simulado:}\\[2pt]
+            $\bullet$ Mobilidade Din\^amica Veicular\\
+            $\bullet$ Chegada Estoc\'astica de Tarefas\\
+            $\bullet$ Atrasos e Ru\'idos na Comunica\c{c}\~ao\\
+            $\bullet$ Gargalos de Processamento (\textit{Throttling})\\
+            $\bullet$ Fen\^omeno de N\~ao-Estacionariedade
+        };
+
+        % ---- Borda ----
+        \draw[thick] (0,0) rectangle (20,18);
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+%%################## SLIDE: ESTUDO DE ABLAÇÃO ##################
+\begin{frame}{Resultados do Estudo de Ablação}
+    \centering
+    \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Variantes Avaliadas em 658 Cenários de Teste, fonttitle=\bfseries\footnotesize, arc=4pt]
+        \scriptsize 
+        Avaliação do impacto de cada componente (TOPSIS, Ação Binária e Recompensa \textit{Deadline-aware}) no desempenho global.
+    \end{tcolorbox}
+
+    \vspace{0.2cm}
     
-% \end{frame}
-
-
-% \section{Equações}
-% %%################ Equações #############
-% \begin{frame}{Equações}
-
-%     Exemplo de equação numerada:
-%     \begin{equation}
-%         \frac{\partial Q\left(z_k,t\right)}{\partial t}+gA_k\frac{\partial H\left(z_k,t\right)}{\partial z_k}+\mu_kQ\left(z_k,t\right)\left|Q\left(z_k,t\right)\right|+g\sin{a_k}=0,
-%         \label{eq:momentum}
-%     \end{equation}
-%     Uma equação numerada se referencia no texto usando seu \textit{label}: A Equação \eqref{eq:momentum} é conhecida como a Equação de Momentum.
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lllllrrr}
+    \toprule
+    \textbf{Variante} & \textbf{Estado} & \textbf{Ação} & \textbf{Recompensa} & \textbf{Taxa de Sucesso(\%)} & \textbf{SWQ} & \textbf{JCT (s)} \\
+    \midrule
+    SAC-Base  & 11D bruto   & Ternária & WSM                & 4,52  & 0,0119 & 57,075 \\
+    SAC-A1    & 11D bruto   & Binária  & WSM                & 39,11 & 0,1256 & 13,722 \\
+    SAC-S1    & 6D          & Ternária & WSM                & 28,69 & 0,1122 & 39,298 \\
+    SAC-R1    & 11D bruto   & Ternária & \textit{Deadline-aware} & 38,26 & 0,1223 & 13,353 \\
+    SAC-T1    & 6D TOPSIS   & Ternária & \textit{Deadline-aware} & 32,96 & 0,1270 & 11,487 \\
+    \midrule
+    \textbf{SAC-FTOPSIS} & \textbf{6D TOPSIS} & \textbf{Binária} & \textbf{\textit{Deadline-aware}} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
+    \bottomrule
+    \end{tabular}}
     
-%     Exemplo de uma equação sem numeração:
-%     $$\frac{\partial H\left(z_k,t\right)}{\partial t}+\frac{b_k^2}{gA_k}\frac{\partial Q\left(z_k,t\right)}{\partial z_k}=0.$$
+    \begin{itemize}
+        \scriptsize
+        \item \textbf{Destaque}: A proposta completa (\textbf{SAC-FTOPSIS}) alcançou o melhor equilíbrio entre taxa de sucesso e tempo de conclusão (\textit{JCT}).
+        \item \textbf{Observação}: A transição para ação binária e o uso de TOPSIS foram cruciais para a estabilidade do aprendizado.
+    \end{itemize}
 
-%     Exemplo da equação no texto: $\mu_k=\frac{fQ_k}{2D_kA_k}$  
-% \end{frame}
+    \vspace{-0.2cm}
+    \begin{tcolorbox}[colback=gray!5, colframe=gray!30, arc=0pt, boxrule=0.5pt, left=2pt, right=2pt, top=1pt, bottom=1pt]
+        \tiny
+        \textbf{Legenda:} \textbf{WSM}: \textit{Weighted Sum Model} (Soma Ponderada); \textbf{Ternária}: Decisão direta entre Local, VEC ou V2V; \textbf{SWQ}: \textit{Service Well-being Quality} (Ponderação entre taxa de sucesso e folga temporal).
+    \end{tcolorbox}
+\end{frame}
 
-
-% \section{Tabelas}
-% %%################ Tabelas #############
-% \begin{frame}{Tabelas}
-%     A Tabela \ref{tab:ModelosPerdida} mostra uma tabela de uma coluna. 
+%%################## SLIDE: RESULTADOS COMPARATIVOS ##################
+\begin{frame}{Resultados: DRL+TOPSIS vs. Heurísticas}
+    \centering
+    \vspace{-0.2cm}
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tabular}{llrrrrr}
+    \toprule
+    \textbf{Política} & \textbf{Categoria} & \textbf{\% Sucesso} & \textbf{SWQ} & \textbf{JCT (s)} & \textbf{\% Local} \\
+    \midrule
+    \textbf{SAC-FTOPSIS} $\star$ & \textbf{DRL+TOPSIS} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} & \textbf{74,1} \\
+    PPO-TOPSIS $\star$           & DRL+TOPSIS          & 42,66 & 0,1426 & 5,895 & 98,7 \\
+    TD3-TOPSIS $\star$           & DRL+TOPSIS          & 43,91 & 0,1388 & 3,703 & 76,5 \\
+    A2C-TOPSIS $\star$           & DRL+TOPSIS          & 42,32 & 0,1418 & 6,045 & 100,0 \\
+    \midrule
+    Greedy-Unfair (Oráculo)      & Heurística          & 41,29 & 0,1262 & 5,613 & 67,3 \\
+    Gini                         & Heurística          & 35,24 & 0,1057 & 3,456 & 61,7 \\
+    Random                       & Heurística          & 30,02 & 0,0950 & 17,853 & 40,7 \\
+    Greedy-Fair                  & Heurística          & 20,61 & 0,0528 & 40,754 & 27,9 \\
+    VEC (Incondicional)          & Heurística          & 1,86  & 0,0030 & 144,191 & 1,2 \\
+    \bottomrule
+    \end{tabular}}
     
-%     \begin{table}[htbp]
-%         \centering
-%          \caption{Fórmulas para o cálculo de perdas de carga em tubulações.\break}
-%          \vspace{-\baselineskip}
-%         \label{tab:ModelosPerdida}
-%         \small
-%         \begin{tabular}{ccc}
-%             \toprule
-%             \textbf{Perda} & \textbf{Coeficiente} $C$ & \textbf{Exponente} $\sigma$ \\
-%             \midrule
-%             Hazen-Williams & $4.727 \mathscr{H}^{-1.852}D^{-4.871}L$ & 1.852 \\
-%             Darcy-Weisbach & $0.0252f(\varepsilon, D, Q)D^{-5}L$ & 2 \\
-%             Chezy-Manning & $4.66n^2D^{-5.33}L$ & 2 \\
-%             \bottomrule
-%         \end{tabular}
-%     \end{table}
+    \vspace{0.2cm}
+    \begin{itemize}
+        \scriptsize
+        \item \textbf{Desempenho}: Algoritmos híbridos superaram as heurísticas clássicas e o oráculo gulo.
+        \item \textbf{Liderança}: O \textbf{SAC-FTOPSIS} mantém a maior taxa de sucesso geral (45,21\%).
+        \item \textbf{Observação}: A estratégia local-dominante (PPO/A2C) minimiza latência, mas sacrifica oportunidades de offloading que o SAC aproveita.
+    \end{itemize}
     
-% \end{frame}
+    \vfill
+    \tiny $\star$ utiliza ranqueamento multicritério TOPSIS para pré-seleção de alvos de descarregamento.
+\end{frame}
 
 
-% %%################ Tabelas Slide 2#############
-% \begin{frame}{Tabelas Slide 2}
 
-%     A Tabela \ref{Tab:Accesorios} mostra um exemplo de duas colunas.
-    
-%     \begin{table}[htbp]
-%         \centering
-%         \caption{Acessórios}
-%         \vspace{-\baselineskip}
-%         \label{Tab:Accesorios}
-%         \null\hfill
-%         \scriptsize
-%         \begin{tabular}{cl}
-%         % \multicolumn{2}{c}{a) Tuberías 1-8}\\[2pt]
-%         \toprule
-%         \textbf{Coluna 01} & \textbf{Coluna 02} \\
-%         \midrule
-%         $\text{N}_{1}-\text{N}_{2}$ & 2 Codos 90°\\
-%         $\text{N}_{2}-\text{N}_{3}$ & 4 Codos 90° \\ 
+\section{Conclusões e Cronograma}
+%%################## SLIDE: CONCLUSÕES ##################
+\begin{frame}{Conclusões}
+    \begin{itemize}
+        \item \textbf{Arquitetura SAC-FTOPSIS}: Integração eficaz entre ranqueamento multicritério (TOPSIS) e Aprendizado por Reforço (SAC).
+        \item \textbf{Escalabilidade}: O estado compacto 6D resolve o problema de número variável de veículos candidatos, garantindo uma interface invariante.
+        \item \textbf{Contribuições Técnicas}:
+            \begin{itemize}
+                \scriptsize
+                \item Engenharia de recompensa \textit{deadline-aware} com foco em prazos rigorosos.
+                \item Redução de 8,6x no JCT médio em comparação ao SAC-Base.
+                \item Superação da heurística oráculo (\textit{Greedy-Unfair}) em cenários reais.
+            \end{itemize}
+        \item \textbf{Métrica SWQ}: Nova métrica que pondera sucesso e folga temporal, provando-se superior à taxa de sucesso simples para avaliação de QoS.
+    \end{itemize}
+    \begin{tcolorbox}[colback=blue!5, colframe=blue!40, arc=4pt, boxrule=0.5pt]
+        \scriptsize \textbf{Resumo}: A proposta demonstrou ser uma solução leve e adaptativa, capaz de operar em ambientes veiculares dinâmicos sem necessidade de retreinamento.
+    \end{tcolorbox}
+\end{frame}
+
+%%################## SLIDE: TRABALHOS FUTUROS ##################
+\begin{frame}{Trabalhos Futuros e Proposta Final}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Evolução do Algoritmo, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \begin{itemize}\setlength\itemsep{0.4em}
+                    \item \textbf{Integração do Fuzzy-TOPSIS}: Substituição do módulo clássico para incorporar incertezas e imprecisões nas medições da rede via Números Fuzzy Triangulares (TFNs).
+                    \item \textbf{Protocolo Estendido}: Expansão do protocolo de treinamento do agente DRL para múltiplos cenários e diferentes regimes dinâmicos de carga.
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
         
-%         $\text{N}_{4}-\text{N}_{5}$ & 2 Codos 90° \\ 
-%         $\text{N}_{5}-\text{N}_{6}$ & 4 Codos 90° \\ 
-        
-%         $\text{N}_{7}-\text{N}_{8}$ & 2 Codos 90° \\
-%         $\text{N}_{8}-\text{N}_{9}$ & 4 Codos 90° \\ 
-%         \bottomrule
-%         \end{tabular}
-%         \hfill\hfill
-%         \begin{tabular}{cl}
-%         % \multicolumn{2}{c}{b) Tuberías 9-16}\\[2pt]
-%         \toprule
-%         \textbf{Coluna 01} & \textbf{Coluna 02} \\
-%         \midrule
-%         $\text{N}_{4}-\text{N}_{10}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
-        
-%         $\text{N}_{11}-\text{N}_{12}$ & 4 Codos 90° \\ 
-%         $\text{N}_{12}-\text{N}_{13}$ & 2 Codos 90° \\ 
-%         $\text{N}_{6}-\text{N}_{14}$ & 1 Codo 90°, 1 Valvula, 1 T \\ 
-        
-%         $\text{N}_{15}-\text{N}_{16}$ & 2 Codos 90° \\ 
-%         $\text{N}_{16}-\text{N}_{17}$ & 4 Codos 90° \\ 
-%         \bottomrule
-%         \end{tabular}
-%         \hfill\null
-%     \end{table}
-    
-% \end{frame}
+        \begin{column}{0.52\textwidth}
+            \vspace*{0.1cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Validação e Simulação Realista, fonttitle=\bfseries\footnotesize, arc=4pt]
+                \scriptsize
+                \begin{itemize}\setlength\itemsep{0.4em}
+                    \item \textbf{Simulação ns-3/SUMO}: Avaliação em ambiente de rede de eventos discretos completo, superando a simplificação atual de "canal perfeito"
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
 
+%%################## SLIDE: CRONOGRAMA ##################
+\begin{frame}{Cronograma de Pesquisa (2026--2028)}
+    \centering
+    \scriptsize
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|c|c|c|c|c|} 
+        \hline
+        \textbf{Atividade / Ano} & \multicolumn{2}{c|}{\textbf{2026}} & \multicolumn{2}{c|}{\textbf{2027}} & \textbf{2028} \\ \cline{2-6}
+        & S1 & S2 & S1 & S2 & Q1 \\ \hline
+        1. Exame de Qualificação            & \cellcolor{blue!15}X &   &   &   &   \\ \hline
+        2. Integração com Simulador (ns-3/SUMO) & \cellcolor{blue!15}X & \cellcolor{blue!15}X &   &   &   \\ \hline
+        3. Refinamento de Algoritmos        & \cellcolor{blue!15}X & \cellcolor{blue!15}X & \cellcolor{blue!15}X &   &   \\ \hline
+        4. Avaliação de Desempenho          &   & \cellcolor{blue!15}X & \cellcolor{blue!15}X &   &   \\ \hline
+        5. Análise dos Resultados           &   &   & \cellcolor{blue!15}X & \cellcolor{blue!15}X &   \\ \hline
+        6. Escrita da Tese Final            &   &   &   & \cellcolor{blue!15}X & \cellcolor{blue!15}X \\ \hline
+        7. Defesa Final                     &   &   &   &   & \cellcolor{blue!15}X \\ \hline
+    \end{tabular} 
+    
+    \vspace{0.4cm}
+    \tiny \textbf{Legenda}: S1: 1º semestre; S2: 2º semestre; Q1: 1º trimestre de 2028.
+\end{frame}
 
 \section{Referências}
 %%################ Referências #############
-\begin{frame}{Referências}
-    Adicione as referências no documento  \texttt{biblio.bib} no formato \texttt{BibTex}.
-
-    Exemplo de uma referência \cite{zhang2017digital}.
-    Exemplo de duas ou mais referências em uma citação, separado com vírgulas \cite{praks2018advanced,santos2018online}.
-    As referências são adiconadas automaticamente na Bibliografia.
-\end{frame}
-
-\begin{frame}[allowframebreaks]{Bibliografia}
+\begin{frame}[allowframebreaks]{Referências}
 \bibliographystyle{ieeetr}
 \bibliography{biblio}
 \end{frame}
