@@ -377,62 +377,6 @@
 %     \end{columns}
 % \end{frame}
 
-%%################## SLIDE 6: PERFIL TOTAL ##################
-\begin{frame}{Perfil: Descarregamento Total}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \vspace{0.3cm}
-            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Foco deste Trabalho, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                $\bullet$ \textbf{Natureza}: Tarefas indivisíveis com \textbf{alta complexidade} computacional.\\
-                $\bullet$ \textbf{Carga}: \textit{Payload} com poucos bytes, mas cálculo pesado (CPU intensiva).\\
-                $\bullet$ \textbf{Prazos}: Curtos ($\le$ 100ms). Transmissão rápida + processamento potente na borda.\\
-                $\bullet$ \textbf{Vantagem}: Poupa consumo energético na transmissão.\\
-                $\bullet$ \textbf{Exemplos}: Controle de veículos autônomos e alertas de segurança.
-            \end{tcolorbox}
-        \end{column}
-        
-        \begin{column}{0.5\textwidth}
-            \centering
-            \vspace{0.4cm}
-            \begin{tikzpicture}[>=stealth, scale=0.95, transform shape, font=\sffamily]
-                % Título da Figura
-                \node[blue!80!black, font=\scriptsize\bfseries] at (2.4, 1.3) {FLUXO DE DESCARREGAMENTO TOTAL};
-                
-                % Nós Veículo e Servidor
-                \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, minimum height=0.8cm, text width=1.7cm, align=center, drop shadow] (app) at (0.7, 0.5) {\textbf{\scriptsize VEÍCULO}\\\tiny (OBU)};
-                \node[draw=gray!80, fill=gray!10, rounded corners=4pt, thick, minimum height=0.8cm, text width=1.7cm, align=center, drop shadow] (srv) at (4.1, 0.5) {\textbf{\scriptsize SERVIDOR}\\\tiny DE BORDA};
-                
-                % Seta de Descarregamento
-                \draw[->, ultra thick, blue!80!black] (app) -- (srv) node[midway, above, font=\tiny\bfseries] {OFFLOADING};
-                
-                % Painel de Parâmetros (Natureza, Carga, Prazo)
-                \draw[draw=blue!40, fill=white, rounded corners=6pt, thick, drop shadow={opacity=0.15}] (-0.3, -1.9) rectangle (5.1, -0.3);
-                \node[blue!80!black, font=\tiny\bfseries, fill=white, inner sep=2pt] at (2.4, -0.3) {ATRIBUTOS DA TAREFA};
-                
-                % Itens com bullets coloridos
-                \node[anchor=west] at (0.3, -0.6) {\tiny \textbf{Natureza}: Indivisível (Binária)};
-                \node[anchor=west] at (0.3, -1.1) {\tiny \textbf{Carga}: Poucos Bytes (Cálculo Pesado)};
-                \node[anchor=west] at (0.3, -1.6) {\tiny \textbf{Prazo}: Curto (Tempo Limite $\le 100$ ms)};
-                
-                % Ícones simples em TikZ para cada item
-                % Natureza (círculo sólido, inseparável)
-                \draw[blue!80!black, fill=blue!20, thick] (0.05, -0.6) circle (0.08cm);
-                \fill[blue!80!black] (0.05, -0.6) circle (0.03cm);
-                
-                % Carga (símbolo de dados: pequeno retângulo/quadrado com linhas)
-                \draw[orange!80!black, fill=orange!20, thick] (-0.03, -1.18) rectangle (0.13, -1.02);
-                \draw[orange!80!black, thick] (-0.03, -1.1) -- (0.13, -1.1);
-                
-                % Prazo (relógio simples)
-                \draw[red!80!black, fill=red!10, thick] (0.05, -1.6) circle (0.08cm);
-                \draw[red!80!black, thick] (0.05, -1.6) -- (0.05, -1.53);
-                \draw[red!80!black, thick] (0.05, -1.6) -- (0.10, -1.6);
-            \end{tikzpicture}
-        \end{column}
-    \end{columns}
-\end{frame}
-
 %%################## SLIDE: FRAGILIDADES DAS HEURÍSTICAS E META-HEURÍSTICAS ##################
 \begin{frame}{Abordagens Tradicionais}
     \begin{columns}[T]
@@ -545,29 +489,35 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 \end{frame}
 
 %%################## SLIDE: COMPARATIVO COM A LITERATURA ##################
-\begin{frame}{Principais Artigos Relacionados (Últimos 5 Anos)}
+\begin{frame}{Revisão de Literatura}
+    \large{Características da Rede Veicular}
     \begin{table}
         \centering
         \renewcommand{\arraystretch}{1.2}
         \resizebox{\textwidth}{!}{%
-        \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
             \hline
-            \multirow{2}{*}{\textbf{Ref.}} & \multicolumn{2}{c|}{\textbf{Tecnologia}} & \multicolumn{2}{c|}{\textbf{Modo}} & \multicolumn{3}{c|}{\textbf{Servidor}} & \multicolumn{3}{c|}{\textbf{Simulador}} & \multicolumn{1}{c|}{\textbf{Mob.}} & \multirow{2}{*}{\shortstack{\textbf{Alg.}\\\textbf{DRL}}} & \multirow{2}{*}{\shortstack{\textbf{Obs.}\\\textbf{Parcial}}} & \multicolumn{3}{c|}{\textbf{Canal}} & \multirow{2}{*}{\shortstack{\textbf{Carga}\\\textbf{Trabalho}\\\textbf{Dinâmica}}} \\ \cline{2-12} \cline{15-17}
-                                             & 5G           &6G & V2I        & \shortstack{V2V} & MEC        & VEC        & Nuvem      & Pers.      & NS3 & Outro      & SUMO       &        &   & Ruído      & Ganho      & Camadas    & -          \\ \hline
-            ~\cite{Moghaddasi2023}           & \checkmark   & - & \checkmark & -                & -          & \checkmark & -          & \checkmark & -   & -          & -          & DDQN   & - & \checkmark & \checkmark & -          & -          \\ \hline
-            ~\cite{sidwini}                  & -            & - & \checkmark & -                & \checkmark & -          & \checkmark & \checkmark & -   & -          & -          & SAC    & - & -          & -          & -          & -          \\ \hline
-            ~\cite{li2025}                   & -            & - & \checkmark & -                & \checkmark & -          & -          & \checkmark & -   & -          & -          & DQN    & - & -          & -          & -          & \checkmark \\ \hline
-            ~\cite{meghamala2025}            & \checkmark   & - & \checkmark & -                & \checkmark & -          & -          & \checkmark & -   & -          & -          & SAC    & - & -          & -          & -          & -          \\ \hline
-            ~\cite{zhao2025}                 & -            & - & \checkmark & -                & -          & \checkmark & -          & \checkmark & -   & -          & -          & DQN    & - & -          & -          & -          & -          \\ \hline
-            % ~\cite{wu2025}                   & -            & - & \checkmark & -                & \checkmark & -          & -          & -          & -   & \checkmark & -          & -      & - & \checkmnark& \checkmark & -          & -          \\ \hline
-            ~\cite{mohammad2025}             & -            & - & \checkmark & \checkmark       & \checkmark & -          & -          & \checkmark & -   & -          & -          & DDPG   & - & -          & -          & -          & -          \\ \hline
-            % ~\cite{liu2025}                  & -            & - & -          & -                & \checkmark & -          & -          & \checkmark & -   & -          & -          & -      & - & -          & -          & -          & -          \\ \hline
-            ~\cite{xie2025}                  & -            & - & \checkmark & -                & -          & \checkmark & -          & \checkmark & -   & -          & -          & PPO    & - & \checkmark & \checkmark & -          & -          \\ \hline
-            ~\cite{wu2025ava}                & -            & - & \checkmark & \checkmark       & -          & \checkmark & -          & \checkmark & -   & -          & -          & MADDPG & - & \checkmark & \checkmark & -          & -          \\ \hline
-            % ~\cite{long2025}                 & -            & - & \checkmark & -                & -          & \checkmark & -          & -          & -   & -          & -          & -      & - & \checkmark & \checkmark & -          & -          \\ \hline
-            % ~\cite{abbas2025}                & -            & - & -          & -                & -          & -          & -          & -          & -   & -          & -          & -      & - & -          & -          & -          & -          \\ \hline
-            \textbf{FOFF}~\cite{vieira2025}  & \checkmark   & - & \checkmark & -                & -          & \checkmark & -          & \checkmark & -   & -          & \checkmark & -      & - & \checkmark & \checkmark & -          & -          \\ \hline
-           \textbf{SAC-FTOPSIS} & \textbf{\checkmark} & -            & \textbf{\checkmark} & \textbf{\checkmark} & - & \textbf{\checkmark} & - & - & \textbf{\checkmark} & - & \textbf{\checkmark} & SAC & \textbf{\checkmark} &  \textbf{\checkmark} & \textbf{\checkmark} & \textbf{\checkmark} & \textbf{\checkmark} \\ \hline
+            \multirow{2}{*}{\textbf{Ref.}} & \multicolumn{2}{c|}{\textbf{Tecnologia}} & \multicolumn{3}{c|}{\textbf{Modo}} & \multicolumn{3}{c|}{\textbf{Servidor}} & \multicolumn{3}{c|}{\textbf{Simulador}} & \multicolumn{1}{c|}{\textbf{Mob.}} & \multirow{2}{*}{\shortstack{\textbf{Obs.}\\\textbf{Parcial}}} & \multicolumn{3}{c|}{\textbf{Modelagem}} & \multirow{2}{*}{\shortstack{\textbf{Car.}\\\textbf{Trabalho}\\\textbf{Dinâmica}}} \\ \cline{2-13} \cline{15-17}
+                                             & 5G           &6G & V2I        & \shortstack{V2V} & I2I & MEC        & VEC        & Nuvem      & Pers.      & NS3 & Outro      & SUMO       &   & Ruído      & Ganho      & Camadas    & -          \\ \hline
+            ~\cite{Moghaddasi2023}           & \checkmark   & - & \checkmark & -                & -   & -          & \checkmark & -          & \checkmark & -   & -          & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{sidwini}                  & -            & - & \checkmark & -                & -   & \checkmark & -          & \checkmark & \checkmark & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            ~\cite{li2025}                   & -            & - & \checkmark & -                & -   & \checkmark & -          & -          & \checkmark & -   & -          & -          & - & -          & -          & -          & \checkmark \\ \hline
+            ~\cite{meghamala2025}            & \checkmark   & - & \checkmark & -                & -   & \checkmark & -          & -          & \checkmark & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            ~\cite{zhao2025}                 & -            & - & \checkmark & -                & -   & -          & \checkmark & -          & \checkmark & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            % remover
+            % ~\cite{wu2025}                   & -            & - & \checkmark & -                & -   & \checkmark & -          & -          & -          & -   & \checkmark & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{mohammad2025}             & -            & - & \checkmark & \checkmark       & -   & \checkmark & -          & -          & \checkmark & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            % remover
+            % ~\cite{liu2025}                  & -            & - & -          & -                & -   & \checkmark & -          & -          & \checkmark & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            ~\cite{xie2025}                  & -            & - & \checkmark & -                & -   & -          & \checkmark & -          & \checkmark & -   & -          & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{wu2025ava}                & -            & - & \checkmark & \checkmark       & -   & -          & \checkmark & -          & \checkmark & -   & -          & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            % remover
+            % ~\cite{long2025}                 & -            & - & \checkmark & -                & -   & -          & \checkmark & -          & -          & -   & -          & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            % remover
+            % ~\cite{abbas2025}                & -            & - & -          & -                & -   & -          & -          & -          & -          & -   & -          & -          & - & -          & -          & -          & -          \\ \hline
+            \textbf{TOLB}~\cite{wu2024}      & -            & - & \checkmark & -                & \checkmark & \checkmark & -          & -          & \checkmark & -   & -          & -          & - & \checkmark & \checkmark & -          & -          \\ \hline
+            % \textbf{FOFF}~\cite{vieira2025}  & \checkmark   & - & \checkmark & -                & -   & -          & \checkmark & -          & \checkmark & -   & -          & \checkmark & - & \checkmark & \checkmark & -          & -          \\ \hline
+           \textbf{SAC-FTOPSIS} & \textbf{\checkmark} & -            & \textbf{\checkmark} & \textbf{\checkmark} & - & - & \textbf{\checkmark} & - & - & \textbf{\checkmark} & - & \textbf{\checkmark} & \textbf{\checkmark} &  \textbf{\checkmark} & \textbf{\checkmark} & \textbf{\checkmark} & \textbf{\checkmark} \\ \hline
         \end{tabular}%
         }
     \end{table}
@@ -575,81 +525,154 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 
 % \textbf{SAC-FTOPSIS} & \checkmark & & \checkmark & \checkmark & & \checkmark & & & \checkmark & & \checkmark & SAC & \checkmark &  & \checkmark \\ \hline
 
-\section{Trabalhos Relacionados e Lacunas}
-%%################## SLIDE: ARTIGO DE REFERÊNCIA (FOFF) ##################
-\begin{frame}{Artigo de Referência}
-\vspace{-0.5cm}
-\begin{center}
-\includegraphics[page=1, width=1.0\textwidth, keepaspectratio, trim={0 9.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/foff_paper.pdf}
-\end{center}
+%%################## SLIDE: PARÂMETROS DE MODELAGEM ##################
+\begin{frame}{Revisão da Literatura}
+    \large{Parâmetros de Modelagem}
+    \begin{table}
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        
+        % Primeira Tabela
+        \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+            \hline
+            \multirow{3}{*}{\textbf{Ref.}} & \multirow{3}{*}{\shortstack{\textbf{Alg.}\\\textbf{DRL}}} & \multicolumn{3}{c|}{\textbf{Desc.}} & \multicolumn{3}{c|}{\textbf{Métricas}} & \multicolumn{1}{c|}{\textbf{Estado}} \\ \cline{3-9}
+            & & \multicolumn{2}{c|}{\textbf{Modo}} & \multirow{2}{*}{\textbf{Prazo}} & \multirow{2}{*}{\textbf{Energia}} & \multirow{2}{*}{\textbf{Latência}} & \multirow{2}{*}{\textbf{Outra}} & \multirow{2}{*}{\textbf{Invariante}} \\ \cline{3-4}
+            & & \textbf{Total} & \textbf{Parcial} & & & & & \\ \hline
+            ~\cite{Moghaddasi2023}          & DDQN       & \checkmark & -          & \checkmark & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{sidwini}                 & SAC        & \checkmark & -          & \checkmark & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{li2025}                  & DQN        & -          & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & -          \\ \hline
+            ~\cite{meghamala2025}           & SAC        & -          & -          & -          & -          & -          & -          & -          \\ \hline
+            ~\cite{zhao2025}                & DQN        & \checkmark & -          & -          & \checkmark & \checkmark & -          & -          \\ \hline
+            % ~\cite{wu2025}                  & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            ~\cite{mohammad2025}            & DDPG       & \checkmark & -          & \checkmark & \checkmark & \checkmark & -          & -          \\ \hline
+            % ~\cite{liu2025}                 & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            ~\cite{xie2025}                 & PPO        & \checkmark & -          & \checkmark & -          & -          & -          & -          \\ \hline
+            ~\cite{wu2025ava}               & MADDPG     & -          & \checkmark & \checkmark & \checkmark & \checkmark & -          & -          \\ \hline
+            % ~\cite{long2025}                & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            % ~\cite{abbas2025}               & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            \textbf{TOLB}~\cite{wu2024}     & TD3        & -          & \checkmark & \checkmark & \checkmark & \checkmark & -          & -          \\ \hline
+            \textbf{Proposta}               & SAC        & \checkmark & -          & \checkmark & \checkmark & \checkmark & -          & \checkmark \\ \hline
+        \end{tabular}%
+        }
+    \end{table}
 \end{frame}
+
+\begin{frame}{Revisão de Literatura}
+    \large{Parâmetros de Modelagem (Cont.)}
+    \begin{table}
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        
+        % Segunda Tabela
+        \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+            \hline
+            \multirow{2}{*}{\textbf{Ref.}} & \multicolumn{4}{c|}{\textbf{Recompensa}} & \multicolumn{3}{c|}{\textbf{Comparação}} & \multicolumn{2}{c|}{\textbf{Ação}} & \multirow{2}{*}{\shortstack{\textbf{Model-}\\\textbf{Free}}} & \multirow{2}{*}{\shortstack{\textbf{Off-}\\\textbf{Policy}}} & \multirow{2}{*}{\shortstack{\textbf{Rep.}\\\textbf{Buf.}}} \\ \cline{2-10}
+            & \shortstack{\textbf{Soma}\\\textbf{Pond.}} & \textbf{GAP} & \textbf{F.O} & \textbf{Outra} & \textbf{Heur.} & \textbf{DRL} & \textbf{Meta} & \textbf{Bin.} & \textbf{N-Ár.} & & & \\ \hline
+            ~\cite{Moghaddasi2023}          & \checkmark & -          & -          & -          & \checkmark & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            ~\cite{sidwini}                 & \checkmark & -          & -          & -          & -          & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            ~\cite{li2025}                  & -          & -          & \checkmark & -          & -          & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            ~\cite{meghamala2025}           & -          & -          & -          & -          & \checkmark & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            ~\cite{zhao2025}                & \checkmark & -          & -          & -          & \checkmark & \checkmark & \checkmark & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            % ~\cite{wu2025}                  & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            ~\cite{mohammad2025}            & -          & -          & -          & -          & -          & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            % ~\cite{liu2025}                 & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            ~\cite{xie2025}                 & -          & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark & -          & \checkmark & \checkmark & -          & -          \\ \hline
+            ~\cite{wu2025ava}               & -          & -          & -          & \checkmark & \checkmark & -          & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            % ~\cite{long2025}                & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            % ~\cite{abbas2025}               & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          & -          \\ \hline % remover depois
+            \textbf{TOLB}~\cite{wu2024}     & \checkmark & -          & \checkmark & -          & \checkmark & \checkmark & -          & -          & \checkmark & \checkmark & \checkmark & \checkmark \\ \hline
+            \textbf{Proposta}               & -          & \checkmark & \checkmark & -          & \checkmark & \checkmark & -          & \checkmark & -          & \checkmark & \checkmark & \checkmark \\ \hline
+        \end{tabular}%
+        }
+    \end{table}
+\end{frame}
+
+% \section{Trabalhos Relacionados e Lacunas}
+% %%################## SLIDE: ARTIGO DE REFERÊNCIA (FOFF) ##################
+% \begin{frame}{Artigo de Referência}
+% \vspace{-0.5cm}
+% \begin{center}
+% \includegraphics[page=1, width=1.0\textwidth, keepaspectratio, trim={0 9.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/foff_paper.pdf}
+% \end{center}
+% \end{frame}
 
 
 %%################## SLIDE: FOFF vs DRL PURO ##################
-\begin{frame}{Vantagens e Desvantagens: FOFF vs. DRL Padrão}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \vspace{0.1cm}
-            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fuzzy Offloading (FOFF), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                \textcolor{green!60!black}{\textbf{Vantagens}}:\\
-                $\bullet$ \textbf{1. Zero Treinamento}: Decisão instantânea (\textit{one-shot}) baseada em regras lógicas.\\
-                $\bullet$ \textbf{2. Eficiência}: Baixa complexidade computacional e menor consumo de energia.\\
-                \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
-                $\bullet$ \textbf{1. Miopia Temporal}: Não possui aprendizado sequencial. Toma decisões sem antecipar o estado futuro.\\
-                $\bullet$ \textbf{2. Adaptação a \textit{Drifts}} : Carece de aprendizado sequencial para mudanças abruptas.
-            \end{tcolorbox}
-        \end{column}
+% \begin{frame}{Vantagens e Desvantagens: FOFF vs. DRL Padrão}
+%     \begin{columns}[T]
+%         \begin{column}{0.48\textwidth}
+%             \vspace{0.1cm}
+%             \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fuzzy Offloading (FOFF), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 \textcolor{green!60!black}{\textbf{Vantagens}}:\\
+%                 $\bullet$ \textbf{1. Zero Treinamento}: Decisão instantânea (\textit{one-shot}) baseada em regras lógicas.\\
+%                 $\bullet$ \textbf{2. Eficiência}: Baixa complexidade computacional e menor consumo de energia.\\
+%                 \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
+%                 $\bullet$ \textbf{1. Miopia Temporal}: Não possui aprendizado sequencial. Toma decisões sem antecipar o estado futuro.\\
+%                 $\bullet$ \textbf{2. Adaptação a \textit{Drifts}} : Carece de aprendizado sequencial para mudanças abruptas.
+%             \end{tcolorbox}
+%         \end{column}
         
-        \begin{column}{0.48\textwidth}
-            \vspace{0.1cm}
-            \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title={DRL Padrão (Ex: DQN, DDPG)}, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                \textcolor{green!60!black}{\textbf{Vantagens}}:\\
-                $\bullet$ \textbf{1. Visão de Longo Prazo}: Aprende políticas sequenciais, antecipando estados futuros.\\
-                $\bullet$ \textbf{2. Model-Free}: Adapta-se à dinâmica do ambiente via tentativa e erro.\\
-                \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
-                $\bullet$ \textbf{1. Engenharia de Recompensa}: Exige ajuste manual de pesos multiobjetivo.\\
-                $\bullet$ \textbf{2. Rigidez Dimensional}: Vulnerável a mudanças na topologia (entradas fixas).
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
+%         \begin{column}{0.48\textwidth}
+%             \vspace{0.1cm}
+%             \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title={DRL Padrão (Ex: DQN, DDPG)}, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 \textcolor{green!60!black}{\textbf{Vantagens}}:\\
+%                 $\bullet$ \textbf{1. Visão de Longo Prazo}: Aprende políticas sequenciais, antecipando estados futuros.\\
+%                 $\bullet$ \textbf{2. Model-Free}: Adapta-se à dinâmica do ambiente via tentativa e erro.\\
+%                 \textcolor{red!80!black}{\textbf{Desvantagens}}:\\
+%                 $\bullet$ \textbf{1. Engenharia de Recompensa}: Exige ajuste manual de pesos multiobjetivo.\\
+%                 $\bullet$ \textbf{2. Rigidez Dimensional}: Vulnerável a mudanças na topologia (entradas fixas).
+%             \end{tcolorbox}
+%         \end{column}
+%     \end{columns}
     
-    % \vspace{0.4cm}
-    % \begin{beamercolorbox}[wd=0.98\textwidth, sep=3pt, center, rounded=true]{block body}
-    %     \scriptsize \textit{Enquanto o FOFF sofre com a incapacidade de planejamento a longo prazo, o DRL puro esbarra na fragilidade do design de sua função de recompensa sob ambientes dinâmicos.}
-    % \end{beamercolorbox}
-\end{frame}
+%     % \vspace{0.4cm}
+%     % \begin{beamercolorbox}[wd=0.98\textwidth, sep=3pt, center, rounded=true]{block body}
+%     %     \scriptsize \textit{Enquanto o FOFF sofre com a incapacidade de planejamento a longo prazo, o DRL puro esbarra na fragilidade do design de sua função de recompensa sob ambientes dinâmicos.}
+%     % \end{beamercolorbox}
+% \end{frame}
 
-\begin{frame}{Artigo de Referência}
-\vspace{-0.5cm}
-\begin{center}
-\includegraphics[page=1, width=1.\textwidth, keepaspectratio, trim={0 11.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/section-related-works/literature-review/Deep learning approaches for computation offloading in edge.pdf}
-\end{center}
-\end{frame}
+% \begin{frame}{Artigo de Referência}
+% \vspace{-0.5cm}
+% \begin{center}
+% \includegraphics[page=1, width=1.\textwidth, keepaspectratio, trim={0 11.8cm 0 3.5cm}, clip]{/home/sergiosvieira/Documentos/uecetex2/related-papers/section-related-works/literature-review/Deep learning approaches for computation offloading in edge.pdf}
+% \end{center}
+% \end{frame}
 
-\begin{frame}{Fraquezas na Literatura (DRL em VEC)}
-    \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Como a Nossa Proposta (Fuzzy-TOPSIS+DRL) Preenche as Lacunas de {[Miriyala \& Chirra, 2026]}, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-        \scriptsize
-        \renewcommand{\arraystretch}{1.2}
-        \centering
-        \begin{tabular}{@{}p{5.2cm}|p{5.2cm}@{}}
-            \textbf{Limitações Mapeadas na Literatura} & \textbf{Respostas da Nossa Proposta} \\
-            \hline
-            \textbf{1. Topologia Variável}: Vetores fixos de estados são inadequados para topologias dinâmicas. & \textbf{Invariância à Escala}: O Fuzzy-TOPSIS processa os candidatos e gera um vetor fixo representativo. \\
-            \textbf{2. Não-Estacionariedade}: Políticas entram em colapso sob alta mobilidade (\textit{drifts}). & \textbf{Adaptação Contínua}: O uso do agente SAC (Model-Free) lida naturalmente com as mudanças do ambiente. \\
-            \textbf{3. Perturbações}: Sensibilidade a ruído ou falhas nas observações. & \textbf{Atenuação de Ruído}: Normalização via Fuzzy-TOPSIS amortece o impacto de \textit{outliers}. \\
-            \textbf{4. Complexidade do Modelo}: Faltam modelos leves para hardware restrito. & \textbf{Leve e Enxuta}: Arquitetura com baixa latência de inferência. \\
-            \textbf{5. \textit{Continual Learning}}: Falha ao tentar aprender de forma incremental e online. & \textbf{Atualização \textit{Off-Policy}}: O \textit{Replay Buffer} dinâmico evita o esquecimento catastrófico. \\
-        \end{tabular}
-    \end{tcolorbox}
+% \begin{frame}{Fraquezas na Literatura (DRL em VEC)}
+%     \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Como a Nossa Proposta (Fuzzy-TOPSIS+DRL) Preenche as Lacunas de {[Miriyala \& Chirra, 2026]}, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%         \scriptsize
+%         \renewcommand{\arraystretch}{1.2}
+%         \centering
+%         \begin{tabular}{@{}p{5.2cm}|p{5.2cm}@{}}
+%             \textbf{Limitações Mapeadas na Literatura} & \textbf{Respostas da Nossa Proposta} \\
+%             \hline
+%             \textbf{1. Topologia Variável}: Vetores fixos de estados são inadequados para topologias dinâmicas. & \textbf{Invariância à Escala}: O Fuzzy-TOPSIS processa os candidatos e gera um vetor fixo representativo. \\
+%             \textbf{2. Não-Estacionariedade}: Políticas entram em colapso sob alta mobilidade (\textit{drifts}). & \textbf{Adaptação Contínua}: O uso do agente SAC (Model-Free) lida naturalmente com as mudanças do ambiente. \\
+%             \textbf{3. Perturbações}: Sensibilidade a ruído ou falhas nas observações. & \textbf{Atenuação de Ruído}: Normalização via Fuzzy-TOPSIS amortece o impacto de \textit{outliers}. \\
+%             \textbf{4. Complexidade do Modelo}: Faltam modelos leves para hardware restrito. & \textbf{Leve e Enxuta}: Arquitetura com baixa latência de inferência. \\
+%             \textbf{5. \textit{Continual Learning}}: Falha ao tentar aprender de forma incremental e online. & \textbf{Atualização \textit{Off-Policy}}: O \textit{Replay Buffer} dinâmico evita o esquecimento catastrófico. \\
+%         \end{tabular}
+%     \end{tcolorbox}
     
-    \vspace{-0.2cm}
-    \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
-        \scriptsize \textit{Miriyala \& Chirra (2026) mapearam os principais gargalos do DRL no Edge Computing. Nossa abordagem híbrida ataca diretamente essas vulnerabilidades estruturais.}
+%     \vspace{-0.2cm}
+%     \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
+%         \scriptsize \textit{Miriyala \& Chirra (2026) mapearam os principais gargalos do DRL no Edge Computing. Nossa abordagem híbrida ataca diretamente essas vulnerabilidades estruturais.}
+%     \end{beamercolorbox}
+% \end{frame}
+
+\section{Proposta}
+\begin{frame}
+    \centering
+    \vfill
+    \begin{beamercolorbox}[sep=12pt,center,rounded=true,shadow=true]{title}
+        \usebeamerfont{title}Proposta\par
     \end{beamercolorbox}
+    \vfill
 \end{frame}
-
 
 \section{Metodologia e Proposta}
 
@@ -659,18 +682,18 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
         \scriptsize
         O problema é formulado rigorosamente como um \textbf{POMDP}, definido pela sétupla $(\mathcal{S}, \mathcal{A}, \Omega, \mathcal{P}, \mathcal{O}, \mathcal{R}, \gamma)$:\\
         \vspace{0.15cm}
-        $\bullet$ \textbf{$\mathcal{S}$ (Estados latentes)}: Oculto. Inclui taxas de canal, filas e posições exatas.\\
-        $\bullet$ \textbf{$\mathcal{A}$ (Ações)}: $\mathcal{A} = \{0, 1\}$ (0: LOCAL, 1: OFFLOAD para o \textit{Rank 1}).\\
-        $\bullet$ \textbf{$\Omega$ (Observações)}: $\Omega \subseteq [0,1]^{15}$. Vetor de estado fixo gerado pelo módulo Fuzzy-TOPSIS.\\
-        $\bullet$ \textbf{$\mathcal{P}$ (Transição)}: $\mathcal{P}(s_{t+1} \mid s_t, a_t)$. Dinâmica não-estacionária da rede.\\
-        $\bullet$ \textbf{$\mathcal{O}$ (Observação)}: $\mathcal{O}(o_t \mid s_t, a_{t-1})$. Mapeamento do estado latente na observação.\\
-        $\bullet$ \textbf{$\mathcal{R}$ (Recompensa)}: $\mathcal{R}(s_t, a_t) = r_t$. Multiobjetivo, penalizando violações de prazo.\\
-        $\bullet$ \textbf{$\gamma$ (Desconto)}: Fator de desconto para retornos futuros ($\gamma = 0{,}99$).
+        $\bullet$ \textbf{$\mathcal{S}$ (Estados)}: Conjunto de estados reais e inobserváveis do ambiente.\\
+        $\bullet$ \textbf{$\mathcal{A}$ (Ações)}: Conjunto de ações possíveis disponíveis para o agente.\\
+        $\bullet$ \textbf{$\Omega$ (Observações)}: Conjunto de observações possíveis que o agente pode receber.\\
+        $\bullet$ \textbf{$\mathcal{P}$ (Transição)}: $\mathcal{P}(s_{t+1} \mid s_t, a_t)$. Dinâmica de transição de estados do ambiente.\\
+        $\bullet$ \textbf{$\mathcal{O}$ (Observação)}: $\mathcal{O}(o_t \mid s_t, a_{t-1})$. Probabilidade de receber a observação $o_t$ no estado $s_t$.\\
+        $\bullet$ \textbf{$\mathcal{R}$ (Recompensa)}: $\mathcal{R}(s_t, a_t)$. Retorno imediato recebido após executar uma ação.\\
+        $\bullet$ \textbf{$\gamma$ (Desconto)}: $\gamma \in [0, 1)$. Pondera a importância das recompensas futuras.
     \end{tcolorbox}
     
     \vspace{0.1cm}
     \begin{beamercolorbox}[wd=\textwidth, sep=3pt, center, rounded=true]{block body}
-        \scriptsize \textit{A formulação como POMDP justifica-se pois o agente não tem acesso ao estado global perfeito do ambiente VEC, que é afetado por ruído de canal, atrasos de telemetria e mobilidade contínua.}
+        \scriptsize \textit{A formulação como POMDP justifica-se em cenários onde o agente não possui acesso total ou perfeito ao estado global do ambiente, tomando decisões com base em informações parciais ou com incerteza.}
     \end{beamercolorbox}
 \end{frame}
 
@@ -700,30 +723,30 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 %%################## SLIDES: DETALHAMENTO DAS RESPOSTAS ##################
 
 %%################## SLIDE: RESPOSTA 1 ##################
-\begin{frame}{Limitação 1: Topologia Variável}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \vspace*{0.2cm}
-            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt] 
-                \scriptsize
-                $\bullet$ O número de nós candidatos para descarregamento de tarefas pode variar, exigindo \textbf{retreinamento} em abordagens clássicas de DRL.
-            \end{tcolorbox}
-        \end{column}
+% \begin{frame}{Limitação 1: Topologia Variável}
+%     \begin{columns}[T]
+%         \begin{column}{0.48\textwidth}
+%             \vspace*{0.2cm}
+%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt] 
+%                 \scriptsize
+%                 $\bullet$ O número de nós candidatos para descarregamento de tarefas pode variar, exigindo \textbf{retreinamento} em abordagens clássicas de DRL.
+%             \end{tcolorbox}
+%         \end{column}
         
-        \begin{column}{0.48\textwidth}
-            \vspace*{0.2cm}
-            \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Invariância à Escala, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                $\bullet$ Propõe-se montar uma representação de dimensão fixa do estado atual percebido pelo agente por meio do ranqueamento (TOPSIS\footnotemark[1]/Fuzzy-TOPSIS\footnotemark[2]), independentemente do número de candidatos.
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
-    \footnotetext[1]{Versão intermediária.}
-    \footnotetext[2]{Versão final.}
-\end{frame}
+%         \begin{column}{0.48\textwidth}
+%             \vspace*{0.2cm}
+%             \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Invariância à Escala, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 $\bullet$ Propõe-se montar uma representação de dimensão fixa do estado atual percebido pelo agente por meio do ranqueamento (TOPSIS\footnotemark[1]/Fuzzy-TOPSIS\footnotemark[2]), independentemente do número de candidatos.
+%             \end{tcolorbox}
+%         \end{column}
+%     \end{columns}
+%     \footnotetext[1]{Versão intermediária.}
+%     \footnotetext[2]{Versão final.}
+% \end{frame}
 
 %%################## SLIDE: FLUXO DE COMPACTING E DECISÃO NEURAL ##################
-\begin{frame}{Limitação 1: Topologia Variável}
+\begin{frame}{Estado Invariante}
     \centering
     \begin{tikzpicture}[>=stealth, scale=1.0, transform shape, font=\sffamily]
         % Candidates box (Neighbor Table)
@@ -819,35 +842,35 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 \end{frame}
 
 %%################## SLIDE: RESPOSTA 2 ##################
-\begin{frame}{Limitação 2: Não-Estacionariedade}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \vspace*{0.2cm}
-            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize 
-                $\bullet$ Em redes veiculares, a carga de tarefas, tempo de processamento, tempo de transmissão e a qualidade do canal podem sofrer variações dinâmicas, gerando colapsos em políticas rígidas.\\
-            \end{tcolorbox}
-        \end{column}
+% \begin{frame}{Limitação 2: Não-Estacionariedade}
+%     \begin{columns}[T]
+%         \begin{column}{0.48\textwidth}
+%             \vspace*{0.2cm}
+%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize 
+%                 $\bullet$ Em redes veiculares, a carga de tarefas, tempo de processamento, tempo de transmissão e a qualidade do canal podem sofrer variações dinâmicas, gerando colapsos em políticas rígidas.\\
+%             \end{tcolorbox}
+%         \end{column}
         
-        \begin{column}{0.52\textwidth}
-            \centering
-            \vspace{0.2cm}
-            \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Solução: Adaptação Contínua (SAC), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                \textbf{Maximização da Recompensa e da Entropia}:
-                \begin{equation*}
-                    J(\pi) = \mathbb{E} \left[ \sum_{t} r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t)) \right]
-                \end{equation*}
-                \vspace{2pt}
-                $\bullet$ Incentiva o agente a manter alternativas ativas, impedindo a convergência prematura para ótimos locais.\\
-                $\bullet$ A política estocástica se reajusta autonomamente a flutuações rápidas de carga sem regras estáticas rígidas.
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
-\end{frame}
+%         \begin{column}{0.52\textwidth}
+%             \centering
+%             \vspace{0.2cm}
+%             \begin{tcolorbox}[colback=orange!5, colframe=orange!80!black, title=Solução: Adaptação Contínua (SAC), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 \textbf{Maximização da Recompensa e da Entropia}:
+%                 \begin{equation*}
+%                     J(\pi) = \mathbb{E} \left[ \sum_{t} r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t)) \right]
+%                 \end{equation*}
+%                 \vspace{2pt}
+%                 $\bullet$ Incentiva o agente a manter alternativas ativas, impedindo a convergência prematura para ótimos locais.\\
+%                 $\bullet$ A política estocástica se reajusta autonomamente a flutuações rápidas de carga sem regras estáticas rígidas.
+%             \end{tcolorbox}
+%         \end{column}
+%     \end{columns}
+% \end{frame}
 
 %%################## SLIDE: RESPOSTA 3 ##################
-\begin{frame}{Limitação 3: Perturbações}
+\begin{frame}{Perturbações}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \vspace*{0.2cm}
@@ -893,86 +916,86 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 \end{frame}
 
 %%################## SLIDE: LIMITAÇÃO 4 (COMPLEXIDADE) ##################
-\begin{frame}{Limitação 4: Complexidade do Modelo}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \vspace*{0.1cm}
-            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                $\bullet$ OBUs com restrições severas de CPU e energia~\cite{xue2025}.\\
-                $\bullet$ Mudanças na topologia exigem arquitetura flexível como GNN, necessitando de mais recursos computacionais.\\
-                $\bullet$ Baixo poder computacional pode inviabilizar decisões em tempo real~\cite{miriyala2026}.
-            \end{tcolorbox}
-        \end{column}
+% \begin{frame}{Limitação 4: Complexidade do Modelo}
+%     \begin{columns}[T]
+%         \begin{column}{0.48\textwidth}
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 $\bullet$ OBUs com restrições severas de CPU e energia~\cite{xue2025}.\\
+%                 $\bullet$ Mudanças na topologia exigem arquitetura flexível como GNN, necessitando de mais recursos computacionais.\\
+%                 $\bullet$ Baixo poder computacional pode inviabilizar decisões em tempo real~\cite{miriyala2026}.
+%             \end{tcolorbox}
+%         \end{column}
         
-        \begin{column}{0.52\textwidth}
-            \vspace*{0.1cm}
-            \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title=Solução: Arquitetura Leve e Enxuta, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize 
-                $\bullet$ \textbf{Treino Offline}: Fase pesada ocorre isolada do veículo (simulador), poupando a OBU.\\
-                $\bullet$ \textbf{Fuzzy-TOPSIS}: Ranqueamento com baixa complexidade computacional $O(n \log n)$~\cite{vieira2025foff}.\\
-                $\bullet$ \textbf{Leveza}: Inferência ultrarrápida (complexidade $O(1)$) em microssegundos~\cite{miriyala2026}.
-                $\bullet$ \textbf{Compactação}: Representação do ambiente e ações compactadas, diminuindo o custo de treinamento do agente.
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
+%         \begin{column}{0.52\textwidth}
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=cyan!5, colframe=cyan!80!black, title=Solução: Arquitetura Leve e Enxuta, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize 
+%                 $\bullet$ \textbf{Treino Offline}: Fase pesada ocorre isolada do veículo (simulador), poupando a OBU.\\
+%                 $\bullet$ \textbf{Fuzzy-TOPSIS}: Ranqueamento com baixa complexidade computacional $O(n \log n)$~\cite{vieira2025foff}.\\
+%                 $\bullet$ \textbf{Leveza}: Inferência ultrarrápida (complexidade $O(1)$) em microssegundos~\cite{miriyala2026}.
+%                 $\bullet$ \textbf{Compactação}: Representação do ambiente e ações compactadas, diminuindo o custo de treinamento do agente.
+%             \end{tcolorbox}
+%         \end{column}
+%     \end{columns}
     
-    \vspace{0.3cm}
-    \begin{center}
-    \begin{tikzpicture}[>=stealth, scale=0.82, transform shape, font=\sffamily]
-        % Bloco Treinamento (Pesado/Offline)
-        \node[draw=red!80!black, fill=red!5, rounded corners=4pt, thick, align=center, text width=2.4cm] (train) at (0, 0) {\scriptsize \textbf{Treinamento SAC}\\ \tiny (Pesado / Offline)};
+%     \vspace{0.3cm}
+%     \begin{center}
+%     \begin{tikzpicture}[>=stealth, scale=0.82, transform shape, font=\sffamily]
+%         % Bloco Treinamento (Pesado/Offline)
+%         \node[draw=red!80!black, fill=red!5, rounded corners=4pt, thick, align=center, text width=2.4cm] (train) at (0, 0) {\scriptsize \textbf{Treinamento SAC}\\ \tiny (Pesado / Offline)};
 
-        % Bloco TOPSIS (Leve/Online)
-        \node[draw=cyan!80!black, fill=cyan!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (topsis) at (4.5, 0) {\scriptsize \textbf{Fuzzy-TOPSIS}\\ \tiny (Custo Linear)};
+%         % Bloco TOPSIS (Leve/Online)
+%         \node[draw=cyan!80!black, fill=cyan!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (topsis) at (4.5, 0) {\scriptsize \textbf{Fuzzy-TOPSIS}\\ \tiny (Custo Linear)};
 
-        % Bloco Inferência (Leve/Online)
-        \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (actor) at (8.5, 0) {\scriptsize \textbf{Rede Actor}\\ \tiny (Inferência $O(1)$)};
+%         % Bloco Inferência (Leve/Online)
+%         \node[draw=blue!80!black, fill=blue!5, rounded corners=4pt, thick, align=center, text width=2.2cm] (actor) at (8.5, 0) {\scriptsize \textbf{Rede Actor}\\ \tiny (Inferência $O(1)$)};
 
-        % Setas
-        \draw[->, thick, red!80!black, dashed] (train.east) -- (topsis.west) node[midway, above, font=\tiny, yshift=2pt] {Pesos Otimizados};
-        \draw[->, thick, cyan!80!black] (topsis.east) -- (actor.west) node[midway, above, font=\tiny, yshift=2pt] {Estado 6D};
-        \draw[->, thick, blue!80!black, line width=1pt] (actor.east) -- (10.5, 0) node[right, font=\bfseries\tiny, align=center, text=blue!80!black] {Decisão\\em $\mu$s};
+%         % Setas
+%         \draw[->, thick, red!80!black, dashed] (train.east) -- (topsis.west) node[midway, above, font=\tiny, yshift=2pt] {Pesos Otimizados};
+%         \draw[->, thick, cyan!80!black] (topsis.east) -- (actor.west) node[midway, above, font=\tiny, yshift=2pt] {Estado 6D};
+%         \draw[->, thick, blue!80!black, line width=1pt] (actor.east) -- (10.5, 0) node[right, font=\bfseries\tiny, align=center, text=blue!80!black] {Decisão\\em $\mu$s};
 
-        % Caixa agrupadora para a OBU
-        \draw[thick, green!60!black, dotted, rounded corners=4pt] (3.0, -0.85) rectangle (9.8, 0.85);
-        \node[green!60!black, font=\bfseries\tiny] at (6.4, 0.65) {Execução Online na OBU (Baixo Custo)};
-    \end{tikzpicture}
-    \end{center}
-\end{frame}
+%         % Caixa agrupadora para a OBU
+%         \draw[thick, green!60!black, dotted, rounded corners=4pt] (3.0, -0.85) rectangle (9.8, 0.85);
+%         \node[green!60!black, font=\bfseries\tiny] at (6.4, 0.65) {Execução Online na OBU (Baixo Custo)};
+%     \end{tikzpicture}
+%     \end{center}
+% \end{frame}
 
 %%################## SLIDE: RESPOSTA 5 (CONTINUAL LEARNING) ##################
-\begin{frame}{Limitação 5: Continual Learning}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \vspace*{0.1cm}
-            \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema: Esquecimento, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize 
-                $\bullet$ \textbf{Vício Temporal}: Experiências sequenciais fortemente correlacionadas~\cite{mnih2016}.\\
-                $\bullet$ \textbf{Instabilidade}: Focar em dados recentes causa o esquecimento catastrófico~\cite{miriyala2026}.\\
-                $\bullet$ \textbf{Divergência}: Inviabiliza o aprendizado contínuo em ambientes dinâmicos.
-            \end{tcolorbox}
-        \end{column}
+% \begin{frame}{Limitação 5: Continual Learning}
+%     \begin{columns}[T]
+%         \begin{column}{0.48\textwidth}
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Problema: Esquecimento, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize 
+%                 $\bullet$ \textbf{Vício Temporal}: Experiências sequenciais fortemente correlacionadas~\cite{mnih2016}.\\
+%                 $\bullet$ \textbf{Instabilidade}: Focar em dados recentes causa o esquecimento catastrófico~\cite{miriyala2026}.\\
+%                 $\bullet$ \textbf{Divergência}: Inviabiliza o aprendizado contínuo em ambientes dinâmicos.
+%             \end{tcolorbox}
+%         \end{column}
         
-        \begin{column}{0.52\textwidth}
-            \vspace*{0.1cm}
-            \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Replay Buffer (SAC), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-                \scriptsize
-                $\bullet$ \textbf{Memória}: Armazena transições $(s_t, a_t, r, s_{t+1})$ para reuso \textit{off-policy}~\cite{mnih2016}.\\
-                $\bullet$ \textbf{Amostragem}: Sorteio de mini-lotes aleatórios quebra a correlação temporal~\cite{mnih2016}.\\
-                $\bullet$ \textbf{Estabilidade}: Garante que estados raros permaneçam representados no gradiente~\cite{miriyala2026}.
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
+%         \begin{column}{0.52\textwidth}
+%             \vspace*{0.1cm}
+%             \begin{tcolorbox}[colback=green!5, colframe=green!60!black, title=Solução: Replay Buffer (SAC), fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%                 \scriptsize
+%                 $\bullet$ \textbf{Memória}: Armazena transições $(s_t, a_t, r, s_{t+1})$ para reuso \textit{off-policy}~\cite{mnih2016}.\\
+%                 $\bullet$ \textbf{Amostragem}: Sorteio de mini-lotes aleatórios quebra a correlação temporal~\cite{mnih2016}.\\
+%                 $\bullet$ \textbf{Estabilidade}: Garante que estados raros permaneçam representados no gradiente~\cite{miriyala2026}.
+%             \end{tcolorbox}
+%         \end{column}
+%     \end{columns}
     
-    \vspace{0.1cm}
-    \begin{center}
-        \includegraphics[width=0.95\textwidth]{figuras/replay_buffer.pdf}
-    \end{center}
-\end{frame}
+%     \vspace{0.1cm}
+%     \begin{center}
+%         \includegraphics[width=0.95\textwidth]{figuras/replay_buffer.pdf}
+%     \end{center}
+% \end{frame}
 
 %%################## SLIDE: RECOMPENSA ##################
-\begin{frame}{Design da Função de Recompensa}
+\begin{frame}{Função de Recompensa}
     \vspace*{0.2cm}
     \begin{center}
         \begin{equation*}
@@ -981,28 +1004,68 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
                 1{,}0 - \frac{1}{4} \left( \frac{\text{JCT}_t}{D_t} + \frac{E_t}{E^{\max}_t} \right), & \text{se } \text{JCT}_t \leq D_t \text{ \scriptsize (Sucesso)} \\[8pt]
                 -1{,}0 - \min \left( 1{,}0, \frac{\text{JCT}_t - D_t}{D_t} \right), & \text{se } \text{JCT}_t > D_t \text{ \scriptsize (Falha)}
             \end{cases}
-        \end{equation*}        
+        \end{equation*}
+        
+    \begin{equation}
+        E^{\text{max}}_t = \max\!\bigl(E^{\ell}_t,\; E^{\text{vec}}_t \cdot \mathbb{1}_{\text{viável}},\; E^{\text{v2v}}_t \cdot \mathbb{1}_{\text{viável}}\bigr)
+        \label{eq:e_max_2}
+    \end{equation}
     \end{center}
 
-    \vspace{0.1cm}
-    \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fundamentação do Design, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-        \footnotesize
-        $\bullet$ \textbf{Penalidade QoS (Falha):} Incorpora restrições críticas aplicando multas severas e progressivas caso a tarefa viole o tempo limite estipulado~\cite{miriyala2026}.\\
-        $\bullet$ \textbf{Otimização Multiobjetivo (Sucesso):} Uma vez garantido o prazo, a função foca em equilibrar de forma adaptativa a minimização da latência e do consumo de energia~\cite{xue2025}.\\
-        $\bullet$ \textbf{Estabilidade de Gradiente (Normalização):} A divisão pelos limites máximos ($D_t$ e $E^{\max}_t$) evita que variáveis com grandezas distintas (Segundos vs. Joules) afetem desproporcionalmente a otimização da rede neural~\cite{xue2025}.
-    \end{tcolorbox}
+    \begin{tikzpicture}[>=stealth, scale=0.85, transform shape, font=\sffamily]
+      % Eixo principal
+      \draw[black, line width=1.2pt, ->] (-6.8,-5.80) -- (7.2,-5.80)
+        node[right, font=\small\bfseries]{$r_t$};
+    
+      % FALHA [-2,-1] -> multiplicador 4x -> [-8 a -4] -> vamos transladar para centrar melhor: 
+      % -2 -> -6
+      % -1 -> -2
+      %  0.5 -> 4
+      %  1.0 -> 6
+      \fill[red!15] (-6.0,-6.20) rectangle (-2.0,-5.80);
+      \node[font=\small\bfseries, text=red!80!black] at (-4.0,-6.02) {FALHA $[\,-2{,}0;\,-1{,}0\,]$};
+      \draw[red!80!black, line width=1.4pt] (-6.0,-6.30) -- (-6.0,-5.70);
+      \draw[red!80!black, line width=1.4pt] (-2.0,-6.30) -- (-2.0,-5.70);
+    
+      % GAP [-1 a 0.5] -> tamanho 1.5 -> de -2 a 4
+      \draw[black!50, <->, line width=1.0pt] (-2.0,-6.50) -- (4.0,-6.50)
+        node[midway, below, yshift=-2pt, font=\scriptsize]{gap $= 1{,}5$};
+      \draw[black!50, line width=1.4pt] (4.0,-6.30) -- (4.0,-5.70);
+    
+      % SUCESSO [0.5,1] -> tamanho 0.5 -> de 4 a 6
+      \fill[green!15] (4.0,-6.20) rectangle (6.0,-5.80);
+      \node[font=\small\bfseries, text=green!60!black] at (5.0,-6.02) {SUCESSO};
+      \draw[green!60!black, line width=1.4pt] (6.0,-6.30) -- (6.0,-5.70);
+    
+      % Labels
+      \node[font=\scriptsize] at (-6.0,-6.70) {$-2{,}0$};
+      \node[font=\scriptsize] at (-2.0,-6.70) {$-1{,}0$};
+      \node[font=\scriptsize] at ( 4.0,-6.70) {$0{,}5$};
+      \node[font=\scriptsize] at ( 6.0,-6.70) {$1{,}0$};
+    
+      % Anotações
+      \node[font=\scriptsize, align=center, text width=4.5cm, text=black!80] at (-4.0,-7.50)
+        {penalidade proporcional ao\\atraso relativo $(\widehat{\text{JCT}}-D_t)/D_t$};
+    %   \node[font=\scriptsize, align=center, text width=4.5cm, text=black!80] at (1.0,-7.50)
+    %     {recompensa decresce com\\latência e energia normalizadas};
+      \node[font=\scriptsize, align=center, text width=3.8cm, text=black!80] at (5.8,-7.50)
+        {benefício proporcial ao cumprimento do prazo e \\da diminuição do custo};
+    \end{tikzpicture}
+
+
+    % \vspace{0.1cm}
+    % \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Fundamentação do Design, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+    %     \footnotesize
+    %     $\bullet$ \textbf{Penalidade QoS (Falha):} Incorpora restrições críticas aplicando multas severas e progressivas caso a tarefa viole o tempo limite estipulado~\cite{miriyala2026}.\\
+    %     $\bullet$ \textbf{Otimização Multiobjetivo (Sucesso):} Uma vez garantido o prazo, a função foca em equilibrar de forma adaptativa a minimização da latência e do consumo de energia~\cite{xue2025}.\\
+    %     $\bullet$ \textbf{Estabilidade de Gradiente (Normalização):} A divisão pelos limites máximos ($D_t$ e $E^{\max}_t$) evita que variáveis com grandezas distintas (Segundos vs. Joules) afetem desproporcionalmente a otimização da rede neural~\cite{xue2025}.
+    % \end{tcolorbox}
 \end{frame}
 
-\begin{frame}{Design da Função de Recompensa}
-    \vspace{-0.4cm}
-    \begin{center}
-        \includegraphics[height=0.85\textheight]{notebook/reward.pdf}
-    \end{center}
-\end{frame}
 
 
 %%################## SLIDE: ARQUITETURA INTEGRADA (COMPACTA) ##################
-\begin{frame}{Arquitetura Proposta Integrada: SAC-FTOPSIS}
+\begin{frame}{Arquitetura Proposta: SAC-FTOPSIS}
     \vspace{-0.4cm}
     \begin{center}
         \includegraphics[height=0.8\textheight]{figuras/treinamento.pdf}
@@ -1011,12 +1074,12 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 
 
 %%################## SLIDE: ARQUITETURA INTEGRADA (COMPACTA) ##################
-\begin{frame}{Arquitetura Proposta Integrada: SAC-FTOPSIS}
-    \vspace{-0.4cm}
-    \begin{center}
-        \includegraphics[height=0.8\textheight]{figuras/inferencia.pdf}
-    \end{center}
-\end{frame}
+% \begin{frame}{Arquitetura Proposta: SAC-FTOPSIS}
+%     \vspace{-0.4cm}
+%     \begin{center}
+%         \includegraphics[height=0.8\textheight]{figuras/inferencia.pdf}
+%     \end{center}
+% \end{frame}
 
 \section{Resultados e Análise}
 \begin{frame}
@@ -1029,241 +1092,362 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 \end{frame}
 
 
-%%################## SLIDE: CENÁRIOS DE TESTE E SIMULAÇÃO ##################
-% \begin{frame}{Cenários de Teste e Simulação Preliminar}
-%     \begin{columns}[T]
-%         \begin{column}{0.48\textwidth}
-%             \vspace*{0.1cm}
-%             \begin{tcolorbox}[colback=purple!5, colframe=purple!80!black, title=Carga de Trabalho e Mobilidade, fonttitle=\bfseries\footnotesize, arc=4pt]
-%                 \scriptsize
-%                 \begin{itemize}\setlength\itemsep{0.4em}
-%                     \item \textbf{Motor de Teste:} Simulação de Eventos Discretos (DES) implementada em C++20.
-%                     \item \textbf{Carga (Traços Reais):} Demandas estocásticas extraídas do \textit{cluster} Alibaba e escalonadas para o contexto veicular.
-%                     \item \textbf{Escalabilidade:} 658 cenários de teste gerados, variando de regimes leves a severos (10 a 45 tarefas/s).
-%                     \item \textbf{Mobilidade:} Trajetórias microscópicas dinâmicas geradas no simulador SUMO.
-%                 \end{itemize}
-%             \end{tcolorbox}
-%         \end{column}
+%%################## SLIDE: PERFIL E CENÁRIOS DE TESTE ##################
+\begin{frame}{Cenário de Testes}
+    \begin{columns}[T]
+        % --- COLUNA ESQUERDA: PERFIL ---
+        \begin{column}{0.34\textwidth}
+            \vspace{0.1cm}
+            \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Perfil da Aplicação, fonttitle=\bfseries\tiny, arc=0pt, outer arc=0pt, leftrule=2pt, rightrule=0.2pt, toprule=0.1pt, bottomrule=0.2pt, boxsep=1pt, left=2pt, right=2pt, top=2pt, bottom=2pt]
+                \tiny
+                $\bullet$ \textbf{Natureza}: Tarefas indivisíveis com \textbf{alta complexidade} computacional.\\
+                $\bullet$ \textbf{Carga}: Poucos bytes, mas cálculo pesado (CPU intensiva).\\
+                $\bullet$ \textbf{Prazos}: Curtos ($\le$ 100ms). Transmissão e processamento rápidos.\\
+                $\bullet$ \textbf{Exemplo}: Controle de veículo autônomo.
+                $\bullet$ \textbf{Exemplo}: 658 Cenários diferentes.
+            \end{tcolorbox}
+        \end{column}
+        
+        % --- COLUNA DIREITA: CENÁRIO DE TESTE ---
+        \begin{column}{0.64\textwidth}
+            \begin{center}
+            \vspace*{0.05cm}
+            \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[
+                    font=\sffamily,
+                    >=Stealth,
+                    % --- Pic: carro visto de cima indo para a direita ---
+                    car right/.pic={
+                        \begin{scope}[scale=0.6]
+                            \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                                (-1.8,-0.75) rectangle (1.8,0.75);
+                            \filldraw[fill=black!60, draw=black, thick]
+                                (-0.55,-0.55) -- (-1.05,-0.45) -- (-1.05,0.45) -- (-0.55,0.55) -- cycle;
+                            \filldraw[fill=black!60, draw=black, thick]
+                                (0.45,-0.55) -- (0.95,-0.45) -- (0.95,0.45) -- (0.45,0.55) -- cycle;
+                            \filldraw[fill=black!25, draw=black, thick]
+                                (-0.55,-0.55) rectangle (0.45,0.55);
+                            \filldraw[fill=yellow!80, draw=none]
+                                (1.55,-0.65) rectangle (1.75,-0.35);
+                            \filldraw[fill=yellow!80, draw=none]
+                                (1.55,0.35) rectangle (1.75,0.65);
+                        \end{scope}
+                    },
+                    % --- Pic: carro visto de cima indo para cima ---
+                    car up/.pic={
+                        \begin{scope}[scale=0.6]
+                            \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
+                                (-0.75,-1.8) rectangle (0.75,1.8);
+                            \filldraw[fill=black!60, draw=black, thick]
+                                (-0.55,-0.45) -- (-0.45,-0.95) -- (0.45,-0.95) -- (0.55,-0.45) -- cycle;
+                            \filldraw[fill=black!60, draw=black, thick]
+                                (-0.55,0.55) -- (-0.45,1.05) -- (0.45,1.05) -- (0.55,0.55) -- cycle;
+                            \filldraw[fill=black!25, draw=black, thick]
+                                (-0.55,-0.45) rectangle (0.55,0.55);
+                            \filldraw[fill=yellow!80, draw=none]
+                                (-0.65,1.55) rectangle (-0.35,1.75);
+                            \filldraw[fill=yellow!80, draw=none]
+                                (0.35,1.55) rectangle (0.65,1.75);
+                        \end{scope}
+                    },
+                    % --- Pic: semaforo ---
+                    semaforo/.pic={
+                        \begin{scope}[scale=0.45]
+                            \filldraw[fill=gray!70, draw=black, thick, rounded corners=3pt]
+                                (-0.55,-1.6) rectangle (0.55,1.6);
+                            \fill[red!90] (0, 1.0) circle (0.38);
+                            \fill[yellow!90] (0, 0) circle (0.38);
+                            \fill[green!70!black] (0,-1.0) circle (0.38);
+                            \draw[gray!60, line width=4pt] (0,-1.6) -- (0,-2.5);
+                        \end{scope}
+                    },
+                    label text/.style={font=\scriptsize\bfseries, align=center, fill=white, draw=black!50, rounded corners=1pt, inner sep=2pt}
+                ]
+                % ---- Canvas: (0,0) a (20,18) ----
+                \clip (0,0) rectangle (20,18);
+        
+                % ---- Fundo (gramado) ----
+                \fill[green!18] (0,0) rectangle (20,18);
+        
+                % ---- Ruas (2 faixas cada) ----
+                % Horizontal: y = 6 a 10
+                \fill[black!45] (0,6) rectangle (20,10);
+                % Vertical: x = 8 a 12
+                \fill[black!45] (8,0) rectangle (12,18);
+                % Cruzamento
+                \fill[black!45] (8,6) rectangle (12,10);
+        
+                % ---- Marcações de faixa ----
+                \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,0)  -- (10,6);
+                \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,10) -- (10,18);
+                \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (0,8)   -- (8,8);
+                \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (12,8)  -- (20,8);
+        
+                % ---- V1: Agente (indo para a direita, faixa inferior) ----
+                \pic at (3.5,7) {car right};
+                \node[fill=blue!15, draw=blue!70, rounded corners=2pt, thick,
+                      font=\small\bfseries, align=center, inner sep=3pt]
+                    (lagente) at (3.5,4.5) {Agente (V1)};
+                \draw[blue!70, thick] (lagente.north) -- (3.5,6.4);
+                % seta mobilidade
+                \draw[->, very thick, orange!90!black] (5.3,7.0) -- (7.4,7.0);
+                \node[fill=white, draw=orange!80, rounded corners=2pt,
+                      font=\scriptsize\bfseries, inner sep=2pt]
+                    at (6.3,5.6) {Mobilidade Din\^amica};
+                \draw[orange!70, thin] (6.3,5.88) -- (6.3,6.55);
+        
+                % ---- V2 (indo para a esquerda, faixa superior) ----
+                \pic[rotate=180] at (16.5,9) {car right};
+                \draw[->, very thick, orange!90!black] (14.7,9.0) -- (12.6,9.0);
+                \node[fill=white, draw=gray!60, rounded corners=2pt,
+                      font=\scriptsize\bfseries, inner sep=2pt]
+                    at (16.5,11.5) {V2};
+                \draw[gray!60, thin] (16.5,11.2) -- (16.5,9.7);
+        
+                % ---- V3 (indo para cima, faixa direita da via vertical) ----
+                \pic at (11,2.5) {car up};
+                \draw[->, very thick, orange!90!black] (11,4.3) -- (11,5.6);
+                \node[fill=white, draw=gray!60, rounded corners=2pt,
+                      font=\scriptsize\bfseries, inner sep=2pt]
+                    at (13.8,2.5) {V3};
+                \draw[gray!60, thin] (13.1,2.5) -- (11.7,2.5);
+        
+                % ---- Semáforo + Edge Server ----
+                \pic at (7.3,11.2) {semaforo};
+                \node[draw=black, fill=red!8, thick, rounded corners=4pt,
+                      align=center, font=\small\bfseries, inner sep=5pt]
+                    (edge) at (4.0,14.2) {Edge Server\\(Dispositivo de Borda)};
+                \draw[thick, gray!70] (7.3,11.8) -- (edge.south east);
+        
+                % ---- Carga de Trabalho (canto inferior esquerdo) ----
+                \node[draw=blue!70, fill=blue!5, thick, rounded corners=4pt,
+                      align=center, font=\scriptsize\bfseries, inner sep=5pt]
+                    (workload) at (2.5,2.0) {Carga de Trabalho\\(Tra\c{c}os Reais / Estoc\'astico)};
+                \draw[->, dotted, thick, blue!70] (workload.north east) -- (3.0,6.2);
+        
+                % ---- \gls{V2I} / V2E ----
+                \draw[<->, dashed, line width=1.5pt, red!70!black]
+                    (3.5,7.8) -- (edge.south);
+                \node[fill=white, draw=red!60, rounded corners=2pt,
+                      font=\scriptsize\bfseries, text=red!80!black, inner sep=2pt]
+                    at (2.2,11.5) {V2I / V2E};
+                \node[fill=white, font=\scriptsize, text=red!70!black, inner sep=1pt]
+                    at (2.2,10.8) {Atraso de Propaga\c{c}\~ao};
+        
+                % ---- Throttling ----
+                \node[draw=red!70, fill=white, dashed, thick, rounded corners=3pt,
+                      align=center, font=\scriptsize\bfseries]
+                    (throttle) at (4.5,16.8) {\textit{Throttling}\\Limita\c{c}\~oes de Processamento};
+                \draw[->, dotted, thick, red!70] (throttle.south) -- (edge.north);
+        
+                % ---- \gls{V2V}: Agente <-> V3 ----
+                \draw[<->, dashed, line width=1.5pt, purple!80]
+                    (4.8,6.4) -- (10.3,3.5);
+                \node[fill=white, draw=purple!70, rounded corners=2pt,
+                      font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+                    at (7.3,4.3) {V2V};
+        
+                % ---- \gls{V2V}: Agente <-> V2 ----
+                \draw[<->, dashed, line width=1.5pt, purple!80]
+                    (5.2,7.6) -- (14.6,8.5);
+                \node[fill=white, draw=purple!70, rounded corners=2pt,
+                      font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
+                    at (10.0,9.0) {V2V};
+        
+                % ---- Não-Estacionariedade (canto inferior direito) ----
+                \node[fill=white, draw=purple!70, thick, rounded corners=3pt,
+                      align=center, font=\scriptsize\bfseries, text=purple!80, inner sep=4pt]
+                    at (15.5,4.0) {Intera\c{c}\~ao Multiagente\\N\~ao-Estacionariedade};
+        
+                % ---- Legenda (canto superior direito) ----
+                \node[draw=black!50, fill=gray!5, very thick, dashed, rounded corners=4pt,
+                      align=left, font=\footnotesize, inner sep=7pt, anchor=north east]
+                    at (19.5,17.8) {
+                    \textbf{Restri\c{c}\~oes do Ambiente Simulado:}\\[2pt]
+                    $\bullet$ Mobilidade Din\^amica Veicular\\
+                    $\bullet$ Chegada Estoc\'astica de Tarefas\\
+                    $\bullet$ Atrasos e Ru\'idos na Comunica\c{c}\~ao\\
+                    $\bullet$ Gargalos de Processamento (\textit{Throttling})\\
+                    $\bullet$ Fen\^omeno de N\~ao-Estacionariedade
+                };
+        
+                % ---- Borda ----
+                \draw[thick] (0,0) rectangle (20,18);
+            \end{tikzpicture}
+            }
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-%         \begin{column}{0.52\textwidth}
-%             \vspace*{0.1cm}
-%             \begin{tcolorbox}[colback=blue!5, colframe=blue!80!black, title=Hardware e Comunicação (V2X), fonttitle=\bfseries\footnotesize, arc=4pt]
-%                 \scriptsize
-%                 \begin{itemize}\setlength\itemsep{0.4em}
-%                     \item \textbf{Heterogeneidade CPU:} O Servidor de Borda (VEC) opera a 1,2 GHz (Fila: 100). Os veículos possuem OBUs variando de 0,3 a 1,5 GHz.
-%                     \item \textbf{Canais V2I e V2V:} Largura de banda de 20 MHz e potência de transmissão de 0,2 W (23 dBm).
-%                     \item \textbf{Atenuação Realista:} Alcance máximo de comunicação de 300 m, utilizando o modelo de propagação \textit{Urban NLOS} (3GPP).
-%                 \end{itemize}
-%             \end{tcolorbox}
-%         \end{column}
-%     \end{columns}
+\begin{frame}{Estudo de Ablação}
+\vspace{-0.5cm}
+\begin{center}
+\includegraphics[page=1, width=0.93\textwidth, keepaspectratio]{figuras/ablation.pdf}
+\end{center}
+\end{frame}
+
+% \begin{frame}{Estudo de Ablação}
+%     \vspace{-0.15cm}
+%     \centering
+%     \resizebox{\textwidth}{!}{
+%     \begin{tikzpicture}[>=stealth, font=\sffamily]
+
+%     % ===== LINHA 1 =====
+%     \node[inner sep=0pt, align=center] (base) at (0, 0) {
+%         \begin{tcolorbox}[width=5.2cm, colback=gray!8, colframe=gray!60,
+%             colbacktitle=gray!60, coltitle=white,
+%             title=\textbf{SAC-Base} \hfill \textcolor{white}{4,5\%},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Referência sem otimizações.}\\[1pt]
+%             \textbf{Estado (11D bruto):}\\
+%             \textcolor{gray!65}{$C_t, D_t, d_{VEC}, f_{dvfs}, Q_{VEC}, T_{cpu}$}\\
+%             \textcolor{gray!65}{$f_{loc}, Q_{loc}, f_{V2V}, Q_{V2V}, d_{V2V}$}\\[1pt]
+%             \textbf{Ação:} Ternária $\{$Loc, VEC, V2V$\}$\\[1pt]
+%             \textbf{Recompensa (WSM):}\\
+%             \textcolor{gray!65}{$r=2(1-\bar{x}_a){-}1$}\\
+%             \textcolor{gray!65}{critérios: JCT, Energia, Fila}\\[2pt]
+%             \textcolor{gray!60}{\textit{94,9\% V2V $\Rightarrow$ colapso.}}
+%         \end{tcolorbox}
+%     };
+
+%     \node[inner sep=0pt, align=center] (s1) at (6.0, 0) {
+%         \begin{tcolorbox}[width=5.2cm, colback=green!5, colframe=green!60!black,
+%             colbacktitle=green!60!black, coltitle=white,
+%             title=\textbf{SAC-S1} \hfill \textcolor{white}{28,7\%},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Avalia: compressão do estado.}\\[1pt]
+%             \textbf{Estado:} \textcolor{green!60!black}{$\oplus$ 6D normalizado}\\
+%             \textcolor{green!60!black}{$C/C_{max}, \hat{JCT}_{loc}/D, d_{VEC}/d_{max}$}\\
+%             \textcolor{green!60!black}{$Q_{VEC}/Q_{max}, Q_{loc}/Q_{max}, f_{loc}/f_{VEC}$}\\
+%             \textcolor{gray!60}{(sem info V2V no estado)}\\[1pt]
+%             \textbf{Ação:} \textcolor{gray!60}{$=$ Base (Ternária)}\\
+%             \textbf{Recompensa:} \textcolor{gray!60}{$=$ Base (WSM)}\\[2pt]
+%             \textcolor{green!60!black}{\textit{Maior ganho isolado: $+$24pp.}}
+%         \end{tcolorbox}
+%     };
+
+%     \node[inner sep=0pt, align=center] (t1) at (12.0, 0) {
+%         \begin{tcolorbox}[width=5.2cm, colback=purple!5, colframe=purple!60!black,
+%             colbacktitle=purple!60!black, coltitle=white,
+%             title=\textbf{SAC-T1} \hfill \textcolor{white}{33,0\%},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Avalie: TOPSIS como feature.}\\[1pt]
+%             \textbf{Estado:} \textcolor{purple!70!black}{$\oplus$ 6D via TOPSIS}\\
+%             \textcolor{purple!70!black}{$\Delta_{obj}, JCT_{r_1}/D, d_{VEC}/d_{max}$}\\
+%             \textcolor{purple!70!black}{$Q_{VEC}/Q_{max}, Q_{loc}/Q_{max}, f_{loc}/f_{VEC}$}\\[1pt]
+%             \textbf{Ação:} \textcolor{gray!60}{$=$ SAC (Ternária)}\\
+%             \textbf{Recompensa:} \textcolor{purple!60!black}{$\oplus$ DL-aware}\\[2pt]
+%             \textcolor{purple!60!black}{\textit{Feature TOPSIS $+$4pp.\\Decisor TOPSIS $+$12pp.}}
+%         \end{tcolorbox}
+%     };
+
+%     % ===== LINHA 2 =====
+%     \node[inner sep=0pt, align=center] (a1) at (0, -6.5) {
+%         \begin{tcolorbox}[width=5.2cm, colback=orange!5, colframe=orange!70!black,
+%             colbacktitle=orange!70!black, coltitle=white,
+%             title=\textbf{SAC-A1} \hfill \textcolor{white}{39,1\%},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Avalia: efeito da ação binária.}\\[1pt]
+%             \textbf{Estado:} \textcolor{gray!60}{$=$ Base (11D bruto)}\\[1pt]
+%             \textbf{Ação:} \textcolor{orange!80!black}{$\oplus$ Binária $\{$Loc, Off$\}$}\\
+%             \textcolor{orange!70!black}{destino: VEC$\succ$V2V (estático)}\\[1pt]
+%             \textbf{Recompensa:} \textcolor{gray!60}{$=$ Base (WSM)}\\[2pt]
+%             \textcolor{orange!70!black}{\textit{Reduz espaço $+$34pp, mas\\destino sem critério dinâmico.}}
+%         \end{tcolorbox}
+%     };
+
+%     \node[inner sep=0pt, align=center] (r1) at (6.0, -6.5) {
+%         \begin{tcolorbox}[width=5.2cm, colback=red!5, colframe=red!60!black,
+%             colbacktitle=red!60!black, coltitle=white,
+%             title=\textbf{SAC-R1} \hfill \textcolor{white}{38,3\%},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Avalia: sinal de recompensa.}\\[1pt]
+%             \textbf{Estado:} \textcolor{gray!60}{$=$ Base (11D bruto)}\\
+%             \textbf{Ação:} \textcolor{gray!60}{$=$ Base (Ternária)}\\[1pt]
+%             \textbf{Recompensa:} \textcolor{red!70!black}{$\oplus$ DL-aware}\\
+%             \textcolor{red!70!black}{Sucesso: $[0{,}5;\,1{,}0]$ / Falha: $[-2;-1]$}\\
+%             \textcolor{red!60!black}{(proporcional ao excesso)}\\[2pt]
+%             \textcolor{red!60!black}{\textit{Poderosa isolada; marginal\\com estado rico ($+$4pp).}}
+%         \end{tcolorbox}
+%     };
+
+%     \node[inner sep=0pt, align=center] (ftopsis) at (12.0, -6.5) {
+%         \begin{tcolorbox}[width=5.2cm, colback=blue!8, colframe=blue!80!black,
+%             colbacktitle=blue!80!black, coltitle=white,
+%             title=\textbf{SAC-TOPSIS} \hfill \textcolor{white}{\textbf{45,2\%}},
+%             fonttitle=\small, arc=2pt,
+%             boxsep=1pt, left=3pt, right=3pt, top=2pt, bottom=2pt]
+%             \small
+%             \textbf{Proposta intermediária completa.}\\[1pt]
+%             \textbf{Estado:} \textcolor{gray!60}{$=$ T1 (6D TOPSIS)}\\[1pt]
+%             \textbf{Ação:} \textcolor{blue!80!black}{$\oplus$ Binária $\{$Loc, rank$_1\}$}\\
+%             \textcolor{blue!70!black}{TOPSIS escolhe VEC ou V2V}\\
+%             \textcolor{blue!70!black}{(elimina ambiguidade)}\\[1pt]
+%             \textbf{Recompensa:} \textcolor{gray!60}{$=$ T1 (DL-aware)}\\[2pt]
+%             \textcolor{blue!80!black}{\textit{SWQ 0,1484; JCT $8{,}6\times$ < Base.}}
+%         \end{tcolorbox}
+%     };
+
+%     % ===== SETAS DO CAMINHO CAUSAL =====
+%     \draw[->, ultra thick, blue!80!black] (base.east) -- (s1.west) node[midway, above, font=\normalsize] {$+24{,}2$ pp};
+%     \draw[->, ultra thick, blue!80!black] (s1.east) -- (t1.west) node[midway, above, font=\normalsize] {$+4{,}3$ pp};
+%     \draw[->, ultra thick, blue!80!black] (t1.south) -- (ftopsis.north) node[midway, left, font=\normalsize] {$+12{,}2$ pp};
+    
+%     % Setas secundárias indicando relação para as outras variantes
+%     \draw[->, thick, dashed, orange!70!black] (base.south) -- (a1.north) node[midway, right, font=\small] {$+34{,}6$ pp};
+%     \draw[->, thick, dashed, red!60!black] (base.south east) -- (r1.north west) node[midway, above right, font=\small] {$+33{,}8$ pp};
+
+%     \end{tikzpicture}
+%     }
 % \end{frame}
 
-%%################## SLIDE: CENÁRIOS DE TESTE E SIMULAÇÃO ##################
-\begin{frame}{Cenários de Teste e Simulação Preliminar}
-    \begin{center}
-    \resizebox{!}{0.75\textheight}{
-\begin{tikzpicture}[
-        font=\sffamily,
-        >=Stealth,
-        % --- Pic: carro visto de cima indo para a direita ---
-        car right/.pic={
-            \begin{scope}[scale=0.6]
-                \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
-                    (-1.8,-0.75) rectangle (1.8,0.75);
-                \filldraw[fill=black!60, draw=black, thick]
-                    (-0.55,-0.55) -- (-1.05,-0.45) -- (-1.05,0.45) -- (-0.55,0.55) -- cycle;
-                \filldraw[fill=black!60, draw=black, thick]
-                    (0.45,-0.55) -- (0.95,-0.45) -- (0.95,0.45) -- (0.45,0.55) -- cycle;
-                \filldraw[fill=black!25, draw=black, thick]
-                    (-0.55,-0.55) rectangle (0.45,0.55);
-                \filldraw[fill=yellow!80, draw=none]
-                    (1.55,-0.65) rectangle (1.75,-0.35);
-                \filldraw[fill=yellow!80, draw=none]
-                    (1.55,0.35) rectangle (1.75,0.65);
-            \end{scope}
-        },
-        % --- Pic: carro visto de cima indo para cima ---
-        car up/.pic={
-            \begin{scope}[scale=0.6]
-                \filldraw[fill=white, draw=black, rounded corners=3pt, thick]
-                    (-0.75,-1.8) rectangle (0.75,1.8);
-                \filldraw[fill=black!60, draw=black, thick]
-                    (-0.55,-0.45) -- (-0.45,-0.95) -- (0.45,-0.95) -- (0.55,-0.45) -- cycle;
-                \filldraw[fill=black!60, draw=black, thick]
-                    (-0.55,0.55) -- (-0.45,1.05) -- (0.45,1.05) -- (0.55,0.55) -- cycle;
-                \filldraw[fill=black!25, draw=black, thick]
-                    (-0.55,-0.45) rectangle (0.55,0.55);
-                \filldraw[fill=yellow!80, draw=none]
-                    (-0.65,1.55) rectangle (-0.35,1.75);
-                \filldraw[fill=yellow!80, draw=none]
-                    (0.35,1.55) rectangle (0.65,1.75);
-            \end{scope}
-        },
-        % --- Pic: semaforo ---
-        semaforo/.pic={
-            \begin{scope}[scale=0.45]
-                \filldraw[fill=gray!70, draw=black, thick, rounded corners=3pt]
-                    (-0.55,-1.6) rectangle (0.55,1.6);
-                \fill[red!90] (0, 1.0) circle (0.38);
-                \fill[yellow!90] (0, 0) circle (0.38);
-                \fill[green!70!black] (0,-1.0) circle (0.38);
-                \draw[gray!60, line width=4pt] (0,-1.6) -- (0,-2.5);
-            \end{scope}
-        },
-        label text/.style={font=\scriptsize\bfseries, align=center, fill=white, draw=black!50, rounded corners=1pt, inner sep=2pt}
-    ]
-        % ---- Canvas: (0,0) a (20,18) ----
-        \clip (0,0) rectangle (20,18);
-
-        % ---- Fundo (gramado) ----
-        \fill[green!18] (0,0) rectangle (20,18);
-
-        % ---- Ruas (2 faixas cada) ----
-        % Horizontal: y = 6 a 10
-        \fill[black!45] (0,6) rectangle (20,10);
-        % Vertical: x = 8 a 12
-        \fill[black!45] (8,0) rectangle (12,18);
-        % Cruzamento
-        \fill[black!45] (8,6) rectangle (12,10);
-
-        % ---- Marcações de faixa ----
-        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,0)  -- (10,6);
-        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (10,10) -- (10,18);
-        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (0,8)   -- (8,8);
-        \draw[line width=2.2pt, white, dashed, dash pattern=on 12pt off 10pt] (12,8)  -- (20,8);
-
-        % ---- V1: Agente (indo para a direita, faixa inferior) ----
-        \pic at (3.5,7) {car right};
-        \node[fill=blue!15, draw=blue!70, rounded corners=2pt, thick,
-              font=\small\bfseries, align=center, inner sep=3pt]
-            (lagente) at (3.5,4.5) {Agente (V1)};
-        \draw[blue!70, thick] (lagente.north) -- (3.5,6.4);
-        % seta mobilidade
-        \draw[->, very thick, orange!90!black] (5.3,7.0) -- (7.4,7.0);
-        \node[fill=white, draw=orange!80, rounded corners=2pt,
-              font=\scriptsize\bfseries, inner sep=2pt]
-            at (6.3,5.6) {Mobilidade Din\^amica};
-        \draw[orange!70, thin] (6.3,5.88) -- (6.3,6.55);
-
-        % ---- V2 (indo para a esquerda, faixa superior) ----
-        \pic[rotate=180] at (16.5,9) {car right};
-        \draw[->, very thick, orange!90!black] (14.7,9.0) -- (12.6,9.0);
-        \node[fill=white, draw=gray!60, rounded corners=2pt,
-              font=\scriptsize\bfseries, inner sep=2pt]
-            at (16.5,11.5) {V2};
-        \draw[gray!60, thin] (16.5,11.2) -- (16.5,9.7);
-
-        % ---- V3 (indo para cima, faixa direita da via vertical) ----
-        \pic at (11,2.5) {car up};
-        \draw[->, very thick, orange!90!black] (11,4.3) -- (11,5.6);
-        \node[fill=white, draw=gray!60, rounded corners=2pt,
-              font=\scriptsize\bfseries, inner sep=2pt]
-            at (13.8,2.5) {V3};
-        \draw[gray!60, thin] (13.1,2.5) -- (11.7,2.5);
-
-        % ---- Semáforo + Edge Server ----
-        \pic at (7.3,11.2) {semaforo};
-        \node[draw=black, fill=red!8, thick, rounded corners=4pt,
-              align=center, font=\small\bfseries, inner sep=5pt]
-            (edge) at (4.0,14.2) {Edge Server\\(Dispositivo de Borda)};
-        \draw[thick, gray!70] (7.3,11.8) -- (edge.south east);
-
-        % ---- Carga de Trabalho (canto inferior esquerdo) ----
-        \node[draw=blue!70, fill=blue!5, thick, rounded corners=4pt,
-              align=center, font=\scriptsize\bfseries, inner sep=5pt]
-            (workload) at (2.5,2.0) {Carga de Trabalho\\(Tra\c{c}os Reais / Estoc\'astico)};
-        \draw[->, dotted, thick, blue!70] (workload.north east) -- (3.0,6.2);
-
-        % ---- \gls{V2I} / V2E ----
-        \draw[<->, dashed, line width=1.5pt, red!70!black]
-            (3.5,7.8) -- (edge.south);
-        \node[fill=white, draw=red!60, rounded corners=2pt,
-              font=\scriptsize\bfseries, text=red!80!black, inner sep=2pt]
-            at (2.2,11.5) {V2I / V2E};
-        \node[fill=white, font=\scriptsize, text=red!70!black, inner sep=1pt]
-            at (2.2,10.8) {Atraso de Propaga\c{c}\~ao};
-
-        % ---- Throttling ----
-        \node[draw=red!70, fill=white, dashed, thick, rounded corners=3pt,
-              align=center, font=\scriptsize\bfseries]
-            (throttle) at (4.5,16.8) {\textit{Throttling}\\Limita\c{c}\~oes de Processamento};
-        \draw[->, dotted, thick, red!70] (throttle.south) -- (edge.north);
-
-        % ---- \gls{V2V}: Agente <-> V3 ----
-        \draw[<->, dashed, line width=1.5pt, purple!80]
-            (4.8,6.4) -- (10.3,3.5);
-        \node[fill=white, draw=purple!70, rounded corners=2pt,
-              font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
-            at (7.3,4.3) {V2V};
-
-        % ---- \gls{V2V}: Agente <-> V2 ----
-        \draw[<->, dashed, line width=1.5pt, purple!80]
-            (5.2,7.6) -- (14.6,8.5);
-        \node[fill=white, draw=purple!70, rounded corners=2pt,
-              font=\scriptsize\bfseries, text=purple!80, inner sep=2pt]
-            at (10.0,9.0) {V2V};
-
-        % ---- Não-Estacionariedade (canto inferior direito) ----
-        \node[fill=white, draw=purple!70, thick, rounded corners=3pt,
-              align=center, font=\scriptsize\bfseries, text=purple!80, inner sep=4pt]
-            at (15.5,4.0) {Intera\c{c}\~ao Multiagente\\N\~ao-Estacionariedade};
-
-        % ---- Legenda (canto superior direito) ----
-        \node[draw=black!50, fill=gray!5, very thick, dashed, rounded corners=4pt,
-              align=left, font=\footnotesize, inner sep=7pt, anchor=north east]
-            at (19.5,17.8) {
-            \textbf{Restri\c{c}\~oes do Ambiente Simulado:}\\[2pt]
-            $\bullet$ Mobilidade Din\^amica Veicular\\
-            $\bullet$ Chegada Estoc\'astica de Tarefas\\
-            $\bullet$ Atrasos e Ru\'idos na Comunica\c{c}\~ao\\
-            $\bullet$ Gargalos de Processamento (\textit{Throttling})\\
-            $\bullet$ Fen\^omeno de N\~ao-Estacionariedade
-        };
-
-        % ---- Borda ----
-        \draw[thick] (0,0) rectangle (20,18);
-    \end{tikzpicture}
-    }
-    \end{center}
-\end{frame}
-
 %%################## SLIDE: ESTUDO DE ABLAÇÃO ##################
-\begin{frame}{Resultados do Estudo de Ablação}
-    \centering
-    \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Variantes Avaliadas em 658 Cenários de Teste, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-        \scriptsize 
-        Avaliação do impacto de cada componente (TOPSIS, Ação Binária e Recompensa \textit{Deadline-aware}) no desempenho global.
-    \end{tcolorbox}
+% \begin{frame}{Resultados do Estudo de Ablação}
+%     \centering
+%     \begin{tcolorbox}[colback=blue!5, colframe=beamer_color, title=Variantes Avaliadas em 658 Cenários de Teste, fonttitle=\bfseries\footnotesize, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%         \scriptsize 
+%         Avaliação do impacto de cada componente (TOPSIS, Ação Binária e Recompensa \textit{Deadline-aware}) no desempenho global.
+%     \end{tcolorbox}
 
-    \vspace{0.2cm}
+%     \vspace{0.2cm}
     
-    \resizebox{\textwidth}{!}{%
-    \begin{tabular}{lllllrrr}
-    \toprule
-    \textbf{Variante} & \textbf{Estado} & \textbf{Ação} & \textbf{Recompensa} & \textbf{Taxa de Sucesso (\%)} & \textbf{SWQ} & \textbf{JCT (s)} \\
-    \midrule
-    SAC-Base  & 11D bruto   & Ternária & WSM                & 4,52  & 0,0119 & 57,075 \\
-    SAC-A1    & 11D bruto   & Binária  & WSM                & 39,11 & 0,1256 & 13,722 \\
-    SAC-S1    & 6D          & Ternária & WSM                & 28,69 & 0,1122 & 39,298 \\
-    SAC-R1    & 11D bruto   & Ternária & \textit{Deadline-aware} & 38,26 & 0,1223 & 13,353 \\
-    SAC-T1    & 6D TOPSIS   & Ternária & \textit{Deadline-aware} & 32,96 & 0,1270 & 11,487 \\
-    \midrule
-    \textbf{SAC-FTOPSIS} & \textbf{6D TOPSIS} & \textbf{Binária} & \textbf{\textit{Deadline-aware}} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
-    \bottomrule
-    \end{tabular}}
+%     \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{lllllrrr}
+%     \toprule
+%     \textbf{Variante} & \textbf{Estado} & \textbf{Ação} & \textbf{Recompensa} & \textbf{Taxa de Sucesso (\%)} & \textbf{SWQ} & \textbf{JCT (s)} \\
+%     \midrule
+%     SAC-Base  & 11D bruto   & Ternária & WSM                & 4,52  & 0,0119 & 57,075 \\
+%     SAC-A1    & 11D bruto   & Binária  & WSM                & 39,11 & 0,1256 & 13,722 \\
+%     SAC-S1    & 6D          & Ternária & WSM                & 28,69 & 0,1122 & 39,298 \\
+%     SAC-R1    & 11D bruto   & Ternária & \textit{Deadline-aware} & 38,26 & 0,1223 & 13,353 \\
+%     SAC-T1    & 6D TOPSIS   & Ternária & \textit{Deadline-aware} & 32,96 & 0,1270 & 11,487 \\
+%     \midrule
+%     \textbf{SAC-FTOPSIS} & \textbf{6D TOPSIS} & \textbf{Binária} & \textbf{\textit{Deadline-aware}} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} \\
+%     \bottomrule
+%     \end{tabular}}
     
-    \vspace{0.1cm}
-    \scriptsize
-    $\bullet$ \textbf{Destaque}: A proposta completa (\textbf{SAC-FTOPSIS}) alcançou o melhor equilíbrio entre taxa de sucesso e tempo de conclusão (\textit{JCT}).\\
-    $\bullet$ \textbf{Observação}: A transição para ação binária e o uso de TOPSIS foram cruciais para a estabilidade do aprendizado.
+%     \vspace{0.1cm}
+%     \scriptsize
+%     $\bullet$ \textbf{Destaque}: A proposta completa (\textbf{SAC-FTOPSIS}) alcançou o melhor equilíbrio entre taxa de sucesso e tempo de conclusão (\textit{JCT}).\\
+%     $\bullet$ \textbf{Observação}: A transição para ação binária e o uso de TOPSIS foram cruciais para a estabilidade do aprendizado.
 
-    \vspace{-0.2cm}
-    \begin{tcolorbox}[colback=gray!5, colframe=gray!30, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
-        \tiny
-        \textbf{Legenda:} \textbf{WSM}: \textit{Weighted Sum Model} (Soma Ponderada); \textbf{Ternária}: Decisão direta entre Local, VEC ou V2V; \textbf{SWQ}: \textit{Service Well-being Quality} (Ponderação entre taxa de sucesso e folga temporal).
-    \end{tcolorbox}
-\end{frame}
+%     \vspace{-0.2cm}
+%     \begin{tcolorbox}[colback=gray!5, colframe=gray!30, arc=0pt, outer arc=0pt, leftrule=3pt, rightrule=0.3pt, toprule=0.1pt, bottomrule=0.3pt]
+%         \tiny     
+%         \textbf{Legenda:} \textbf{WSM}: \textit{Weighted Sum Model} (Soma Ponderada); \textbf{Ternária}: Decisão direta entre Local, VEC ou V2V; \textbf{SWQ}: \textit{Service Well-being Quality} (Ponderação entre taxa de sucesso e folga temporal).
+%     \end{tcolorbox}
+% \end{frame}
 
 %%################## SLIDE: RESULTADOS COMPARATIVOS ##################
 \begin{frame}{Resultados: DRL+TOPSIS vs. Heurísticas}
@@ -1274,7 +1458,7 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
     \toprule
     \textbf{Política} & \textbf{Categoria} & \textbf{\% Sucesso} & \textbf{SWQ} & \textbf{JCT (s)} & \textbf{\% Local} \\
     \midrule
-    \textbf{SAC-FTOPSIS} $\star$ & \textbf{DRL+TOPSIS} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} & \textbf{74,1} \\
+    \textbf{SAC-TOPSIS} $\star$ & \textbf{DRL+TOPSIS} & \textbf{45,21} & \textbf{0,1484} & \textbf{6,547} & \textbf{74,1} \\
     PPO-TOPSIS $\star$           & DRL+TOPSIS          & 42,66 & 0,1426 & 5,895 & 98,7 \\
     TD3-TOPSIS $\star$           & DRL+TOPSIS          & 43,91 & 0,1388 & 3,703 & 76,5 \\
     A2C-TOPSIS $\star$           & DRL+TOPSIS          & 42,32 & 0,1418 & 6,045 & 100,0 \\
@@ -1283,7 +1467,7 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
     Gini                         & Heurística          & 35,24 & 0,1057 & 3,456 & 61,7 \\
     Random                       & Heurística          & 30,02 & 0,0950 & 17,853 & 40,7 \\
     Greedy-Fair                  & Heurística          & 20,61 & 0,0528 & 40,754 & 27,9 \\
-    VEC (Incondicional)          & Heurística          & 1,86  & 0,0030 & 144,191 & 1,2 \\
+    Apenas VEC          & Heurística          & 1,86  & 0,0030 & 144,191 & 1,2 \\
     \bottomrule
     \end{tabular}}
     
@@ -1291,7 +1475,7 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
     \vspace{0.1cm}
     \scriptsize
     $\bullet$ \textbf{Desempenho}: Algoritmos híbridos superaram as heurísticas clássicas e o oráculo guloso.\\
-    $\bullet$ \textbf{Liderança}: O \textbf{SAC-FTOPSIS} mantém a maior taxa de sucesso geral (45,21\%).\\
+    $\bullet$ \textbf{Liderança}: O \textbf{SAC-TOPSIS} mantém a maior taxa de sucesso geral (45,21\%).\\
     $\bullet$ \textbf{Observação}: A estratégia local-dominante (PPO/A2C) minimiza latência, mas sacrifica oportunidades de offloading que o SAC aproveita.
     
     \vfill
@@ -1304,7 +1488,7 @@ VEC/V2X, com número variável de candidatos ao processamento, não-estacionarie
 %%################## SLIDE: CONCLUSÕES ##################
 \begin{frame}{Conclusões}
     \scriptsize
-    $\bullet$ \textbf{Arquitetura SAC-FTOPSIS}: Integração eficaz entre ranqueamento multicritério (TOPSIS) e Aprendizado por Reforço (SAC).\\
+    $\bullet$ \textbf{Arquitetura SAC-TOPSIS}: Integração eficaz entre ranqueamento multicritério (TOPSIS) e Aprendizado por Reforço (SAC).\\
     $\bullet$ \textbf{Escalabilidade}: O estado compacto 6D resolve o problema de número variável de veículos candidatos, garantindo uma interface invariante.\\
     $\bullet$ \textbf{Contribuições Técnicas}:\\
     \hspace*{0.4cm} $\circ$ Engenharia de recompensa \textit{deadline-aware} com foco em prazos rigorosos.\\
